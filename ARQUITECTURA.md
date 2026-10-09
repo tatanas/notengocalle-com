@@ -1,4 +1,4 @@
-# Cómo está hecho NoTengoCalle.com
+# Cómo está hecho NoTengoCalle
 
 Este archivo explica el programa completo: qué hay en cada carpeta, cómo se conectan las partes, de dónde
 salen los datos y cómo se prueba y se publica. Si cambias la estructura, actualízalo.

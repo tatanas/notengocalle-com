@@ -8,5 +8,5 @@ export default defineConfig({
     serviceWorker({ source: 'src/service-worker.js', publicDir: 'public' }),
   ],
   server: { port: 5173 },
-  preview: { port: 8765, host: '127.0.0.1', strictPort: true },
+  preview: { port: 8766, host: '127.0.0.1', strictPort: true },
 })

@@ -1,7 +1,7 @@
 {
   "name": "notengocalle-tools",
   "private": true,
-  "description": "Pipeline que genera public/data/data.js de NoTengoCalle.com. Ver ../ARQUITECTURA.md",
+  "description": "Pipeline que genera public/data/data.js de NoTengoCalle. Ver ../ARQUITECTURA.md",
   "scripts": {
     "build": "node build_data.js ../public/data/data.js"
   },

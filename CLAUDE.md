@@ -1,7 +1,7 @@
-# NoTengoCalle.com — contexto para continuar el proyecto
+# NoTengoCalle — contexto para continuar el proyecto
 
 Juego web para aprender la geografía de Santiago: comunas, calles, lugares, metro, rutas, y regiones/ciudades/parques de Chile. Tiene cuentas (usuario y clave, sin correo) y ranking por juego; también se puede jugar sin cuenta. El dueño vive en el sector oriente (Lo Barnechea / Las Condes / Vitacura) y estudia en el Campus San Joaquín UC; quiere que sirva sobre todo para el oriente, pero está pensando en generalizarla (por eso se están sacando cosas demasiado específicas y se quiere que cada usuario pueda agregar las suyas).
-"NoTengoCalle.com" es solo el **nombre mostrado**; el dominio lo define Netlify.
+"NoTengoCalle" es solo el **nombre mostrado**; el dominio lo define Netlify.
 
 **La estructura del código, el servidor, la base de datos, el pipeline de datos, las pruebas y el despliegue están explicados en [ARQUITECTURA.md](ARQUITECTURA.md). Léelo antes de tocar código y mantenlo al día.** Este archivo solo guarda lo que no está ahí: cómo trabajar y las decisiones de contenido.
 
@@ -34,7 +34,7 @@ Los retirados están en `src/quiz/modes/retired/` (se ven con `?retirados` en la
 - El límite de solicitudes por IP declarado en `netlify/functions/api.js` (`rateLimit`) tampoco se ha visto funcionar: verificarlo en el primer despliegue.
 
 ## Estado y decisiones de contenido (resumen)
-- 179 calles (109 con foto), 279 landmarks en landmarks.json (+126 estaciones, 17 cerros, 41 barrios con perímetro; categorías incluyen Religión y Gobierno y justicia), 93 ciudades y 46 parques nacionales, 29 recorridos de micro en Explorar.
+- 179 calles (109 con foto), 302 landmarks en landmarks.json (+126 estaciones, 17 cerros, 41 barrios con perímetro; categorías incluyen Religión y Gobierno y justicia), 93 ciudades y 46 parques nacionales, 29 recorridos de micro en Explorar.
 - Sacados por irrelevantes (no volver a agregar sin preguntar): El Cortijo, Av. Lo Barnechea, Las Nieves, Río Tajo, Av. El Mirador, Alexander Fleming, calles "Cerro El Plomo/Cerro Colorado", San Damián como calle (sigue como barrio), muchos colegios específicos del oriente, clubes de golf/polo/Stade Français, varios restaurantes. Quedan bares Liguria y Nacional (el usuario puede querer sacarlos).
 - Pendientes de confirmar con el usuario: Estadio Español (club de socios, sigue), Colegio SEK de Las Condes (no se encontró; el que había estaba en Peñalolén y se sacó), "Av. Pedro Aguirre Cerda" se tomó la de Cerrillos, "Las Flores" se tomó Camino Las Flores de Las Condes, falta la Gerónimo de Alderete de La Florida.
 - Secciones retiradas de la UI pero con datos disponibles: Barrios (ahora dentro de Landmarks), Fotos, Cerros (solo 17 pasaron a landmarks; los 44 siguen en la capa Cerros de Explorar). Fronteras está retirada y hoy **sin datos** en data.js (`borders` vacío; el cálculo sigue en `tools/border.js`).

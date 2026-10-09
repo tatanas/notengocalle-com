@@ -3,8 +3,31 @@ const comunas=JSON.parse(fs.readFileSync('comunas_s.geojson'));
 const comunaOf=(lon,lat)=>{const p=turf.point([lon,lat]);for(const f of comunas.features)if(turf.booleanPointInPolygon(p,f))return f.properties.name;return null;};
 const geo=JSON.parse(fs.readFileSync('landmarks_geo.json'));
 const CAR=require('./careers.js');
-const DROP=['Colegio SEK','Duoc UC – San Carlos de Apoquindo','Duoc UC – sede Alameda','Duoc UC – sede Padre Alonso de Ovalle','Colegio Manquehue','Confitería Torres','Casa Piedra'];
+const DROP=['Colegio SEK','Colegio Manquehue','Confitería Torres','Casa Piedra'];
 const F={
+"Duoc UC – sede Plaza Norte":{ll:[-33.363,-70.67771]},
+"Duoc UC – sede Plaza Vespucio":{ll:[-33.51628,-70.59824]},
+"Duoc UC – sede San Bernardo":{ll:[-33.59878,-70.70528],obvious:true},
+"INACAP Ñuñoa":{ll:[-33.45269,-70.59244],obvious:true},
+"AIEP – sede Santiago Centro":{ll:[-33.44695,-70.66129]},
+"AIEP – sede San Joaquín":{ll:[-33.49705,-70.61691],obvious:true},
+"AIEP – sede Maipú":{ll:[-33.50922,-70.75795],obvious:true},
+"AIEP – sede San Bernardo":{ll:[-33.59566,-70.70731],obvious:true},
+"Santo Tomás – sede Estación Central":{ll:[-33.45245,-70.6782],obvious:true},
+"Santo Tomás – sede San Joaquín":{ll:[-33.49891,-70.6172],obvious:true},
+"Santo Tomás – sede Puente Alto":{ll:[-33.57673,-70.5783],obvious:true},
+"Universidad de las Américas (campus Maipú)":{ll:[-33.50999,-70.74989],obvious:true},
+"Universidad de las Américas (campus La Florida)":{ll:[-33.52196,-70.58362],obvious:true},
+"Universidad de las Américas (campus Santiago)":{ll:[-33.44946,-70.66841],obvious:true},
+"Universidad Mayor – campus Alameda":{ll:[-33.44825,-70.66741]},
+"Universidad Mayor – campus Oriente":{ll:[-33.40824,-70.55787]},
+"UTEM – Campus Macul":{ll:[-33.46627,-70.59728]},
+"Universidad Central – Campus Santa Isabel":{ll:[-33.45259,-70.65158]},
+"Universidad Autónoma – Providencia":{ll:[-33.42763,-70.61187],obvious:true},
+"Universidad Católica Silva Henríquez – Campus Lo Cañas":{ll:[-33.52366,-70.55337]},
+"Duoc UC – San Carlos de Apoquindo":{"ll":[-33.40019,-70.50521],"name":"Duoc UC – sede San Carlos de Apoquindo","desc":"Sede de Duoc UC en Camino El Alba, sector San Carlos de Apoquindo."},
+"Duoc UC – sede Alameda":{"ll":[-33.44894,-70.67008]},
+"Duoc UC – sede Padre Alonso de Ovalle":{"ll":[-33.44731,-70.65759]},
 "Quebrada de Macul":{ll:[-33.49300,-70.51793]},
 "Teleférico del San Cristóbal (estación Oasis)":{ll:[-33.41455,-70.61553]},"Teleférico Bicentenario (estación Canal San Carlos)":{ll:[-33.41691,-70.60509]},
 "Catedral Metropolitana":{ll:[-33.43780,-70.65150]},
