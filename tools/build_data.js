@@ -27,6 +27,8 @@ for(let i=0;i<feats.length;i++){const nb=[];for(let j=0;j<feats.length;j++){if(i
   feats[i].properties.nb=nb;}
 const metro=JSON.parse(fs.readFileSync('metro.json'));
 const streets=JSON.parse(fs.readFileSync('streets.json'));
+// prolongaciones punteadas de las rutas que siguen fuera de Santiago (tools/extensions.js)
+{const ext=fs.existsSync('extensions.json')?JSON.parse(fs.readFileSync('extensions.json')):{};for(const s of streets)if(ext[s.name])s.ext=ext[s.name];}
 const landmarks=JSON.parse(fs.readFileSync('landmarks.json'));
 const routes=JSON.parse(fs.readFileSync('routes.json'));
 const cerros=JSON.parse(fs.readFileSync('cerros.json')).map(({osm,wikidata,...c})=>c);

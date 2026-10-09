@@ -1,6 +1,7 @@
 import * as auth from './auth.js'
 import { HttpError, forbidden, invalid, notFound, unavailable } from './errors.js'
 import * as scores from './scores.js'
+import { isBreachedPassword } from './passwords.js'
 import { sessionUser } from './sessions.js'
 
 // Cada ruta recibe { db, request, url, body, user } y devuelve { data, status?, cookie? }.
@@ -42,7 +43,7 @@ async function readBody(request) {
 }
 
 // El mismo manejador sirve en Netlify Functions y en el servidor local: recibe un Request y devuelve un Response.
-export function createApi(db) {
+export function createApi(db, { isBreached = isBreachedPassword } = {}) {
   return async function handle(request) {
     const url = new URL(request.url)
     try {
@@ -53,7 +54,7 @@ export function createApi(db) {
       if (isPost) assertSameOrigin(request, url)
       const body = isPost ? await readBody(request) : {}
       const user = await sessionUser(db, request)
-      const { status = 200, data, cookie } = await route({ db, request, url, body, user })
+      const { status = 200, data, cookie } = await route({ db, request, url, body, user, isBreached })
       return json(status, data, cookie)
     } catch (error) {
       if (error instanceof HttpError) return json(error.status, { error: error.code, message: error.message })

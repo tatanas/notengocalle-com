@@ -89,7 +89,10 @@ function addEmojiMarker(landmark) {
 }
 
 // De una lista ordenada por cercanía, toma los primeros que no se amontonen en el mapa.
-function pickSpaced(sortedLandmarks, max, minGapKm) {
+// Solo se descartan los que quedan prácticamente uno encima del otro.
+const MIN_GAP_KM = 0.08
+
+function pickSpaced(sortedLandmarks, max, minGapKm = MIN_GAP_KM) {
   const chosen = []
   for (const landmark of sortedLandmarks) {
     if (chosen.length >= max) break
@@ -114,7 +117,6 @@ export function showLandmarksNear(landmark, max = 8) {
   pickSpaced(
     nearby.filter(other => other !== landmark),
     max,
-    0.25,
   ).forEach(addEmojiMarker)
 }
 
@@ -124,7 +126,7 @@ export function landmarksAlong(street, max = 8) {
     -1,
     0.5,
   )
-  return pickSpaced(alongside, max, 0.3)
+  return pickSpaced(alongside, max)
 }
 
 export function showLandmarksAlong(street) {

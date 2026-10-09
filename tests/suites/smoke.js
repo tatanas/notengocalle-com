@@ -61,9 +61,10 @@ export async function smoke(browser, { check }, { mobile = false, retired = fals
   await page.click('#goExplore')
   await sleep(1500)
   await page.screenshot({ path: SHOTS + prefix + 'explore.png' })
-  await page.evaluate(() =>
-    ['ex-metro', 'ex-streets', 'ex-lm'].forEach(id => document.getElementById(id).click()),
-  )
+  await page.evaluate(() => {
+    for (const id of ['ex-metro', 'ex-streets']) document.getElementById(id).click()
+    document.querySelector('[data-cat="Universidades"]').click()
+  })
   await sleep(1200)
   await page.screenshot({ path: SHOTS + prefix + 'explore_layers.png' })
   check(await exists(page, '#ex-q'), 'Explorar abre con su buscador')

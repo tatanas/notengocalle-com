@@ -132,6 +132,16 @@ export function drawMetro(target, { dots = true, ids = LINE_IDS, weight = 4, opa
     }).addTo(target)
 }
 
+// Lo que la calle sigue más allá de lo dibujado (hacia Valparaíso, San Antonio…): línea segmentada.
+export const continuationStyle = (color, weight) => ({
+  pane: 'streets',
+  color,
+  weight,
+  opacity: 0.65,
+  dashArray: '6 9',
+  interactive: false,
+})
+
 // El borde blanco separa la calle del mapa base.
 export function drawStreet(street, color, { weight = 5, labelText = null, target = layer } = {}) {
   L.polyline(street.lines, {
@@ -142,6 +152,7 @@ export function drawStreet(street, color, { weight = 5, labelText = null, target
     interactive: false,
   }).addTo(target)
   L.polyline(street.lines, { pane: 'streets', color, weight, interactive: false }).addTo(target)
+  for (const line of street.ext || []) L.polyline(line, continuationStyle(color, weight - 1)).addTo(target)
   if (labelText) lineLabel(streetMidVertex(street), labelText).addTo(target)
 }
 

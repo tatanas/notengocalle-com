@@ -4,12 +4,13 @@ import { beforeEach, test } from 'node:test'
 import { openLocalDatabase } from '../dev/localDatabase.js'
 import { createApi } from '../server/api.js'
 import { resetPassword } from '../server/auth.js'
+import { COST, hashPassword, isBreachedPassword } from '../server/passwords.js'
 
 let db, handle
 
 beforeEach(async () => {
   db = await openLocalDatabase()
-  handle = createApi(db)
+  handle = createApi(db, { isBreached: async password => password === 'filtrada123' })
 })
 
 // Un "navegador" mínimo: recuerda la cookie de sesión entre llamadas.
@@ -234,4 +235,51 @@ test('el administrador puede cambiar una clave, y eso cierra las sesiones abiert
 test('ya no existe la recuperación por código', async () => {
   const { call } = await signedUp('Seba')
   assert.equal((await call('POST', '/recover', { name: 'Seba' })).status, 404)
+})
+
+test('se rechazan claves filtradas, iguales al nombre o muy cortas', async () => {
+  const call = client()
+  const attempt = (name, password) => call('POST', '/register', { name, password })
+  assert.equal((await attempt('seba', 'filtrada123')).data.error, 'breached_password')
+  assert.equal((await attempt('sebastian', 'SEBASTIAN')).data.error, 'invalid_password')
+  assert.equal((await attempt('seba', '1234567')).data.error, 'invalid_password')
+  assert.equal((await attempt('seba', 'otra-clave-1')).status, 201)
+})
+
+test('las claves nuevas usan el costo actual y las antiguas se actualizan al entrar', async () => {
+  await signedUp('Nueva', 'secreto1')
+  const [fresh] = await db.query("select password_hash from users where name = 'Nueva'")
+  assert.equal(+fresh.password_hash.split('$')[1], COST)
+
+  await db.query('insert into users (name, name_key, password_hash) values ($1, $2, $3)', [
+    'Vieja',
+    'vieja',
+    await hashPassword('secreto1', 16384),
+  ])
+  assert.equal((await client()('POST', '/login', { name: 'Vieja', password: 'secreto1' })).status, 200)
+  const [upgraded] = await db.query("select password_hash from users where name = 'Vieja'")
+  assert.equal(+upgraded.password_hash.split('$')[1], COST)
+  assert.equal((await client()('POST', '/login', { name: 'Vieja', password: 'secreto1' })).status, 200)
+  assert.equal((await client()('POST', '/login', { name: 'Vieja', password: 'incorrecta1' })).status, 401)
+})
+
+test('la consulta de claves filtradas manda solo 5 caracteres del hash y falla hacia "permitir"', async () => {
+  const sent = []
+  const fake = body => async url => {
+    sent.push(url)
+    return { ok: true, text: async () => body }
+  }
+  // SHA-1 de "password" = 5BAA61E4C9B93F3F0682250B6CF8331B7EE68FD8
+  const hit = fake('0018A45C4D1DEF81644B54AB7F969B88D65:1\r\n1E4C9B93F3F0682250B6CF8331B7EE68FD8:3861493\r\n')
+  assert.equal(await isBreachedPassword('password', hit), true)
+  assert.deepEqual(sent, ['https://api.pwnedpasswords.com/range/5BAA6'])
+  assert.equal(await isBreachedPassword('password', fake('0018A45C4D1DEF81644B54AB7F969B88D65:0\r\n')), false)
+  assert.equal(await isBreachedPassword('password', fake('1E4C9B93F3F0682250B6CF8331B7EE68FD8:0\r\n')), false)
+  assert.equal(
+    await isBreachedPassword('password', async () => {
+      throw new Error('sin red')
+    }),
+    false,
+  )
+  assert.equal(await isBreachedPassword('password', async () => ({ ok: false })), false)
 })

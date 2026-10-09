@@ -83,8 +83,7 @@ registerMode({
       const d = distanceToPolyline(p, s.lines)
       const ok = d <= 0.4
       L.marker(p, { icon: divIcon('pin you'), pane: 'points' }).addTo(layer)
-      L.polyline(s.lines, { pane: 'streets', color: '#fff', weight: 9, opacity: 0.9 }).addTo(layer)
-      L.polyline(s.lines, { pane: 'streets', color: ok ? COLORS.ok : COLORS.street, weight: 5 }).addTo(layer)
+      drawStreet(s, ok ? COLORS.ok : COLORS.street)
       let near = null,
         nd = Infinity
       for (const o of DATA.streets) {

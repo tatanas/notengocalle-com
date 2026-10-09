@@ -24,7 +24,7 @@ export function localApi({ dataDir } = {}) {
   let handle = null
   const middleware = async (nodeRequest, nodeResponse, next) => {
     if (!nodeRequest.url.startsWith('/api/')) return next()
-    handle ||= openLocalDatabase(dataDir).then(createApi)
+    handle ||= openLocalDatabase(dataDir).then(db => createApi(db, { isBreached: async () => false }))
     await sendWebResponse(nodeResponse, await (await handle)(await toWebRequest(nodeRequest)))
   }
   return {

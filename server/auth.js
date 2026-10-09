@@ -6,7 +6,7 @@ import {
   usernameKey,
 } from '../shared/accounts.js'
 import { conflict, invalid, tooMany, unauthorized } from './errors.js'
-import { hashPassword, passwordMatches } from './passwords.js'
+import { hashPassword, needsRehash, passwordMatches } from './passwords.js'
 import { endAllSessions, endSession, startSession } from './sessions.js'
 
 const MAX_FAILED_ATTEMPTS = 10
@@ -25,6 +25,14 @@ function validPassword(password) {
     throw invalid('invalid_password', `La clave debe tener al menos ${PASSWORD_MIN_LENGTH} caracteres`)
   if (password.length > PASSWORD_MAX_LENGTH) throw invalid('invalid_password', 'La clave es demasiado larga')
   return password
+}
+
+async function assertNotBreached(password, isBreached) {
+  if (await isBreached(password))
+    throw invalid(
+      'breached_password',
+      'Esa clave aparece en filtraciones de datos de otros sitios. Elige otra, distinta a las que usas en otras partes.',
+    )
 }
 
 // Frena a quien prueba claves en serie contra un mismo nombre.
@@ -46,9 +54,12 @@ async function recordFailure(db, nameKey) {
 const findUser = async (db, nameKey) =>
   (await db.query(`select * from users where name_key = $1`, [nameKey]))[0]
 
-export async function register({ db, request, body }) {
+export async function register({ db, request, body, isBreached }) {
   const name = validName(body)
   const password = validPassword(body.password)
+  if (password.toLowerCase() === name.toLowerCase())
+    throw invalid('invalid_password', 'La clave no puede ser igual al nombre de usuario')
+  await assertNotBreached(password, isBreached)
   const [user] = await db.query(
     `insert into users (name, name_key, password_hash) values ($1, $2, $3)
      on conflict (name_key) do nothing returning id, name`,
@@ -70,6 +81,12 @@ export async function logIn({ db, request, body }) {
     await recordFailure(db, nameKey)
     throw unauthorized('bad_credentials', 'Nombre o clave incorrectos')
   }
+  const password = String(body.password ?? '')
+  if (needsRehash(user.password_hash))
+    await db.query(`update users set password_hash = $1 where id = $2`, [
+      await hashPassword(password),
+      user.id,
+    ])
   return { data: { user: publicUser(user) }, cookie: await startSession(db, request, user.id) }
 }
 

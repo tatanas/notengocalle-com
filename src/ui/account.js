@@ -31,7 +31,7 @@ const VIEWS = {
   register: () => `<h3>Crear cuenta</h3>
     <p class="muted">Solo un nombre y una clave. Sin correo.</p>
     <form>${nameField}${passwordField(`Clave (mínimo ${PASSWORD_MIN_LENGTH} caracteres)`, 'new-password')}
-      <p class="muted hint">${USERNAME_RULES} Es el nombre que se verá en el ranking.</p>
+      <p class="muted hint">${USERNAME_RULES} Es el nombre que se verá en el ranking. Usa una clave que no tengas en otros sitios.</p>
       <p class="error" role="alert"></p>
       <button class="btn wide">Crear cuenta</button></form>
     <p class="muted">¿Ya tienes cuenta? ${switchTo('login', 'Entra')}</p>`,

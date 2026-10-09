@@ -86,7 +86,13 @@ export async function openPage(browser, { mobile = false, path = '/', storage = 
 
 export const text = (page, selector) => page.$eval(selector, element => element.innerText)
 export const exists = async (page, selector) => !!(await page.$(selector))
-export const goHome = page => page.evaluate(() => document.getElementById('btnHome').click())
+// Con una ronda en curso, el menú pide confirmación: se acepta. Sin ronda, no aparece ningún aviso.
+export async function goHome(page) {
+  await page.evaluate(() => document.getElementById('btnHome').click())
+  await sleep(60)
+  if (await page.$('#confirmDialog[open]')) await page.click('#confirmOk')
+  await page.waitForSelector('#screen:not(.hidden) [data-mode]')
+}
 
 // Un punto del mapa sobre algo que se puede tocar (una comuna, una región); si no hay, un punto fijo.
 const tappablePoint = page =>

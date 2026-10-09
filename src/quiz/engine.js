@@ -2,8 +2,9 @@ import { OFFICIAL_ROUNDS, OFFICIAL_RULES } from '../../shared/ranked.js'
 import { adaptiveWeight, bests, record, saveBest, weightedSample } from '../core/progress.js'
 import { applyRoundRules, settings } from '../core/store.js'
 import { $, escapeHtml, formatTime } from '../core/util.js'
-import { clearLayer, labelMode, map, setChile, setLabelMode, setRelief } from '../map/map.js'
-import { navigate } from '../ui/navigation.js'
+import { clearLayer, labelMode, map, refit, setChile, setLabelMode, setRelief } from '../map/map.js'
+import { confirmAction } from '../ui/confirm.js'
+import { guardLeaving, navigate } from '../ui/navigation.js'
 import { showOfficialOutcome } from '../ui/officialOutcome.js'
 import { hideScreen, hud, panel, showPanel, title, toast } from '../ui/panel.js'
 
@@ -154,6 +155,7 @@ export function answer(ok, feedbackHtml, { points = null, partial = false } = {}
   feedback.innerHTML = `<h4>${feedbackTitle(ok, partial, q.hinted)}</h4>${feedbackHtml || ''}
     <button class="btn next" id="btnNext">${isLast ? 'Ver resultado' : 'Siguiente →'}</button>`
   panel.appendChild(feedback)
+  refit()
   $('#btnNext').onclick = () => nextQuestion()
   setTimeout(() => feedback.scrollIntoView({ block: 'nearest', behavior: 'smooth' }), 30)
 }
@@ -209,6 +211,24 @@ function endQuiz() {
   if ($('#goOfficial')) $('#goOfficial').onclick = () => startQuiz(mode, { ranked: true })
   if (ranked) showOfficialOutcome({ mode: mode.id, correct: ok, total, ms }, $('#officialOutcome'))
 }
+
+// Salir a media ronda pierde el avance (y, en una oficial, el puntaje): se pide confirmación.
+guardLeaving(() =>
+  quiz
+    ? confirmAction({
+        title: '¿Salir de la ronda?',
+        message: quiz.ranked
+          ? 'Es una ronda oficial: si sales ahora no cuenta para el ranking.'
+          : 'Perderás el avance de esta ronda.',
+        confirmLabel: 'Salir',
+        cancelLabel: 'Seguir jugando',
+      })
+    : true,
+)
+
+window.addEventListener('beforeunload', event => {
+  if (quiz) event.preventDefault()
+})
 
 document.addEventListener('keydown', event => {
   if (!quiz || event.target.tagName === 'INPUT') return
