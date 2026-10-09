@@ -1,0 +1,5 @@
+[out:json][timeout:180];
+rel["route"="subway"](-33.75,-70.95,-33.25,-70.45);
+out body;
+>;
+out body qt;

@@ -1,0 +1,4 @@
+[out:json][timeout:200];
+(way["highway"~"^(motorway|trunk|primary|secondary|tertiary)$"]["name"~"Matta|San Pablo|Fleming|Sol",i](-33.72,-70.92,-33.28,-70.40);
+way["highway"~"^(motorway|trunk)$"]["ref"~"^(78|68)$"](-33.72,-70.92,-33.28,-70.40););
+out geom tags;
