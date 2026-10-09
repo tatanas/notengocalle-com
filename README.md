@@ -1,8 +1,8 @@
 # NoTengoCalle
 
 Juego web para aprender la geografía de Santiago (comunas, calles, lugares, metro, rutas) y de Chile
-(regiones, ciudades, parques nacionales). Se puede jugar sin cuenta; con cuenta, las rondas oficiales 🏆
-entran al ranking.
+(regiones, ciudades, parques nacionales). Se puede jugar sin cuenta; con cuenta, las rondas oficiales
+(el botón grande de cada juego) entran al ranking.
 
 Todo es gratis y sin API keys. El juego corre en el navegador; un servidor mínimo guarda cuentas y puntajes.
 

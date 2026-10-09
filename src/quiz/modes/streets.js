@@ -20,6 +20,7 @@ import { registerMode } from '../registry.js'
 registerMode({
   id: 'st-name',
   noHint: true,
+  roomy: true,
   group: 'Calles',
   name: '¿Qué calle es?',
   desc: 'Te marco una avenida o autopista; eliges el nombre.',
@@ -29,7 +30,6 @@ registerMode({
     showPanel(questionHeader(q) + `<div class="q-prompt">${STREET_QUESTION[s.kind || 'calle']}</div>`)
     streetContextChips()
     drawStreet(s, COLORS.street)
-    fit(L.latLngBounds(s.bb).pad(0.25), 14)
     const opts = shuffle([s, ...streetDistractors(s, 3)]).map(x => ({
       label: escapeHtml(x.name),
       value: x.name,
@@ -43,13 +43,14 @@ registerMode({
           if (f) mapLabel(labelPoint(f), c).addTo(layer)
         }
         let extra = ''
+        let shown = L.latLngBounds(s.bb).pad(0.25)
         setLabelMode('labels')
         noteConfusion(s.name, v)
         if (v !== s.name) {
           const w = streetByName[v]
           drawStreet(w, COLORS.bad, { labelText: w.name })
           drawStreet(s, COLORS.ok, { labelText: s.name })
-          fit(L.latLngBounds(s.bb).extend(L.latLngBounds(w.bb)).pad(0.1), 14)
+          shown = L.latLngBounds(s.bb).extend(L.latLngBounds(w.bb)).pad(0.1)
           extra = `<p>En <span style="color:${COLORS.bad};font-weight:700">rojo</span> la que elegiste (${escapeHtml(w.name)}); en <span style="color:${COLORS.ok};font-weight:700">verde</span> la correcta.</p>`
         }
         drawNamedSegments(s)
@@ -58,14 +59,19 @@ registerMode({
           v === s.name,
           `${extra}<p><b>${escapeHtml(s.name)}</b></p><p class="muted">${escapeHtml(s.hint)}</p>${namedSegmentsHtml(s)}${nearHtml}<p class="muted">Pasa por: ${s.comunas.map(escapeHtml).join(', ')}</p>${photoHtml('s:' + s.name)}`,
         )
+        // El encuadre va después de la respuesta: así cuenta con el tamaño final del panel.
+        fit(shown, 14)
       },
       { one: true },
     )
+    // Y el primero, después de las alternativas, por la misma razón.
+    fit(L.latLngBounds(s.bb).pad(0.25), 14)
   },
 })
 registerMode({
   id: 'st-find',
   noHint: true,
+  roomy: true,
   group: 'Calles',
   name: 'Encuentra la calle',
   desc: 'Toca cualquier punto de la calle que te pido (margen 400 m).',
@@ -95,7 +101,6 @@ registerMode({
       }
       setLabelMode('labels')
       if (!ok && near && nd < 0.4) noteConfusion(s.name, near.name)
-      if (!ok) fit(L.latLngBounds(s.bb).extend(p).pad(0.15), 14)
       const extra =
         !ok && near && near !== s && nd < 0.4
           ? `<p>Tocaste cerca de <b>${escapeHtml(near.name)}</b>.</p>`
@@ -106,6 +111,7 @@ registerMode({
         ok,
         `${ok ? '' : `<p>Quedaste a ${formatKm(d)} de la calle.</p>`}${extra}<p class="muted">${escapeHtml(s.hint)}</p>${namedSegmentsHtml(s)}${nearHtml}${photoHtml('s:' + s.name)}`,
       )
+      if (!ok) fit(L.latLngBounds(s.bb).extend(p).pad(0.15), 14)
     })
   },
 })

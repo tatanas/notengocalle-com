@@ -1,4 +1,4 @@
-import { SHOTS, answerSomehow, exists, goHome, openPage, sleep } from '../support.js'
+import { SHOTS, answerSomehow, clickNext, exists, goHome, openPage, sleep } from '../support.js'
 
 // Conexiones mezcla 13 tipos de pregunta: se juegan más para pasar por todos.
 const questionsFor = id => (id === 'cx' ? 14 : id.startsWith('rs-') ? 2 : 3)
@@ -9,7 +9,7 @@ const MAX_STEPS_PER_QUESTION = 16
 // Una pregunta puede pedir varios pasos (rutas) o varios intentos (completar el mapa).
 async function answerQuestion(page, id) {
   for (let step = 0; step < MAX_STEPS_PER_QUESTION; step++) {
-    await answerSomehow(page)
+    await answerSomehow(page, step)
     await sleep(settleMs(id))
     if (await exists(page, '#btnNext')) return true
   }
@@ -47,7 +47,7 @@ export async function smoke(browser, { check }, { mobile = false, retired = fals
         break
       }
       if (question === 0) await page.screenshot({ path: `${SHOTS}${prefix}${id}_a.png` })
-      await page.click('#btnNext')
+      await clickNext(page)
       await sleep(500)
     }
   }

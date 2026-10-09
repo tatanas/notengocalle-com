@@ -1,5 +1,4 @@
 import { $, escapeHtml } from '../core/util.js'
-import { refit } from '../map/map.js'
 import { panel } from '../ui/panel.js'
 import { quiz } from './engine.js'
 
@@ -30,7 +29,6 @@ export function renderOptions(choices, correct, onPick, { one = false } = {}) {
     box.appendChild(button)
   })
   panel.appendChild(box)
-  refit()
 }
 
 export function renderMulti(choices, correct, onDone) {
@@ -56,7 +54,6 @@ export function renderMulti(choices, correct, onDone) {
   confirmRow.innerHTML = `<span class="muted" style="font-size:12.5px;margin-right:auto">Puede haber una o varias correctas</span>
     <button class="btn" id="btnConfirm" disabled>Confirmar</button>`
   panel.appendChild(confirmRow)
-  refit()
 
   $('#btnConfirm').onclick = () => {
     if (quiz.answered) return
