@@ -1,0 +1,1 @@
+[out:json][timeout:60];(node["aerialway"](-33.45,-70.66,-33.36,-70.58);way["aerialway"](-33.45,-70.66,-33.36,-70.58);way["construction"~"gondola|cable"](-33.45,-70.66,-33.36,-70.58););out center tags;

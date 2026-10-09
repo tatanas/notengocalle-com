@@ -1,0 +1,4 @@
+[out:json][timeout:180];
+area["ISO3166-1"="CL"][admin_level=2]->.cl;
+(relation(area.cl)["boundary"~"national_park|protected_area"]["name"~"^Parque Nacional"];way(area.cl)["boundary"~"national_park|protected_area"]["name"~"^Parque Nacional"];);
+out center tags;

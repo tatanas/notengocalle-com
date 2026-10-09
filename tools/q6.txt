@@ -1,0 +1,6 @@
+[out:json][timeout:600][maxsize:1073741824];
+area["name"="Región Metropolitana de Santiago"]["admin_level"="4"]->.rm;
+rel(area.rm)["boundary"="administrative"]["admin_level"="8"]["name"~"^(Santiago|Cerrillos|Cerro Navia|Conchalí|El Bosque|Estación Central|Huechuraba|Independencia|La Cisterna|La Florida|La Granja|La Pintana|La Reina|Las Condes|Lo Barnechea|Lo Espejo|Lo Prado|Macul|Maipú|Ñuñoa|Pedro Aguirre Cerda|Peñalolén|Providencia|Pudahuel|Quilicura|Quinta Normal|Recoleta|Renca|San Joaquín|San Miguel|San Ramón|Vitacura|Puente Alto|San Bernardo)$"]->.c;
+way(r.c)->.bw;
+(way(around.bw:60)["highway"]["name"]; way(around.bw:60)["waterway"]["name"]; way(around.bw:60)["railway"="rail"];);
+out geom tags;
