@@ -1,11 +1,13 @@
 {
   "name": "notengocalle-tools",
   "private": true,
-  "description": "Pipeline que genera data/data.js de NoTengoCalle.com. Ver ../CLAUDE.md",
+  "description": "Pipeline que genera public/data/data.js de NoTengoCalle.com. Ver ../ARQUITECTURA.md",
+  "scripts": {
+    "build": "node build_data.js ../public/data/data.js"
+  },
   "dependencies": {
     "@turf/turf": "^7.4.0",
     "mapshaper": "^0.7.72",
-    "osmtogeojson": "^3.0.0-beta.5",
-    "puppeteer-core": "^25.12.0"
+    "osmtogeojson": "^3.0.0-beta.5"
   }
 }
