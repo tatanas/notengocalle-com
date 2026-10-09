@@ -3,7 +3,7 @@ import assert from 'node:assert/strict'
 import { beforeEach, test } from 'node:test'
 import { openLocalDatabase } from '../dev/localDatabase.js'
 import { createApi } from '../server/api.js'
-import { issueRecoveryCode } from '../server/auth.js'
+import { resetPassword } from '../server/auth.js'
 
 let db, handle
 
@@ -33,16 +33,15 @@ const round = (mode, correct, ms, total = 15) => ({ mode, correct, total, ms })
 
 async function signedUp(name, password = 'secreto1') {
   const call = client()
-  const { data } = await call('POST', '/register', { name, password })
-  return { call, recoveryCode: data.recoveryCode }
+  await call('POST', '/register', { name, password })
+  return { call }
 }
 
-test('registrarse deja la sesión iniciada y entrega un código de recuperación', async () => {
+test('registrarse deja la sesión iniciada', async () => {
   const call = client()
   const created = await call('POST', '/register', { name: 'Seba', password: 'secreto1' })
   assert.equal(created.status, 201)
   assert.deepEqual(created.data.user, { name: 'Seba' })
-  assert.match(created.data.recoveryCode, /^[A-Z2-9]{4}-[A-Z2-9]{4}-[A-Z2-9]{4}$/)
   assert.match(created.setCookie, /HttpOnly; SameSite=Lax/)
   assert.match(created.setCookie, /Secure/)
   assert.deepEqual((await call('GET', '/me')).data.user, { name: 'Seba' })
@@ -52,13 +51,12 @@ test('sin sesión, /me responde usuario nulo', async () => {
   assert.deepEqual((await client()('GET', '/me')).data, { user: null })
 })
 
-test('la clave y el código no se guardan en claro', async () => {
-  const { recoveryCode } = await signedUp('Seba', 'secreto1')
+test('la clave no se guarda en claro', async () => {
+  await signedUp('Seba', 'secreto1')
   const [user] = await db.query('select * from users')
   const [session] = await db.query('select * from sessions')
   const stored = JSON.stringify([user, session])
   assert.ok(!stored.includes('secreto1'))
-  assert.ok(!stored.includes(recoveryCode))
   assert.match(user.password_hash, /^scrypt\$/)
 })
 
@@ -106,33 +104,6 @@ test('tras muchos intentos fallidos se bloquea ese nombre por un rato', async ()
   for (let i = 0; i < 10; i++)
     assert.equal((await call('POST', '/login', { name: 'Seba', password: 'mala' })).status, 401)
   assert.equal((await call('POST', '/login', { name: 'Seba', password: 'secreto1' })).status, 429)
-})
-
-test('recuperar con el código cambia la clave, cierra las otras sesiones y entrega un código nuevo', async () => {
-  const { call: oldDevice, recoveryCode } = await signedUp('Seba', 'secreto1')
-  const call = client()
-  const wrong = await call('POST', '/recover', {
-    name: 'Seba',
-    recoveryCode: 'AAAA-BBBB-CCCC',
-    newPassword: 'nueva-clave',
-  })
-  assert.equal(wrong.status, 401)
-
-  const typedByHand = recoveryCode.toLowerCase().replaceAll('-', ' ')
-  const recovered = await call('POST', '/recover', {
-    name: 'seba',
-    recoveryCode: typedByHand,
-    newPassword: 'nueva-clave',
-  })
-  assert.equal(recovered.status, 200)
-  assert.notEqual(recovered.data.recoveryCode, recoveryCode)
-  assert.deepEqual((await call('GET', '/me')).data.user, { name: 'Seba' })
-  assert.deepEqual((await oldDevice('GET', '/me')).data.user, null)
-
-  assert.equal((await client()('POST', '/login', { name: 'Seba', password: 'secreto1' })).status, 401)
-  assert.equal((await client()('POST', '/login', { name: 'Seba', password: 'nueva-clave' })).status, 200)
-  const reused = await client()('POST', '/recover', { name: 'Seba', recoveryCode, newPassword: 'otra-mas' })
-  assert.equal(reused.status, 401)
 })
 
 test('solo se guardan puntajes con sesión y con forma de ronda oficial', async () => {
@@ -251,22 +222,16 @@ test('sin base de datos el API avisa que las cuentas no están disponibles', asy
   assert.equal((await response.json()).error, 'unavailable')
 })
 
-test('el administrador puede entregar un código de recuperación nuevo', async () => {
-  const { recoveryCode: original } = await signedUp('Seba', 'secreto1')
-  const issued = await issueRecoveryCode(db, 'seba')
-  assert.equal(issued.name, 'Seba')
-  assert.equal(await issueRecoveryCode(db, 'nadie'), null)
+test('el administrador puede cambiar una clave, y eso cierra las sesiones abiertas', async () => {
+  const { call: oldDevice } = await signedUp('Seba', 'secreto1')
+  assert.equal(await resetPassword(db, 'seba', 'nueva-clave'), 'Seba')
+  assert.equal(await resetPassword(db, 'nadie', 'nueva-clave'), null)
+  assert.deepEqual((await oldDevice('GET', '/me')).data.user, null)
+  assert.equal((await client()('POST', '/login', { name: 'Seba', password: 'secreto1' })).status, 401)
+  assert.equal((await client()('POST', '/login', { name: 'Seba', password: 'nueva-clave' })).status, 200)
+})
 
-  const withOld = await client()('POST', '/recover', {
-    name: 'Seba',
-    recoveryCode: original,
-    newPassword: 'nueva-clave',
-  })
-  assert.equal(withOld.status, 401)
-  const withNew = await client()('POST', '/recover', {
-    name: 'Seba',
-    recoveryCode: issued.recoveryCode,
-    newPassword: 'nueva-clave',
-  })
-  assert.equal(withNew.status, 200)
+test('ya no existe la recuperación por código', async () => {
+  const { call } = await signedUp('Seba')
+  assert.equal((await call('POST', '/recover', { name: 'Seba' })).status, 404)
 })

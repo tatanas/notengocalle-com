@@ -1,9 +1,9 @@
 // Tareas de administración contra la base de producción. Necesita DATABASE_URL en el entorno:
 //   node server/admin.js usuarios
-//   node server/admin.js codigo <nombre>      entrega un código de recuperación nuevo
+//   node server/admin.js clave <nombre> <nueva>   cambia la clave de alguien y cierra sus sesiones
 //   node server/admin.js borrar <nombre>      borra la cuenta con sus puntajes
 import { usernameKey } from '../shared/accounts.js'
-import { issueRecoveryCode } from './auth.js'
+import { resetPassword } from './auth.js'
 import { connectProductionDatabase } from './database.js'
 
 const TASKS = {
@@ -16,11 +16,9 @@ const TASKS = {
     console.table(users)
   },
 
-  async codigo(db, name) {
-    const issued = await issueRecoveryCode(db, name)
-    console.log(
-      issued ? `Código nuevo para ${issued.name}: ${issued.recoveryCode}` : 'No existe ese usuario.',
-    )
+  async clave(db, name, newPassword) {
+    const reset = await resetPassword(db, name, newPassword)
+    console.log(reset ? `Clave de ${reset} cambiada.` : 'No existe ese usuario.')
   },
 
   async borrar(db, name) {
@@ -31,9 +29,9 @@ const TASKS = {
   },
 }
 
-const [task, name] = process.argv.slice(2)
+const [task, name, extra] = process.argv.slice(2)
 const db = connectProductionDatabase()
 if (!db) throw new Error('Falta DATABASE_URL (la cadena de conexión de Neon).')
-if (!TASKS[task] || (task !== 'usuarios' && !name))
-  throw new Error('Uso: node server/admin.js usuarios | codigo <nombre> | borrar <nombre>')
-await TASKS[task](db, name)
+if (!TASKS[task] || (task !== 'usuarios' && !name) || (task === 'clave' && !extra))
+  throw new Error('Uso: node server/admin.js usuarios | clave <nombre> <nueva> | borrar <nombre>')
+await TASKS[task](db, name, extra)

@@ -1,4 +1,4 @@
-import { createHash, randomBytes, randomInt, scrypt, timingSafeEqual } from 'node:crypto'
+import { createHash, randomBytes, scrypt, timingSafeEqual } from 'node:crypto'
 import { promisify } from 'node:util'
 
 const deriveKey = promisify(scrypt)
@@ -19,25 +19,7 @@ export async function passwordMatches(password, stored) {
   return timingSafeEqual(actual, expected)
 }
 
-// Los tokens y códigos son aleatorios y largos: basta un hash rápido para no guardarlos en claro.
+// Los tokens son aleatorios y largos: basta un hash rápido para no guardarlos en claro.
 export const fingerprint = secret => createHash('sha256').update(secret).digest('hex')
 
 export const newToken = () => randomBytes(32).toString('base64url')
-
-// Sin 0/O ni 1/I/L, que se confunden al copiar a mano.
-const CODE_ALPHABET = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789'
-const CODE_GROUPS = 3
-const CODE_GROUP_LENGTH = 4
-
-export function newRecoveryCode() {
-  const group = () =>
-    Array.from({ length: CODE_GROUP_LENGTH }, () => CODE_ALPHABET[randomInt(CODE_ALPHABET.length)]).join('')
-  return Array.from({ length: CODE_GROUPS }, group).join('-')
-}
-
-export const normalizeRecoveryCode = code =>
-  String(code || '')
-    .toUpperCase()
-    .replace(/[^A-Z0-9]/g, '')
-
-export const recoveryFingerprint = code => fingerprint(normalizeRecoveryCode(code))

@@ -6,7 +6,7 @@ import {
   usernameKey,
 } from '../shared/accounts.js'
 import { conflict, invalid, tooMany, unauthorized } from './errors.js'
-import { hashPassword, newRecoveryCode, passwordMatches, recoveryFingerprint } from './passwords.js'
+import { hashPassword, passwordMatches } from './passwords.js'
 import { endAllSessions, endSession, startSession } from './sessions.js'
 
 const MAX_FAILED_ATTEMPTS = 10
@@ -27,7 +27,7 @@ function validPassword(password) {
   return password
 }
 
-// Frena a quien prueba claves o códigos en serie contra un mismo nombre.
+// Frena a quien prueba claves en serie contra un mismo nombre.
 async function assertNotThrottled(db, nameKey) {
   const [{ failures }] = await db.query(
     `select count(*)::int as failures from failed_logins
@@ -49,16 +49,15 @@ const findUser = async (db, nameKey) =>
 export async function register({ db, request, body }) {
   const name = validName(body)
   const password = validPassword(body.password)
-  const recoveryCode = newRecoveryCode()
   const [user] = await db.query(
-    `insert into users (name, name_key, password_hash, recovery_hash) values ($1, $2, $3, $4)
+    `insert into users (name, name_key, password_hash) values ($1, $2, $3)
      on conflict (name_key) do nothing returning id, name`,
-    [name, usernameKey(name), await hashPassword(password), recoveryFingerprint(recoveryCode)],
+    [name, usernameKey(name), await hashPassword(password)],
   )
   if (!user) throw conflict('name_taken', 'Ese nombre ya está en uso')
   return {
     status: 201,
-    data: { user: publicUser(user), recoveryCode },
+    data: { user: publicUser(user) },
     cookie: await startSession(db, request, user.id),
   }
 }
@@ -74,34 +73,15 @@ export async function logIn({ db, request, body }) {
   return { data: { user: publicUser(user) }, cookie: await startSession(db, request, user.id) }
 }
 
-// Sin correo, el código de recuperación es la única vía; al usarlo se entrega uno nuevo.
-export async function recover({ db, request, body }) {
-  const nameKey = usernameKey(String(body.name ?? '').trim())
-  const password = validPassword(body.newPassword)
-  await assertNotThrottled(db, nameKey)
-  const user = await findUser(db, nameKey)
-  if (!user || user.recovery_hash !== recoveryFingerprint(body.recoveryCode)) {
-    await recordFailure(db, nameKey)
-    throw unauthorized('bad_recovery_code', 'El nombre o el código de recuperación no coinciden')
-  }
-  const recoveryCode = newRecoveryCode()
-  await db.query(`update users set password_hash = $1, recovery_hash = $2 where id = $3`, [
-    await hashPassword(password),
-    recoveryFingerprint(recoveryCode),
-    user.id,
-  ])
+// Para el administrador (server/admin.js): el usuario no puede recuperar su cuenta por su cuenta.
+export async function resetPassword(db, name, newPassword) {
+  const [user] = await db.query(
+    `update users set password_hash = $1 where name_key = $2 returning id, name`,
+    [await hashPassword(validPassword(newPassword)), usernameKey(name)],
+  )
+  if (!user) return null
   await endAllSessions(db, user.id)
-  return { data: { user: publicUser(user), recoveryCode }, cookie: await startSession(db, request, user.id) }
-}
-
-// Para el administrador (server/admin.js): cuando alguien perdió la clave y también su código.
-export async function issueRecoveryCode(db, name) {
-  const recoveryCode = newRecoveryCode()
-  const [user] = await db.query(`update users set recovery_hash = $1 where name_key = $2 returning name`, [
-    recoveryFingerprint(recoveryCode),
-    usernameKey(name),
-  ])
-  return user ? { name: user.name, recoveryCode } : null
+  return user.name
 }
 
 export async function logOut({ db, request }) {

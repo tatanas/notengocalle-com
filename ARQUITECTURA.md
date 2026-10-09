@@ -73,7 +73,7 @@ npm install          una vez
 npm run dev          juego + API en http://localhost:5173 (recarga sola al guardar)
 npm test             lint + pruebas unitarias y del servidor + pruebas de navegador
 npm run build        genera dist/ igual que lo hará Netlify
-npm run preview      sirve dist/ en http://127.0.0.1:8765 con el API local
+npm run preview      sirve dist/ en http://127.0.0.1:8766 con el API local
 npm run format       Prettier sobre todo el código
 ```
 
@@ -139,19 +139,20 @@ El sorteo (`core/progress.js`) es ponderado: lo nuevo y lo fallado pesa más, lo
 
 Hay dos formas de jugar el mismo modo:
 
-| | Práctica | Ronda oficial 🏆 |
-|---|---|---|
-| Ajustes | los del jugador (comunas, largo, categorías, líneas, modo estricto) | fijos: `OFFICIAL_RULES` en `shared/ranked.js` |
-| Sorteo | ponderado por lo que el jugador falla | parejo para todos |
-| Calles propias | incluidas | excluidas |
-| Largo | el elegido | fijo por modo: `OFFICIAL_ROUNDS` |
-| Va al ranking | no | sí, si hay cuenta |
+|                | Práctica                                                            | Ronda oficial 🏆                              |
+| -------------- | ------------------------------------------------------------------- | --------------------------------------------- |
+| Ajustes        | los del jugador (comunas, largo, categorías, líneas, modo estricto) | fijos: `OFFICIAL_RULES` en `shared/ranked.js` |
+| Sorteo         | ponderado por lo que el jugador falla                               | parejo para todos                             |
+| Calles propias | incluidas                                                           | excluidas                                     |
+| Largo          | el elegido                                                          | fijo por modo: `OFFICIAL_ROUNDS`              |
+| Va al ranking  | no                                                                  | sí, si hay cuenta                             |
 
 Las reglas fijas se imponen en un solo lugar: `settings` (`core/store.js`) devuelve las preferencias del
 jugador, salvo durante una ronda oficial, donde devuelve las de la ronda. Por eso los modos no necesitan
 saber qué tipo de ronda es: siguen leyendo `settings.scope`, `settings.cats`, etc.
 
 Al terminar una ronda oficial (`ui/officialOutcome.js` → `account/scores.js`):
+
 - con sesión, el puntaje se envía y se muestra el puesto;
 - sin sesión, queda en una cola local y se sube al entrar o crear cuenta;
 - sin conexión, queda en la misma cola y se sube solo la próxima vez.
@@ -160,16 +161,16 @@ Al terminar una ronda oficial (`ui/officialOutcome.js` → `account/scores.js`):
 
 `localStorage`, con prefijo `ntc:`:
 
-| Clave | Contenido |
-|---|---|
-| `settings` | preferencias de práctica |
-| `stats` | por cada `modo:ítem`: respuestas, aciertos y racha |
-| `best` | récord personal por `modo:largo` |
-| `conf` | pares de calles que el jugador ha confundido |
-| `myStreets` | calles agregadas por el usuario |
-| `explore`, `ranking` | última vista de esas pantallas |
-| `user` | nombre de la sesión (solo para pintar el botón al instante) |
-| `outbox` | rondas oficiales pendientes de enviar |
+| Clave                | Contenido                                                   |
+| -------------------- | ----------------------------------------------------------- |
+| `settings`           | preferencias de práctica                                    |
+| `stats`              | por cada `modo:ítem`: respuestas, aciertos y racha          |
+| `best`               | récord personal por `modo:largo`                            |
+| `conf`               | pares de calles que el jugador ha confundido                |
+| `myStreets`          | calles agregadas por el usuario                             |
+| `explore`, `ranking` | última vista de esas pantallas                              |
+| `user`               | nombre de la sesión (solo para pintar el botón al instante) |
+| `outbox`             | rondas oficiales pendientes de enviar                       |
 
 El progreso de práctica es local a cada navegador. Al servidor solo llegan las rondas oficiales.
 
@@ -191,16 +192,15 @@ mano** en cada despliegue. Nunca intercepta `/api/` ni las teselas del mapa.
 Es una sola Function de Netlify. `server/api.js` recibe un `Request` y devuelve un `Response` (el estándar
 web), así que el mismo código corre en Netlify y en el servidor local de desarrollo.
 
-| Ruta | Qué hace |
-|---|---|
-| `POST /api/register` | crea la cuenta, inicia sesión y entrega el código de recuperación |
-| `POST /api/login` | inicia sesión |
-| `POST /api/logout` | cierra la sesión |
-| `POST /api/recover` | cambia la clave usando el código de recuperación (y entrega uno nuevo) |
-| `GET /api/me` | usuario de la sesión, o `null` |
-| `POST /api/scores` | guarda una ronda oficial; responde puesto y mejor marca |
-| `GET /api/leaderboard?mode=&period=` | los 50 mejores de un juego, más la fila del usuario |
-| `GET /api/leaders?period=` | el líder de cada juego y el puesto del usuario en cada uno |
+| Ruta                                 | Qué hace                                                   |
+| ------------------------------------ | ---------------------------------------------------------- |
+| `POST /api/register`                 | crea la cuenta e inicia sesión                             |
+| `POST /api/login`                    | inicia sesión                                              |
+| `POST /api/logout`                   | cierra la sesión                                           |
+| `GET /api/me`                        | usuario de la sesión, o `null`                             |
+| `POST /api/scores`                   | guarda una ronda oficial; responde puesto y mejor marca    |
+| `GET /api/leaderboard?mode=&period=` | los 50 mejores de un juego, más la fila del usuario        |
+| `GET /api/leaders?period=`           | el líder de cada juego y el puesto del usuario en cada uno |
 
 Los errores siempre salen como `{ "error": "código", "message": "texto para mostrar" }`.
 
@@ -211,8 +211,9 @@ Nombre de usuario y clave, sin correo. Decisiones:
 - **Claves** con scrypt (`server/passwords.js`); nunca se guardan en claro.
 - **Sesión** en una cookie `HttpOnly` (el JavaScript de la página no puede leerla), `SameSite=Lax`, de 180
   días. En la base solo queda la huella del token.
-- **Sin correo no hay "recuperar por mail"**: al registrarse se muestra una vez un código de recuperación
-  (`ABCD-EFGH-JKMN`). Si alguien pierde clave y código, el administrador puede darle otro (ver abajo).
+- **No hay recuperación de clave.** Sin correo no hay a dónde mandar nada, y se descartó un código de
+  recuperación. "Olvidé mi clave" solo muestra un aviso. Si alguien pierde la clave, el administrador puede
+  ponerle otra (ver "Administrar") o puede crear una cuenta nueva.
 - **Nombres**: 3 a 20 letras, números, `.`, `_` o `-`. "Ñandú" y "nandu" cuentan como el mismo nombre.
 - **Freno a fuerza bruta**: 10 intentos fallidos por nombre en 15 minutos bloquean ese nombre por un rato.
 - Los `POST` que vienen de otro sitio se rechazan (cabecera `Origin`).
@@ -233,12 +234,12 @@ Postgres. El esquema completo está en `server/schema.sql` y se aplica solo en c
 (`server/migrate.js`); cada sentencia es repetible (`create … if not exists`). Para cambiarlo, se agregan
 sentencias repetibles al final (por ejemplo `alter table … add column if not exists …`).
 
-| Tabla | Para qué |
-|---|---|
-| `users` | nombre, clave (hash), código de recuperación (hash) |
-| `sessions` | sesiones abiertas |
-| `scores` | cada ronda oficial jugada: usuario, modo, aciertos, total, milisegundos, fecha |
-| `failed_logins` | intentos fallidos recientes (freno a fuerza bruta) |
+| Tabla           | Para qué                                                                       |
+| --------------- | ------------------------------------------------------------------------------ |
+| `users`         | nombre y clave (hash)                                                          |
+| `sessions`      | sesiones abiertas                                                              |
+| `scores`        | cada ronda oficial jugada: usuario, modo, aciertos, total, milisegundos, fecha |
+| `failed_logins` | intentos fallidos recientes (freno a fuerza bruta)                             |
 
 En producción la base es **Neon** (Postgres serverless, plan gratis): se duerme sin uso y despierta sola con
 la primera consulta, que por eso puede tardar cerca de un segundo.
@@ -249,7 +250,7 @@ Con la cadena de conexión de Neon en la variable `DATABASE_URL`:
 
 ```
 node server/admin.js usuarios            lista de cuentas con cuántas rondas tiene cada una
-node server/admin.js codigo <nombre>     código de recuperación nuevo para ese usuario
+node server/admin.js clave <nombre> <nueva>   cambia la clave de alguien y cierra sus sesiones
 node server/admin.js borrar <nombre>     borra la cuenta y sus puntajes
 ```
 
@@ -269,17 +270,19 @@ Netlify construye el sitio desde GitHub: cada push a la rama de producción publ
 tener su propia vista previa. La configuración está en `netlify.toml`.
 
 **Una vez, para conectar el repositorio** (en el sitio que ya existe, para conservar la dirección):
-1. Netlify → el sitio → *Project configuration* → *Build & deploy* → *Continuous deployment* → *Link
-   repository* → GitHub → `tatanas/notengocalle-com`.
+
+1. Netlify → el sitio → _Project configuration_ → _Build & deploy_ → _Continuous deployment_ → _Link
+   repository_ → GitHub → `tatanas/notengocalle-com`.
 2. Rama de producción: `main`. El comando y la carpeta se leen de `netlify.toml`; no hay que escribirlos.
-3. En *Branches and deploy contexts*, activar los *branch deploys* para ver ramas como esta en una dirección
+3. En _Branches and deploy contexts_, activar los _branch deploys_ para ver ramas como esta en una dirección
    propia antes de pasarlas a `main`.
 
 **Una vez, para activar cuentas y ranking** (sin esto el sitio funciona igual, solo sin cuentas):
+
 - Opción A, dentro de Netlify: agregar una base con **Netlify DB** (extensión de Neon). Crea la variable
   `NETLIFY_DATABASE_URL` sola. Hay que "reclamar" la base con una cuenta de Neon para que no caduque.
 - Opción B, directo en Neon: crear un proyecto gratis en neon.tech, copiar la cadena de conexión y guardarla
-  en Netlify como variable de entorno `DATABASE_URL` (disponible para *Builds* y *Functions*).
+  en Netlify como variable de entorno `DATABASE_URL` (disponible para _Builds_ y _Functions_).
 
 Después, volver a desplegar. En el registro del build debe aparecer `Base de datos: esquema al día.`
 
@@ -293,14 +296,14 @@ separarlas, Netlify permite dar a cada contexto de despliegue un valor distinto 
 
 ### Fuentes
 
-| Qué | De dónde |
-|---|---|
-| Comunas, calles, metro, lugares, barrios, cerros | OpenStreetMap (ODbL), vía Overpass y Nominatim |
-| Rutas en auto | OSRM (router.project-osrm.org) |
-| Rutas en micro y metro, recorridos | GTFS de Red (DTPM) |
-| Regiones, ciudades y parques nacionales | OpenStreetMap; población de las ciudades |
-| Fotos | Wikimedia Commons y Panoramax, siempre con autor y licencia visibles |
-| Mapa base y relieve (en vivo, no en data.js) | OpenFreeMap / OpenMapTiles y AWS Terrain Tiles |
+| Qué                                              | De dónde                                                             |
+| ------------------------------------------------ | -------------------------------------------------------------------- |
+| Comunas, calles, metro, lugares, barrios, cerros | OpenStreetMap (ODbL), vía Overpass y Nominatim                       |
+| Rutas en auto                                    | OSRM (router.project-osrm.org)                                       |
+| Rutas en micro y metro, recorridos               | GTFS de Red (DTPM)                                                   |
+| Regiones, ciudades y parques nacionales          | OpenStreetMap; población de las ciudades                             |
+| Fotos                                            | Wikimedia Commons y Panoramax, siempre con autor y licencia visibles |
+| Mapa base y relieve (en vivo, no en data.js)     | OpenFreeMap / OpenMapTiles y AWS Terrain Tiles                       |
 
 Todo es gratis y sin API keys. No se usan imágenes de Google.
 
@@ -329,10 +332,10 @@ Regenerar el archivo final (minutos): `npm run build` dentro de `tools/`
   Para ver cómo figura una calle en OSM: `nameidx.json`, `ways_named.json`,
   `node cross.js "<nombre OSM>" lat|lon`.
 - **Agregar o quitar un landmark**: editar `lmlist.js` (`[nombre, categoría, consulta Nominatim, comuna
-  esperada, descripción]`) → `cp landmarks.json landmarks.prev.json` → `node geocode.js` (1 consulta por
+esperada, descripción]`) → `cp landmarks.json landmarks.prev.json` → `node geocode.js` (1 consulta por
   segundo) → `node finalize_lm.js` (ajustes en el objeto `F`: coordenadas `ll`, renombres, `obvious`, foto
   prestada `pk`, `alt`; lista `DROP`; carreras en `careers.js`) → **`node remap_routes.js`** (los ids `l0,
-  l1…` se corren; esto reasigna las rutas) → `node merge_st.js` → `npm run build`.
+l1…` se corren; esto reasigna las rutas) → `node merge_st.js` → `npm run build`.
 - **Barrios con perímetro**: `zones.js` (esquinas como cruces de calles por regex, o `axis`/`at` para zonas
   aproximadas) → `zones.json`. Si el barrio ya existe como landmark con otro nombre, se enlazan en
   `LANDMARK_NAME_OF_ZONE` (`src/data/dataset.js`).
@@ -351,11 +354,11 @@ regiones), hay que actualizar `OFFICIAL_ROUNDS` en `shared/ranked.js`.
 
 ## Pruebas (tests/)
 
-| Comando | Qué cubre |
-|---|---|
-| `npm run lint` | nombres no definidos, imports sobrantes |
-| `npm run test:unit` | `unit.test.js` (geometría, sorteo, reglas compartidas) y `api.test.js` (el servidor completo contra un Postgres en memoria) |
-| `npm run test:e2e` | Chrome real sobre el build: recorre todos los juegos en escritorio y celular, los retirados, el cronómetro, las calles propias, el inicio de las 15 rondas oficiales, las fotos y el flujo completo de cuentas y ranking |
+| Comando             | Qué cubre                                                                                                                                                                                                                |
+| ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `npm run lint`      | nombres no definidos, imports sobrantes                                                                                                                                                                                  |
+| `npm run test:unit` | `unit.test.js` (geometría, sorteo, reglas compartidas) y `api.test.js` (el servidor completo contra un Postgres en memoria)                                                                                              |
+| `npm run test:e2e`  | Chrome real sobre el build: recorre todos los juegos en escritorio y celular, los retirados, el cronómetro, las calles propias, el inicio de las 15 rondas oficiales, las fotos y el flujo completo de cuentas y ranking |
 
 `node tests/run.js smoke accounts` corre solo algunas suites; `--no-build` reutiliza `dist/`; `--dev` sirve el
 código sin empaquetar, para que un error apunte al archivo y la línea reales. Las capturas quedan en

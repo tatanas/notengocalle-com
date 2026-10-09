@@ -8,7 +8,6 @@ const ROUTES = {
   'POST /api/register': auth.register,
   'POST /api/login': auth.logIn,
   'POST /api/logout': auth.logOut,
-  'POST /api/recover': auth.recover,
   'GET /api/me': auth.me,
   'POST /api/scores': scores.submit,
   'GET /api/leaderboard': scores.leaderboard,

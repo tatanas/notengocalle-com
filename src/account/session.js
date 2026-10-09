@@ -33,19 +33,11 @@ export function sessionExpired() {
 }
 
 export async function register(name, password) {
-  const result = await api('POST', '/register', { name, password })
-  setUser(result.user)
-  return result
+  setUser((await api('POST', '/register', { name, password })).user)
 }
 
 export async function logIn(name, password) {
   setUser((await api('POST', '/login', { name, password })).user)
-}
-
-export async function recoverAccount(name, recoveryCode, newPassword) {
-  const result = await api('POST', '/recover', { name, recoveryCode, newPassword })
-  setUser(result.user)
-  return result
 }
 
 export async function logOut() {
