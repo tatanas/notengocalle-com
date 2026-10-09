@@ -18,7 +18,15 @@ import { cityText, parkText, regionText } from '../domain/chile.js'
 import { linePill } from '../domain/metro.js'
 import { namedSegmentsHtml } from '../domain/streets.js'
 import { zoneInfo } from '../domain/zones.js'
-import { REGION_COLORS, comunaLayer, drawMetro, mapLabel, parkIcon, peakIcon } from '../map/draw.js'
+import {
+  REGION_COLORS,
+  continuationStyle,
+  comunaLayer,
+  drawMetro,
+  mapLabel,
+  parkIcon,
+  peakIcon,
+} from '../map/draw.js'
 import {
   boundsOfFeatures,
   clearLayer,
@@ -53,7 +61,6 @@ function openExplore() {
       names: true,
       metro: false,
       streets: false,
-      lm: false,
       cerros: false,
       zones: false,
       tren: false,
@@ -62,7 +69,7 @@ function openExplore() {
       cities: false,
       parks: false,
       relief: false,
-      cats: CATEGORIES.slice(),
+      cats: [],
     },
     store.get('explore', {}),
   )
@@ -211,7 +218,9 @@ function openExplore() {
       pl.setPopupContent(
         `<h4>${escapeHtml(s.name)}</h4><p>${escapeHtml(s.hint)}</p>${namedSegmentsHtml(s)}${photoHtml('s:' + s.name)}`,
       )
-    ;(s.kind === 'tren' ? groups.tren : groups.streets).addLayer(pl)
+    const group = s.kind === 'tren' ? groups.tren : groups.streets
+    group.addLayer(pl)
+    for (const line of s.ext || []) group.addLayer(L.polyline(line, continuationStyle(pl.options.color, 3)))
   }
   drawMetro(groups.metro, { dots: false })
   for (const s of stations)
@@ -241,6 +250,8 @@ function openExplore() {
     '#a16207',
     '#4b5563',
   ]
+  // Las estaciones ya tienen su propia capa (Metro): no se repiten como "lugares".
+  const placeCategories = CATEGORIES.filter(category => category !== 'Metro')
   const lmMarkers = DATA.landmarks
     .filter(l => !l.metro)
     .map(l => ({
@@ -280,7 +291,8 @@ function openExplore() {
       'cities',
       'parks',
     ]) {
-      if (st[k]) layer.addLayer(groups[k])
+      const visible = k === 'lm' ? st.cats.length > 0 : st[k]
+      if (visible) layer.addLayer(groups[k])
       else layer.removeLayer(groups[k])
     }
     const wantCh = st.regs || st.cities || st.parks
@@ -290,6 +302,16 @@ function openExplore() {
     }
     if (labelMode !== 'plain') setLabelMode(st.names ? 'streets' : 'labels')
     store.set('explore', st)
+  }
+  function setCategory(category, on) {
+    st.cats = on ? [...new Set([...st.cats, category])] : st.cats.filter(c => c !== category)
+    const checkbox = panel.querySelector(`[data-cat="${CSS.escape(category)}"]`)
+    if (checkbox) {
+      checkbox.checked = on
+      checkbox.parentElement.classList.toggle('on', on)
+    }
+    refreshLm()
+    apply()
   }
   const searchItems = [
     ...comunas.map(f => ({
@@ -305,15 +327,7 @@ function openExplore() {
       go: () => {
         map.setView([l.lat, l.lon], 15)
         setTimeout(() => {
-          if (!st.lm) {
-            st.lm = true
-            $('#ex-lm').checked = true
-          }
-          if (!st.cats.includes(l.cat)) {
-            st.cats.push(l.cat)
-            refreshLm()
-          }
-          apply()
+          setCategory(l.cat, true)
           lmMarkers.find(x => x.l === l).m.openPopup()
         }, 300)
       },
@@ -369,7 +383,6 @@ function openExplore() {
         ['names', 'Nombres comunas'],
         ['metro', 'Metro'],
         ['streets', 'Calles principales'],
-        ['lm', 'Lugares'],
         ['zones', 'Barrios (perímetros)'],
         ['cerros', 'Cerros'],
         ['tren', 'Tren'],
@@ -385,27 +398,28 @@ function openExplore() {
         )
         .join('')}
     </div>
-    <div id="ex-cats" style="margin-top:10px;${st.lm ? '' : 'display:none'}"><div class="muted" style="font-size:12.5px;margin-bottom:4px">Categorías de lugares</div><div class="chips">
-      ${CATEGORIES.map((c, i) => `<label class="chip ${st.cats.includes(c) ? 'on' : ''}"><input type="checkbox" data-cat="${escapeHtml(c)}" ${st.cats.includes(c) ? 'checked' : ''}><span class="dot" style="background:${CAT_COLORS[i % CAT_COLORS.length]}"></span>${escapeHtml(c)}</label>`).join('')}
-    </div></div>
+    <div style="margin-top:12px">
+      <div class="row" style="justify-content:space-between;margin-bottom:4px">
+        <span class="muted" style="font-size:12.5px">Lugares por categoría</span>
+        <span><button type="button" class="linklike" id="ex-cats-all">Todas</button> · <button type="button" class="linklike" id="ex-cats-none">Ninguna</button></span>
+      </div>
+      <div class="chips" id="ex-cats">
+        ${placeCategories.map(c => `<label class="chip ${st.cats.includes(c) ? 'on' : ''}"><input type="checkbox" data-cat="${escapeHtml(c)}" ${st.cats.includes(c) ? 'checked' : ''}><span class="dot" style="background:${CAT_COLORS[CATEGORIES.indexOf(c) % CAT_COLORS.length]}"></span>${escapeHtml(c)}</label>`).join('')}
+      </div>
+    </div>
     <div class="row" style="margin-top:10px"><button class="btn sec small" id="ex-tiles">Mapa sin nombres</button><button class="btn sec small" id="ex-hide">Ocultar panel</button></div>
     <p class="muted" style="font-size:12px;margin-bottom:0">Toca cualquier comuna, calle, estación o lugar para ver su info.</p>`)
   panel.querySelectorAll('.chip input').forEach(
     inp =>
       (inp.onchange = () => {
+        if (inp.dataset.cat) return setCategory(inp.dataset.cat, inp.checked)
         inp.parentElement.classList.toggle('on', inp.checked)
-        if (inp.dataset.cat) {
-          const c = inp.dataset.cat
-          st.cats = inp.checked ? [...st.cats, c] : st.cats.filter(x => x !== c)
-          refreshLm()
-        } else {
-          const k = inp.id.slice(3)
-          st[k] = inp.checked
-          if (k === 'lm') $('#ex-cats').style.display = inp.checked ? '' : 'none'
-        }
+        st[inp.id.slice(3)] = inp.checked
         apply()
       }),
   )
+  $('#ex-cats-all').onclick = () => placeCategories.forEach(category => setCategory(category, true))
+  $('#ex-cats-none').onclick = () => placeCategories.forEach(category => setCategory(category, false))
   $('#ex-q').onchange = e => {
     const it = searchItems.find(s => s.t.toLowerCase() === e.target.value.trim().toLowerCase())
     if (it) {

@@ -45,9 +45,15 @@ map.attributionControl.setPrefix('')
 // Todo lo que dibuja la pregunta o pantalla actual vive en esta capa, para borrarlo de una vez.
 export const layer = L.layerGroup().addTo(map)
 
+// Los encuadres son instantáneos: dos animaciones de zoom seguidas (el encuadre y su repetición al crecer el panel)
+// se pisan en Leaflet y dejan el mapa mal dibujado.
+// El último encuadre pedido, para repetirlo cuando el panel crece (aparecen las alternativas o la respuesta).
+let lastFit = null
+
 export function clearLayer() {
   layer.clearLayers()
   map.off('click')
+  lastFit = null
 }
 
 // ----- mapa base (vectorial); sin WebGL se cae a las teselas raster de OSM, que siempre traen nombres
@@ -144,7 +150,12 @@ function panelPadding() {
 }
 
 export function fit(bounds, maxZoom = 15) {
-  map.fitBounds(bounds, { maxZoom, animate: true, ...panelPadding() })
+  lastFit = { bounds, maxZoom }
+  map.fitBounds(bounds, { maxZoom, animate: false, ...panelPadding() })
+}
+
+export function refit() {
+  if (lastFit) fit(lastFit.bounds, lastFit.maxZoom)
 }
 
 export const boundsOfFeatures = features => L.geoJSON({ type: 'FeatureCollection', features }).getBounds()

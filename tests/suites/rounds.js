@@ -133,3 +133,79 @@ export async function photos(browser, { check }) {
   check(!errors.length, `sin errores en la consola${errors.length ? ': ' + errors.join(' | ') : ''}`)
   await page.close()
 }
+
+// Salir de una ronda a medias pide confirmación; "seguir jugando" no pierde nada.
+export async function leaveConfirm(browser, { check }) {
+  const { page, errors } = await openPage(browser)
+  await page.click('[data-mode="com-name"]')
+  await page.waitForSelector('.opt:not([disabled])')
+  await page.click('#btnHome')
+  await page.waitForSelector('#confirmDialog[open]')
+  check(/Perderás el avance/.test(await text(page, '#confirmDialog')), 'salir de una ronda pide confirmación')
+  await page.click('#confirmCancel')
+  await sleep(100)
+  check(await exists(page, '.opt:not([disabled])'), '"Seguir jugando" deja la pregunta como estaba')
+  check(await page.$eval('#screen', screen => screen.classList.contains('hidden')), 'y no vuelve al menú')
+
+  await page.click('#btnHome')
+  await page.waitForSelector('#confirmDialog[open]')
+  await page.keyboard.press('Escape')
+  await sleep(100)
+  check(await exists(page, '.opt:not([disabled])'), 'Escape equivale a quedarse')
+
+  await page.click('#btnHome')
+  await page.waitForSelector('#confirmDialog[open]')
+  await page.click('#confirmOk')
+  await page.waitForSelector('[data-mode]', { visible: true })
+  check(
+    !(await exists(page, '.hud-active')) && !(await text(page, '#hud')),
+    'confirmar vuelve al menú y borra la ronda',
+  )
+
+  await page.click('[data-official="com-name"]')
+  await page.waitForSelector('.opt:not([disabled])')
+  await page.click('#btnHome')
+  await page.waitForSelector('#confirmDialog[open]')
+  check(
+    /ranking/.test(await text(page, '#confirmDialog')),
+    'en una ronda oficial el aviso menciona el ranking',
+  )
+  await page.click('#confirmCancel')
+
+  check(!errors.length, `sin errores en la consola${errors.length ? ': ' + errors.join(' | ') : ''}`)
+  await page.close()
+}
+
+// En el celular las alternativas ocupan la mitad de la pantalla: la calle marcada debe quedar a la vista.
+export async function mobileFit(browser, { check }) {
+  const { page, errors } = await openPage(browser, { mobile: true })
+  await page.click('[data-mode="st-name"]')
+  let visible = 0
+  const questions = 6
+  for (let question = 0; question < questions; question++) {
+    await page.waitForSelector('.opt:not([disabled])')
+    await sleep(1300)
+    const fits = await page.evaluate(() => {
+      const mapBox = document.getElementById('map').getBoundingClientRect()
+      const panelTop = document.getElementById('panel').getBoundingClientRect().top
+      const paths = [...document.querySelectorAll('path[stroke="#2563eb"]')].filter(
+        path => !path.getAttribute('stroke-dasharray'),
+      )
+      if (!paths.length) return null
+      const rects = paths.map(path => path.getBoundingClientRect())
+      const top = Math.min(...rects.map(rect => rect.top))
+      const bottom = Math.max(...rects.map(rect => rect.bottom))
+      return top >= mapBox.top - 4 && bottom <= panelTop + 4
+    })
+    if (fits) visible++
+    await page.click('.opt:not([disabled])')
+    await page.waitForSelector('#btnNext')
+    await page.click('#btnNext')
+  }
+  check(
+    visible >= questions - 1,
+    `la calle marcada queda sobre el panel en el celular (${visible} de ${questions})`,
+  )
+  check(!errors.length, `sin errores en la consola${errors.length ? ': ' + errors.join(' | ') : ''}`)
+  await page.close()
+}

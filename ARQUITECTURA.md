@@ -65,6 +65,8 @@ Cómo dependen entre sí dentro de `src/`: `core` y `data` son la base y no cono
 encima, y `account` solo depende de `core`. Tres piezas pequeñas de `ui` son de uso común para cualquier
 capa: `panel.js` (el panel y la barra), `photos.js` y `navigation.js`. Las pantallas (menú, Explorar,
 ranking) no se importan entre sí: se abren por nombre con `navigate('home' | 'explore' | 'ranking')`.
+Antes de cambiar de pantalla, `navigate` pregunta a quien tenga algo en curso (`guardLeaving`): el motor de
+rondas lo usa para pedir confirmación (`ui/confirm.js`) si se sale a media ronda.
 
 ## Trabajar en local
 
@@ -102,7 +104,9 @@ excluyen las calles propias.
 
 `map.js` crea el mapa y concentra su estado: qué nombres muestra el mapa base (`setLabelMode('plain' |
 'streets' | 'labels')`: durante las preguntas se ocultan), el relieve, el paso entre "solo Región
-Metropolitana" y "todo Chile" (`setChile`) y los encuadres que respetan el panel (`fit`, `fitCity`). Todo lo
+Metropolitana" y "todo Chile" (`setChile`) y los encuadres que respetan el panel (`fit`, `fitCity`). Los encuadres son
+instantáneos, y cuando el panel crece (aparecen las alternativas o la respuesta) se repiten con el panel ya
+dibujado (`refit`): así lo marcado nunca queda tapado, ni siquiera en el celular. Todo lo
 que dibuja la pregunta en curso va a `layer`, que se vacía con `clearLayer()`.
 
 `draw.js` sabe dibujar cada cosa: comunas y regiones (`comunaLayer`), metro, calles, tramos con nombre,
@@ -208,7 +212,11 @@ Los errores siempre salen como `{ "error": "código", "message": "texto para mos
 
 Nombre de usuario y clave, sin correo. Decisiones:
 
-- **Claves** con scrypt (`server/passwords.js`); nunca se guardan en claro.
+- **Claves** con scrypt (`server/passwords.js`); nunca se guardan en claro. El costo (hoy 64 MB por intento)
+  va dentro de cada hash: al subirlo, las claves antiguas se recalculan solas la próxima vez que la persona
+  entra. Mínimo 8 caracteres, distinta del nombre de usuario y **que no aparezca en filtraciones públicas**:
+  al registrarse se consulta Pwned Passwords (Have I Been Pwned) enviando solo 5 caracteres del SHA-1, nunca
+  la clave. Si ese servicio no responde, el registro sigue.
 - **Sesión** en una cookie `HttpOnly` (el JavaScript de la página no puede leerla), `SameSite=Lax`, de 180
   días. En la base solo queda la huella del token.
 - **No hay recuperación de clave.** Sin correo no hay a dónde mandar nada, y se descartó un código de
@@ -343,6 +351,12 @@ l1…` se corren; esto reasigna las rutas) → `node merge_st.js` → `npm run b
   `parkphotos.js`. Revisar siempre a ojo con `sheets.py` (arma mosaicos). La selección revisada está fijada
   **por índice** en `merge_st.js` (`BAD`/`KEEP` por tanda) y en `build_data.js` (`BADP`): si se regenera un
   JSON de fotos, los índices cambian y hay que revisar de nuevo.
+- **Prolongaciones de rutas**: `extensions.js` (→ `extensions.json`) agrega a algunas calles (`ext`, en data.js)
+  lo que siguen fuera de la zona descargada: Ruta 5 hacia el norte y el sur, Ruta 68 a Valparaíso, Ruta 78 a San
+  Antonio, Ruta 57 a Los Andes y el Camino a Melipilla. El juego las dibuja en línea segmentada. Descarga las
+  rutas numeradas de toda la RM una vez (`ruta_raw.json`, ignorado por git) y se queda con lo que está a más de
+  400 m de la línea ya dibujada. Para prolongar otra calle, se agrega a la lista `ROADS` de ese archivo y se
+  corre `node extensions.js` y luego `npm run build`.
 - **Otros**: `metro.js`, `cerros.js`, `chile.js`/`chile2.js`, `extras.js` (rotondas, calles por línea de
   metro), `relations.js` (cruces y paralelas), `steproutes.js` (OSRM), `transit.js` (GTFS → itinerarios),
   `micros.js`, `border.js` (fronteras entre comunas; la sección se retiró, el cálculo sigue disponible).
