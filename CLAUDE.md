@@ -46,7 +46,6 @@ Los retirados están en `src/quiz/modes/retired/` (se ven con `?retirados` en la
 - Los juegos "desde tu casa o el campus" (`rs-home-*`, `mt-route`) están retirados; sus datos personales (Los Trapenses, Campus San Joaquín) siguen en `src/quiz/steps.js` y en `transit` de data.js.
 
 - Las calles que siguen fuera de Santiago (Ruta 5, 68, 78, 57, Camino a Melipilla) llevan una prolongación punteada (`ext`); ver `tools/extensions.js`.
-- Las fotos de "PUC – Campus San Joaquín" son incorrectas (AIEP San Joaquín, un Cesfam, una ciclovía). Pendiente de revisar con el usuario.
 
 ## Ideas pendientes
 
