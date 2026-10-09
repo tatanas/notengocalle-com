@@ -72,8 +72,8 @@ export async function openPage(browser, { mobile = false, path = '/', storage = 
   page.on('load', () => loads++)
   await page.evaluateOnNewDocument(entries => {
     for (const [key, value] of Object.entries(entries))
-      if (localStorage.getItem('ubicate:' + key) === null)
-        localStorage.setItem('ubicate:' + key, JSON.stringify(value))
+      if (localStorage.getItem('ntc:' + key) === null)
+        localStorage.setItem('ntc:' + key, JSON.stringify(value))
   }, storage)
   await page.goto(BASE_URL + path, { waitUntil: 'networkidle2' })
   // during(nombre) etiqueta los errores que aparezcan desde ahí, para saber en qué paso ocurrieron.

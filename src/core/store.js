@@ -1,5 +1,4 @@
-// El prefijo viene del nombre anterior del juego; se mantiene para no perder el progreso ya guardado.
-const PREFIX = 'ubicate:'
+const PREFIX = 'ntc:'
 
 export const store = {
   get(key, fallback) {

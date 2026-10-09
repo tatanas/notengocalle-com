@@ -158,7 +158,7 @@ Al terminar una ronda oficial (`ui/officialOutcome.js` → `account/scores.js`):
 
 ### Lo que se guarda en el navegador
 
-`localStorage`, con prefijo `ubicate:` (nombre antiguo del juego; se mantiene para no perder progreso):
+`localStorage`, con prefijo `ntc:`:
 
 | Clave | Contenido |
 |---|---|
