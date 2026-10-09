@@ -37,7 +37,11 @@ export async function startServer({ rebuild = true, dev = false } = {}) {
     return () => server.close()
   }
   if (rebuild) await build({ logLevel: 'warn' })
-  const server = await preview({ logLevel: 'warn' })
+  // Puerto propio de las pruebas, para no chocar con un `npm run preview` abierto.
+  const server = await preview({
+    logLevel: 'warn',
+    preview: { port: PORT, host: '127.0.0.1', strictPort: true },
+  })
   return () => new Promise(resolve => server.httpServer.close(resolve))
 }
 

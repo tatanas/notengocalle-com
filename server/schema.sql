@@ -5,7 +5,6 @@ create table if not exists users (
   name          text not null,
   name_key      text not null unique,
   password_hash text not null,
-  recovery_hash text not null,
   created_at    timestamptz not null default now()
 );
 

@@ -26,7 +26,7 @@ const outcome = page =>
 const dialogError = page =>
   page.waitForFunction(() => document.querySelector('#accountDialog .error')?.innerText)
 
-// El recorrido completo de una cuenta: jugar sin ella, crearla, aparecer en el ranking, salir, entrar y recuperarla.
+// El recorrido completo de una cuenta: jugar sin ella, crearla, aparecer en el ranking, salir y entrar.
 export async function accounts(browser, { check }) {
   const { page, context, errors } = await openPage(browser)
   await waitForAccountButton(page, 'Entrar')
@@ -43,14 +43,7 @@ export async function accounts(browser, { check }) {
   await page.click('#outcomeLogin')
   await page.click('#accountDialog [data-view="register"]')
   await fill(page, { name: 'Ana', password: PASSWORD })
-  await page.waitForSelector('.recovery-code')
-  const recoveryCode = await text(page, '.recovery-code')
-  check(
-    /^[A-Z2-9]{4}-[A-Z2-9]{4}-[A-Z2-9]{4}$/.test(recoveryCode),
-    'al crear la cuenta se muestra el código de recuperación',
-  )
-  await page.screenshot({ path: SHOTS + 'account_code.png' })
-  await page.click('#accountDialog .btn[data-close]')
+  await waitForAccountButton(page, 'Ana')
   await page.waitForFunction(() => /Puesto 1/.test(document.getElementById('officialOutcome').innerText))
   check(true, 'la ronda jugada sin cuenta se sube al crearla (puesto 1 de 1)')
   check((await accountButton(page)).includes('Ana'), 'la barra muestra el nombre del usuario')
@@ -82,8 +75,7 @@ export async function accounts(browser, { check }) {
     'no se puede registrar un nombre ya tomado',
   )
   await fill(second.page, { name: 'Beto', password: PASSWORD })
-  await second.page.waitForSelector('.recovery-code')
-  await second.page.click('#accountDialog .btn[data-close]')
+  await second.page.waitForFunction(() => document.getElementById('btnAccount').innerText.includes('Beto'))
   await playOfficialRound(second.page)
   await second.page.waitForFunction(() =>
     /de 2 en el ranking/.test(document.getElementById('officialOutcome').innerText),
@@ -115,20 +107,20 @@ export async function accounts(browser, { check }) {
   )
   await page.screenshot({ path: SHOTS + 'account_login.png' })
 
-  await page.click('#accountDialog [data-view="recover"]')
-  await fill(page, { name: 'Ana', recoveryCode, password: 'clave-nueva-1' })
-  await page.waitForSelector('.recovery-code')
-  check((await text(page, '.recovery-code')) !== recoveryCode, 'recuperar la cuenta entrega un código nuevo')
-  await page.click('#accountDialog .btn[data-close]')
-  await waitForAccountButton(page, 'Ana')
+  let alertText = ''
+  page.once('dialog', async dialog => {
+    alertText = dialog.message()
+    await dialog.dismiss()
+  })
+  await page.click('#accountDialog [data-forgot]')
+  await sleep(200)
+  check(alertText === 'pucha :(', '"Olvidé mi clave" muestra el aviso "pucha :("')
+  await page.click('#accountDialog .dialog-close')
 
   await page.click('#btnAccount')
-  await page.click('#logOut')
-  await waitForAccountButton(page, 'Entrar')
-  await page.click('#btnAccount')
-  await fill(page, { name: 'Ana', password: 'clave-nueva-1' })
+  await fill(page, { name: 'Ana', password: PASSWORD })
   await waitForAccountButton(page, 'Ana')
-  check(true, 'se puede entrar con la clave nueva')
+  check(true, 'se puede volver a entrar con la clave')
 
   // El 401 de la clave incorrecta es esperado; cualquier otro error no.
   const unexpected = errors.filter(error => !/401/.test(error))
