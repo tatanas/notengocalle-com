@@ -1,0 +1,3 @@
+[out:json][timeout:300];
+(way["highway"~"^(motorway|trunk|primary|secondary|tertiary|unclassified|residential|living_street|pedestrian|service|track)$"]["name"](-33.42,-70.64,-33.26,-70.40);way["waterway"]["name"](-33.42,-70.64,-33.26,-70.40);way["railway"="rail"](-33.42,-70.64,-33.26,-70.40););
+out geom tags;

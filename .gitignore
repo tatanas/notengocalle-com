@@ -1,0 +1,19 @@
+# --- NoTengoCalle.com ---
+# carpeta lista para subir a Netlify (se regenera con tools/make_dist.js)
+dist/
+node_modules/
+# resultados de pruebas automáticas
+tools/tests/shots/
+tools/shots/
+tools/sheets*/
+
+# datos crudos descargados (pesados y regenerables; ver CLAUDE.md)
+tools/btiles/
+tools/gtfs/
+tools/*_raw*.json
+tools/ways_named.json
+tools/majors.json
+tools/nameidx.json
+tools/rb_raw.json
+tools/*cache*.json
+tools/comunas_all.geojson
