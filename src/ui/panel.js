@@ -6,7 +6,7 @@ export const screenView = $('#screen')
 export const hud = $('#hud')
 export const title = $('#title')
 
-export const APP_NAME = 'NoTengoCalle.com'
+export const APP_NAME = 'NoTengoCalle'
 
 export function showPanel(html) {
   panel.innerHTML = html
