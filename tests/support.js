@@ -95,20 +95,26 @@ export async function goHome(page) {
 }
 
 // Un punto del mapa sobre algo que se puede tocar (una comuna, una región); si no hay, un punto fijo.
-const tappablePoint = page =>
-  page.evaluate(() => {
+// Con attempt distinto se elige otra figura: en "completa el mapa" tocar una ya respondida no cuenta.
+const tappablePoint = (page, attempt) =>
+  page.evaluate(attempt => {
     const map = document.getElementById('map').getBoundingClientRect()
+    const found = new Map()
     for (let fy = 0.15; fy < 0.9; fy += 0.05)
       for (let fx = 0.05; fx < 0.9; fx += 0.03) {
         const x = map.left + map.width * fx
         const y = map.top + map.height * fy
-        if (document.elementFromPoint(x, y)?.matches('path.leaflet-interactive')) return { x, y }
+        const element = document.elementFromPoint(x, y)
+        if (element?.matches('path.leaflet-interactive') && !found.has(element)) found.set(element, { x, y })
       }
-    return { x: map.left + map.width * 0.45, y: map.top + map.height * 0.35 }
-  })
+    const points = [...found.values()]
+    return points.length
+      ? points[attempt % points.length]
+      : { x: map.left + map.width * 0.45, y: map.top + map.height * 0.35 }
+  }, attempt)
 
 // Da un paso hacia responder la pregunta en pantalla: una alternativa, una línea de metro o un toque en el mapa.
-export async function answerSomehow(page) {
+export async function answerSomehow(page, attempt = 0) {
   const choice = (await page.$('.opt:not([disabled])')) || (await page.$('.linebtn'))
   if (choice) {
     await choice.click()
@@ -116,7 +122,7 @@ export async function answerSomehow(page) {
     if (confirm) await confirm.click()
     return
   }
-  const { x, y } = await tappablePoint(page)
+  const { x, y } = await tappablePoint(page, attempt)
   await page.mouse.click(x, y)
 }
 
@@ -129,7 +135,7 @@ export async function playRoundOfChoices(page, { thinkMs = 320 } = {}) {
     await sleep(thinkMs)
     await page.click('.opt:not([disabled])')
     await page.waitForSelector('#btnNext')
-    await page.click('#btnNext')
+    await clickNext(page)
   }
 }
 
@@ -143,3 +149,7 @@ export function createChecker(suite) {
     },
   }
 }
+
+// "Siguiente" queda al final del panel, que se desplaza suavemente al responder: un clic por coordenadas puede
+// caer a mitad del desplazamiento. El clic del DOM no depende de dónde esté el botón en ese instante.
+export const clickNext = page => page.$eval('#btnNext', button => button.click())

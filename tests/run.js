@@ -4,7 +4,16 @@
 //   node tests/run.js --no-build      reutiliza el dist/ existente
 //   node tests/run.js --dev           sirve el código sin empaquetar (errores con archivo y línea reales)
 import { accounts } from './suites/accounts.js'
-import { leaveConfirm, mobileFit, officialRounds, ownStreets, photos, timer } from './suites/rounds.js'
+import {
+  countdown,
+  leaveConfirm,
+  menuLayout,
+  mobileFit,
+  officialRounds,
+  ownStreets,
+  photos,
+  timer,
+} from './suites/rounds.js'
 import { smoke } from './suites/smoke.js'
 import { createChecker, launchBrowser, startServer } from './support.js'
 
@@ -16,6 +25,8 @@ const SUITES = {
   'own-streets': ownStreets,
   'official-rounds': officialRounds,
   'leave-confirm': leaveConfirm,
+  'menu-layout': menuLayout,
+  countdown,
   'mobile-fit': mobileFit,
   photos,
   accounts,

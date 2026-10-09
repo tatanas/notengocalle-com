@@ -2,17 +2,44 @@ import { OFFICIAL_ROUNDS, OFFICIAL_RULES } from '../../shared/ranked.js'
 import { adaptiveWeight, bests, record, saveBest, weightedSample } from '../core/progress.js'
 import { applyRoundRules, settings } from '../core/store.js'
 import { $, escapeHtml, formatTime } from '../core/util.js'
-import { clearLayer, labelMode, map, refit, setChile, setLabelMode, setRelief } from '../map/map.js'
+import { clearLayer, labelMode, map, setChile, setLabelMode, setRelief, setRoomyPanning } from '../map/map.js'
 import { confirmAction } from '../ui/confirm.js'
 import { guardLeaving, navigate } from '../ui/navigation.js'
 import { showOfficialOutcome } from '../ui/officialOutcome.js'
-import { hideScreen, hud, panel, showPanel, title, toast } from '../ui/panel.js'
+import { hidePanel, hideScreen, hud, panel, showPanel, title, toast } from '../ui/panel.js'
 
 /* Un modo define: id, group, name, desc, pool(), key(item) y ask(item, quiz).
-   Opcionales: label(item), balance(item), setup(quiz), all, keepLayer, noHint, relief, chile, tall, study. */
+   Opcionales: label(item), balance(item), setup(quiz), all, keepLayer, noHint, relief, chile, roomy, tall, study. */
 
 export let quiz = null
 let hudTimer = null
+
+const COUNTDOWN_SECONDS = 3
+let countdownTimer = null
+
+// Las rondas oficiales empiezan con una cuenta regresiva; el reloj de la ronda parte después, con la primera pregunta.
+function runCountdown(modeName, onDone) {
+  const box = $('#countdown')
+  let remaining = COUNTDOWN_SECONDS
+  const render = () => {
+    box.innerHTML = `<p class="countdown-label">🏆 Ronda oficial · ${escapeHtml(modeName)}</p>
+      <p class="countdown-number">${remaining}</p><p class="countdown-hint">¡Prepárate!</p>`
+  }
+  box.hidden = false
+  render()
+  countdownTimer = setInterval(() => {
+    remaining--
+    if (remaining > 0) return render()
+    stopCountdown()
+    onDone()
+  }, 1000)
+}
+
+function stopCountdown() {
+  clearInterval(countdownTimer)
+  countdownTimer = null
+  $('#countdown').hidden = true
+}
 
 const statKey = (mode, item) => mode.id + ':' + mode.key(item)
 
@@ -77,7 +104,6 @@ export function startQuiz(mode, { ranked = false } = {}) {
     answered: false,
     hinted: false,
   }
-  hudTimer = setInterval(updateHud, 500)
   hideScreen()
   title.textContent = mode.name
   setLabelMode('plain')
@@ -85,11 +111,25 @@ export function startQuiz(mode, { ranked = false } = {}) {
   hintControl.reset()
   setRelief(!!mode.relief)
   setChile(!!mode.chile)
-  if (mode.setup) mode.setup(quiz)
-  if (mode.study) {
+  setRoomyPanning(!!mode.roomy)
+  if (!ranked) return beginRound()
+  quiz.starting = true
+  panel.innerHTML = ''
+  hidePanel()
+  clearLayer()
+  runCountdown(mode.name, () => {
+    quiz.starting = false
+    beginRound()
+  })
+}
+
+function beginRound() {
+  hudTimer = setInterval(updateHud, 500)
+  if (quiz.mode.setup) quiz.mode.setup(quiz)
+  if (quiz.mode.study) {
     clearLayer()
     setLabelMode('streets')
-    mode.ask(null, quiz)
+    quiz.mode.ask(null, quiz)
     return
   }
   nextQuestion({ first: true })
@@ -98,8 +138,10 @@ export function startQuiz(mode, { ranked = false } = {}) {
 export function stopQuiz() {
   quiz = null
   clearInterval(hudTimer)
+  stopCountdown()
   applyRoundRules(null)
   map.removeControl(hintControl)
+  setRoomyPanning(false)
   panel.classList.remove('tall')
   hud.textContent = ''
 }
@@ -155,7 +197,6 @@ export function answer(ok, feedbackHtml, { points = null, partial = false } = {}
   feedback.innerHTML = `<h4>${feedbackTitle(ok, partial, q.hinted)}</h4>${feedbackHtml || ''}
     <button class="btn next" id="btnNext">${isLast ? 'Ver resultado' : 'Siguiente →'}</button>`
   panel.appendChild(feedback)
-  refit()
   $('#btnNext').onclick = () => nextQuestion()
   setTimeout(() => feedback.scrollIntoView({ block: 'nearest', behavior: 'smooth' }), 30)
 }
@@ -214,7 +255,7 @@ function endQuiz() {
 
 // Salir a media ronda pierde el avance (y, en una oficial, el puntaje): se pide confirmación.
 guardLeaving(() =>
-  quiz
+  quiz && !quiz.starting
     ? confirmAction({
         title: '¿Salir de la ronda?',
         message: quiz.ranked
@@ -227,7 +268,7 @@ guardLeaving(() =>
 )
 
 window.addEventListener('beforeunload', event => {
-  if (quiz) event.preventDefault()
+  if (quiz && !quiz.starting) event.preventDefault()
 })
 
 document.addEventListener('keydown', event => {

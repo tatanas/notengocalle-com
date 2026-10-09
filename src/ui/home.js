@@ -12,6 +12,11 @@ import { APP_NAME, hidePanel, screenView, showScreen, title } from './panel.js'
 
 const GROUPS = [
   {
+    name: 'Calles',
+    emoji: '🛣️',
+    blurb: `${quizStreets().length} avenidas, autopistas y carreteras, más ríos y canales. Las que cambian de nombre muestran sus tramos.`,
+  },
+  {
     name: 'Comunas',
     emoji: '🗺️',
     blurb: 'Ubica las comunas del Gran Santiago y aprende con cuáles limita cada una.',
@@ -20,11 +25,6 @@ const GROUPS = [
     name: 'Landmarks',
     emoji: '📍',
     blurb: `${DATA.landmarks.length} lugares: estadios, parques, malls, universidades, colegios, barrios, restaurantes y las estaciones de metro.`,
-  },
-  {
-    name: 'Calles',
-    emoji: '🛣️',
-    blurb: `${quizStreets().length} avenidas, autopistas y carreteras, más ríos y canales. Las que cambian de nombre muestran sus tramos.`,
   },
   {
     name: 'Ruteo',
@@ -71,15 +71,16 @@ function mastery(mode) {
   return `${Math.round((mastered / items.length) * 100)}% dominado`
 }
 
+// El botón grande es la ronda oficial (cuenta para el ranking); el chico, una ronda de práctica.
+// Un juego sin ronda oficial deja su único botón como práctica.
 function modeRow(mode) {
-  const official = hasOfficialRound(mode)
-    ? `<button class="official" data-official="${mode.id}" title="Ronda oficial: cuenta para el ranking" aria-label="Ronda oficial de ${escapeHtml(mode.name)}">🏆</button>`
-    : ''
+  const label = `<span><b>${escapeHtml(mode.name)}</b><br><small>${escapeHtml(mode.desc)}</small></span>
+      <span class="mastery">${mastery(mode)}</span>`
+  if (!hasOfficialRound(mode))
+    return `<div class="mode-row"><button class="mode" data-mode="${mode.id}">${label}</button></div>`
   return `<div class="mode-row">
-    <button class="mode" data-mode="${mode.id}">
-      <span><b>${escapeHtml(mode.name)}</b><br><small>${escapeHtml(mode.desc)}</small></span>
-      <span class="mastery">${mastery(mode)}</span>
-    </button>${official}
+    <button class="mode ranked" data-official="${mode.id}" title="Ronda oficial: cuenta para el ranking">${label}</button>
+    <button class="practice" data-mode="${mode.id}" title="Ronda de práctica, sin ranking" aria-label="Práctica de ${escapeHtml(mode.name)}">Práctica</button>
   </div>`
 }
 
@@ -122,7 +123,7 @@ function settingsCard() {
     <label>Categorías de landmarks</label>
     <div class="chips" id="setCats">${categoryChips.join('')}</div>
     <div style="margin-top:10px">${chip('Modo estricto en landmarks (800 m en vez de 1,5 km)', settings.strict, 'id="setStrict"')}</div>
-    <p class="muted" style="font-size:12px;margin:10px 0 0">Los ajustes valen para las rondas de práctica; las rondas oficiales 🏆 usan reglas fijas.</p>
+    <p class="muted" style="font-size:12px;margin:10px 0 0">Los ajustes valen para las rondas de práctica; las rondas oficiales usan reglas fijas.</p>
   </div>`
 }
 
@@ -171,13 +172,13 @@ const homeHtml = () => `<div class="wrap">
   <div class="hero"><h2>¿Dónde queda eso? 🏔️</h2>
     <p>Practica comunas, lugares, calles, rutas y metro de Santiago. Lo que fallas te lo pregunta más seguido.</p></div>
   <div class="grid">
+    ${[...GROUPS, ...retiredGroups()].map(groupCard).join('')}
+    <div class="card"><h3><span class="em">🏆</span>Ranking</h3>
+      <p>El botón grande de cada juego es su ronda oficial: mismas reglas para todos y cuenta para el ranking, con cuenta. <b>Práctica</b> es una ronda sin presión que aprende de lo que fallas.</p>
+      <button class="btn wide" id="goRanking">Ver ranking</button></div>
     <div class="card"><h3><span class="em">🔎</span>Explorar</h3>
       <p>Mapa interactivo con comunas, metro, calles y lugares. Para estudiar antes de jugar.</p>
       <button class="btn wide" id="goExplore">Abrir mapa</button></div>
-    <div class="card"><h3><span class="em">🏆</span>Ranking</h3>
-      <p>Cada juego tiene una ronda oficial (el botón 🏆) con las mismas reglas para todos. Compara tus aciertos y tu tiempo con el resto.</p>
-      <button class="btn wide" id="goRanking">Ver ranking</button></div>
-    ${[...GROUPS, ...retiredGroups()].map(groupCard).join('')}
   </div>
   <div class="grid settings">
     ${settingsCard()}

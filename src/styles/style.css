@@ -774,18 +774,26 @@ h3.tight {
   flex: 1;
   min-width: 0;
 }
-.official {
+.mode.ranked {
+  border-color: #f2d58a;
+  background: #fffbeb;
+}
+.mode.ranked:hover {
+  border-color: var(--warn);
+}
+.practice {
   flex: 0 0 auto;
-  width: 44px;
+  width: 72px;
   border: 1px solid var(--line);
   border-radius: 10px;
   background: var(--bg);
   cursor: pointer;
-  font-size: 17px;
+  font-size: 13px;
+  color: var(--muted);
 }
-.official:hover {
-  border-color: var(--warn);
-  background: #fef3c7;
+.practice:hover {
+  border-color: var(--pri);
+  color: var(--ink);
 }
 
 /* cuenta */
@@ -911,4 +919,49 @@ table.board.clickable tr[data-open] {
 }
 table.board.clickable tr[data-open]:hover td {
   background: var(--bg);
+}
+
+/* cuenta regresiva antes de una ronda oficial */
+#countdown {
+  position: fixed;
+  inset: var(--top-h) 0 0 0;
+  z-index: 1250;
+  display: grid;
+  place-content: center;
+  text-align: center;
+  color: #fff;
+  background: rgba(15, 23, 42, 0.68);
+}
+#countdown[hidden] {
+  display: none;
+}
+.countdown-label {
+  margin: 0;
+  font-size: 16px;
+  opacity: 0.85;
+}
+.countdown-number {
+  margin: 6px 0;
+  font-size: min(38vw, 180px);
+  font-weight: 800;
+  line-height: 1;
+  animation: count-pop 1s ease-out;
+}
+.countdown-hint {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 650;
+}
+@keyframes count-pop {
+  0% {
+    transform: scale(1.6);
+    opacity: 0;
+  }
+  30% {
+    opacity: 1;
+  }
+  100% {
+    transform: scale(0.9);
+    opacity: 0.85;
+  }
 }

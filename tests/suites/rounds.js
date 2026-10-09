@@ -1,5 +1,5 @@
 import { OFFICIAL_ROUNDS } from '../../shared/ranked.js'
-import { exists, goHome, openPage, playRoundOfChoices, sleep, text } from '../support.js'
+import { clickNext, exists, goHome, openPage, playRoundOfChoices, sleep, text } from '../support.js'
 
 const seconds = hud => {
   const [, minutes, secs] = hud.match(/(\d+):(\d\d)/)
@@ -22,7 +22,7 @@ export async function timer(browser, { check }) {
     `el reloj se detiene al responder (${atAnswer}s → ${afterReading}s)`,
   )
 
-  await page.click('#btnNext')
+  await clickNext(page)
   await playRoundOfChoices(page, { thinkMs: 60 })
   const result = await text(page, '#panel')
   check(/\/ 10/.test(result), 'la ronda respeta el largo elegido (10 preguntas)')
@@ -96,8 +96,8 @@ export async function officialRounds(browser, { check }) {
   for (const id of offered) {
     await goHome(page)
     await page.click(`[data-official="${id}"]`)
-    await sleep(600)
-    const header = (await exists(page, '.q-head')) ? await text(page, '.q-head') : ''
+    const started = await page.waitForSelector('.q-head', { timeout: 8000 }).catch(() => null)
+    const header = started ? await text(page, '.q-head') : ''
     const total = +(header.match(/de (\d+)/) || [])[1]
     if (total !== OFFICIAL_ROUNDS[id] || !/Ronda oficial/.test(header))
       wrong.push(`${id} (${total || 'no partió'})`)
@@ -117,7 +117,7 @@ export async function photos(browser, { check }) {
   await page.waitForSelector('.ph img')
   for (let question = 0; question < 15 && !(await exists(page, '.phnav.next')); question++) {
     await page.click('.opt:not([disabled])')
-    await page.click('#btnNext')
+    await clickNext(page)
     await page.waitForSelector('.ph img')
   }
   const counter = () => text(page, '.phcount')
@@ -200,12 +200,88 @@ export async function mobileFit(browser, { check }) {
     if (fits) visible++
     await page.click('.opt:not([disabled])')
     await page.waitForSelector('#btnNext')
-    await page.click('#btnNext')
+    await clickNext(page)
   }
   check(
     visible >= questions - 1,
     `la calle marcada queda sobre el panel en el celular (${visible} de ${questions})`,
   )
+  check(!errors.length, `sin errores en la consola${errors.length ? ': ' + errors.join(' | ') : ''}`)
+  await page.close()
+}
+
+// El botón grande de cada juego es la ronda oficial y el chico, la práctica; el menú sigue el orden pedido.
+export async function menuLayout(browser, { check }) {
+  const { page, errors } = await openPage(browser)
+  const headings = await page.$eval('.grid', grid =>
+    [...grid.querySelectorAll('.card h3')].map(title => title.innerText.trim()),
+  )
+  const order = ['Calles', 'Comunas', 'Landmarks', 'Ruteo', 'Ranking', 'Explorar']
+  const positions = order.map(name => headings.findIndex(heading => heading.endsWith(name)))
+  check(
+    positions.every((position, i) => position >= 0 && (i === 0 || position > positions[i - 1])),
+    `las tarjetas salen en el orden Calles, Comunas, Landmarks, Ruteo, Ranking, Explorar (${headings.join(' · ')})`,
+  )
+  const big = await page.$$eval('.mode-row .mode.ranked', buttons => buttons.length)
+  const small = await page.$$eval('.mode-row .practice', buttons =>
+    buttons.map(button => button.innerText.trim()),
+  )
+  check(
+    big === 15 && small.length === 15,
+    `cada juego tiene botón grande (oficial) y chico (práctica): ${big} y ${small.length}`,
+  )
+  check(
+    small.every(label => label === 'Práctica'),
+    'el botón chico dice "Práctica"',
+  )
+
+  await page.click('[data-mode="com-name"]')
+  await page.waitForSelector('.q-head', { timeout: 1500 })
+  check(
+    !/Ronda oficial/.test(await text(page, '.q-head')),
+    'el botón chico abre una ronda de práctica, sin cuenta regresiva',
+  )
+  await goHome(page)
+  await page.click('[data-official="com-name"]')
+  await page.waitForSelector('.q-head', { timeout: 8000 })
+  check(/Ronda oficial/.test(await text(page, '.q-head')), 'el botón grande abre la ronda oficial')
+  check(!(await page.$eval('#countdown', box => !box.hidden)), 'la cuenta regresiva se cierra al empezar')
+  check(!errors.length, `sin errores en la consola${errors.length ? ': ' + errors.join(' | ') : ''}`)
+  await page.close()
+}
+
+// Las rondas oficiales parten con 3, 2, 1; el reloj de la ronda no cuenta ese tiempo.
+export async function countdown(browser, { check }) {
+  const { page, errors } = await openPage(browser)
+  await page.click('[data-official="com-name"]')
+  await page.waitForSelector('#countdown:not([hidden])')
+  const shown = () => page.$eval('.countdown-number', number => number.innerText)
+  check((await shown()) === '3', 'la cuenta regresiva parte en 3')
+  check(!(await exists(page, '.q-head')), 'mientras cuenta no se ve ninguna pregunta')
+  await sleep(1150)
+  check((await shown()) === '2', 'a los 1,1 segundos va en 2')
+  const startedAt = Date.now()
+  await page.waitForSelector('.q-head', { timeout: 6000 })
+  const waited = Date.now() - startedAt
+  check(
+    waited > 1000 && waited < 2600,
+    `la primera pregunta aparece a los 3 segundos (${waited} ms después del "2")`,
+  )
+  check(
+    /0:0[01]/.test(await text(page, '#hud')),
+    'el reloj de la ronda parte en cero: no cuenta la cuenta regresiva',
+  )
+
+  // Salir durante la cuenta regresiva no pide confirmación: todavía no hay nada que perder.
+  await goHome(page)
+  await page.click('[data-official="st-name"]')
+  await page.waitForSelector('#countdown:not([hidden])')
+  await page.click('#btnHome')
+  await page.waitForSelector('#screen:not(.hidden) [data-mode]')
+  check(!(await exists(page, '#confirmDialog[open]')), 'salir durante la cuenta no pide confirmación')
+  check(await page.$eval('#countdown', box => box.hidden), 'y la cuenta regresiva desaparece')
+  await sleep(3300)
+  check(!(await exists(page, '.q-head')), 'tampoco parte una ronda fantasma después')
   check(!errors.length, `sin errores en la consola${errors.length ? ': ' + errors.join(' | ') : ''}`)
   await page.close()
 }

@@ -45,15 +45,9 @@ map.attributionControl.setPrefix('')
 // Todo lo que dibuja la pregunta o pantalla actual vive en esta capa, para borrarlo de una vez.
 export const layer = L.layerGroup().addTo(map)
 
-// Los encuadres son instantáneos: dos animaciones de zoom seguidas (el encuadre y su repetición al crecer el panel)
-// se pisan en Leaflet y dejan el mapa mal dibujado.
-// El último encuadre pedido, para repetirlo cuando el panel crece (aparecen las alternativas o la respuesta).
-let lastFit = null
-
 export function clearLayer() {
   layer.clearLayers()
   map.off('click')
-  lastFit = null
 }
 
 // ----- mapa base (vectorial); sin WebGL se cae a las teselas raster de OSM, que siempre traen nombres
@@ -149,13 +143,22 @@ function panelPadding() {
     : { paddingTopLeft: [50, 20], paddingBottomRight: [panel.offsetWidth + 30, 20] }
 }
 
-export function fit(bounds, maxZoom = 15) {
-  lastFit = { bounds, maxZoom }
-  map.fitBounds(bounds, { maxZoom, animate: false, ...panelPadding() })
-}
+// Leaflet ignora un zoom animado pedido mientras otro sigue en curso (dura unos 250 ms) y deja el mapa donde estaba:
+// si el encuadre llega en ese instante, se espera a que termine el anterior. Solo cambia ese caso.
+let pendingFit = null
 
-export function refit() {
-  if (lastFit) fit(lastFit.bounds, lastFit.maxZoom)
+export function fit(bounds, maxZoom = 15) {
+  if (map._animatingZoom) {
+    if (!pendingFit)
+      map.once('zoomend', () => {
+        const next = pendingFit
+        pendingFit = null
+        fit(next.bounds, next.maxZoom)
+      })
+    pendingFit = { bounds, maxZoom }
+    return
+  }
+  map.fitBounds(bounds, { maxZoom, animate: true, ...panelPadding() })
 }
 
 export const boundsOfFeatures = features => L.geoJSON({ type: 'FeatureCollection', features }).getBounds()
@@ -163,6 +166,21 @@ export const boundsOfFeatures = features => L.geoJSON({ type: 'FeatureCollection
 // Con el Gran Santiago se encuadra la mancha urbana: el polígono de Lo Barnechea es enorme y achicaría todo.
 export function fitCity() {
   fit(settings.scope === 'core' ? L.latLngBounds(URBAN_AREA) : boundsOfFeatures(scopeComunas()), 13)
+}
+
+// ----- los juegos de calles dejan correr el mapa un poco más allá de la región.
+// Un río o una autopista larga (el Maipo) queda pegado al borde, y para dejarlo sobre el panel de alternativas el
+// mapa necesita espacio hacia ese lado: con el límite normal, Leaflet lo empuja de vuelta y la calle queda tapada.
+const STREET_PAN_LIMITS = [
+  [-35.3, -72.8],
+  [-31.8, -68.7],
+]
+let roomyPanning = false
+
+export function setRoomyPanning(on) {
+  if (on === roomyPanning || showingChile) return
+  roomyPanning = on
+  map.setMaxBounds(on ? STREET_PAN_LIMITS : REGION_BOUNDS)
 }
 
 // ----- el mapa normalmente está limitado a la RM; los juegos de Chile lo abren a todo el país

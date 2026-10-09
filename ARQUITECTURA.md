@@ -104,9 +104,12 @@ excluyen las calles propias.
 
 `map.js` crea el mapa y concentra su estado: qué nombres muestra el mapa base (`setLabelMode('plain' |
 'streets' | 'labels')`: durante las preguntas se ocultan), el relieve, el paso entre "solo Región
-Metropolitana" y "todo Chile" (`setChile`) y los encuadres que respetan el panel (`fit`, `fitCity`). Los encuadres son
-instantáneos, y cuando el panel crece (aparecen las alternativas o la respuesta) se repiten con el panel ya
-dibujado (`refit`): así lo marcado nunca queda tapado, ni siquiera en el celular. Todo lo
+Metropolitana" y "todo Chile" (`setChile`) y los encuadres que respetan el panel (`fit`, `fitCity`; animados). Un encuadre se calcula con el tamaño
+que tiene el panel en ese momento, así que los juegos de calles dibujan primero las alternativas y recién
+entonces encuadran (y en la respuesta, al revés: primero la respuesta, después el encuadre). Esos juegos
+marcan `roomy: true`, que deja correr el mapa más allá de los límites de la región (`setRoomyPanning`):
+sin eso, Leaflet empuja de vuelta el mapa cuando una calle larga queda en el borde (el Maipo) y la deja
+bajo el panel. Todo lo
 que dibuja la pregunta en curso va a `layer`, que se vacía con `clearLayer()`.
 
 `draw.js` sabe dibujar cada cosa: comunas y regiones (`comunaLayer`), metro, calles, tramos con nombre,
@@ -143,13 +146,18 @@ El sorteo (`core/progress.js`) es ponderado: lo nuevo y lo fallado pesa más, lo
 
 Hay dos formas de jugar el mismo modo:
 
-|                | Práctica                                                            | Ronda oficial 🏆                              |
+|                | Práctica                                                            | Ronda oficial (botón grande)                  |
 | -------------- | ------------------------------------------------------------------- | --------------------------------------------- |
 | Ajustes        | los del jugador (comunas, largo, categorías, líneas, modo estricto) | fijos: `OFFICIAL_RULES` en `shared/ranked.js` |
 | Sorteo         | ponderado por lo que el jugador falla                               | parejo para todos                             |
 | Calles propias | incluidas                                                           | excluidas                                     |
 | Largo          | el elegido                                                          | fijo por modo: `OFFICIAL_ROUNDS`              |
 | Va al ranking  | no                                                                  | sí, si hay cuenta                             |
+| Al empezar     | de inmediato                                                        | cuenta regresiva de 3 segundos                |
+
+En el menú, el **botón grande** de cada juego es la ronda oficial y el **chico** ("Práctica") es la ronda de
+práctica. La cuenta regresiva (`runCountdown`, `quiz/engine.js`) tapa el mapa antes de la primera pregunta; el
+reloj de la ronda parte con la pregunta, no con la cuenta, y salir durante la cuenta no pide confirmación.
 
 Las reglas fijas se imponen en un solo lugar: `settings` (`core/store.js`) devuelve las preferencias del
 jugador, salvo durante una ronda oficial, donde devuelve las de la ronda. Por eso los modos no necesitan
