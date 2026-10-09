@@ -5,6 +5,8 @@ const geo=JSON.parse(fs.readFileSync('landmarks_geo.json'));
 const CAR=require('./careers.js');
 const DROP=['Colegio SEK','Colegio Manquehue','Confitería Torres','Casa Piedra'];
 const F={
+"UAI – sede Vitacura":{ll:[-33.37979,-70.58650],obvious:true},
+"Universidad Andrés Bello – Bellavista":{ll:[-33.43496,-70.63407],alt:["Recoleta","Providencia"]},
 "Duoc UC – sede Plaza Norte":{ll:[-33.363,-70.67771]},
 "Duoc UC – sede Plaza Vespucio":{ll:[-33.51628,-70.59824]},
 "Duoc UC – sede San Bernardo":{ll:[-33.59878,-70.70528],obvious:true},
