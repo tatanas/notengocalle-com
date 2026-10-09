@@ -1,13 +1,17 @@
 # --- NoTengoCalle.com ---
-# carpeta lista para subir a Netlify (se regenera con tools/make_dist.js)
-dist/
 node_modules/
-# resultados de pruebas automáticas
-tools/tests/shots/
+# sitio compilado (lo genera `npm run build`; Netlify lo construye solo)
+dist/
+# base de datos local de desarrollo y otros archivos de trabajo
+.local/
+.netlify/
+.env
+# capturas de las pruebas de navegador
+tests/shots/
 tools/shots/
 tools/sheets*/
 
-# datos crudos descargados (pesados y regenerables; ver CLAUDE.md)
+# datos crudos descargados (pesados y regenerables; ver ARQUITECTURA.md)
 tools/btiles/
 tools/gtfs/
 tools/*_raw*.json
