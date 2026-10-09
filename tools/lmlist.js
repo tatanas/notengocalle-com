@@ -294,6 +294,8 @@ module.exports=[
 ["Universidad Central – Campus Santa Isabel","Universidades","Universidad Central – Campus Santa Isabel","Santiago","Campus de la U. Central en calle Santa Isabel, barrio Matta."],
 ["Universidad Autónoma – Providencia","Universidades","Universidad Autónoma – Providencia","Providencia","Campus de la U. Autónoma en Av. Pedro de Valdivia."],
 ["Universidad Católica Silva Henríquez – Campus Lo Cañas","Universidades","Universidad Católica Silva Henríquez – Campus Lo Cañas","La Florida","Campus de la UCSH en el sector alto de La Florida."],
+["UAI – sede Vitacura","Universidades","UAI – sede Vitacura","Vitacura","Sede de la U. Adolfo Ibáñez en Vitacura, cerca de Av. Santa María."],
+["Universidad Andrés Bello – Bellavista","Universidades","Universidad Andrés Bello – Bellavista","Recoleta","Campus de la UNAB en Bellavista 7, en el límite entre Recoleta y Providencia, pegado a los edificios de AIEP."],
 // --- barrios y sectores
 ["Plaza San Enrique","Barrios","Plaza San Enrique, Lo Barnechea","Lo Barnechea","Plaza al final de Av. Las Condes, donde parte el camino a Farellones y el camino a El Arrayán. Zona de restaurantes y bares."],
 ["El Arrayán","Barrios","El Arrayán, Lo Barnechea","Lo Barnechea","Sector precordillerano siguiendo el estero Arrayán hacia el norte desde Plaza San Enrique; casas, restaurantes y el Santuario de la Naturaleza."],
