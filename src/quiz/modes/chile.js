@@ -138,7 +138,7 @@ registerMode({
   },
   click(g, l) {
     const q = quiz
-    if (!q || q.answered) return
+    if (!q || q.answered || q.starting) return
     const f = q.items[q.i],
       name = f.properties.name
     if (q.state[g.properties.name]) {

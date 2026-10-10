@@ -163,9 +163,46 @@ export function fit(bounds, maxZoom = 15) {
 
 export const boundsOfFeatures = features => L.geoJSON({ type: 'FeatureCollection', features }).getBounds()
 
+// En las rondas oficiales hay una cuenta regresiva en la que se puede acomodar el mapa. Si la persona lo movió,
+// el encuadre general del comienzo (ciudad o Chile) ya no lo pisa.
+let trackingAdjustments = false
+let viewAdjusted = false
+const markAdjusted = () => {
+  if (trackingAdjustments) viewAdjusted = true
+}
+for (const gesture of ['pointerdown', 'wheel']) map.getContainer().addEventListener(gesture, markAdjusted)
+
+export function watchViewAdjustments(on) {
+  trackingAdjustments = on
+  if (on) viewAdjusted = false
+}
+
+export function forgetViewAdjustments() {
+  trackingAdjustments = false
+  viewAdjusted = false
+}
+
 // Con el Gran Santiago se encuadra la mancha urbana: el polígono de Lo Barnechea es enorme y achicaría todo.
 export function fitCity() {
+  if (viewAdjusted) return
   fit(settings.scope === 'core' ? L.latLngBounds(URBAN_AREA) : boundsOfFeatures(scopeComunas()), 13)
+}
+
+// Como fit, pero sin redondear el zoom hacia abajo al entero: la región llena la pantalla en vez de quedar lejos.
+function fitClosely(bounds, maxZoom) {
+  const snap = map.options.zoomSnap
+  map.options.zoomSnap = 0
+  try {
+    fit(bounds, maxZoom)
+  } finally {
+    map.options.zoomSnap = snap
+  }
+}
+
+// Vista inicial de "completa el mapa": solo el Gran Santiago, de cerca; con la periferia (Colina, Lampa…), más lejos.
+export function fitGreaterSantiago() {
+  if (settings.scope === 'core') fitClosely(L.latLngBounds(URBAN_AREA).pad(-0.08), 14)
+  else fit(boundsOfFeatures(scopeComunas()), 13)
 }
 
 // ----- los juegos de calles dejan correr el mapa un poco más allá de la región.
@@ -201,6 +238,7 @@ export function setChile(on) {
 
 // Se espera un instante a que el panel tenga su tamaño final antes de encuadrar.
 export function fitChile() {
+  if (viewAdjusted) return
   setTimeout(() => {
     map.invalidateSize()
     map.fitBounds(L.latLngBounds(CONTINENTAL_CHILE), { maxZoom: 6, animate: false, ...panelPadding() })

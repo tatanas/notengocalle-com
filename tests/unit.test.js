@@ -2,7 +2,7 @@
 import assert from 'node:assert/strict'
 import { test } from 'node:test'
 import { usernameKey, USERNAME_PATTERN } from '../shared/accounts.js'
-import { OFFICIAL_ROUNDS, isBetterScore, scoreProblem } from '../shared/ranked.js'
+import { categoryOf, isBetterScore, legacyCategory, scoreProblem } from '../shared/ranked.js'
 import {
   distanceKm,
   distanceKmAnyLatitude,
@@ -141,10 +141,14 @@ test('un puntaje es mejor con más aciertos o, a igual número, con menos tiempo
 })
 
 test('solo pasan los puntajes con forma de ronda oficial', () => {
-  const round = { mode: 'com-name', correct: 10, total: OFFICIAL_ROUNDS['com-name'], ms: 60000 }
+  const round = { mode: 'com-name', category: '15', correct: 10, total: 15, ms: 60000 }
   assert.equal(scoreProblem(round), null)
+  assert.equal(scoreProblem({ ...round, category: '30', total: 30 }), null)
+  assert.equal(scoreProblem({ ...round, category: 'all', total: 179, correct: 100, ms: 600000 }), null)
   assert.ok(scoreProblem({ ...round, mode: 'otro' }))
-  assert.ok(scoreProblem({ ...round, total: 10 }))
+  assert.ok(scoreProblem({ ...round, category: '12' }))
+  assert.ok(scoreProblem({ ...round, total: 10 }), 'el largo no coincide con la categoría')
+  assert.ok(scoreProblem({ ...round, category: 'all', total: 3 }))
   assert.ok(scoreProblem({ ...round, correct: 16 }))
   assert.ok(scoreProblem({ ...round, ms: 1000 }))
   assert.ok(scoreProblem({ ...round, ms: 7 * 60 * 60 * 1000 }))
@@ -156,4 +160,18 @@ test('nombres de usuario: qué se acepta y cuándo dos son el mismo', () => {
     assert.ok(!USERNAME_PATTERN.test(name), name)
   assert.equal(usernameKey('Ñandú'), usernameKey('NANDU'))
   assert.notEqual(usernameKey('seba'), usernameKey('seba2'))
+})
+
+test('el largo de la ronda decide su categoría de ranking', () => {
+  assert.equal(categoryOf(15, 34), '15')
+  assert.equal(categoryOf(34, 34), 'all')
+  assert.equal(categoryOf(179, 179), 'all')
+  assert.equal(
+    categoryOf(30, 20),
+    'all',
+    'si el juego tiene menos preguntas que el largo pedido, se recorre todo',
+  )
+  assert.equal(legacyCategory({ mode: 'com-name', total: 15 }), '15')
+  assert.equal(legacyCategory({ mode: 'ch-all', total: 16 }), 'all')
+  assert.equal(legacyCategory({ mode: 'st-name', total: 179 }), 'all')
 })

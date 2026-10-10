@@ -149,15 +149,19 @@ Hay dos formas de jugar el mismo modo:
 |                | Práctica                                                            | Ronda oficial (botón grande)                  |
 | -------------- | ------------------------------------------------------------------- | --------------------------------------------- |
 | Ajustes        | los del jugador (comunas, largo, categorías, líneas, modo estricto) | fijos: `OFFICIAL_RULES` en `shared/ranked.js` |
+| Ayudas         | modo fácil / difícil (bordes de comunas y metro) y "Ver nombres"    | ninguna: siempre difícil, sin botones         |
 | Sorteo         | ponderado por lo que el jugador falla                               | parejo para todos                             |
 | Calles propias | incluidas                                                           | excluidas                                     |
-| Largo          | el elegido                                                          | fijo por modo: `OFFICIAL_ROUNDS`              |
+| Largo          | el elegido (10, 15, 20, 30 o todas)                                 | el elegido; cada largo tiene su ranking       |
 | Va al ranking  | no                                                                  | sí, si hay cuenta                             |
 | Al empezar     | de inmediato                                                        | cuenta regresiva de 3 segundos                |
 
 En el menú, el **botón grande** de cada juego es la ronda oficial y el **chico** ("Práctica") es la ronda de
 práctica. La cuenta regresiva (`runCountdown`, `quiz/engine.js`) tapa el mapa antes de la primera pregunta; el
 reloj de la ronda parte con la pregunta, no con la cuenta, y salir durante la cuenta no pide confirmación.
+Durante la cuenta el mapa se puede mover: si la persona lo acomodó, el encuadre general del comienzo (ciudad
+o Chile) no lo pisa (`watchViewAdjustments`, `src/map/map.js`). Las rondas oficiales tienen un botón de
+reiniciar en la barra (`#btnRestart`): vuelve a partir, con otras preguntas, mismo juego y mismo largo.
 
 Las reglas fijas se imponen en un solo lugar: `settings` (`core/store.js`) devuelve las preferencias del
 jugador, salvo durante una ronda oficial, donde devuelve las de la ronda. Por eso los modos no necesitan
@@ -204,15 +208,15 @@ mano** en cada despliegue. Nunca intercepta `/api/` ni las teselas del mapa.
 Es una sola Function de Netlify. `server/api.js` recibe un `Request` y devuelve un `Response` (el estándar
 web), así que el mismo código corre en Netlify y en el servidor local de desarrollo.
 
-| Ruta                                 | Qué hace                                                   |
-| ------------------------------------ | ---------------------------------------------------------- |
-| `POST /api/register`                 | crea la cuenta e inicia sesión                             |
-| `POST /api/login`                    | inicia sesión                                              |
-| `POST /api/logout`                   | cierra la sesión                                           |
-| `GET /api/me`                        | usuario de la sesión, o `null`                             |
-| `POST /api/scores`                   | guarda una ronda oficial; responde puesto y mejor marca    |
-| `GET /api/leaderboard?mode=&period=` | los 50 mejores de un juego, más la fila del usuario        |
-| `GET /api/leaders?period=`           | el líder de cada juego y el puesto del usuario en cada uno |
+| Ruta                                           | Qué hace                                                                                                      |
+| ---------------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
+| `POST /api/register`                           | crea la cuenta e inicia sesión                                                                                |
+| `POST /api/login`                              | inicia sesión                                                                                                 |
+| `POST /api/logout`                             | cierra la sesión                                                                                              |
+| `GET /api/me`                                  | usuario de la sesión, o `null`                                                                                |
+| `POST /api/scores`                             | guarda una ronda oficial; responde puesto y mejor marca                                                       |
+| `GET /api/leaderboard?mode=&category=&period=` | los 50 mejores de un juego en esa categoría, más la fila del usuario y cuántos jugadores tiene cada categoría |
+| `GET /api/leaders?category=&period=`           | el líder de cada juego en esa categoría y el puesto del usuario en cada uno                                   |
 
 Los errores siempre salen como `{ "error": "código", "message": "texto para mostrar" }`.
 
@@ -236,7 +240,10 @@ Nombre de usuario y clave, sin correo. Decisiones:
 
 ### Ranking
 
-- Un ranking por juego. Ordena por aciertos y, a igual número, por menor tiempo.
+- Un ranking por juego **y por largo de ronda** (categorías `10`, `15`, `20`, `30` y `all` = todas las preguntas del
+  juego): 15 preguntas y todas no se pueden comparar. El largo es el que el jugador tiene elegido en sus ajustes;
+  desde el ranking también se puede jugar el largo de la pestaña abierta. Ordena por aciertos y, a igual número, por
+  menor tiempo.
 - De cada jugador cuenta su mejor ronda; todas las rondas quedan guardadas (permite el ranking "últimos 7
   días" y, a futuro, historial).
 - **El puntaje lo calcula el navegador.** El servidor solo descarta lo imposible (`scoreProblem` en
@@ -250,12 +257,12 @@ Postgres. El esquema completo está en `server/schema.sql` y se aplica solo en c
 (`server/migrate.js`); cada sentencia es repetible (`create … if not exists`). Para cambiarlo, se agregan
 sentencias repetibles al final (por ejemplo `alter table … add column if not exists …`).
 
-| Tabla           | Para qué                                                                       |
-| --------------- | ------------------------------------------------------------------------------ |
-| `users`         | nombre y clave (hash)                                                          |
-| `sessions`      | sesiones abiertas                                                              |
-| `scores`        | cada ronda oficial jugada: usuario, modo, aciertos, total, milisegundos, fecha |
-| `failed_logins` | intentos fallidos recientes (freno a fuerza bruta)                             |
+| Tabla           | Para qué                                                                                  |
+| --------------- | ----------------------------------------------------------------------------------------- |
+| `users`         | nombre y clave (hash)                                                                     |
+| `sessions`      | sesiones abiertas                                                                         |
+| `scores`        | cada ronda oficial jugada: usuario, modo, categoría, aciertos, total, milisegundos, fecha |
+| `failed_logins` | intentos fallidos recientes (freno a fuerza bruta)                                        |
 
 En producción la base es **Neon** (Postgres serverless, plan gratis): se duerme sin uso y despierta sola con
 la primera consulta, que por eso puede tardar cerca de un segundo.
@@ -371,8 +378,8 @@ l1…` se corren; esto reasigna las rutas) → `node merge_st.js` → `npm run b
 - **Descargas crudas**: consultas Overpass en `q*.txt`. GTFS: el enlace vigente está en
   https://www.dtpm.cl/index.php/noticias/gtfs-vigente
 
-Si cambia el tamaño de algún conjunto que se pregunta completo (hoy 34 comunas del Gran Santiago y 16
-regiones), hay que actualizar `OFFICIAL_ROUNDS` en `shared/ranked.js`.
+Los juegos de "completa el mapa" recorren siempre todo su conjunto (hoy 34 comunas del Gran Santiago y 16
+regiones) y caen en la categoría "todas"; no hay nada que actualizar si ese tamaño cambia.
 
 ## Pruebas (tests/)
 
@@ -405,8 +412,8 @@ código sin empaquetar, para que un error apunte al archivo y la línea reales. 
 ## Cambios frecuentes
 
 - **Nuevo juego**: `registerMode({...})` en el archivo del tema dentro de `src/quiz/modes/`. Si debe tener
-  ranking, agregar su id y largo a `OFFICIAL_ROUNDS` (`shared/ranked.js`).
-- **Retirar un juego**: mover su `registerMode` a `src/quiz/modes/retired/` y quitarlo de `OFFICIAL_ROUNDS`.
+  ranking, agregar su id a `RANKED_MODES` (`shared/ranked.js`).
+- **Retirar un juego**: mover su `registerMode` a `src/quiz/modes/retired/` y quitarlo de `RANKED_MODES`.
 - **Nuevo ajuste de práctica**: valor por defecto en `core/store.js`, control en `ui/home.js` y, si afecta la
   dificultad, su valor fijo en `OFFICIAL_RULES`.
 - **Nueva ruta del API**: función en `server/` y una línea en `ROUTES` (`server/api.js`); prueba en

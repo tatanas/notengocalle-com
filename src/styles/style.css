@@ -930,7 +930,8 @@ table.board.clickable tr[data-open]:hover td {
   place-content: center;
   text-align: center;
   color: #fff;
-  background: rgba(15, 23, 42, 0.68);
+  background: rgba(15, 23, 42, 0.28);
+  pointer-events: none;
 }
 #countdown[hidden] {
   display: none;
@@ -938,19 +939,22 @@ table.board.clickable tr[data-open]:hover td {
 .countdown-label {
   margin: 0;
   font-size: 16px;
-  opacity: 0.85;
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.75);
 }
 .countdown-number {
   margin: 6px 0;
   font-size: min(38vw, 180px);
   font-weight: 800;
   line-height: 1;
+  text-shadow: 0 2px 14px rgba(0, 0, 0, 0.7);
   animation: count-pop 1s ease-out;
 }
 .countdown-hint {
   margin: 0;
-  font-size: 18px;
+  padding: 0 16px;
+  font-size: 16px;
   font-weight: 650;
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.8);
 }
 @keyframes count-pop {
   0% {
@@ -964,4 +968,35 @@ table.board.clickable tr[data-open]:hover td {
     transform: scale(0.9);
     opacity: 0.85;
   }
+}
+
+/* pestañas de largo de ronda en el ranking */
+.tabs {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+  border-bottom: 1.5px solid var(--line);
+}
+.tab {
+  font: inherit;
+  font-size: 14px;
+  padding: 8px 14px;
+  border: 0;
+  border-bottom: 3px solid transparent;
+  margin-bottom: -1.5px;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+}
+.tab small {
+  opacity: 0.7;
+}
+.tab.on {
+  color: var(--pri);
+  border-bottom-color: var(--pri);
+  font-weight: 650;
+}
+
+.iconbtn[hidden] {
+  display: none;
 }

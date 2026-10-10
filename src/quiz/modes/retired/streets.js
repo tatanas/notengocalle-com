@@ -1,11 +1,8 @@
 import { roads, isPara, isRoad, streetByName, streetMidVertex } from '../../../data/dataset.js'
 import { answer, questionHeader } from '../../engine.js'
-import {
-  confusionsOf,
-  namedSegmentsHtml,
-  noteConfusion,
-  streetContextChips,
-} from '../../../domain/streets.js'
+import { showAids } from '../../../map/aids.js'
+import { comunas, isUrban } from '../../../data/dataset.js'
+import { confusionsOf, namedSegmentsHtml, noteConfusion } from '../../../domain/streets.js'
 import { escapeHtml, shuffle } from '../../../core/util.js'
 import { fit, layer, setLabelMode } from '../../../map/map.js'
 import { panel, showPanel } from '../../../ui/panel.js'
@@ -39,7 +36,7 @@ registerMode({
     showPanel(
       questionHeader(q) + `<div class="q-prompt">¿Cuál de estas es <b>${escapeHtml(s.name)}</b>?</div>`,
     )
-    streetContextChips()
+    showAids({ borders: comunas.filter(isUrban) })
     fit(
       L.latLngBounds(s.bb)
         .extend(L.latLngBounds(rivals.flatMap(r => r.bb)))

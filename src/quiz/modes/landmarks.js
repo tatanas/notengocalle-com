@@ -3,7 +3,8 @@ import { settings } from '../../core/store.js'
 import { escapeHtml, formatKm } from '../../core/util.js'
 import { comunaByName, comunas, inScope, labelPoint, scopeComunas } from '../../data/dataset.js'
 import { landmarkInfo, landmarkPool, showLandmarksNear, showZone } from '../../domain/landmarks.js'
-import { COLORS, comunaLayer, divIcon, mapLabel, outlineComunas } from '../../map/draw.js'
+import { showAids } from '../../map/aids.js'
+import { COLORS, comunaLayer, divIcon, mapLabel } from '../../map/draw.js'
 import { fit, fitCity, layer, map } from '../../map/map.js'
 import { showPanel } from '../../ui/panel.js'
 import { answer, questionHeader } from '../engine.js'
@@ -11,8 +12,9 @@ import { registerMode } from '../registry.js'
 
 registerMode({
   id: 'lm-loc',
+  aids: true,
   balance: l => l.comuna,
-  group: 'Landmarks',
+  group: 'Lugares emblemáticos',
   name: 'Ubícalo en el mapa',
   desc: 'Toca dónde crees que está el lugar. Cuenta como correcto a menos de 1,5 km.',
   cats: true,
@@ -24,7 +26,7 @@ registerMode({
       questionHeader(q) +
         `<div class="q-prompt">¿Dónde está <b>${escapeHtml(l.name)}</b>?</div><div class="q-sub">${escapeHtml(l.cat)} · toca el mapa</div>`,
     )
-    outlineComunas(scopeComunas()).addTo(layer)
+    showAids({ borders: scopeComunas() })
     if (q.i === 0) fitCity()
     map.on('click', e => {
       if (q.answered) return
@@ -51,8 +53,9 @@ registerMode({
 })
 registerMode({
   id: 'lm-com',
+  aids: true,
   balance: l => l.comuna,
-  group: 'Landmarks',
+  group: 'Lugares emblemáticos',
   name: '¿En qué comuna está?',
   desc: 'Toca la comuna donde queda el lugar.',
   cats: true,
@@ -64,6 +67,7 @@ registerMode({
       questionHeader(q) +
         `<div class="q-prompt">¿En qué comuna está <b>${escapeHtml(l.name)}</b>?</div><div class="q-sub">${escapeHtml(l.cat)} · toca la comuna</div>`,
     )
+    showAids()
     const fs = comunas.filter(f => inScope(f) || f.properties.name === l.comuna)
     if (q.i === 0) fitCity()
     comunaLayer(fs, {

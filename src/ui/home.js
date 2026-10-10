@@ -22,7 +22,7 @@ const GROUPS = [
     blurb: 'Ubica las comunas del Gran Santiago y aprende con cuáles limita cada una.',
   },
   {
-    name: 'Landmarks',
+    name: 'Lugares emblemáticos',
     emoji: '📍',
     blurb: `${DATA.landmarks.length} lugares: estadios, parques, malls, universidades, colegios, barrios, restaurantes y las estaciones de metro.`,
   },
@@ -101,7 +101,7 @@ function groupCard(group) {
   const modes = MODES.filter(mode => mode.group === group.name).sort(stepsFirst)
   return `<div class="card">
     <h3><span class="em">${group.emoji}</span>${group.name}</h3><p>${group.blurb}</p>
-    ${group.name === 'Landmarks' ? metroLineChips() : ''}
+    ${group.name === 'Lugares emblemáticos' ? metroLineChips() : ''}
     <div class="modes">${modes.map(modeRow).join('')}</div>
   </div>`
 }
@@ -118,12 +118,12 @@ function settingsCard() {
       <option value="peri">Gran Santiago + periferia (Colina, Lampa, Padre Hurtado, Pirque, Buin…)</option>
       <option value="all">Toda la Región Metropolitana (52)</option>
     </select>
-    <label for="setLen">Preguntas por ronda</label>
+    <label for="setLen">Preguntas por ronda (también en las oficiales: cada largo tiene su ranking)</label>
     <select id="setLen"><option>10</option><option>15</option><option>20</option><option>30</option><option value="999">Todas</option></select>
-    <label>Categorías de landmarks</label>
+    <label>Categorías de lugares emblemáticos</label>
     <div class="chips" id="setCats">${categoryChips.join('')}</div>
-    <div style="margin-top:10px">${chip('Modo estricto en landmarks (800 m en vez de 1,5 km)', settings.strict, 'id="setStrict"')}</div>
-    <p class="muted" style="font-size:12px;margin:10px 0 0">Los ajustes valen para las rondas de práctica; las rondas oficiales usan reglas fijas.</p>
+    <div style="margin-top:10px">${chip('Modo estricto en lugares emblemáticos (800 m en vez de 1,5 km)', settings.strict, 'id="setStrict"')}</div>
+    <p class="muted" style="font-size:12px;margin:10px 0 0">Los demás ajustes valen solo para la práctica; las rondas oficiales usan reglas fijas.</p>
   </div>`
 }
 
@@ -174,7 +174,7 @@ const homeHtml = () => `<div class="wrap">
   <div class="grid">
     ${[...GROUPS, ...retiredGroups()].map(groupCard).join('')}
     <div class="card"><h3><span class="em">🏆</span>Ranking</h3>
-      <p>El botón grande de cada juego es su ronda oficial: mismas reglas para todos y cuenta para el ranking, con cuenta. <b>Práctica</b> es una ronda sin presión que aprende de lo que fallas.</p>
+      <p>El botón grande de cada juego es su ronda oficial: mismas reglas para todos y cuenta para el ranking (con cuenta), según el número de preguntas que tengas elegido. <b>Práctica</b> es una ronda con ayudas (modo fácil o difícil) que aprende de lo que fallas.</p>
       <button class="btn wide" id="goRanking">Ver ranking</button></div>
     <div class="card"><h3><span class="em">🔎</span>Explorar</h3>
       <p>Mapa interactivo con comunas, metro, calles y lugares. Para estudiar antes de jugar.</p>

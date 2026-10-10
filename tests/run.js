@@ -6,12 +6,15 @@
 import { accounts } from './suites/accounts.js'
 import {
   countdown,
+  easyHard,
   leaveConfirm,
   menuLayout,
   mobileFit,
   officialRounds,
   ownStreets,
   photos,
+  rankingCategories,
+  restartRound,
   timer,
 } from './suites/rounds.js'
 import { smoke } from './suites/smoke.js'
@@ -28,6 +31,9 @@ const SUITES = {
   'menu-layout': menuLayout,
   countdown,
   'mobile-fit': mobileFit,
+  'easy-hard': easyHard,
+  'restart-round': restartRound,
+  'ranking-categories': rankingCategories,
   photos,
   accounts,
 }

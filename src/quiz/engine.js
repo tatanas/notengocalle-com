@@ -1,29 +1,47 @@
-import { OFFICIAL_ROUNDS, OFFICIAL_RULES } from '../../shared/ranked.js'
+import { OFFICIAL_RULES, RANKED_MODES, categoryOf } from '../../shared/ranked.js'
 import { adaptiveWeight, bests, record, saveBest, weightedSample } from '../core/progress.js'
-import { applyRoundRules, settings } from '../core/store.js'
+import { applyRoundRules, saveSettings, settings } from '../core/store.js'
 import { $, escapeHtml, formatTime } from '../core/util.js'
-import { clearLayer, labelMode, map, setChile, setLabelMode, setRelief, setRoomyPanning } from '../map/map.js'
+import { clearAids, redrawAids } from '../map/aids.js'
+import {
+  clearLayer,
+  forgetViewAdjustments,
+  labelMode,
+  map,
+  setChile,
+  setLabelMode,
+  setRelief,
+  setRoomyPanning,
+  watchViewAdjustments,
+} from '../map/map.js'
 import { confirmAction } from '../ui/confirm.js'
 import { guardLeaving, navigate } from '../ui/navigation.js'
 import { showOfficialOutcome } from '../ui/officialOutcome.js'
-import { hidePanel, hideScreen, hud, panel, showPanel, title, toast } from '../ui/panel.js'
+import { hideScreen, hud, panel, showPanel, title, toast } from '../ui/panel.js'
 
 /* Un modo define: id, group, name, desc, pool(), key(item) y ask(item, quiz).
-   Opcionales: label(item), balance(item), setup(quiz), all, keepLayer, noHint, relief, chile, roomy, tall, study. */
+   Opcionales: label(item), balance(item), setup(quiz), all, keepLayer, noHint, aids, relief, chile, roomy, tall, study.
+   noHint: sin el botón "Ver nombres". aids: ofrece el modo fácil / difícil (bordes de comunas y metro). */
 
 export let quiz = null
 let hudTimer = null
 
+const statKey = (mode, item) => mode.id + ':' + mode.key(item)
+
+export const hasOfficialRound = mode => RANKED_MODES.includes(mode.id)
+
 const COUNTDOWN_SECONDS = 3
 let countdownTimer = null
 
-// Las rondas oficiales empiezan con una cuenta regresiva; el reloj de la ronda parte después, con la primera pregunta.
+// Las rondas oficiales empiezan con una cuenta regresiva en la que se puede mover el mapa; el reloj de la ronda
+// parte después, con la primera pregunta.
 function runCountdown(modeName, onDone) {
   const box = $('#countdown')
   let remaining = COUNTDOWN_SECONDS
   const render = () => {
     box.innerHTML = `<p class="countdown-label">🏆 Ronda oficial · ${escapeHtml(modeName)}</p>
-      <p class="countdown-number">${remaining}</p><p class="countdown-hint">¡Prepárate!</p>`
+      <p class="countdown-number">${remaining}</p>
+      <p class="countdown-hint">¡Prepárate! Puedes mover el mapa para acomodarlo.</p>`
   }
   box.hidden = false
   render()
@@ -40,10 +58,6 @@ function stopCountdown() {
   countdownTimer = null
   $('#countdown').hidden = true
 }
-
-const statKey = (mode, item) => mode.id + ':' + mode.key(item)
-
-export const hasOfficialRound = mode => mode.id in OFFICIAL_ROUNDS
 
 const SHOW_NAMES = '👁 Ver nombres'
 const HIDE_NAMES = '🙈 Ocultar nombres'
@@ -71,6 +85,34 @@ const HintControl = L.Control.extend({
 })
 const hintControl = new HintControl()
 
+// Un solo botón para todas las ayudas de la práctica: fácil las dibuja, difícil no. En una ronda oficial no hay botón.
+const AidsControl = L.Control.extend({
+  options: { position: 'topleft' },
+  onAdd() {
+    this.button = L.DomUtil.create('button', 'maptoggle')
+    this.button.type = 'button'
+    L.DomEvent.disableClickPropagation(this.button)
+    this.button.onclick = () => {
+      settings.easy = !settings.easy
+      saveSettings()
+      redrawAids()
+      this.refresh()
+    }
+    this.refresh()
+    return this.button
+  },
+  refresh() {
+    if (!this.button) return
+    this.button.textContent = settings.easy ? '🟢 Modo fácil' : '🔴 Modo difícil'
+    this.button.title = settings.easy
+      ? 'Fácil: se ven los bordes de las comunas y las líneas del metro. Toca para pasar a difícil.'
+      : 'Difícil: sin bordes de comunas ni líneas del metro. Toca para pasar a fácil.'
+  },
+})
+const aidsControl = new AidsControl()
+
+const restartButton = $('#btnRestart')
+
 function updateHud() {
   if (!quiz || quiz.mode.study) return
   const answered = quiz.i + (quiz.answered ? 1 : 0)
@@ -78,19 +120,23 @@ function updateHud() {
   hud.textContent = `${quiz.ok}/${answered} ✓ · ⏱ ${formatTime(elapsed)}`
 }
 
-export function startQuiz(mode, { ranked = false } = {}) {
+// category: solo para empezar una ronda oficial de un largo concreto (desde el ranking); si no, se usa el largo
+// que la persona tiene elegido en sus ajustes.
+export function startQuiz(mode, { ranked = false, category = null } = {}) {
   stopQuiz()
   applyRoundRules(ranked ? OFFICIAL_RULES : null)
   const pool = mode.pool()
-  const size = mode.all ? pool.length : Math.min(settings.len, pool.length)
-  if (!pool.length || (ranked && size !== OFFICIAL_ROUNDS[mode.id])) {
+  const wanted = category ? (category === 'all' ? pool.length : +category) : settings.len
+  const size = mode.all ? pool.length : Math.min(wanted, pool.length)
+  if (!pool.length) {
     applyRoundRules(null)
-    toast(ranked ? 'La ronda oficial de este juego no está disponible' : 'No hay elementos con estos filtros')
+    toast('No hay elementos con estos filtros')
     return
   }
   quiz = {
     mode,
     ranked,
+    category: ranked ? categoryOf(size, pool.length) : null,
     items: weightedSample(pool, size, {
       weightOf: ranked ? undefined : item => adaptiveWeight(statKey(mode, item)),
       groupOf: mode.balance,
@@ -107,25 +153,38 @@ export function startQuiz(mode, { ranked = false } = {}) {
   hideScreen()
   title.textContent = mode.name
   setLabelMode('plain')
-  if (!mode.noHint && !mode.study) hintControl.addTo(map)
+  if (!ranked && mode.aids) aidsControl.addTo(map)
+  aidsControl.refresh()
+  if (!ranked && !mode.noHint && !mode.study) hintControl.addTo(map)
   hintControl.reset()
   setRelief(!!mode.relief)
   setChile(!!mode.chile)
   setRoomyPanning(!!mode.roomy)
-  if (!ranked) return beginRound()
+  if (!ranked) {
+    prepareRound()
+    return beginRound()
+  }
   quiz.starting = true
-  panel.innerHTML = ''
-  hidePanel()
   clearLayer()
+  clearAids()
+  showPanel(`<div class="progress"><i style="width:0%"></i></div>
+    <div class="q-sub" style="margin:0 0 6px">🏆 Ronda oficial</div><div class="q-prompt">Prepárate…</div>`)
+  watchViewAdjustments(true)
+  prepareRound()
   runCountdown(mode.name, () => {
     quiz.starting = false
     beginRound()
   })
 }
 
+// Lo que se dibuja antes de la primera pregunta (en las oficiales, durante la cuenta regresiva).
+function prepareRound() {
+  if (quiz.mode.setup) quiz.mode.setup(quiz)
+}
+
 function beginRound() {
   hudTimer = setInterval(updateHud, 500)
-  if (quiz.mode.setup) quiz.mode.setup(quiz)
+  restartButton.hidden = !quiz.ranked
   if (quiz.mode.study) {
     clearLayer()
     setLabelMode('streets')
@@ -141,7 +200,11 @@ export function stopQuiz() {
   stopCountdown()
   applyRoundRules(null)
   map.removeControl(hintControl)
+  map.removeControl(aidsControl)
+  clearAids()
+  forgetViewAdjustments()
   setRoomyPanning(false)
+  restartButton.hidden = true
   panel.classList.remove('tall')
   hud.textContent = ''
 }
@@ -160,7 +223,10 @@ export function nextQuestion({ first = false } = {}) {
   setLabelMode('plain')
   hintControl.reset()
   panel.classList.toggle('tall', !!quiz.mode.tall)
-  if (!quiz.mode.keepLayer) clearLayer()
+  if (!quiz.mode.keepLayer) {
+    clearLayer()
+    clearAids()
+  }
   quiz.t0 = Date.now()
   updateHud()
   quiz.mode.ask(quiz.items[quiz.i], quiz)
@@ -216,7 +282,7 @@ function personalBestHtml(total, previous, isBest) {
 }
 
 function endQuiz() {
-  const { mode, ranked, ok, ms, pts, misses } = quiz
+  const { mode, ranked, category, ok, ms, pts, misses } = quiz
   const total = quiz.items.length
   stopQuiz()
   clearLayer()
@@ -231,7 +297,7 @@ function endQuiz() {
   const percent = Math.round((ok / total) * 100)
   const secondsPerQuestion = (ms / total / 1000).toFixed(1).replace('.', ',')
   const closingNote = ranked
-    ? 'Las rondas oficiales usan las mismas reglas para todos: Gran Santiago, todas las categorías, sin tus calles propias.'
+    ? 'Las rondas oficiales usan las mismas reglas para todos: Gran Santiago, todas las categorías, sin tus calles propias y sin ayudas.'
     : 'Las preguntas que fallas aparecen más seguido en las próximas rondas.'
   showPanel(`<h3 class="tight">${verdict(percent)}</h3>
     <p class="result-score">${ok} / ${total} <span class="muted">(${percent}%)</span></p>
@@ -247,10 +313,26 @@ function endQuiz() {
     </div>
     <p class="muted" style="font-size:12px;margin-top:10px">${closingNote}</p>`)
 
-  $('#again').onclick = () => startQuiz(mode, { ranked })
+  $('#again').onclick = () => startQuiz(mode, { ranked, category })
   $('#menu').onclick = () => navigate('home')
   if ($('#goOfficial')) $('#goOfficial').onclick = () => startQuiz(mode, { ranked: true })
-  if (ranked) showOfficialOutcome({ mode: mode.id, correct: ok, total, ms }, $('#officialOutcome'))
+  if (ranked) showOfficialOutcome({ mode: mode.id, category, correct: ok, total, ms }, $('#officialOutcome'))
+}
+
+// Reiniciar una ronda oficial a medias: otras preguntas, mismo juego y mismo largo, otra vez con cuenta regresiva.
+restartButton.onclick = async () => {
+  const current = quiz
+  if (!current?.ranked || current.starting) return
+  const untouched = current.i === 0 && !current.answered
+  const confirmed =
+    untouched ||
+    (await confirmAction({
+      title: '¿Reiniciar la ronda?',
+      message: 'Empiezas de nuevo, con otras preguntas. Esta ronda no cuenta para el ranking.',
+      confirmLabel: 'Reiniciar',
+      cancelLabel: 'Seguir jugando',
+    }))
+  if (confirmed && quiz === current) startQuiz(current.mode, { ranked: true, category: current.category })
 }
 
 // Salir a media ronda pierde el avance (y, en una oficial, el puntaje): se pide confirmación.

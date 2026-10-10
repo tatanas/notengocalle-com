@@ -3,11 +3,13 @@ import { $, formatTime } from '../core/util.js'
 import { openAccountDialog } from './account.js'
 import { navigate } from './navigation.js'
 
-function savedHtml({ rank, players, improved, best }) {
-  const standing = `🏆 <b>Puesto ${rank}</b> de ${players} en el ranking de este juego.`
+const categoryText = category => (category === 'all' ? 'todas las preguntas' : `${category} preguntas`)
+
+function savedHtml({ category, rank, players, improved, best }) {
+  const standing = `🏆 <b>Puesto ${rank}</b> de ${players} en el ranking de este juego con ${categoryText(category)}.`
   const personal = improved
-    ? 'Es tu mejor ronda oficial.'
-    : `Tu mejor ronda oficial sigue siendo ${best.correct}/${best.total} en ${formatTime(best.ms)}.`
+    ? 'Es tu mejor ronda oficial de este largo.'
+    : `Tu mejor ronda oficial de este largo sigue siendo ${best.correct}/${best.total} en ${formatTime(best.ms)}.`
   return `<p class="tight">${standing}</p><p class="muted tight">${personal}</p>
     <button class="btn sec small" id="outcomeRanking" style="margin-top:6px">Ver ranking</button>`
 }
@@ -31,7 +33,7 @@ function render(result, box, outcome) {
   if (!box.isConnected) return
   if (outcome.status === 'saved') {
     box.innerHTML = savedHtml(outcome)
-    $('#outcomeRanking').onclick = () => navigate('ranking', result.mode)
+    $('#outcomeRanking').onclick = () => navigate('ranking', result.mode, outcome.category)
   } else if (outcome.status === 'guest') {
     box.innerHTML = GUEST_HTML
     $('#outcomeLogin').onclick = async () => {
