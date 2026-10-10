@@ -1,4 +1,4 @@
-import { OFFICIAL_ROUNDS } from '../../shared/ranked.js'
+import { RANKED_MODES } from '../../shared/ranked.js'
 import { clickNext, exists, goHome, openPage, playRoundOfChoices, sleep, text } from '../support.js'
 
 const seconds = hud => {
@@ -66,14 +66,17 @@ export async function ownStreets(browser, { check }) {
   }
   const practice = await streetsAsked(false)
   const official = await streetsAsked(true)
-  check(official === 15, `la ronda oficial ignora los ajustes del jugador (${official} preguntas)`)
-  check(!(await exists(page, '.chips input[data-key]')), 'la ronda oficial no ofrece ayudas opcionales')
+  check(!(await exists(page, '.maptoggle')), 'la ronda oficial no ofrece botones de ayuda')
 
   await goHome(page)
   await Promise.all([page.waitForNavigation({ waitUntil: 'networkidle2' }), page.click('#myst [data-del]')])
   await page.click('[data-mode="st-find"]')
   await page.waitForSelector('.q-head')
   const withoutOwn = +(await text(page, '.q-head')).match(/de (\d+)/)[1]
+  check(
+    official === withoutOwn,
+    `la ronda oficial no incluye la calle propia (${official} preguntas, como la práctica sin ella)`,
+  )
   check(
     practice === withoutOwn + 1,
     `la práctica incluye la calle propia (${practice} con ella, ${withoutOwn} sin ella)`,
@@ -89,7 +92,7 @@ export async function officialRounds(browser, { check }) {
     buttons.map(button => button.dataset.official),
   )
   check(
-    offered.length === Object.keys(OFFICIAL_ROUNDS).length && offered.every(id => id in OFFICIAL_ROUNDS),
+    offered.length === RANKED_MODES.length && offered.every(id => RANKED_MODES.includes(id)),
     `los ${offered.length} juegos del menú tienen ronda oficial definida`,
   )
   const wrong = []
@@ -99,8 +102,8 @@ export async function officialRounds(browser, { check }) {
     const started = await page.waitForSelector('.q-head', { timeout: 8000 }).catch(() => null)
     const header = started ? await text(page, '.q-head') : ''
     const total = +(header.match(/de (\d+)/) || [])[1]
-    if (total !== OFFICIAL_ROUNDS[id] || !/Ronda oficial/.test(header))
-      wrong.push(`${id} (${total || 'no partió'})`)
+    const expected = { 'com-all': 34, 'ch-all': 16 }[id] ?? 10
+    if (total !== expected || !/Ronda oficial/.test(header)) wrong.push(`${id} (${total || 'no partió'})`)
   }
   check(
     !wrong.length,
@@ -216,11 +219,11 @@ export async function menuLayout(browser, { check }) {
   const headings = await page.$eval('.grid', grid =>
     [...grid.querySelectorAll('.card h3')].map(title => title.innerText.trim()),
   )
-  const order = ['Calles', 'Comunas', 'Landmarks', 'Ruteo', 'Ranking', 'Explorar']
+  const order = ['Calles', 'Comunas', 'Lugares emblemáticos', 'Ruteo', 'Ranking', 'Explorar']
   const positions = order.map(name => headings.findIndex(heading => heading.endsWith(name)))
   check(
     positions.every((position, i) => position >= 0 && (i === 0 || position > positions[i - 1])),
-    `las tarjetas salen en el orden Calles, Comunas, Landmarks, Ruteo, Ranking, Explorar (${headings.join(' · ')})`,
+    `las tarjetas salen en el orden Calles, Comunas, Lugares emblemáticos, Ruteo, Ranking, Explorar (${headings.join(' · ')})`,
   )
   const big = await page.$$eval('.mode-row .mode.ranked', buttons => buttons.length)
   const small = await page.$$eval('.mode-row .practice', buttons =>
@@ -282,6 +285,147 @@ export async function countdown(browser, { check }) {
   check(await page.$eval('#countdown', box => box.hidden), 'y la cuenta regresiva desaparece')
   await sleep(3300)
   check(!(await exists(page, '.q-head')), 'tampoco parte una ronda fantasma después')
+  check(!errors.length, `sin errores en la consola${errors.length ? ': ' + errors.join(' | ') : ''}`)
+  await page.close()
+}
+
+const mapButtons = page =>
+  page.$$eval('button.maptoggle', buttons => buttons.map(button => button.innerText.trim()))
+const metroLines = page => page.$$eval('.leaflet-metro-pane path', paths => paths.length)
+
+// Un solo botón de modo fácil / difícil activa o apaga los bordes de comunas y las líneas del metro; solo en práctica.
+export async function easyHard(browser, { check }) {
+  const { page, errors } = await openPage(browser)
+  await page.click('[data-mode="lm-loc"]')
+  await page.waitForSelector('.q-head')
+  await sleep(500)
+  const buttons = await mapButtons(page)
+  check(
+    /Modo fácil/.test(buttons[0] ?? ''),
+    `la práctica ofrece el botón de modo fácil / difícil (${buttons.join(' | ')})`,
+  )
+  check(/Ver nombres/.test(buttons[1] ?? ''), 'y debajo, "Ver nombres", donde sigue existiendo')
+  check((await metroLines(page)) > 0, 'en modo fácil se dibujan las líneas del metro')
+  await page.$eval('.maptoggle', button => button.click())
+  await sleep(200)
+  check(/Modo difícil/.test((await mapButtons(page))[0]), 'al tocarlo pasa a modo difícil')
+  check((await metroLines(page)) === 0, 'en modo difícil no hay líneas del metro')
+
+  await goHome(page)
+  await page.reload({ waitUntil: 'networkidle2' })
+  await page.click('[data-mode="com-name"]')
+  await page.waitForSelector('.q-head')
+  const comunas = await mapButtons(page)
+  check(/Modo difícil/.test(comunas[0] ?? ''), 'el modo elegido se recuerda al volver a jugar')
+  check(comunas.length === 1, 'en el juego de comunas ya no está "Ver nombres"')
+
+  await goHome(page)
+  await page.click('[data-official="lm-loc"]')
+  await page.waitForSelector('#panel .q-head', { timeout: 8000 })
+  check(
+    (await mapButtons(page)).length === 0,
+    'una ronda oficial no muestra ni el modo fácil / difícil ni "Ver nombres"',
+  )
+  check((await metroLines(page)) === 0, 'y se juega sin ayudas')
+  check(!errors.length, `sin errores en la consola${errors.length ? ': ' + errors.join(' | ') : ''}`)
+  await page.close()
+}
+
+// Reiniciar una ronda oficial a medias, sin volver al menú.
+export async function restartRound(browser, { check }) {
+  const { page, errors } = await openPage(browser)
+  const restartVisible = () => page.$eval('#btnRestart', button => !button.hidden)
+  await page.click('[data-mode="com-name"]')
+  await page.waitForSelector('.q-head')
+  check(!(await restartVisible()), 'en la práctica no hay botón de reiniciar')
+
+  await goHome(page)
+  await page.click('[data-official="com-name"]')
+  await page.waitForSelector('#countdown:not([hidden])')
+  check(!(await restartVisible()), 'durante la cuenta regresiva tampoco')
+  await page.waitForSelector('#panel .q-head', { timeout: 8000 })
+  check(await restartVisible(), 'en una ronda oficial sí')
+
+  await page.click('#btnRestart')
+  check(!(await exists(page, '#confirmDialog[open]')), 'sin responder nada, reiniciar no pide confirmación')
+  await page.waitForSelector('#countdown:not([hidden])')
+  check(true, 'y vuelve a partir con la cuenta regresiva')
+  await page.waitForSelector('#panel .q-head', { timeout: 8000 })
+
+  await sleep(400)
+  await page.click('.opt:not([disabled])')
+  await clickNext(page)
+  await page.waitForSelector('.opt:not([disabled])')
+  await page.click('#btnRestart')
+  await page.waitForSelector('#confirmDialog[open]')
+  check(
+    /no cuenta para el ranking/.test(await text(page, '#confirmDialog')),
+    'con la ronda avanzada pide confirmación',
+  )
+  await page.click('#confirmCancel')
+  await sleep(150)
+  check(/Pregunta 2 de/.test(await text(page, '#panel .q-head')), '"Seguir jugando" conserva el avance')
+  await page.click('#btnRestart')
+  await page.waitForSelector('#confirmDialog[open]')
+  await page.click('#confirmOk')
+  await page.waitForSelector('#countdown:not([hidden])')
+  await page.waitForSelector('#panel .q-head', { timeout: 8000 })
+  check(/Pregunta 1 de/.test(await text(page, '#panel .q-head')), 'al confirmar la ronda parte de cero')
+  check(!errors.length, `sin errores en la consola${errors.length ? ': ' + errors.join(' | ') : ''}`)
+  await page.close()
+}
+
+// Cada largo de ronda tiene su ranking: una ronda de 10 preguntas cae en la pestaña "10", no en la de 15.
+export async function rankingCategories(browser, { check }) {
+  const { page, errors } = await openPage(browser, { storage: { settings: { len: 10 } } })
+  await page.evaluate(() =>
+    fetch('/api/register', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: 'Cata', password: 'clave-larga-1' }),
+    }),
+  )
+  await page.reload({ waitUntil: 'networkidle2' })
+  await page.waitForFunction(() => document.getElementById('btnAccount').innerText.includes('Cata'))
+  await page.click('[data-official="com-name"]')
+  await playRoundOfChoices(page)
+  await page.waitForFunction(() => /Puesto/.test(document.getElementById('officialOutcome')?.innerText ?? ''))
+  check(
+    /con 10 preguntas/.test(await text(page, '#officialOutcome')),
+    'el resultado dice en qué largo quedó (10 preguntas)',
+  )
+
+  await page.click('#outcomeRanking')
+  await page.waitForSelector('table.board tr.me')
+  const tabs = await page.$$eval('.tab', items =>
+    items.map(item => item.innerText.replace(/\s+/g, ' ').trim()),
+  )
+  check(
+    tabs.length === 5 && /^10/.test(tabs[0]) && /^Todas/.test(tabs[4]),
+    `el ranking tiene pestañas 10, 15, 20, 30 y Todas (${tabs.join(' | ')})`,
+  )
+  check(/^10 1$/.test(tabs[0]), 'la pestaña "10" muestra que tiene 1 jugador')
+  check(
+    await page.$eval('.tab.on', tab => tab.dataset.category === '10'),
+    'y se abre en la del largo recién jugado',
+  )
+
+  await page.$eval('[data-category="15"]', tab => tab.click())
+  await page.waitForSelector('#rankBody p.muted')
+  check(
+    /Nadie ha jugado/.test(await text(page, '#rankBody')),
+    'la pestaña de 15 preguntas está vacía: no se mezclan',
+  )
+  await page.$eval('[data-category="10"]', tab => tab.click())
+  await page.waitForSelector('table.board tr.me')
+  check(true, 'y la de 10 sigue mostrando la marca')
+
+  await page.click('#rankPlay')
+  await page.waitForSelector('#panel .q-head', { timeout: 8000 })
+  check(
+    /de 10$/.test((await text(page, '#panel .q-head')).split('\n')[0].trim()),
+    'jugar desde el ranking usa el largo de la pestaña',
+  )
   check(!errors.length, `sin errores en la consola${errors.length ? ': ' + errors.join(' | ') : ''}`)
   await page.close()
 }

@@ -24,7 +24,17 @@ create table if not exists scores (
   created_at timestamptz not null default now()
 );
 
-create index if not exists scores_by_mode on scores (mode, created_at);
+-- Categoría de ranking según el largo de la ronda: '10', '15', '20', '30' o 'all' (todas las preguntas del juego).
+-- Las rondas guardadas antes de que existiera se clasifican por su largo, sin perder ninguna.
+alter table scores add column if not exists category text;
+
+update scores
+set category = case when mode like '%-all' or total > 30 then 'all' else total::text end
+where category is null;
+
+alter table scores alter column category set not null;
+
+create index if not exists scores_by_category on scores (mode, category, created_at);
 
 create index if not exists scores_by_user on scores (user_id, created_at);
 

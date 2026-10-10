@@ -1,14 +1,5 @@
-import {
-  COLORS,
-  comunaLayer,
-  divIcon,
-  drawMetro,
-  drawStreet,
-  highlightComuna,
-  mapLabel,
-  outlineComunas,
-  peakIcon,
-} from '../../map/draw.js'
+import { KM_PER_DEG_LAT, KM_PER_DEG_LON, distanceKm, distanceToPolyline } from '../../core/geo.js'
+import { escapeHtml, formatKm, pick, sameSet, shuffle } from '../../core/util.js'
 import {
   DATA,
   LINE_IDS,
@@ -27,16 +18,25 @@ import {
   stations,
   streetByName,
 } from '../../data/dataset.js'
-import { KM_PER_DEG_LAT, KM_PER_DEG_LON, distanceKm, distanceToPolyline } from '../../core/geo.js'
-import { answer, questionHeader } from '../engine.js'
-import { boundsOfFeatures, fit, fitCity, layer, map, setLabelMode } from '../../map/map.js'
 import { comunaDistractors } from '../../domain/comunas.js'
-import { escapeHtml, formatKm, pick, sameSet, shuffle } from '../../core/util.js'
 import { landmarkInComuna, landmarkInfo } from '../../domain/landmarks.js'
 import { lineName, linePill } from '../../domain/metro.js'
+import { showAids } from '../../map/aids.js'
+import {
+  COLORS,
+  comunaLayer,
+  divIcon,
+  drawMetro,
+  drawStreet,
+  highlightComuna,
+  mapLabel,
+  peakIcon,
+} from '../../map/draw.js'
+import { boundsOfFeatures, fit, fitCity, layer, map, setLabelMode } from '../../map/map.js'
+import { showPanel } from '../../ui/panel.js'
+import { answer, questionHeader } from '../engine.js'
 import { option, renderMulti, renderOptions } from '../options.js'
 import { registerMode } from '../registry.js'
-import { showPanel } from '../../ui/panel.js'
 
 export const GENERATORS = {
   roundabout() {
@@ -544,6 +544,7 @@ export const GENERATOR_NAMES = {
 }
 registerMode({
   id: 'cx',
+  aids: true,
   group: 'Conexiones',
   name: 'Conexiones (mezcla)',
   desc: 'Preguntas que relacionan todo: cruces, calles por comuna, metro más cercano, vecinas, puntos cardinales…',
@@ -569,7 +570,7 @@ registerMode({
       questionHeader(q) +
         `<div class="q-head" style="margin-top:-4px"><span>${escapeHtml(GENERATOR_NAMES[x.gen])}</span></div><div class="q-prompt">${x.prompt}</div>${x.sub ? `<div class="q-sub">${escapeHtml(x.sub)}</div>` : ''}`,
     )
-    outlineComunas(coreComunas()).addTo(layer)
+    showAids({ borders: coreComunas() })
     if (x.pre) x.pre()
     else if (q.i === 0) fitCity()
     if (x.multi)

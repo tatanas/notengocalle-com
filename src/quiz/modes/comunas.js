@@ -2,7 +2,8 @@ import { escapeHtml, shuffle } from '../../core/util.js'
 import { comunaByName, inScope, labelPoint, scopeComunas } from '../../data/dataset.js'
 import { comunaDistractors } from '../../domain/comunas.js'
 import { COLORS, comunaLayer, mapLabel } from '../../map/draw.js'
-import { boundsOfFeatures, clearLayer, fit, fitCity, layer } from '../../map/map.js'
+import { showAids } from '../../map/aids.js'
+import { boundsOfFeatures, clearLayer, fit, fitGreaterSantiago, layer } from '../../map/map.js'
 import { showPanel, toast } from '../../ui/panel.js'
 import { answer, questionHeader, quiz } from '../engine.js'
 import { renderOptions } from '../options.js'
@@ -10,6 +11,8 @@ import { registerMode } from '../registry.js'
 
 registerMode({
   id: 'com-name',
+  noHint: true,
+  aids: true,
   group: 'Comunas',
   name: '¿Qué comuna es?',
   desc: 'Te marco una comuna y eliges su nombre.',
@@ -18,6 +21,7 @@ registerMode({
   ask(f, q) {
     const name = f.properties.name
     showPanel(questionHeader(q) + `<div class="q-prompt">¿Qué comuna está marcada en naranjo?</div>`)
+    showAids()
     comunaLayer(scopeComunas(), {
       interactive: false,
       style: g => (g === f ? { fillColor: COLORS.hi, fillOpacity: 0.85, weight: 3, color: '#92400e' } : {}),
@@ -41,6 +45,8 @@ registerMode({
 
 registerMode({
   id: 'com-all',
+  noHint: true,
+  aids: true,
   group: 'Comunas',
   name: 'Completa el mapa',
   desc: 'Todas las comunas, una por una, hasta pintar el mapa entero.',
@@ -53,7 +59,8 @@ registerMode({
     q.state = {}
     q.tries = 0
     q.lay = comunaLayer(scopeComunas(), { onClick: (g, l) => this.click(g, l) }).addTo(layer)
-    fitCity()
+    showAids()
+    fitGreaterSantiago()
   },
   ask(f, q) {
     q.tries = 0
@@ -64,7 +71,7 @@ registerMode({
   },
   click(g, l) {
     const q = quiz
-    if (!q || q.answered) return
+    if (!q || q.answered || q.starting) return
     const f = q.items[q.i]
     const name = f.properties.name
     if (q.state[g.properties.name]) {

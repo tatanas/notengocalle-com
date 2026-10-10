@@ -1,3 +1,4 @@
+import { ROUND_CATEGORIES, categoryLabel } from '../../shared/ranked.js'
 import { fetchLeaderboard, fetchLeaders } from '../account/scores.js'
 import { accountsAvailable, user } from '../account/session.js'
 import { store } from '../core/store.js'
@@ -11,9 +12,13 @@ import { hidePanel, showScreen, title } from './panel.js'
 
 const PERIOD_LABELS = { all: 'Histórico', week: 'Últimos 7 días' }
 const ALL_GAMES = ''
+const DEFAULT_CATEGORY = '15'
 
-// Qué tabla se está mirando: un juego o el resumen de líderes.
-const view = { mode: ALL_GAMES, period: 'all', ...store.get('ranking', {}) }
+// Qué tabla se está mirando: un juego (o el resumen de líderes), el largo de la ronda y el período.
+const view = { mode: ALL_GAMES, category: DEFAULT_CATEGORY, period: 'all', ...store.get('ranking', {}) }
+
+// Cuántos jugadores tiene cada categoría del juego mirado; solo se conoce al cargar su tabla.
+let playersByCategory = {}
 
 const rankedModes = () => MODES.filter(hasOfficialRound)
 const groupsOf = modes => [...new Set(modes.map(mode => mode.group))]
@@ -43,19 +48,31 @@ const periodChipsHtml = () =>
     )
     .join('')
 
+// Pestañas por largo de ronda: cada una es un ranking aparte, porque 15 preguntas y todas no se pueden comparar.
+function categoryTabsHtml() {
+  const tabs = ROUND_CATEGORIES.map(category => {
+    const players = view.mode ? playersByCategory[category] : null
+    const count = players ? ` <small>${players}</small>` : ''
+    return `<button class="tab ${category === view.category ? 'on' : ''}" data-category="${category}">${categoryLabel(category)}${count}</button>`
+  })
+  return `<div class="tabs" role="tablist" aria-label="Número de preguntas">${tabs.join('')}</div>`
+}
+
+const categoryText = category => (category === 'all' ? 'todas las preguntas' : `${category} preguntas`)
+
 const boardRow = entry =>
   `<tr class="${isMe(entry) ? 'me' : ''}"><td>${entry.rank}</td><td>${escapeHtml(entry.name)}</td><td>${score(entry)}</td><td>${formatTime(entry.ms)}</td><td class="muted">${shortDate(entry.at)}</td></tr>`
 
 function boardHtml({ rows, players, me }) {
   if (!rows.length)
-    return '<p class="muted">Nadie ha jugado esta ronda oficial en este período. ¡Puedes ser el primero!</p>'
+    return `<p class="muted">Nadie ha jugado esta ronda (${categoryText(view.category)}) en este período. ¡Puedes ser el primero!</p>`
   const outsideTop =
     me && !rows.some(isMe)
       ? `<tr><td colspan="5" class="muted">…</td></tr>${boardRow({ ...me, name: user.name })}`
       : ''
   return `<table class="stats board"><tr><th>#</th><th>Jugador</th><th>Aciertos</th><th>Tiempo</th><th>Fecha</th></tr>
     ${rows.map(boardRow).join('')}${outsideTop}</table>
-    <p class="muted" style="font-size:12.5px">${players} ${players === 1 ? 'jugador' : 'jugadores'}. Cuenta la mejor ronda de cada uno.</p>`
+    <p class="muted" style="font-size:12.5px">${players} ${players === 1 ? 'jugador' : 'jugadores'} en ${categoryText(view.category)}. Cuenta la mejor ronda de cada uno.</p>`
 }
 
 function leadersHtml({ modes }) {
@@ -71,7 +88,9 @@ function leadersHtml({ modes }) {
 }
 
 function footerHtml() {
-  const play = view.mode ? '<button class="btn" id="rankPlay">🏆 Jugar la ronda oficial</button>' : ''
+  const play = view.mode
+    ? `<button class="btn" id="rankPlay">🏆 Jugar la ronda oficial (${categoryText(view.category)})</button>`
+    : ''
   const signIn = user ? '' : '<button class="btn sec" id="rankSignIn">Entrar o crear cuenta</button>'
   const guestNote = user
     ? ''
@@ -85,19 +104,31 @@ async function loadBoard() {
   body.innerHTML = '<p class="muted">Cargando…</p>'
   let html
   try {
-    html = view.mode
-      ? boardHtml(await fetchLeaderboard(view.mode, view.period))
-      : leadersHtml(await fetchLeaders(view.period))
+    if (view.mode) {
+      const board = await fetchLeaderboard(view.mode, view.category, view.period)
+      playersByCategory = board.played
+      html = boardHtml(board)
+    } else {
+      playersByCategory = {}
+      html = leadersHtml(await fetchLeaders(view.category, view.period))
+    }
   } catch (error) {
     html = `<p class="muted">No se pudo cargar el ranking: ${escapeHtml(error.message)}.</p>`
   }
-  const stillCurrent = body.isConnected && requested.mode === view.mode && requested.period === view.period
+  const stillCurrent =
+    body.isConnected &&
+    requested.mode === view.mode &&
+    requested.category === view.category &&
+    requested.period === view.period
   if (!stillCurrent) return
   body.innerHTML = html + footerHtml()
+  $('#rankTabs').innerHTML = categoryTabsHtml()
+  wireTabs()
 
   for (const row of body.querySelectorAll('[data-open]'))
     row.onclick = () => select({ mode: row.dataset.open })
-  if ($('#rankPlay')) $('#rankPlay').onclick = () => startQuiz(modeById(view.mode), { ranked: true })
+  if ($('#rankPlay'))
+    $('#rankPlay').onclick = () => startQuiz(modeById(view.mode), { ranked: true, category: view.category })
   if ($('#rankSignIn')) $('#rankSignIn').onclick = () => openAccountDialog().then(loadBoard)
 }
 
@@ -107,13 +138,19 @@ function select(change) {
   render()
 }
 
+function wireTabs() {
+  for (const tab of document.querySelectorAll('[data-category]'))
+    tab.onclick = () => select({ category: tab.dataset.category })
+}
+
 function render() {
   showScreen(`<div class="wrap narrow">
     <button class="btn sec small" id="rankBack">← Menú</button>
     <div class="hero"><h2>🏆 Ranking</h2>
-      <p>Solo cuentan las rondas oficiales. Gana quien acierta más; si hay empate, quien pensó menos tiempo.</p></div>
+      <p>Solo cuentan las rondas oficiales. Gana quien acierta más; si hay empate, quien pensó menos tiempo. Cada largo de ronda tiene su propio ranking.</p></div>
     <div class="card">
       <div class="row">${modeSelectHtml()}<div class="chips">${periodChipsHtml()}</div></div>
+      <div id="rankTabs" style="margin-top:12px">${categoryTabsHtml()}</div>
       <div id="rankBody" style="margin-top:12px"></div>
     </div>
   </div>`)
@@ -121,18 +158,23 @@ function render() {
   $('#rankMode').onchange = event => select({ mode: event.target.value })
   for (const chip of document.querySelectorAll('[data-period]'))
     chip.onclick = () => select({ period: chip.dataset.period })
+  wireTabs()
 
   if (accountsAvailable) loadBoard()
   else $('#rankBody').innerHTML = '<p class="muted">El ranking no está disponible en este momento.</p>'
 }
 
-function openRanking(modeId) {
+// Se abre en el juego y el largo de la ronda recién jugada, si vienen de un resultado.
+function openRanking(modeId, category) {
   stopQuiz()
   clearLayer()
   hidePanel()
   title.textContent = 'Ranking'
   if (modeId !== undefined) view.mode = modeId
+  if (category !== undefined) view.category = category
   if (view.mode && !rankedModes().some(mode => mode.id === view.mode)) view.mode = ALL_GAMES
+  if (!ROUND_CATEGORIES.includes(view.category)) view.category = DEFAULT_CATEGORY
+  playersByCategory = {}
   render()
 }
 

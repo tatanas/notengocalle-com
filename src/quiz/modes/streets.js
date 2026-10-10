@@ -1,14 +1,17 @@
 import { distanceToPolyline } from '../../core/geo.js'
 import { escapeHtml, formatKm, shuffle } from '../../core/util.js'
-import { DATA, comunaByName, labelPoint, quizStreets, streetByName } from '../../data/dataset.js'
-import { showLandmarksAlong } from '../../domain/landmarks.js'
 import {
-  STREET_QUESTION,
-  namedSegmentsHtml,
-  noteConfusion,
-  streetContextChips,
-  streetDistractors,
-} from '../../domain/streets.js'
+  DATA,
+  comunaByName,
+  comunas,
+  isUrban,
+  labelPoint,
+  quizStreets,
+  streetByName,
+} from '../../data/dataset.js'
+import { showLandmarksAlong } from '../../domain/landmarks.js'
+import { STREET_QUESTION, namedSegmentsHtml, noteConfusion, streetDistractors } from '../../domain/streets.js'
+import { showAids } from '../../map/aids.js'
 import { COLORS, divIcon, drawNamedSegments, drawStreet, mapLabel } from '../../map/draw.js'
 import { fit, fitCity, layer, map, setLabelMode } from '../../map/map.js'
 import { showPanel } from '../../ui/panel.js'
@@ -20,6 +23,7 @@ import { registerMode } from '../registry.js'
 registerMode({
   id: 'st-name',
   noHint: true,
+  aids: true,
   roomy: true,
   group: 'Calles',
   name: '¿Qué calle es?',
@@ -28,7 +32,7 @@ registerMode({
   key: s => s.name,
   ask(s, q) {
     showPanel(questionHeader(q) + `<div class="q-prompt">${STREET_QUESTION[s.kind || 'calle']}</div>`)
-    streetContextChips()
+    showAids({ borders: comunas.filter(isUrban) })
     drawStreet(s, COLORS.street)
     const opts = shuffle([s, ...streetDistractors(s, 3)]).map(x => ({
       label: escapeHtml(x.name),
@@ -71,6 +75,7 @@ registerMode({
 registerMode({
   id: 'st-find',
   noHint: true,
+  aids: true,
   roomy: true,
   group: 'Calles',
   name: 'Encuentra la calle',
@@ -81,7 +86,7 @@ registerMode({
     showPanel(
       questionHeader(q) + `<div class="q-prompt">Toca cualquier punto de: <b>${escapeHtml(s.name)}</b></div>`,
     )
-    streetContextChips()
+    showAids({ borders: comunas.filter(isUrban) })
     if (q.i === 0) fitCity()
     map.on('click', e => {
       if (q.answered) return

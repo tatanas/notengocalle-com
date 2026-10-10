@@ -1,4 +1,5 @@
-import { COLORS, divIcon, drawMetro, outlineComunas } from '../map/draw.js'
+import { showAids } from '../map/aids.js'
+import { COLORS, divIcon, drawMetro } from '../map/draw.js'
 import { DATA, METRO_LINES, coreComunas, landmarkById, roads } from '../data/dataset.js'
 import { answer, questionHeader, quiz } from './engine.js'
 import { escapeHtml, shuffle } from '../core/util.js'
@@ -36,7 +37,7 @@ export function askSteps(q, cfg) {
   let i = 0,
     errors = 0
   const done = []
-  outlineComunas(coreComunas()).addTo(layer)
+  showAids({ borders: coreComunas(), metro: false })
   L.marker([A.lat, A.lon], { icon: divIcon('pin a', 'A', 28), pane: 'points' }).addTo(layer)
   L.marker([B.lat, B.lon], { icon: divIcon('pin b', 'B', 28), pane: 'points' }).addTo(layer)
   if (cfg.pre) cfg.pre()
@@ -144,6 +145,7 @@ export function registerCarStepsMode(id, name, desc, filt) {
   registerMode({
     id,
     group: 'Ruteo',
+    aids: true,
     name,
     desc,
     balance: r => (otherEnd(r) || {}).comuna,
@@ -185,6 +187,7 @@ export function registerTransitStepsMode(id, name, desc, filt) {
   registerMode({
     id,
     group: 'Ruteo',
+    aids: true,
     name,
     desc,
     balance: r => (otherEnd(r) || {}).comuna,

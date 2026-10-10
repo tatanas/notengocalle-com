@@ -65,7 +65,7 @@ async function sendPending() {
 
 onSessionChange(flushOutbox)
 
-export const fetchLeaderboard = (mode, period) =>
-  api('GET', `/leaderboard?mode=${encodeURIComponent(mode)}&period=${period}`)
+export const fetchLeaderboard = (mode, category, period) =>
+  api('GET', `/leaderboard?mode=${encodeURIComponent(mode)}&category=${category}&period=${period}`)
 
-export const fetchLeaders = period => api('GET', `/leaders?period=${period}`)
+export const fetchLeaders = (category, period) => api('GET', `/leaders?category=${category}&period=${period}`)

@@ -25,8 +25,8 @@ const DEFAULT_PREFERENCES = {
   lines: null,
   strict: false,
   ownStreets: true,
-  stCom: true,
-  stMetro: false,
+  // Modo fácil: se dibujan los bordes de las comunas y las líneas del metro como ayuda.
+  easy: true,
 }
 const preferences = { ...DEFAULT_PREFERENCES, ...store.get('settings', {}) }
 

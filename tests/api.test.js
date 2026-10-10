@@ -2,8 +2,10 @@
 import assert from 'node:assert/strict'
 import { beforeEach, test } from 'node:test'
 import { openLocalDatabase } from '../dev/localDatabase.js'
+import { PGlite } from '@electric-sql/pglite'
 import { createApi } from '../server/api.js'
 import { resetPassword } from '../server/auth.js'
+import { applySchema } from '../server/schema.js'
 import { COST, hashPassword, isBreachedPassword } from '../server/passwords.js'
 
 let db, handle
@@ -30,7 +32,14 @@ function client() {
   }
 }
 
-const round = (mode, correct, ms, total = 15) => ({ mode, correct, total, ms })
+const categoryFor = total => (total > 30 ? 'all' : String(total))
+const round = (mode, correct, ms, total = 15, category = categoryFor(total)) => ({
+  mode,
+  category,
+  correct,
+  total,
+  ms,
+})
 
 async function signedUp(name, password = 'secreto1') {
   const call = client()
@@ -112,18 +121,21 @@ test('solo se guardan puntajes con sesión y con forma de ronda oficial', async 
   const { call } = await signedUp('Seba')
   const rejected = [
     round('no-existe', 10, 60000),
-    round('com-name', 10, 60000, 20),
+    round('com-name', 10, 60000, 20, '15'),
+    round('com-name', 10, 60000, 15, 'cuarenta'),
+    round('com-name', 10, 60000, 5, 'all'),
     round('com-name', 16, 60000),
     round('com-name', -1, 60000),
     round('com-name', 10.5, 60000),
     round('com-name', 10, 100),
     round('com-name', 10, '60000'),
-    round('com-all', 15, 60000),
   ]
   for (const bad of rejected)
     assert.equal((await call('POST', '/scores', bad)).data.error, 'invalid_score', JSON.stringify(bad))
   assert.equal((await call('POST', '/scores', round('com-all', 34, 90000, 34))).status, 201)
-  assert.equal((await db.query('select * from scores')).length, 1)
+  assert.equal((await call('POST', '/scores', round('st-name', 40, 120000, 179, 'all'))).status, 201)
+  assert.equal((await call('POST', '/scores', round('lm-loc', 20, 60000, 30))).status, 201)
+  assert.equal((await db.query('select * from scores')).length, 3)
 })
 
 test('el ranking ordena por aciertos y luego por tiempo, con la mejor ronda de cada jugador', async () => {
@@ -133,6 +145,7 @@ test('el ranking ordena por aciertos y luego por tiempo, con la mejor ronda de c
 
   const first = await ana.call('POST', '/scores', round('com-name', 12, 50000))
   assert.deepEqual(first.data, {
+    category: '15',
     rank: 1,
     players: 1,
     improved: true,
@@ -143,6 +156,7 @@ test('el ranking ordena por aciertos y luego por tiempo, con la mejor ronda de c
   await caro.call('POST', '/scores', round('com-name', 14, 70000))
   const worse = await ana.call('POST', '/scores', round('com-name', 9, 20000))
   assert.deepEqual(worse.data, {
+    category: '15',
     rank: 3,
     players: 3,
     improved: false,
@@ -282,4 +296,117 @@ test('la consulta de claves filtradas manda solo 5 caracteres del hash y falla h
     false,
   )
   assert.equal(await isBreachedPassword('password', async () => ({ ok: false })), false)
+})
+
+test('cada largo de ronda tiene su propio ranking, y se avisa qué largos tienen marcas', async () => {
+  const ana = await signedUp('Ana')
+  const beto = await signedUp('Beto')
+  await ana.call('POST', '/scores', round('st-name', 12, 50000, 15))
+  await ana.call('POST', '/scores', round('st-name', 25, 150000, 30))
+  await beto.call('POST', '/scores', round('st-name', 150, 900000, 179, 'all'))
+  const saved = await beto.call('POST', '/scores', round('st-name', 28, 160000, 30))
+  assert.equal(saved.data.category, '30')
+  assert.equal(saved.data.rank, 1)
+
+  const board = async category =>
+    (await ana.call('GET', `/leaderboard?mode=st-name&category=${category}`)).data
+  const fifteen = await board('15')
+  assert.deepEqual(
+    fifteen.rows.map(row => [row.name, row.correct]),
+    [['Ana', 12]],
+  )
+  const thirty = await board('30')
+  assert.deepEqual(
+    thirty.rows.map(row => [row.name, row.correct]),
+    [
+      ['Beto', 28],
+      ['Ana', 25],
+    ],
+  )
+  const everything = await board('all')
+  assert.deepEqual(
+    everything.rows.map(row => [row.name, row.total]),
+    [['Beto', 179]],
+  )
+  assert.deepEqual(thirty.played, { 15: 1, 30: 2, all: 1 })
+  assert.equal((await board('20')).rows.length, 0)
+
+  const leaders = (await ana.call('GET', '/leaders?category=30')).data.modes
+  assert.equal(leaders['st-name'].leader.name, 'Beto')
+  assert.equal(leaders['st-name'].me.rank, 2)
+  assert.equal((await ana.call('GET', '/leaderboard?mode=st-name&category=7')).status, 400)
+})
+
+test('las rondas de una categoría no se mezclan con las de otra al comparar la mejor marca', async () => {
+  const { call } = await signedUp('Ana')
+  assert.equal((await call('POST', '/scores', round('com-name', 14, 60000, 15))).data.improved, true)
+  const other = await call('POST', '/scores', round('com-name', 5, 60000, 10))
+  assert.equal(
+    other.data.improved,
+    true,
+    'la primera de 10 preguntas es marca propia aunque sea peor que la de 15',
+  )
+  assert.equal(other.data.rank, 1)
+})
+
+test('un puntaje sin categoría (de antes de que existiera) se clasifica por su largo', async () => {
+  const { call } = await signedUp('Ana')
+  const legacy = ({ mode, correct, total, ms }) => ({ mode, correct, total, ms })
+  assert.equal((await call('POST', '/scores', legacy(round('com-name', 10, 60000)))).data.category, '15')
+  assert.equal((await call('POST', '/scores', legacy(round('com-all', 30, 90000, 34)))).data.category, 'all')
+  assert.equal((await call('POST', '/scores', legacy(round('ch-all', 12, 60000, 16)))).data.category, 'all')
+})
+
+test('al actualizar la base no se pierde ninguna marca: las anteriores quedan en su categoría', async () => {
+  // Una base creada antes de las categorías, con rondas ya guardadas.
+  const old = new PGlite()
+  const query = async (text, params = []) => (await old.query(text, params)).rows
+  await query(
+    'create table users (id integer generated always as identity primary key, name text not null, name_key text not null unique, password_hash text not null, created_at timestamptz not null default now())',
+  )
+  await query(
+    'create table sessions (token_hash text primary key, user_id integer not null references users (id) on delete cascade, expires_at timestamptz not null)',
+  )
+  await query(
+    'create table scores (id integer generated always as identity primary key, user_id integer not null references users (id) on delete cascade, mode text not null, correct integer not null, total integer not null, ms integer not null, created_at timestamptz not null default now())',
+  )
+  await query('create table failed_logins (name_key text not null, at timestamptz not null default now())')
+  await query("insert into users (name, name_key, password_hash) values ('Ana', 'ana', 'x')")
+  const before = [
+    ['com-all', 33, 34, 70000],
+    ['com-name', 12, 15, 55000],
+    ['ch-all', 16, 16, 40000],
+    ['lm-loc', 20, 30, 120000],
+  ]
+  for (const [mode, correct, total, ms] of before)
+    await query('insert into scores (user_id, mode, correct, total, ms) values (1, $1, $2, $3, $4)', [
+      mode,
+      correct,
+      total,
+      ms,
+    ])
+
+  const upgraded = { query }
+  await applySchema(upgraded)
+  await applySchema(upgraded) // cada despliegue lo vuelve a aplicar: tiene que poder repetirse
+
+  const rows = await query('select mode, category, correct, total, ms from scores order by id')
+  assert.deepEqual(
+    rows.map(row => [row.mode, row.category, row.correct, row.total, row.ms]),
+    [
+      ['com-all', 'all', 33, 34, 70000],
+      ['com-name', '15', 12, 15, 55000],
+      ['ch-all', 'all', 16, 16, 40000],
+      ['lm-loc', '30', 20, 30, 120000],
+    ],
+  )
+
+  // y siguen apareciendo en el ranking
+  const api = createApi(upgraded, { isBreached: async () => false })
+  const response = await api(new Request('https://juego.test/api/leaderboard?mode=com-all&category=all'))
+  const board = await response.json()
+  assert.deepEqual(
+    board.rows.map(row => [row.name, row.correct, row.total]),
+    [['Ana', 33, 34]],
+  )
 })
