@@ -1000,3 +1000,18 @@ table.board.clickable tr[data-open]:hover td {
 .iconbtn[hidden] {
   display: none;
 }
+
+/* número de preguntas, dentro de la tarjeta de cada juego */
+.length-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin: 0 0 10px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.length-row select {
+  width: auto;
+  padding: 5px 8px;
+}

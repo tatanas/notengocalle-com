@@ -7,9 +7,6 @@ import './ui/home.js'
 import './ui/leaderboard.js'
 import { navigate } from './ui/navigation.js'
 
-// Con ?retirados en la URL se cargan también los juegos retirados del menú (para revisarlos o probarlos).
-if (new URLSearchParams(location.search).has('retirados')) await import('./quiz/modes/retired/index.js')
-
 $('#btnHome').onclick = () => navigate('home')
 navigate('home')
 restoreSession()

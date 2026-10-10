@@ -22,8 +22,8 @@ Juego web para aprender la geografía de Santiago: comunas, calles, lugares, met
 
 ## Modos actuales (ids)
 
-Comunas: `com-name`, `com-all` · Lugares emblemáticos (antes "Landmarks"): `lm-loc`, `lm-com` (incluye barrios con perímetro, estaciones de metro como categoría "Metro" filtrable por línea, 17 cerros) · Calles: `st-name`, `st-find` (con landmarks cercanos al responder, tramos con nombre, bordes de comunas/metro activables) · Ruteo: `rs-any-car`, `rs-any-tp` (paso a paso, GTFS de Red) · Chile: `ch-find`, `ch-city`, `ch-cityreg`, `ch-all` · Parques nacionales: `pn-reg`, `pn-photo` · Conexiones: `cx` (13 tipos de preguntas, selección múltiple). Los 15 tienen ronda oficial 🏆 con ranking. Más: Explorar (capas activables), "Mis calles" (el usuario busca una calle en Nominatim y se guarda en su navegador), cronómetro + récord personal por juego.
-Los retirados están en `src/quiz/modes/retired/` (se ven con `?retirados` en la URL). No se borra su código.
+Comunas: `com-name`, `com-all` (siempre con todas las comunas: no tienen largo ni categorías de ranking) · Lugares emblemáticos (antes "Landmarks"): `lm-loc`, `lm-com` (incluye barrios con perímetro, estaciones de metro como categoría "Metro" filtrable por línea, 17 cerros) · Calles: `st-name`, `st-find` (acierta quien toca sobre la calle: margen de unos 14 píxeles, entre 80 y 250 m según el zoom, y la calle pedida debe ser la más cercana; con landmarks cercanos al responder, tramos con nombre, bordes de comunas/metro activables) · Ruteo: `rs-any-car`, `rs-any-tp` (paso a paso, GTFS de Red) · Chile: `ch-find`, `ch-city`, `ch-cityreg`, `ch-all` · Parques nacionales: `pn-reg`, `pn-photo` · Conexiones: `cx` (13 tipos de preguntas, selección múltiple). Los 15 tienen ronda oficial 🏆 con ranking. Más: Explorar (capas activables), "Mis calles" (el usuario busca una calle en Nominatim y se guarda en su navegador), cronómetro + récord personal por juego.
+Los juegos que se retiraron del menú (fronteras, metro, cerros, fotos, barrios, rutas desde casa, etc.) se **borraron del código**; su historia está en git (commits anteriores a "Quita los juegos retirados").
 
 ## Trampas conocidas
 
@@ -43,7 +43,7 @@ Los retirados están en `src/quiz/modes/retired/` (se ven con `?retirados` en la
 - Sacados por irrelevantes (no volver a agregar sin preguntar): El Cortijo, Av. Lo Barnechea, Las Nieves, Río Tajo, Av. El Mirador, Alexander Fleming, calles "Cerro El Plomo/Cerro Colorado", San Damián como calle (sigue como barrio), muchos colegios específicos del oriente, clubes de golf/polo/Stade Français, varios restaurantes. Quedan bares Liguria y Nacional (el usuario puede querer sacarlos).
 - Pendientes de confirmar con el usuario: Estadio Español (club de socios, sigue), Colegio SEK de Las Condes (no se encontró; el que había estaba en Peñalolén y se sacó), "Av. Pedro Aguirre Cerda" se tomó la de Cerrillos, "Las Flores" se tomó Camino Las Flores de Las Condes, falta la Gerónimo de Alderete de La Florida.
 - Secciones retiradas de la UI pero con datos disponibles: Barrios (ahora dentro de Lugares emblemáticos), Fotos, Cerros (solo 17 pasaron a landmarks; los 44 siguen en la capa Cerros de Explorar). Fronteras está retirada y hoy **sin datos** en data.js (`borders` vacío; el cálculo sigue en `tools/border.js`).
-- Los juegos "desde tu casa o el campus" (`rs-home-*`, `mt-route`) están retirados; sus datos personales (Los Trapenses, Campus San Joaquín) siguen en `src/quiz/steps.js` y en `transit` de data.js.
+- Los juegos "desde tu casa o el campus" (`rs-home-*`, `mt-route`) se borraron; sus datos personales (Los Trapenses, Campus San Joaquín) siguen en `src/quiz/steps.js` y en `transit` de data.js.
 
 - Las calles que siguen fuera de Santiago (Ruta 5, 68, 78, 57, Camino a Melipilla) llevan una prolongación punteada (`ext`); ver `tools/extensions.js`.
 

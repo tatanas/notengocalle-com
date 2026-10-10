@@ -17,7 +17,7 @@ async function fill(page, values) {
 
 async function playOfficialRound(page) {
   await goHome(page)
-  await page.click('[data-official="com-name"]')
+  await page.click('[data-official="st-name"]')
   await playRoundOfChoices(page)
 }
 
@@ -84,9 +84,9 @@ export async function accounts(browser, { check }) {
   await second.page.click('#menu')
   await second.page.click('#goRanking')
   await second.page.select('#rankMode', '')
-  await second.page.waitForSelector('table.board [data-open="com-name"]')
+  await second.page.waitForSelector('table.board [data-open="st-name"]')
   check(
-    /de 2/.test(await text(second.page, 'table.board [data-open="com-name"]')),
+    /de 2/.test(await text(second.page, 'table.board [data-open="st-name"]')),
     'el resumen de líderes muestra tu puesto en cada juego',
   )
   await second.page.screenshot({ path: SHOTS + 'ranking_leaders.png' })

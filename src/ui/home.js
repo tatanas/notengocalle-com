@@ -1,5 +1,5 @@
 import { bests, resetProgress, stats } from '../core/progress.js'
-import { saveSettings, settings } from '../core/store.js'
+import { lengthFor, saveSettings, settings } from '../core/store.js'
 import { $, escapeHtml, formatTime } from '../core/util.js'
 import { CATEGORIES, CHILE, DATA, LINE_IDS, METRO_LINES, PARKS, quizStreets } from '../data/dataset.js'
 import { selectedLines } from '../domain/metro.js'
@@ -49,12 +49,6 @@ const GROUPS = [
   },
 ]
 
-// Con ?retirados aparecen grupos que el menú normal no conoce.
-const retiredGroups = () =>
-  [...new Set(MODES.map(mode => mode.group))]
-    .filter(name => !GROUPS.some(group => group.name === name))
-    .map(name => ({ name, emoji: '🗄️', blurb: 'Juegos retirados del menú.' }))
-
 const link = (href, text) => `<a href="${href}" target="_blank" rel="noopener">${text}</a>`
 
 const chip = (label, checked, attributes, style = '') =>
@@ -97,10 +91,24 @@ function metroLineChips() {
 // Los juegos paso a paso van primero dentro de su grupo.
 const stepsFirst = (a, b) => (b.id.startsWith('rs-') ? 1 : 0) - (a.id.startsWith('rs-') ? 1 : 0)
 
+const LENGTH_CHOICES = [10, 15, 20, 30, 999]
+
+// Cuántas preguntas por ronda, en la tarjeta del juego. Los juegos que siempre recorren todo su conjunto
+// (las comunas: son pocas) no lo ofrecen.
+function lengthPicker(group, modes) {
+  if (modes.every(mode => mode.all)) return ''
+  const options = LENGTH_CHOICES.map(
+    choice =>
+      `<option value="${choice}" ${choice === lengthFor(group) ? 'selected' : ''}>${choice === 999 ? 'Todas' : choice}</option>`,
+  )
+  return `<label class="length-row">Preguntas por ronda <select data-length-group="${escapeHtml(group)}">${options.join('')}</select></label>`
+}
+
 function groupCard(group) {
   const modes = MODES.filter(mode => mode.group === group.name).sort(stepsFirst)
   return `<div class="card">
     <h3><span class="em">${group.emoji}</span>${group.name}</h3><p>${group.blurb}</p>
+    ${lengthPicker(group.name, modes)}
     ${group.name === 'Lugares emblemáticos' ? metroLineChips() : ''}
     <div class="modes">${modes.map(modeRow).join('')}</div>
   </div>`
@@ -118,8 +126,6 @@ function settingsCard() {
       <option value="peri">Gran Santiago + periferia (Colina, Lampa, Padre Hurtado, Pirque, Buin…)</option>
       <option value="all">Toda la Región Metropolitana (52)</option>
     </select>
-    <label for="setLen">Preguntas por ronda (también en las oficiales: cada largo tiene su ranking)</label>
-    <select id="setLen"><option>10</option><option>15</option><option>20</option><option>30</option><option value="999">Todas</option></select>
     <label>Categorías de lugares emblemáticos</label>
     <div class="chips" id="setCats">${categoryChips.join('')}</div>
     <div style="margin-top:10px">${chip('Modo estricto en lugares emblemáticos (800 m en vez de 1,5 km)', settings.strict, 'id="setStrict"')}</div>
@@ -172,9 +178,9 @@ const homeHtml = () => `<div class="wrap">
   <div class="hero"><h2>¿Dónde queda eso? 🏔️</h2>
     <p>Practica comunas, lugares, calles, rutas y metro de Santiago. Lo que fallas te lo pregunta más seguido.</p></div>
   <div class="grid">
-    ${[...GROUPS, ...retiredGroups()].map(groupCard).join('')}
+    ${GROUPS.map(groupCard).join('')}
     <div class="card"><h3><span class="em">🏆</span>Ranking</h3>
-      <p>El botón grande de cada juego es su ronda oficial: mismas reglas para todos y cuenta para el ranking (con cuenta), según el número de preguntas que tengas elegido. <b>Práctica</b> es una ronda con ayudas (modo fácil o difícil) que aprende de lo que fallas.</p>
+      <p>El botón grande de cada juego es su ronda oficial: mismas reglas para todos y cuenta para el ranking (con cuenta), con el número de preguntas que tengas elegido en la tarjeta del juego. <b>Práctica</b> es una ronda con ayudas (modo fácil o difícil) que aprende de lo que fallas.</p>
       <button class="btn wide" id="goRanking">Ver ranking</button></div>
     <div class="card"><h3><span class="em">🔎</span>Explorar</h3>
       <p>Mapa interactivo con comunas, metro, calles y lugares. Para estudiar antes de jugar.</p>
@@ -212,12 +218,11 @@ function wireSettings() {
     openHome()
   }
 
-  const length = $('#setLen')
-  length.value = String(settings.len)
-  length.onchange = () => {
-    settings.len = +length.value
-    saveSettings()
-  }
+  for (const picker of screenView.querySelectorAll('[data-length-group]'))
+    picker.onchange = () => {
+      settings.lengths = { ...settings.lengths, [picker.dataset.lengthGroup]: +picker.value }
+      saveSettings()
+    }
 
   const categories = $('#setCats')
   for (const input of categories.querySelectorAll('input'))

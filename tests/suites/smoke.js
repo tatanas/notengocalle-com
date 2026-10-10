@@ -18,16 +18,13 @@ async function answerQuestion(page, id) {
 
 // Recorre todos los juegos del menú respondiendo unas cuantas preguntas, y después Explorar.
 // Falla si aparece un error de JavaScript, si algo local no carga o si la página se recarga sola.
-export async function smoke(browser, { check }, { mobile = false, retired = false } = {}) {
-  const prefix = (mobile ? 'm_' : '') + (retired ? 'r_' : '')
-  const { page, errors, reloads, during } = await openPage(browser, {
-    mobile,
-    path: retired ? '/?retirados' : '/',
-  })
+export async function smoke(browser, { check }, { mobile = false } = {}) {
+  const prefix = mobile ? 'm_' : ''
+  const { page, errors, reloads, during } = await openPage(browser, { mobile })
   await page.screenshot({ path: SHOTS + prefix + 'home.png' })
 
   const modes = await page.$$eval('[data-mode]', buttons => buttons.map(button => button.dataset.mode))
-  check(modes.length >= (retired ? 30 : 15), `el menú ofrece ${modes.length} juegos`)
+  check(modes.length >= 15, `el menú ofrece ${modes.length} juegos`)
 
   const unanswered = []
   for (const id of modes) {

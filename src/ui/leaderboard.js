@@ -20,6 +20,9 @@ const view = { mode: ALL_GAMES, category: DEFAULT_CATEGORY, period: 'all', ...st
 // Cuántos jugadores tiene cada categoría del juego mirado; solo se conoce al cargar su tabla.
 let playersByCategory = {}
 
+// Los juegos que recorren siempre todo su conjunto (las comunas) no tienen largos: solo "todas".
+const categoriesOf = modeId => (modeId && modeById(modeId)?.all ? ['all'] : ROUND_CATEGORIES)
+
 const rankedModes = () => MODES.filter(hasOfficialRound)
 const groupsOf = modes => [...new Set(modes.map(mode => mode.group))]
 const score = entry => `${entry.correct}/${entry.total}`
@@ -50,7 +53,7 @@ const periodChipsHtml = () =>
 
 // Pestañas por largo de ronda: cada una es un ranking aparte, porque 15 preguntas y todas no se pueden comparar.
 function categoryTabsHtml() {
-  const tabs = ROUND_CATEGORIES.map(category => {
+  const tabs = categoriesOf(view.mode).map(category => {
     const players = view.mode ? playersByCategory[category] : null
     const count = players ? ` <small>${players}</small>` : ''
     return `<button class="tab ${category === view.category ? 'on' : ''}" data-category="${category}">${categoryLabel(category)}${count}</button>`
@@ -132,8 +135,15 @@ async function loadBoard() {
   if ($('#rankSignIn')) $('#rankSignIn').onclick = () => openAccountDialog().then(loadBoard)
 }
 
+// Si la pestaña elegida no existe en este juego (los de comunas solo tienen "todas"), se pasa a la que sí.
+function keepCategoryValid() {
+  const valid = categoriesOf(view.mode)
+  if (!valid.includes(view.category)) view.category = valid.length === 1 ? valid[0] : DEFAULT_CATEGORY
+}
+
 function select(change) {
   Object.assign(view, change)
+  keepCategoryValid()
   store.set('ranking', view)
   render()
 }
@@ -173,7 +183,7 @@ function openRanking(modeId, category) {
   if (modeId !== undefined) view.mode = modeId
   if (category !== undefined) view.category = category
   if (view.mode && !rankedModes().some(mode => mode.id === view.mode)) view.mode = ALL_GAMES
-  if (!ROUND_CATEGORIES.includes(view.category)) view.category = DEFAULT_CATEGORY
+  keepCategoryValid()
   playersByCategory = {}
   render()
 }

@@ -41,7 +41,6 @@ src/                    el juego (navegador)
     steps.js                juegos "paso a paso" (rutas en auto y en transporte público)
     registry.js             lista de juegos registrados
     modes/                  un archivo por tema; cada juego es un registerMode({...})
-    modes/retired/          juegos retirados del menú (se conservan; ver "Juegos retirados")
   ui/                     pantallas: menú, Explorar, ranking, cuenta, Mis calles, fotos
   account/                cliente del servidor: sesión y envío de puntajes
   styles/style.css        todos los estilos
@@ -190,13 +189,6 @@ Al terminar una ronda oficial (`ui/officialOutcome.js` → `account/scores.js`):
 
 El progreso de práctica es local a cada navegador. Al servidor solo llegan las rondas oficiales.
 
-### Juegos retirados
-
-Los juegos que se sacaron del menú viven en `quiz/modes/retired/`. No se cargan en el sitio normal; con
-`?retirados` en la URL sí aparecen, y las pruebas los recorren para que no se pudran. Para reactivar uno,
-se mueve su `registerMode({...})` al archivo del tema en `quiz/modes/`. Algunos no tienen datos hoy
-(`route`, `rs-home-car` y los de fronteras: `DATA.routes` y `DATA.borders` vienen vacíos).
-
 ### Service worker
 
 `src/service-worker.js` guarda el sitio para abrir sin conexión. Al construir, `dev/serviceWorkerPlugin.js`
@@ -241,8 +233,10 @@ Nombre de usuario y clave, sin correo. Decisiones:
 ### Ranking
 
 - Un ranking por juego **y por largo de ronda** (categorías `10`, `15`, `20`, `30` y `all` = todas las preguntas del
-  juego): 15 preguntas y todas no se pueden comparar. El largo es el que el jugador tiene elegido en sus ajustes;
-  desde el ranking también se puede jugar el largo de la pestaña abierta. Ordena por aciertos y, a igual número, por
+  juego): 15 preguntas y todas no se pueden comparar. El largo lo elige el jugador en la tarjeta de cada grupo de juegos
+  (`settings.lengths`, con `settings.len` como valor por defecto); desde el ranking también se puede jugar el largo
+  de la pestaña abierta. Los juegos de comunas (`all: true`: son pocas) siempre recorren todas y solo tienen la
+  pestaña "todas". Ordena por aciertos y, a igual número, por
   menor tiempo.
 - De cada jugador cuenta su mejor ronda; todas las rondas quedan guardadas (permite el ranking "últimos 7
   días" y, a futuro, historial).
@@ -383,11 +377,11 @@ regiones) y caen en la categoría "todas"; no hay nada que actualizar si ese tam
 
 ## Pruebas (tests/)
 
-| Comando             | Qué cubre                                                                                                                                                                                                                |
-| ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `npm run lint`      | nombres no definidos, imports sobrantes                                                                                                                                                                                  |
-| `npm run test:unit` | `unit.test.js` (geometría, sorteo, reglas compartidas) y `api.test.js` (el servidor completo contra un Postgres en memoria)                                                                                              |
-| `npm run test:e2e`  | Chrome real sobre el build: recorre todos los juegos en escritorio y celular, los retirados, el cronómetro, las calles propias, el inicio de las 15 rondas oficiales, las fotos y el flujo completo de cuentas y ranking |
+| Comando             | Qué cubre                                                                                                                                                                                                 |
+| ------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `npm run lint`      | nombres no definidos, imports sobrantes                                                                                                                                                                   |
+| `npm run test:unit` | `unit.test.js` (geometría, sorteo, reglas compartidas) y `api.test.js` (el servidor completo contra un Postgres en memoria)                                                                               |
+| `npm run test:e2e`  | Chrome real sobre el build: recorre todos los juegos en escritorio y celular, el cronómetro, las calles propias, el inicio de las 15 rondas oficiales, las fotos y el flujo completo de cuentas y ranking |
 
 `node tests/run.js smoke accounts` corre solo algunas suites; `--no-build` reutiliza `dist/`; `--dev` sirve el
 código sin empaquetar, para que un error apunte al archivo y la línea reales. Las capturas quedan en
@@ -413,7 +407,7 @@ código sin empaquetar, para que un error apunte al archivo y la línea reales. 
 
 - **Nuevo juego**: `registerMode({...})` en el archivo del tema dentro de `src/quiz/modes/`. Si debe tener
   ranking, agregar su id a `RANKED_MODES` (`shared/ranked.js`).
-- **Retirar un juego**: mover su `registerMode` a `src/quiz/modes/retired/` y quitarlo de `RANKED_MODES`.
+- **Retirar un juego**: borrar su `registerMode` y quitarlo de `RANKED_MODES`. Sus marcas guardadas quedan en la base.
 - **Nuevo ajuste de práctica**: valor por defecto en `core/store.js`, control en `ui/home.js` y, si afecta la
   dificultad, su valor fijo en `OFFICIAL_RULES`.
 - **Nueva ruta del API**: función en `server/` y una línea en `ROUTES` (`server/api.js`); prueba en

@@ -9,8 +9,8 @@ const seconds = hud => {
 // El cronómetro solo cuenta el tiempo de pensar, y el récord personal se guarda y se muestra.
 export async function timer(browser, { check }) {
   const { page, errors } = await openPage(browser)
-  await page.select('#setLen', '10')
-  await page.click('[data-mode="com-name"]')
+  await page.select('[data-length-group="Calles"]', '10')
+  await page.click('[data-mode="st-name"]')
   await page.waitForSelector('.opt:not([disabled])')
   await sleep(1200)
   await page.click('.opt:not([disabled])')
@@ -33,7 +33,7 @@ export async function timer(browser, { check }) {
   check(/récord/i.test(await text(page, '#panel')), 'la segunda ronda se compara con el récord')
 
   await page.click('#menu')
-  check(/¿Qué comuna es\?\s+20/.test(await text(page, 'table.stats')), 'el progreso suma las 20 respuestas')
+  check(/¿Qué calle es\?\s+20/.test(await text(page, 'table.stats')), 'el progreso suma las 20 respuestas')
   check(!errors.length, `sin errores en la consola${errors.length ? ': ' + errors.join(' | ') : ''}`)
   await page.close()
 }
@@ -102,7 +102,7 @@ export async function officialRounds(browser, { check }) {
     const started = await page.waitForSelector('.q-head', { timeout: 8000 }).catch(() => null)
     const header = started ? await text(page, '.q-head') : ''
     const total = +(header.match(/de (\d+)/) || [])[1]
-    const expected = { 'com-all': 34, 'ch-all': 16 }[id] ?? 10
+    const expected = { 'com-name': 34, 'com-all': 34, 'ch-all': 16 }[id] ?? 10
     if (total !== expected || !/Ronda oficial/.test(header)) wrong.push(`${id} (${total || 'no partió'})`)
   }
   check(
@@ -387,7 +387,7 @@ export async function rankingCategories(browser, { check }) {
   )
   await page.reload({ waitUntil: 'networkidle2' })
   await page.waitForFunction(() => document.getElementById('btnAccount').innerText.includes('Cata'))
-  await page.click('[data-official="com-name"]')
+  await page.click('[data-official="st-name"]')
   await playRoundOfChoices(page)
   await page.waitForFunction(() => /Puesto/.test(document.getElementById('officialOutcome')?.innerText ?? ''))
   check(

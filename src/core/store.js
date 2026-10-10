@@ -20,7 +20,9 @@ export const store = {
 
 const DEFAULT_PREFERENCES = {
   scope: 'core',
+  // Preguntas por ronda: la de cada grupo de juegos (lengths) o, si no eligió, esta (len).
   len: 15,
+  lengths: {},
   cats: null,
   lines: null,
   strict: false,
@@ -36,6 +38,8 @@ let roundRules = null
 export const settings = new Proxy(preferences, {
   get: (prefs, key) => (roundRules && key in roundRules ? roundRules[key] : prefs[key]),
 })
+
+export const lengthFor = group => settings.lengths[group] ?? settings.len
 
 export const saveSettings = () => store.set('settings', preferences)
 
