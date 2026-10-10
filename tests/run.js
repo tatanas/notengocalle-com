@@ -23,7 +23,6 @@ import { createChecker, launchBrowser, startServer } from './support.js'
 const SUITES = {
   smoke: (browser, checker) => smoke(browser, checker),
   'smoke-mobile': (browser, checker) => smoke(browser, checker, { mobile: true }),
-  'smoke-retired': (browser, checker) => smoke(browser, checker, { retired: true }),
   timer,
   'own-streets': ownStreets,
   'official-rounds': officialRounds,

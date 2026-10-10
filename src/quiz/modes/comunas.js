@@ -11,6 +11,7 @@ import { registerMode } from '../registry.js'
 
 registerMode({
   id: 'com-name',
+  all: true,
   noHint: true,
   aids: true,
   group: 'Comunas',

@@ -1,6 +1,6 @@
 import { OFFICIAL_RULES, RANKED_MODES, categoryOf } from '../../shared/ranked.js'
 import { adaptiveWeight, bests, record, saveBest, weightedSample } from '../core/progress.js'
-import { applyRoundRules, saveSettings, settings } from '../core/store.js'
+import { applyRoundRules, lengthFor, saveSettings, settings } from '../core/store.js'
 import { $, escapeHtml, formatTime } from '../core/util.js'
 import { clearAids, redrawAids } from '../map/aids.js'
 import {
@@ -126,7 +126,7 @@ export function startQuiz(mode, { ranked = false, category = null } = {}) {
   stopQuiz()
   applyRoundRules(ranked ? OFFICIAL_RULES : null)
   const pool = mode.pool()
-  const wanted = category ? (category === 'all' ? pool.length : +category) : settings.len
+  const wanted = category ? (category === 'all' ? pool.length : +category) : lengthFor(mode.group)
   const size = mode.all ? pool.length : Math.min(wanted, pool.length)
   if (!pool.length) {
     applyRoundRules(null)

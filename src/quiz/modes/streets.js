@@ -72,6 +72,18 @@ registerMode({
     fit(L.latLngBounds(s.bb).pad(0.25), 14)
   },
 })
+// El margen de acierto son unos 14 píxeles: en metros, más estricto cuanto más se acerca el mapa (entre 80 y 250 m).
+const TAP_PIXELS = 14
+const MIN_TAP_KM = 0.08
+const MAX_TAP_KM = 0.25
+// Si otra calle del juego queda más cerca del toque que la pedida por más de esto, se tocó esa otra.
+const CLOSER_OTHER_KM = 0.03
+
+function tapToleranceKm(latlng) {
+  const fingertip = map.containerPointToLatLng(map.latLngToContainerPoint(latlng).add([TAP_PIXELS, 0]))
+  return Math.min(MAX_TAP_KM, Math.max(MIN_TAP_KM, latlng.distanceTo(fingertip) / 1000))
+}
+
 registerMode({
   id: 'st-find',
   noHint: true,
@@ -79,7 +91,7 @@ registerMode({
   roomy: true,
   group: 'Calles',
   name: 'Encuentra la calle',
-  desc: 'Toca cualquier punto de la calle que te pido (margen 400 m).',
+  desc: 'Toca sobre la calle que te pido. El margen es el ancho de un dedo: más estricto cuanto más acercas el mapa.',
   pool: () => quizStreets(),
   key: s => s.name,
   ask(s, q) {
@@ -92,9 +104,6 @@ registerMode({
       if (q.answered) return
       const p = [e.latlng.lat, e.latlng.lng]
       const d = distanceToPolyline(p, s.lines)
-      const ok = d <= 0.4
-      L.marker(p, { icon: divIcon('pin you'), pane: 'points' }).addTo(layer)
-      drawStreet(s, ok ? COLORS.ok : COLORS.street)
       let near = null,
         nd = Infinity
       for (const o of DATA.streets) {
@@ -104,10 +113,14 @@ registerMode({
           near = o
         }
       }
+      const tolerance = tapToleranceKm(e.latlng)
+      const ok = d <= tolerance && !(near !== s && nd < d - CLOSER_OTHER_KM)
+      L.marker(p, { icon: divIcon('pin you'), pane: 'points' }).addTo(layer)
+      drawStreet(s, ok ? COLORS.ok : COLORS.street)
       setLabelMode('labels')
-      if (!ok && near && nd < 0.4) noteConfusion(s.name, near.name)
+      if (!ok && near && near !== s && nd <= tolerance) noteConfusion(s.name, near.name)
       const extra =
-        !ok && near && near !== s && nd < 0.4
+        !ok && near && near !== s && nd <= tolerance
           ? `<p>Tocaste cerca de <b>${escapeHtml(near.name)}</b>.</p>`
           : ''
       drawNamedSegments(s)
