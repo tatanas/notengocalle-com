@@ -39,6 +39,7 @@ Los juegos que se retiraron del menú (fronteras, metro, cerros, fotos, barrios,
 
 ## Estado y decisiones de contenido (resumen)
 
+- Largos de ronda: solo 15 o todas (las regiones y las comunas siempre van completas). Las marcas antiguas de 10, 20 y 30 siguen en la base pero ya no salen en el ranking.
 - 179 calles (109 con foto), 304 landmarks en landmarks.json (+17 cerros y 41 barrios con perímetro; las 126 estaciones son aparte, de los juegos de metro; categorías incluyen Religión y Gobierno y justicia), 93 ciudades y 46 parques nacionales, 29 recorridos de micro en Explorar.
 - Sacados por irrelevantes (no volver a agregar sin preguntar): El Cortijo, Av. Lo Barnechea, Las Nieves, Río Tajo, Av. El Mirador, Alexander Fleming, calles "Cerro El Plomo/Cerro Colorado", San Damián como calle (sigue como barrio), muchos colegios específicos del oriente, clubes de golf/polo/Stade Français, varios restaurantes. Quedan bares Liguria y Nacional (el usuario puede querer sacarlos).
 - Pendientes de confirmar con el usuario: Estadio Español (club de socios, sigue), Colegio SEK de Las Condes (no se encontró; el que había estaba en Peñalolén y se sacó), "Av. Pedro Aguirre Cerda" se tomó la de Cerrillos, "Las Flores" se tomó Camino Las Flores de Las Condes, falta la Gerónimo de Alderete de La Florida.

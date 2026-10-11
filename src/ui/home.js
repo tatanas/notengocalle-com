@@ -105,7 +105,7 @@ function metroLineChips() {
 // Los juegos paso a paso van primero dentro de su grupo.
 const stepsFirst = (a, b) => (b.id.startsWith('rs-') ? 1 : 0) - (a.id.startsWith('rs-') ? 1 : 0)
 
-const LENGTH_CHOICES = [10, 15, 20, 30, 999]
+const LENGTH_CHOICES = [15, 999]
 
 // Cuántas preguntas por ronda, en la tarjeta del juego. Los juegos que siempre recorren todo su conjunto
 // (las comunas: son pocas) no lo ofrecen.

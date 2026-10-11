@@ -32,7 +32,7 @@ function client() {
   }
 }
 
-const categoryFor = total => (total > 30 ? 'all' : String(total))
+const categoryFor = total => (total > 15 ? 'all' : String(total))
 const round = (mode, correct, ms, total = 15, category = categoryFor(total)) => ({
   mode,
   category,
@@ -298,14 +298,14 @@ test('la consulta de claves filtradas manda solo 5 caracteres del hash y falla h
   assert.equal(await isBreachedPassword('password', async () => ({ ok: false })), false)
 })
 
-test('cada largo de ronda tiene su propio ranking, y se avisa qué largos tienen marcas', async () => {
+test('cada largo de ronda (15 o todas) tiene su propio ranking, y se avisa qué largos tienen marcas', async () => {
   const ana = await signedUp('Ana')
   const beto = await signedUp('Beto')
   await ana.call('POST', '/scores', round('st-name', 12, 50000, 15))
-  await ana.call('POST', '/scores', round('st-name', 25, 150000, 30))
+  await ana.call('POST', '/scores', round('st-name', 100, 700000, 120, 'all'))
   await beto.call('POST', '/scores', round('st-name', 150, 900000, 179, 'all'))
-  const saved = await beto.call('POST', '/scores', round('st-name', 28, 160000, 30))
-  assert.equal(saved.data.category, '30')
+  const saved = await beto.call('POST', '/scores', round('st-name', 160, 960000, 179, 'all'))
+  assert.equal(saved.data.category, 'all')
   assert.equal(saved.data.rank, 1)
 
   const board = async category =>
@@ -315,23 +315,22 @@ test('cada largo de ronda tiene su propio ranking, y se avisa qué largos tienen
     fifteen.rows.map(row => [row.name, row.correct]),
     [['Ana', 12]],
   )
-  const thirty = await board('30')
-  assert.deepEqual(
-    thirty.rows.map(row => [row.name, row.correct]),
-    [
-      ['Beto', 28],
-      ['Ana', 25],
-    ],
-  )
   const everything = await board('all')
   assert.deepEqual(
-    everything.rows.map(row => [row.name, row.total]),
-    [['Beto', 179]],
+    everything.rows.map(row => [row.name, row.correct]),
+    [
+      ['Beto', 160],
+      ['Ana', 100],
+    ],
   )
-  assert.deepEqual(thirty.played, { 15: 1, 30: 2, all: 1 })
-  assert.equal((await board('20')).rows.length, 0)
+  assert.deepEqual(everything.played, { 15: 1, all: 2 })
+  assert.equal(
+    (await ana.call('GET', '/leaderboard?mode=st-name&category=20')).status,
+    400,
+    'ya no hay rondas de 20',
+  )
 
-  const leaders = (await ana.call('GET', '/leaders?category=30')).data.modes
+  const leaders = (await ana.call('GET', '/leaders?category=all')).data.modes
   assert.equal(leaders['st-name'].leader.name, 'Beto')
   assert.equal(leaders['st-name'].me.rank, 2)
   assert.equal((await ana.call('GET', '/leaderboard?mode=st-name&category=7')).status, 400)
@@ -340,11 +339,11 @@ test('cada largo de ronda tiene su propio ranking, y se avisa qué largos tienen
 test('las rondas de una categoría no se mezclan con las de otra al comparar la mejor marca', async () => {
   const { call } = await signedUp('Ana')
   assert.equal((await call('POST', '/scores', round('com-name', 14, 60000, 15))).data.improved, true)
-  const other = await call('POST', '/scores', round('com-name', 5, 60000, 10))
+  const other = await call('POST', '/scores', round('com-name', 5, 60000, 12, 'all'))
   assert.equal(
     other.data.improved,
     true,
-    'la primera de 10 preguntas es marca propia aunque sea peor que la de 15',
+    'la primera de "todas" es marca propia aunque sea peor que la de 15',
   )
   assert.equal(other.data.rank, 1)
 })

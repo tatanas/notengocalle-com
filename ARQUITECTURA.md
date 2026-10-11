@@ -154,7 +154,7 @@ Hay dos formas de jugar el mismo modo:
 | Ayudas         | modo fácil / difícil (bordes de comunas y metro) y "Ver nombres"    | ninguna: siempre difícil, sin botones         |
 | Sorteo         | ponderado por lo que el jugador falla                               | parejo para todos                             |
 | Calles propias | incluidas                                                           | excluidas                                     |
-| Largo          | el elegido (10, 15, 20, 30 o todas)                                 | el elegido; cada largo tiene su ranking       |
+| Largo          | el elegido (15 o todas)                               | el elegido; cada largo tiene su ranking       |
 | Va al ranking  | no                                                                  | sí, si hay cuenta                             |
 | Al empezar     | de inmediato                                                        | cuenta regresiva de 3 segundos                |
 
