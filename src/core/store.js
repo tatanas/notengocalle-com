@@ -30,7 +30,18 @@ const DEFAULT_PREFERENCES = {
   // Modo fácil: se dibujan los bordes de las comunas y las líneas del metro como ayuda.
   easy: true,
 }
-const preferences = { ...DEFAULT_PREFERENCES, ...store.get('settings', {}) }
+const ALL_LENGTH = 999
+// Antes se podía elegir 10, 20 o 30: ahora solo 15 o todas.
+const simplifiedLength = length => (length >= ALL_LENGTH ? ALL_LENGTH : DEFAULT_PREFERENCES.len)
+const saved = store.get('settings', {})
+const preferences = {
+  ...DEFAULT_PREFERENCES,
+  ...saved,
+  len: simplifiedLength(saved.len ?? DEFAULT_PREFERENCES.len),
+  lengths: Object.fromEntries(
+    Object.entries(saved.lengths ?? {}).map(([group, length]) => [group, simplifiedLength(length)]),
+  ),
+}
 
 let roundRules = null
 

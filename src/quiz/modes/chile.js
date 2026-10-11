@@ -10,6 +10,7 @@ import { showPanel, toast } from '../../ui/panel.js'
 
 registerMode({
   id: 'ch-find',
+  all: true,
   group: 'Chile',
   name: 'Ubica la región',
   desc: 'Te digo la región; la tocas en el mapa de Chile.',

@@ -9,7 +9,7 @@ const seconds = hud => {
 // El cronómetro solo cuenta el tiempo de pensar, y el récord personal se guarda y se muestra.
 export async function timer(browser, { check }) {
   const { page, errors } = await openPage(browser)
-  await page.select('[data-length-group="Calles"]', '10')
+  await page.select('[data-length-group="Calles"]', '15')
   await page.click('[data-mode="st-name"]')
   await page.waitForSelector('.opt:not([disabled])')
   await sleep(1200)
@@ -25,15 +25,15 @@ export async function timer(browser, { check }) {
   await clickNext(page)
   await playRoundOfChoices(page, { thinkMs: 60 })
   const result = await text(page, '#panel')
-  check(/\/ 10/.test(result), 'la ronda respeta el largo elegido (10 preguntas)')
-  check(/Primera marca en rondas de 10/.test(result), 'la primera ronda queda como marca personal')
+  check(/\/ 15/.test(result), 'la ronda respeta el largo elegido (15 preguntas)')
+  check(/Primera marca en rondas de 15/.test(result), 'la primera ronda queda como marca personal')
 
   await page.click('#again')
   await playRoundOfChoices(page, { thinkMs: 60 })
   check(/récord/i.test(await text(page, '#panel')), 'la segunda ronda se compara con el récord')
 
   await page.click('#menu')
-  check(/¿Qué calle es\?\s+20/.test(await text(page, 'table.stats')), 'el progreso suma las 20 respuestas')
+  check(/¿Qué calle es\?\s+30/.test(await text(page, 'table.stats')), 'el progreso suma las 30 respuestas')
   check(!errors.length, `sin errores en la consola${errors.length ? ': ' + errors.join(' | ') : ''}`)
   await page.close()
 }
@@ -87,7 +87,7 @@ export async function ownStreets(browser, { check }) {
 
 // Cada juego con ranking debe poder iniciar su ronda oficial con el largo que el servidor espera.
 export async function officialRounds(browser, { check }) {
-  const { page, errors } = await openPage(browser, { storage: { settings: { scope: 'all', len: 10 } } })
+  const { page, errors } = await openPage(browser, { storage: { settings: { scope: 'all', len: 15 } } })
   const offered = await page.$$eval('[data-official]', buttons =>
     buttons.map(button => button.dataset.official),
   )
@@ -102,7 +102,7 @@ export async function officialRounds(browser, { check }) {
     const started = await page.waitForSelector('.q-head', { timeout: 8000 }).catch(() => null)
     const header = started ? await text(page, '.q-head') : ''
     const total = +(header.match(/de (\d+)/) || [])[1]
-    const expected = { 'com-name': 34, 'com-all': 34, 'ch-all': 16 }[id] ?? 10
+    const expected = { 'com-name': 34, 'com-all': 34, 'ch-all': 16, 'ch-find': 16 }[id] ?? 15
     if (total !== expected || !/Ronda oficial/.test(header)) wrong.push(`${id} (${total || 'no partió'})`)
   }
   check(
@@ -383,9 +383,9 @@ export async function restartRound(browser, { check }) {
   await page.close()
 }
 
-// Cada largo de ronda tiene su ranking: una ronda de 10 preguntas cae en la pestaña "10", no en la de 15.
+// Cada largo de ronda tiene su ranking: una ronda de 15 preguntas cae en la pestaña "15", no en la de "Todas".
 export async function rankingCategories(browser, { check }) {
-  const { page, errors } = await openPage(browser, { storage: { settings: { len: 10 } } })
+  const { page, errors } = await openPage(browser, { storage: { settings: { len: 15 } } })
   await page.evaluate(() =>
     fetch('/api/register', {
       method: 'POST',
@@ -399,8 +399,8 @@ export async function rankingCategories(browser, { check }) {
   await playRoundOfChoices(page)
   await page.waitForFunction(() => /Puesto/.test(document.getElementById('officialOutcome')?.innerText ?? ''))
   check(
-    /con 10 preguntas/.test(await text(page, '#officialOutcome')),
-    'el resultado dice en qué largo quedó (10 preguntas)',
+    /con 15 preguntas/.test(await text(page, '#officialOutcome')),
+    'el resultado dice en qué largo quedó (15 preguntas)',
   )
 
   await page.click('#outcomeRanking')
@@ -409,29 +409,26 @@ export async function rankingCategories(browser, { check }) {
     items.map(item => item.innerText.replace(/\s+/g, ' ').trim()),
   )
   check(
-    tabs.length === 5 && /^10/.test(tabs[0]) && /^Todas/.test(tabs[4]),
-    `el ranking tiene pestañas 10, 15, 20, 30 y Todas (${tabs.join(' | ')})`,
+    tabs.length === 2 && /^15/.test(tabs[0]) && /^Todas/.test(tabs[1]),
+    `el ranking tiene pestañas 15 y Todas (${tabs.join(' | ')})`,
   )
-  check(/^10 1$/.test(tabs[0]), 'la pestaña "10" muestra que tiene 1 jugador')
+  check(/^15 1$/.test(tabs[0]), 'la pestaña "15" muestra que tiene 1 jugador')
   check(
-    await page.$eval('.tab.on', tab => tab.dataset.category === '10'),
+    await page.$eval('.tab.on', tab => tab.dataset.category === '15'),
     'y se abre en la del largo recién jugado',
   )
 
-  await page.$eval('[data-category="15"]', tab => tab.click())
+  await page.$eval('[data-category="all"]', tab => tab.click())
   await page.waitForSelector('#rankBody p.muted')
-  check(
-    /Nadie ha jugado/.test(await text(page, '#rankBody')),
-    'la pestaña de 15 preguntas está vacía: no se mezclan',
-  )
-  await page.$eval('[data-category="10"]', tab => tab.click())
+  check(/Nadie ha jugado/.test(await text(page, '#rankBody')), 'la pestaña "Todas" está vacía: no se mezclan')
+  await page.$eval('[data-category="15"]', tab => tab.click())
   await page.waitForSelector('table.board tr.me')
-  check(true, 'y la de 10 sigue mostrando la marca')
+  check(true, 'y la de 15 sigue mostrando la marca')
 
   await page.click('#rankPlay')
   await page.waitForSelector('#panel .q-head', { timeout: 8000 })
   check(
-    /de 10$/.test((await text(page, '#panel .q-head')).split('\n')[0].trim()),
+    /de 15$/.test((await text(page, '#panel .q-head')).split('\n')[0].trim()),
     'jugar desde el ranking usa el largo de la pestaña',
   )
   check(!errors.length, `sin errores en la consola${errors.length ? ': ' + errors.join(' | ') : ''}`)
