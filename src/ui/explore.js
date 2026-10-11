@@ -250,24 +250,21 @@ function openExplore() {
     '#a16207',
     '#4b5563',
   ]
-  // Las estaciones ya tienen su propia capa (Metro): no se repiten como "lugares".
-  const placeCategories = CATEGORIES.filter(category => category !== 'Metro')
-  const lmMarkers = DATA.landmarks
-    .filter(l => !l.metro)
-    .map(l => ({
-      l,
-      m: L.circleMarker([l.lat, l.lon], {
-        pane: 'points',
-        radius: 6,
-        color: '#fff',
-        weight: 2,
-        fillColor: CAT_COLORS[CATEGORIES.indexOf(l.cat) % CAT_COLORS.length],
-        fillOpacity: 1,
-      }).bindPopup(
-        `<h4>${escapeHtml(l.name)}</h4><p>${escapeHtml(l.cat)} · <b>${escapeHtml(l.comuna)}</b></p><p class="muted">${escapeHtml(l.desc || '')}</p>${l.car ? `<p><b>Qué se estudia:</b> ${escapeHtml(l.car)}</p>` : ''}${photoHtml('l:' + l.name)}`,
-        { maxWidth: 280 },
-      ),
-    }))
+  const placeCategories = CATEGORIES
+  const lmMarkers = DATA.landmarks.map(l => ({
+    l,
+    m: L.circleMarker([l.lat, l.lon], {
+      pane: 'points',
+      radius: 6,
+      color: '#fff',
+      weight: 2,
+      fillColor: CAT_COLORS[CATEGORIES.indexOf(l.cat) % CAT_COLORS.length],
+      fillOpacity: 1,
+    }).bindPopup(
+      `<h4>${escapeHtml(l.name)}</h4><p>${escapeHtml(l.cat)} · <b>${escapeHtml(l.comuna)}</b></p><p class="muted">${escapeHtml(l.desc || '')}</p>${l.car ? `<p><b>Qué se estudia:</b> ${escapeHtml(l.car)}</p>` : ''}${photoHtml('l:' + l.name)}`,
+      { maxWidth: 280 },
+    ),
+  }))
   const refreshLm = () => {
     groups.lm.clearLayers()
     lmMarkers.forEach(({ l, m }) => {

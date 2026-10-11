@@ -22,7 +22,7 @@ Juego web para aprender la geografía de Santiago: comunas, calles, lugares, met
 
 ## Modos actuales (ids)
 
-Comunas: `com-name`, `com-all` (siempre con todas las comunas: no tienen largo ni categorías de ranking) · Lugares emblemáticos (antes "Landmarks"): `lm-loc`, `lm-com` (incluye barrios con perímetro, estaciones de metro como categoría "Metro" filtrable por línea, 17 cerros) · Calles: `st-name`, `st-find` (acierta quien toca sobre la calle: margen de unos 14 píxeles, entre 80 y 250 m según el zoom, y la calle pedida debe ser la más cercana; con landmarks cercanos al responder, tramos con nombre, bordes de comunas/metro activables) · Ruteo: `rs-any-car`, `rs-any-tp` (paso a paso, GTFS de Red) · Chile: `ch-find`, `ch-city`, `ch-cityreg`, `ch-all` · Parques nacionales: `pn-reg`, `pn-photo` · Conexiones: `cx` (13 tipos de preguntas, selección múltiple). Los 15 tienen ronda oficial 🏆 con ranking. Más: Explorar (capas activables), "Mis calles" (el usuario busca una calle en Nominatim y se guarda en su navegador), cronómetro + récord personal por juego.
+Comunas: `com-name`, `com-all` (siempre con todas las comunas: no tienen largo ni categorías de ranking) · Lugares emblemáticos (antes "Landmarks"): `lm-loc`, `lm-com` (incluye barrios con perímetro y 17 cerros; las estaciones de metro **ya no son lugares emblemáticos**) · Metro: `mt-find` (tocar dónde está la estación, sin dibujarlas), `mt-name` (alternativas), filtrables por línea · Calles: `st-name`, `st-find` (acierta quien toca sobre la calle: margen de unos 14 píxeles, entre 80 y 250 m según el zoom, y la calle pedida debe ser la más cercana; con landmarks cercanos al responder, tramos con nombre, bordes de comunas/metro activables) · Ruteo: `rs-any-car`, `rs-any-tp` (paso a paso, GTFS de Red) · Chile: `ch-find`, `ch-city`, `ch-cityreg`, `ch-all` · Parques nacionales: `pn-reg`, `pn-photo` · Conexiones: `cx` (13 tipos de preguntas, selección múltiple). Los 17 tienen ronda oficial 🏆 con ranking. Más: Explorar (capas activables), "Mis calles" (el usuario busca una calle en Nominatim y se guarda en su navegador), cronómetro + récord personal por juego.
 Los juegos que se retiraron del menú (fronteras, metro, cerros, fotos, barrios, rutas desde casa, etc.) se **borraron del código**; su historia está en git (commits anteriores a "Quita los juegos retirados").
 
 ## Trampas conocidas
@@ -39,7 +39,7 @@ Los juegos que se retiraron del menú (fronteras, metro, cerros, fotos, barrios,
 
 ## Estado y decisiones de contenido (resumen)
 
-- 179 calles (109 con foto), 304 landmarks en landmarks.json (+126 estaciones, 17 cerros, 41 barrios con perímetro; categorías incluyen Religión y Gobierno y justicia), 93 ciudades y 46 parques nacionales, 29 recorridos de micro en Explorar.
+- 179 calles (109 con foto), 304 landmarks en landmarks.json (+17 cerros y 41 barrios con perímetro; las 126 estaciones son aparte, de los juegos de metro; categorías incluyen Religión y Gobierno y justicia), 93 ciudades y 46 parques nacionales, 29 recorridos de micro en Explorar.
 - Sacados por irrelevantes (no volver a agregar sin preguntar): El Cortijo, Av. Lo Barnechea, Las Nieves, Río Tajo, Av. El Mirador, Alexander Fleming, calles "Cerro El Plomo/Cerro Colorado", San Damián como calle (sigue como barrio), muchos colegios específicos del oriente, clubes de golf/polo/Stade Français, varios restaurantes. Quedan bares Liguria y Nacional (el usuario puede querer sacarlos).
 - Pendientes de confirmar con el usuario: Estadio Español (club de socios, sigue), Colegio SEK de Las Condes (no se encontró; el que había estaba en Peñalolén y se sacó), "Av. Pedro Aguirre Cerda" se tomó la de Cerrillos, "Las Flores" se tomó Camino Las Flores de Las Condes, falta la Gerónimo de Alderete de La Florida.
 - Secciones retiradas de la UI pero con datos disponibles: Barrios (ahora dentro de Lugares emblemáticos), Fotos, Cerros (solo 17 pasaron a landmarks; los 44 siguen en la capa Cerros de Explorar). Fronteras está retirada y hoy **sin datos** en data.js (`borders` vacío; el cálculo sigue en `tools/border.js`).
@@ -48,6 +48,12 @@ Los juegos que se retiraron del menú (fronteras, metro, cerros, fotos, barrios,
 - Las calles que siguen fuera de Santiago (Ruta 5, 68, 78, 57, Camino a Melipilla) llevan una prolongación punteada (`ext`); ver `tools/extensions.js`.
 
 ## Ideas pendientes
+
+0. **Más modos difíciles de calles** (ideas del dueño, aún sin hacer):
+   - *Sin mapa*: solo una descripción de la calle (comuna, paralela a cuál, perpendicular a cuál, dónde parte y termina…) y se elige o se escribe cuál es. Los datos ya existen: `inter` (cruces), `para` (paralelas), `comunas` y los extremos de cada calle.
+   - *Wordle diario*: una calle por día que parte con la pista más amplia (región, comuna) y baja a pistas más específicas con cada intento.
+   - *Con vista de calle*: encontrar la calle en el mapa a partir de cómo se ve, pudiendo moverse un poco y con la calle pedida marcada en el piso. **Choca con "nada de imágenes de Google"**: Street View exige API key y es de pago; las alternativas libres son Panoramax (ya se usa para fotos sueltas, tiene visor propio) y Mapillary (descartado antes). Hay que ver cobertura de Panoramax en Santiago.
+   - *Modo extremo*: preguntar por **cualquier** calle de Santiago, no solo las anotadas, y encontrarla en el mapa (sin callejones ni cosas muy chicas). Requiere un conjunto de calles de OSM por comuna (descarga pesada: el pipeline actual solo guarda las anotadas) y decidir qué tamaño mínimo cuenta.
 
 1. **Sincronizar el progreso de práctica** entre dispositivos (hoy solo las rondas oficiales llegan al servidor; `stats` y `best` son locales).
 2. **Lugares propios** del usuario (como "Mis calles"), para poder sacar lo hiperlocal del juego base.

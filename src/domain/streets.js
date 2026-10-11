@@ -1,8 +1,11 @@
+import { distanceKm, nearestBy } from '../core/geo.js'
+import { angleBetween, lookalikeWeight, streetShape } from '../core/lookalike.js'
 import { weightedSample } from '../core/progress.js'
 import { store } from '../core/store.js'
 import { escapeHtml, shuffle } from '../core/util.js'
-import { DATA, isRoad, streetByName } from '../data/dataset.js'
+import { DATA, isPara, isRoad, parallelPartnersOf, roads, streetByName } from '../data/dataset.js'
 import { SEGMENT_COLORS } from '../map/draw.js'
+import { quiz } from '../quiz/engine.js'
 
 export const STREET_QUESTION = {
   calle: '¿Qué calle está marcada en azul?',
@@ -21,19 +24,57 @@ export function namedSegmentsHtml(street) {
   return `<p><b>Cambia de nombre por tramos:</b></p><ul class="blist">${items.join('')}</ul>`
 }
 
-const NEIGHBORS_CONSIDERED = 8
+const shapes = new Map()
+const shapeOf = street => {
+  if (!shapes.has(street)) shapes.set(street, streetShape(street.lines))
+  return shapes.get(street)
+}
 
-// Alternativas incorrectas: calles realmente cercanas (street.nb viene ordenado), con más peso a las más próximas.
+// Las calles que se pueden confundir con esta: las vecinas, las que corren pegadas a ella y las que el jugador
+// ya confundió con ella (aunque queden lejos). En una ronda oficial no cuenta lo que haya confundido cada uno:
+// las alternativas son las mismas para todos.
+function lookalikes(street) {
+  const personal = new Map(quiz?.ranked ? [] : confusionsOf(street.name))
+  const distanceTo = new Map(street.nb || [])
+  const names = new Set([...distanceTo.keys(), ...parallelPartnersOf(street.name), ...personal.keys()])
+  const shape = shapeOf(street)
+  const candidates = []
+  for (const name of names) {
+    const other = streetByName[name]
+    if (!other || other === street || !isRoad(other)) continue
+    const otherShape = shapeOf(other)
+    candidates.push({
+      street: other,
+      weight: lookalikeWeight({
+        distanceKm: distanceTo.get(name) ?? distanceKm(street.mid, other.mid),
+        angleDiff: angleBetween(shape.angle, otherShape.angle),
+        straightness: Math.min(shape.straightness, otherShape.straightness),
+        sameKind: (street.kind || 'calle') === (other.kind || 'calle'),
+        overlaps: isPara(street.name, name),
+        confusions: personal.get(name) || 0,
+      }),
+    })
+  }
+  return candidates
+}
+
+// Alternativas incorrectas que cuesten: calles cercanas que apuntan hacia el mismo lado (Holanda, Suecia, Luis Thayer
+// Ojeda), las que van una dentro de la otra (Eduardo Frei y la Ruta 5) y las que el jugador ha confundido antes.
 export function streetDistractors(street, count = 3) {
   if (street.kind === 'agua')
     return shuffle(DATA.streets.filter(other => other.kind === 'agua' && other !== street)).slice(0, count)
-  const neighbors = (street.nb || [])
-    .map(([name]) => streetByName[name])
-    .filter(neighbor => neighbor && isRoad(neighbor))
-    .slice(0, NEIGHBORS_CONSIDERED)
-  return weightedSample(neighbors, count, {
-    weightOf: neighbor => NEIGHBORS_CONSIDERED - neighbors.indexOf(neighbor),
-  })
+  const picked = weightedSample(lookalikes(street), count, { weightOf: candidate => candidate.weight }).map(
+    candidate => candidate.street,
+  )
+  if (picked.length >= count) return picked
+  const fillers = nearestBy(
+    roads(),
+    street.mid,
+    other => other.mid,
+    count,
+    other => other === street || picked.includes(other),
+  )
+  return [...picked, ...fillers].slice(0, count)
 }
 
 // ----- confusiones: qué calles ha mezclado el jugador entre sí
