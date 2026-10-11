@@ -21,6 +21,7 @@ export const RANKED_MODES = [
   'mt-name',
   'st-name',
   'st-find',
+  'st-text',
   'rs-any-car',
   'rs-any-tp',
   'ch-find',

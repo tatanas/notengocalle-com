@@ -99,6 +99,8 @@ barrios con perímetro (ids `z…`), 17 cerros destacados (`k…`). Las estacion
 **Alternativas de "¿Qué calle es?"** (`domain/streets.js`, `core/lookalike.js`): cada candidata pesa por cercanía, parecido de orientación
 (`streetShape`), si corre pegada a la pedida (`parallelPartnersOf`) y las confusiones previas del jugador (estas últimas se ignoran en rondas oficiales).
 
+**Calle sin mapa** (`quiz/modes/streetClues.js`, `domain/streetClues.js`): las pistas salen de los datos de cruces (`inter`) y paralelas (`para`); el extremo "bajo" y el "alto" de la calle son los cruces con menor y mayor proyección sobre su eje. Las alternativas nunca son calles nombradas en las pistas, porque esas no pueden ser la respuesta.
+
 `roads()` y `quizStreets()` son funciones y no listas porque dependen de la ronda: en una ronda oficial
 excluyen las calles propias.
 
@@ -384,7 +386,7 @@ regiones) y caen en la categoría "todas"; no hay nada que actualizar si ese tam
 | ------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `npm run lint`      | nombres no definidos, imports sobrantes                                                                                                                                                                   |
 | `npm run test:unit` | `unit.test.js` (geometría, sorteo, reglas compartidas) y `api.test.js` (el servidor completo contra un Postgres en memoria)                                                                               |
-| `npm run test:e2e`  | Chrome real sobre el build: recorre todos los juegos en escritorio y celular, el cronómetro, las calles propias, el inicio de las 17 rondas oficiales, las fotos y el flujo completo de cuentas y ranking |
+| `npm run test:e2e`  | Chrome real sobre el build: recorre todos los juegos en escritorio y celular, el cronómetro, las calles propias, el inicio de las 18 rondas oficiales, las fotos y el flujo completo de cuentas y ranking |
 
 `node tests/run.js smoke accounts` corre solo algunas suites; `--no-build` reutiliza `dist/`; `--dev` sirve el
 código sin empaquetar, para que un error apunte al archivo y la línea reales. Las capturas quedan en
