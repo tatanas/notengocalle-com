@@ -161,6 +161,12 @@ export function fit(bounds, maxZoom = 15) {
   map.fitBounds(bounds, { maxZoom, animate: true, ...panelPadding() })
 }
 
+// Cuántos kilómetros ocupan unos píxeles de dedo en este lugar y zoom del mapa.
+export function fingertipKm(latlng, pixels = 14) {
+  const fingertip = map.containerPointToLatLng(map.latLngToContainerPoint(latlng).add([pixels, 0]))
+  return latlng.distanceTo(fingertip) / 1000
+}
+
 export const boundsOfFeatures = features => L.geoJSON({ type: 'FeatureCollection', features }).getBounds()
 
 // En las rondas oficiales hay una cuenta regresiva en la que se puede acomodar el mapa. Si la persona lo movió,

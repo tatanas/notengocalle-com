@@ -13,7 +13,7 @@ import { showLandmarksAlong } from '../../domain/landmarks.js'
 import { STREET_QUESTION, namedSegmentsHtml, noteConfusion, streetDistractors } from '../../domain/streets.js'
 import { showAids } from '../../map/aids.js'
 import { COLORS, divIcon, drawNamedSegments, drawStreet, mapLabel } from '../../map/draw.js'
-import { fit, fitCity, layer, map, setLabelMode } from '../../map/map.js'
+import { fingertipKm, fit, fitCity, layer, map, setLabelMode } from '../../map/map.js'
 import { showPanel } from '../../ui/panel.js'
 import { photoHtml } from '../../ui/photos.js'
 import { answer, questionHeader } from '../engine.js'
@@ -72,17 +72,13 @@ registerMode({
     fit(L.latLngBounds(s.bb).pad(0.25), 14)
   },
 })
-// El margen de acierto son unos 14 píxeles: en metros, más estricto cuanto más se acerca el mapa (entre 80 y 250 m).
-const TAP_PIXELS = 14
+// El margen de acierto son unos 14 píxeles de dedo: en metros, más estricto cuanto más se acerca el mapa (entre 80 y 250 m).
 const MIN_TAP_KM = 0.08
 const MAX_TAP_KM = 0.25
 // Si otra calle del juego queda más cerca del toque que la pedida por más de esto, se tocó esa otra.
 const CLOSER_OTHER_KM = 0.03
 
-function tapToleranceKm(latlng) {
-  const fingertip = map.containerPointToLatLng(map.latLngToContainerPoint(latlng).add([TAP_PIXELS, 0]))
-  return Math.min(MAX_TAP_KM, Math.max(MIN_TAP_KM, latlng.distanceTo(fingertip) / 1000))
-}
+const tapToleranceKm = latlng => Math.min(MAX_TAP_KM, Math.max(MIN_TAP_KM, fingertipKm(latlng)))
 
 registerMode({
   id: 'st-find',

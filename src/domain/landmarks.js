@@ -2,10 +2,10 @@ import { distanceKm, distanceToPolyline } from '../core/geo.js'
 import { settings } from '../core/store.js'
 import { escapeHtml } from '../core/util.js'
 import { DATA } from '../data/dataset.js'
-import { COLORS, drawMetro } from '../map/draw.js'
+import { COLORS } from '../map/draw.js'
 import { layer, setLabelMode } from '../map/map.js'
 import { photoHtml } from '../ui/photos.js'
-import { comunasText, linePill, selectedLines } from './metro.js'
+import { comunasText } from './metro.js'
 
 const CATEGORY_EMOJI = {
   Universidades: '🎓',
@@ -27,11 +27,7 @@ const emojiOf = landmark => CATEGORY_EMOJI[landmark.cat] || '📍'
 const positionOf = landmark => [landmark.lat, landmark.lon]
 
 export const landmarkPool = () =>
-  DATA.landmarks.filter(
-    landmark =>
-      (!settings.cats || settings.cats.includes(landmark.cat)) &&
-      (!landmark.metro || landmark.lines.some(id => selectedLines().includes(id))),
-  )
+  DATA.landmarks.filter(landmark => !settings.cats || settings.cats.includes(landmark.cat))
 
 export const landmarkInComuna = (landmark, comuna) =>
   landmark.comuna === comuna || (landmark.alt || []).includes(comuna)
@@ -47,17 +43,15 @@ export function zoneLine(zone) {
 }
 
 export function landmarkInfo(landmark) {
-  const pills = landmark.metro ? ' ' + landmark.lines.map(linePill).join('') : ''
-  return `<p><b>${escapeHtml(landmark.name)}</b>${pills} — ${comunasText(landmark)}</p>
+  return `<p><b>${escapeHtml(landmark.name)}</b> — ${comunasText(landmark)}</p>
     <p class="muted">${escapeHtml(landmark.desc || '')}</p>
     ${landmark.zone ? zoneLine(landmark.zone) : ''}
     ${landmark.car ? `<p><b>Qué se estudia:</b> ${escapeHtml(landmark.car)}</p>` : ''}
     ${photoHtml(landmark.pk || 'l:' + landmark.name)}`
 }
 
-// Al responder: el perímetro del barrio o, si es una estación, sus líneas.
+// Al responder: el perímetro del barrio.
 export function showZone(landmark) {
-  if (landmark.metro) drawMetro(layer, { ids: landmark.lines, dots: false, opacity: 0.7 })
   if (!landmark.zone) return
   L.polygon(landmark.zone.poly, {
     pane: 'comunas',
@@ -104,7 +98,6 @@ function pickSpaced(sortedLandmarks, max, minGapKm = MIN_GAP_KM) {
 
 function nearestLandmarks(distanceOf, minKm, maxKm) {
   return DATA.landmarks
-    .filter(landmark => !landmark.metro)
     .map(landmark => ({ landmark, distance: distanceOf(landmark) }))
     .filter(entry => entry.distance > minKm && entry.distance <= maxKm)
     .sort((a, b) => a.distance - b.distance)

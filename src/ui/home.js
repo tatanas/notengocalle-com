@@ -1,7 +1,16 @@
 import { bests, resetProgress, stats } from '../core/progress.js'
 import { lengthFor, saveSettings, settings } from '../core/store.js'
 import { $, escapeHtml, formatTime } from '../core/util.js'
-import { CATEGORIES, CHILE, DATA, LINE_IDS, METRO_LINES, PARKS, quizStreets } from '../data/dataset.js'
+import {
+  CATEGORIES,
+  CHILE,
+  DATA,
+  LINE_IDS,
+  METRO_LINES,
+  PARKS,
+  quizStreets,
+  stations,
+} from '../data/dataset.js'
 import { selectedLines } from '../domain/metro.js'
 import { clearLayer, setChile, setRelief } from '../map/map.js'
 import { hasOfficialRound, startQuiz, stopQuiz } from '../quiz/engine.js'
@@ -24,7 +33,12 @@ const GROUPS = [
   {
     name: 'Lugares emblemáticos',
     emoji: '📍',
-    blurb: `${DATA.landmarks.length} lugares: estadios, parques, malls, universidades, colegios, barrios, restaurantes y las estaciones de metro.`,
+    blurb: `${DATA.landmarks.length} lugares: estadios, parques, malls, universidades, colegios, barrios y restaurantes.`,
+  },
+  {
+    name: 'Metro',
+    emoji: '🚇',
+    blurb: `${stations.length} estaciones de las líneas L1 a L6, con sus combinaciones. Elige con qué líneas jugar.`,
   },
   {
     name: 'Ruteo',
@@ -85,7 +99,7 @@ function metroLineChips() {
     return chip(id, on, `data-line="${id}"`, on ? `background:${color};border-color:${color};color:#fff` : '')
   })
   return `<div class="chips" id="setLines" style="margin-bottom:10px">${chips.join('')}
-    <span class="muted" style="font-size:12px;align-self:center">← líneas de metro incluidas (categoría Metro)</span></div>`
+    <span class="muted" style="font-size:12px;align-self:center">← líneas con las que jugar</span></div>`
 }
 
 // Los juegos paso a paso van primero dentro de su grupo.
@@ -109,7 +123,7 @@ function groupCard(group) {
   return `<div class="card">
     <h3><span class="em">${group.emoji}</span>${group.name}</h3><p>${group.blurb}</p>
     ${lengthPicker(group.name, modes)}
-    ${group.name === 'Lugares emblemáticos' ? metroLineChips() : ''}
+    ${group.name === 'Metro' ? metroLineChips() : ''}
     <div class="modes">${modes.map(modeRow).join('')}</div>
   </div>`
 }

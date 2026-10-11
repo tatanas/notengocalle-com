@@ -31,10 +31,10 @@ Navegador                                   Netlify
 index.html              página única; carga las librerías del mapa, los datos y src/main.js
 src/                    el juego (navegador)
   main.js                 punto de entrada: carga los modos y las pantallas, abre el menú
-  core/                   piezas sin dependencias: utilidades, geometría, localStorage, progreso
+  core/                   piezas sin dependencias: utilidades, geometría, localStorage, progreso, parecido entre calles
   data/dataset.js         lee window.DATA y arma los índices que usa todo lo demás
   map/                    el mapa Leaflet (map.js) y cómo se dibuja cada cosa sobre él (draw.js)
-  domain/                 ayudas por tema (comunas, landmarks, calles, metro, cerros, barrios, Chile)
+  domain/                 ayudas por tema (comunas, lugares emblemáticos, calles, metro, cerros, barrios, Chile)
   quiz/                   el motor de las rondas y los juegos
     engine.js               ciclo de una ronda: sortear, preguntar, corregir, cronometrar, resultado
     options.js              botones de alternativas (selección única y múltiple)
@@ -93,8 +93,11 @@ menú y, en paralelo, pregunta al servidor si hay sesión (`restoreSession`). El
 
 Expone `DATA` (el objeto generado) más índices derivados: `comunaByName`, `streetByName`, `stationByName`,
 `landmarkById`, `CATEGORIES`, etc. También **completa los landmarks** con lo que no viene en `landmarks.json`:
-barrios con perímetro (ids `z…`), 17 cerros destacados (`k…`) y las estaciones de metro (`m:…`). Y agrega a
+barrios con perímetro (ids `z…`), 17 cerros destacados (`k…`). Las estaciones de metro no son landmarks: tienen sus propios juegos (`quiz/modes/metro.js`: `mt-find`, `mt-name`). Y agrega a
 `DATA.streets` las calles propias del usuario ("Mis calles", guardadas en su navegador, marcadas `custom`).
+
+**Alternativas de "¿Qué calle es?"** (`domain/streets.js`, `core/lookalike.js`): cada candidata pesa por cercanía, parecido de orientación
+(`streetShape`), si corre pegada a la pedida (`parallelPartnersOf`) y las confusiones previas del jugador (estas últimas se ignoran en rondas oficiales).
 
 `roads()` y `quizStreets()` son funciones y no listas porque dependen de la ronda: en una ronda oficial
 excluyen las calles propias.
@@ -381,7 +384,7 @@ regiones) y caen en la categoría "todas"; no hay nada que actualizar si ese tam
 | ------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `npm run lint`      | nombres no definidos, imports sobrantes                                                                                                                                                                   |
 | `npm run test:unit` | `unit.test.js` (geometría, sorteo, reglas compartidas) y `api.test.js` (el servidor completo contra un Postgres en memoria)                                                                               |
-| `npm run test:e2e`  | Chrome real sobre el build: recorre todos los juegos en escritorio y celular, el cronómetro, las calles propias, el inicio de las 15 rondas oficiales, las fotos y el flujo completo de cuentas y ranking |
+| `npm run test:e2e`  | Chrome real sobre el build: recorre todos los juegos en escritorio y celular, el cronómetro, las calles propias, el inicio de las 17 rondas oficiales, las fotos y el flujo completo de cuentas y ranking |
 
 `node tests/run.js smoke accounts` corre solo algunas suites; `--no-build` reutiliza `dist/`; `--dev` sirve el
 código sin empaquetar, para que un error apunte al archivo y la línea reales. Las capturas quedan en

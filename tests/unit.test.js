@@ -11,6 +11,7 @@ import {
   pointInFeature,
   pointInPolygon,
 } from '../src/core/geo.js'
+import { angleBetween, lookalikeWeight, streetShape } from '../src/core/lookalike.js'
 import { adaptiveWeight, record, weightedSample } from '../src/core/progress.js'
 
 const PLAZA_ITALIA = [-33.4372, -70.6344]
@@ -174,4 +175,63 @@ test('el largo de la ronda decide su categoría de ranking', () => {
   assert.equal(legacyCategory({ mode: 'com-name', total: 15 }), '15')
   assert.equal(legacyCategory({ mode: 'ch-all', total: 16 }), 'all')
   assert.equal(legacyCategory({ mode: 'st-name', total: 179 }), 'all')
+})
+
+// una calle como [[lat, lon], ...]; en Santiago 1° de latitud son más km que 1° de longitud
+const line = (...points) => [points]
+
+test('la orientación de una calle sale de su trazado, sin importar cuántos puntos tenga', () => {
+  const eastWest = streetShape(line([-33.45, -70.7], [-33.45, -70.6]))
+  const northSouth = streetShape(line([-33.5, -70.65], [-33.4, -70.65]))
+  assert.ok(angleBetween(eastWest.angle, 0) < 1, `oriente-poniente ≈ 0° (${eastWest.angle})`)
+  assert.ok(angleBetween(northSouth.angle, 90) < 1, `norte-sur ≈ 90° (${northSouth.angle})`)
+  assert.ok(eastWest.straightness > 0.99)
+  const sparse = streetShape(line([-33.5, -70.65], [-33.4, -70.65]))
+  const dense = streetShape(line([-33.5, -70.65], [-33.499, -70.65], [-33.498, -70.65], [-33.4, -70.65]))
+  assert.ok(angleBetween(sparse.angle, dense.angle) < 0.5, 'puntos de más no cambian la orientación')
+})
+
+test('un anillo no tiene una orientación que comparar', () => {
+  const ring = Array.from({ length: 60 }, (_, i) => [
+    -33.45 + 0.1 * Math.sin((i / 60) * 2 * Math.PI),
+    -70.65 + 0.12 * Math.cos((i / 60) * 2 * Math.PI),
+  ])
+  assert.ok(streetShape([ring]).straightness < 0.2)
+})
+
+test('la diferencia entre orientaciones da la vuelta: 5° y 175° son casi paralelas', () => {
+  assert.equal(angleBetween(5, 175), 10)
+  assert.equal(angleBetween(0, 90), 90)
+  assert.equal(angleBetween(30, 30), 0)
+})
+
+test('las alternativas que más se parecen pesan más', () => {
+  const base = {
+    distanceKm: 0.5,
+    angleDiff: 0,
+    straightness: 1,
+    sameKind: true,
+    overlaps: false,
+    confusions: 0,
+  }
+  const weight = changes => lookalikeWeight({ ...base, ...changes })
+  assert.ok(weight({}) > weight({ distanceKm: 3 }), 'más cerca pesa más')
+  assert.ok(weight({}) > weight({ angleDiff: 90 }), 'la misma orientación pesa más que la perpendicular')
+  assert.ok(weight({ angleDiff: 90 }) > 0, 'la perpendicular cercana no queda descartada del todo')
+  assert.ok(weight({ overlaps: true }) > weight({}) * 3, 'una que corre pegada a la otra pesa mucho más')
+  assert.ok(weight({}) > weight({ sameKind: false }), 'una autopista no es alternativa natural de una calle')
+  assert.ok(weight({ confusions: 1 }) > weight({}) + 2, 'una confusión anterior sube el peso')
+  assert.ok(
+    weight({ confusions: 99 }) <= weight({ confusions: 3 }),
+    'el efecto de las confusiones tiene tope',
+  )
+  assert.ok(
+    weight({ distanceKm: 8, angleDiff: 90, confusions: 2 }) > weight({ distanceKm: 1, angleDiff: 60 }),
+    'lo confundido sale aunque quede lejos y mire para otro lado',
+  )
+  assert.equal(
+    weight({ straightness: 0, angleDiff: 90 }),
+    weight({ straightness: 0, angleDiff: 0 }),
+    'con calles curvas la orientación no pesa',
+  )
 })

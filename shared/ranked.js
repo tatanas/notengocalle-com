@@ -17,6 +17,8 @@ export const RANKED_MODES = [
   'com-all',
   'lm-loc',
   'lm-com',
+  'mt-find',
+  'mt-name',
   'st-name',
   'st-find',
   'rs-any-car',

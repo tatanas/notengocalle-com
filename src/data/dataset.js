@@ -32,7 +32,7 @@ export const PARKS = CHILE.parks || []
 
 export const PHOTOS = DATA.photos || {}
 
-// ----- landmarks: a los de landmarks.json se suman barrios con perímetro, cerros destacados y estaciones
+// ----- lugares emblemáticos: a los de landmarks.json se suman barrios con perímetro y cerros destacados
 const LANDMARK_NAME_OF_ZONE = {
   'Barrio República (barrio universitario)': 'Barrio República',
   'Barrio Franklin (persas)': 'Barrio Franklin',
@@ -94,24 +94,6 @@ for (const peak of cerros.filter(peak => FEATURED_PEAKS.includes(peak.name)))
     alt: peak.alt || [],
     pk: 'c:' + peak.name,
     tol: peakToleranceKm(peak),
-  })
-
-const lineNames = station => station.lines.map(id => id.replace('L', 'Línea ')).join(' y la ')
-
-for (const station of stations)
-  DATA.landmarks.push({
-    id: 'm:' + station.name,
-    name: 'Metro ' + station.name,
-    cat: 'Metro',
-    metro: station,
-    lines: station.lines,
-    desc: `Estación de la ${lineNames(station)}${station.lines.length > 1 ? ' (combinación).' : '.'}`,
-    lat: station.lat,
-    lon: station.lon,
-    comuna: station.comuna,
-    alt: station.alt || [],
-    tol: 0.8,
-    obvious: station.name.toLowerCase().includes(station.comuna.toLowerCase()),
   })
 
 export const landmarkById = Object.fromEntries(DATA.landmarks.map(landmark => [landmark.id, landmark]))
@@ -188,6 +170,8 @@ export function streetMidVertex(street) {
 // ----- relaciones entre calles (precalculadas por tools/relations.js)
 const parallelPairs = new Set((DATA.para || []).map(pair => pair.join('|')))
 export const isPara = (a, b) => parallelPairs.has(a + '|' + b) || parallelPairs.has(b + '|' + a)
+export const parallelPartnersOf = name =>
+  (DATA.para || []).filter(pair => pair.includes(name)).map(([a, b]) => (a === name ? b : a))
 export const crossingsOf = name =>
   (DATA.inter || [])
     .filter(crossing => crossing.a === name || crossing.b === name)

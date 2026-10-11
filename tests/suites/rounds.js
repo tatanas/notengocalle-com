@@ -225,12 +225,20 @@ export async function menuLayout(browser, { check }) {
     positions.every((position, i) => position >= 0 && (i === 0 || position > positions[i - 1])),
     `las tarjetas salen en el orden Calles, Comunas, Lugares emblemáticos, Ruteo, Ranking, Explorar (${headings.join(' · ')})`,
   )
+  check(
+    headings.some(heading => heading.endsWith('Metro')),
+    'el metro tiene su propia tarjeta de juegos',
+  )
+  const categories = await page.$$eval('#setCats label', labels =>
+    labels.map(label => label.innerText.trim()),
+  )
+  check(!categories.includes('Metro'), 'y ya no es una categoría de los lugares emblemáticos')
   const big = await page.$$eval('.mode-row .mode.ranked', buttons => buttons.length)
   const small = await page.$$eval('.mode-row .practice', buttons =>
     buttons.map(button => button.innerText.trim()),
   )
   check(
-    big === 15 && small.length === 15,
+    big === RANKED_MODES.length && small.length === RANKED_MODES.length,
     `cada juego tiene botón grande (oficial) y chico (práctica): ${big} y ${small.length}`,
   )
   check(
