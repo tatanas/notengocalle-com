@@ -1,0 +1,802 @@
+[
+  {
+    "nombre": "Kennedy con Las Tranqueras",
+    "tipo": "lugar",
+    "comuna": "Vitacura",
+    "lat": -33.39089,
+    "lon": -70.55333,
+    "rumbo": 180
+  },
+  {
+    "nombre": "Rotonda Atenas",
+    "tipo": "lugar",
+    "comuna": "Las Condes",
+    "lat": -33.41717,
+    "lon": -70.5531,
+    "rumbo": 180
+  },
+  {
+    "nombre": "Frente al Estadio Nacional",
+    "tipo": "lugar",
+    "comuna": "Ñuñoa",
+    "lat": -33.46213,
+    "lon": -70.61033,
+    "rumbo": 180
+  },
+  {
+    "nombre": "Mall Plaza Egaña",
+    "tipo": "lugar",
+    "comuna": "La Reina",
+    "lat": -33.45338,
+    "lon": -70.5694,
+    "rumbo": 1
+  },
+  {
+    "nombre": "Torre Entel",
+    "tipo": "lugar",
+    "comuna": "Santiago",
+    "lat": -33.44445,
+    "lon": -70.65749,
+    "rumbo": 77
+  },
+  {
+    "nombre": "Mall Plaza Norte",
+    "tipo": "lugar",
+    "comuna": "Huechuraba",
+    "lat": -33.3684,
+    "lon": -70.67871,
+    "rumbo": 0
+  },
+  {
+    "nombre": "Mall Barrio Independencia",
+    "tipo": "lugar",
+    "comuna": "Independencia",
+    "lat": -33.4232,
+    "lon": -70.65373,
+    "rumbo": 197
+  },
+  {
+    "nombre": "Mall Paseo Arauco Estación",
+    "tipo": "lugar",
+    "comuna": "Estación Central",
+    "lat": -33.45214,
+    "lon": -70.67791,
+    "rumbo": 277
+  },
+  {
+    "nombre": "Alto Las Condes",
+    "tipo": "lugar",
+    "comuna": "Las Condes",
+    "lat": -33.39106,
+    "lon": -70.5476,
+    "rumbo": 83
+  },
+  {
+    "nombre": "Edificio Titanium",
+    "tipo": "lugar",
+    "comuna": "Las Condes",
+    "lat": -33.41338,
+    "lon": -70.60335,
+    "rumbo": 289
+  },
+  {
+    "nombre": "Paseo Ahumada",
+    "tipo": "lugar",
+    "comuna": "Santiago",
+    "lat": -33.4408,
+    "lon": -70.6508,
+    "rumbo": 72
+  },
+  {
+    "nombre": "Teatro Municipal",
+    "tipo": "lugar",
+    "comuna": "Santiago",
+    "lat": -33.4412,
+    "lon": -70.64793,
+    "rumbo": 84
+  },
+  {
+    "nombre": "Biblioteca Nacional",
+    "tipo": "lugar",
+    "comuna": "Santiago",
+    "lat": -33.44258,
+    "lon": -70.64547,
+    "rumbo": 343
+  },
+  {
+    "nombre": "Estación Mapocho",
+    "tipo": "lugar",
+    "comuna": "Santiago",
+    "lat": -33.43253,
+    "lon": -70.65469,
+    "rumbo": 15
+  },
+  {
+    "nombre": "Plaza Italia (Plaza Baquedano)",
+    "tipo": "lugar",
+    "comuna": "Providencia",
+    "lat": -33.43652,
+    "lon": -70.63407,
+    "rumbo": 194
+  },
+  {
+    "nombre": "Plaza de Armas",
+    "tipo": "lugar",
+    "comuna": "Santiago",
+    "lat": -33.43734,
+    "lon": -70.65128,
+    "rumbo": 120
+  },
+  {
+    "nombre": "Estadio Bicentenario de La Florida (Audax Italiano)",
+    "tipo": "lugar",
+    "comuna": "La Florida",
+    "lat": -33.54084,
+    "lon": -70.57784,
+    "rumbo": 269
+  },
+  {
+    "nombre": "Claro Arena (U. Católica)",
+    "tipo": "lugar",
+    "comuna": "Las Condes",
+    "lat": -33.39589,
+    "lon": -70.50146,
+    "rumbo": 153
+  },
+  {
+    "nombre": "Estadio Nacional (selección chilena; hace de local la U. de Chile)",
+    "tipo": "lugar",
+    "comuna": "Ñuñoa",
+    "lat": -33.46438,
+    "lon": -70.6106,
+    "rumbo": 220
+  },
+  {
+    "nombre": "Estadio Municipal de La Cisterna (Palestino)",
+    "tipo": "lugar",
+    "comuna": "La Cisterna",
+    "lat": -33.52092,
+    "lon": -70.67566,
+    "rumbo": 70
+  },
+  {
+    "nombre": "Estadio Monumental (Colo-Colo)",
+    "tipo": "lugar",
+    "comuna": "Macul",
+    "lat": -33.50643,
+    "lon": -70.60474,
+    "rumbo": 255
+  },
+  {
+    "nombre": "Museo de la Memoria",
+    "tipo": "lugar",
+    "comuna": "Santiago",
+    "lat": -33.43971,
+    "lon": -70.68001,
+    "rumbo": 93
+  },
+  {
+    "nombre": "Fantasilandia",
+    "tipo": "lugar",
+    "comuna": "Santiago",
+    "lat": -33.46064,
+    "lon": -70.66196,
+    "rumbo": 297
+  },
+  {
+    "nombre": "Matucana 100",
+    "tipo": "lugar",
+    "comuna": "Estación Central",
+    "lat": -33.44526,
+    "lon": -70.6795,
+    "rumbo": 259
+  },
+  {
+    "nombre": "Viña Concha y Toro (Pirque)",
+    "tipo": "lugar",
+    "comuna": "Pirque",
+    "lat": -33.63553,
+    "lon": -70.5746,
+    "rumbo": 50
+  },
+  {
+    "nombre": "Planetario USACH",
+    "tipo": "lugar",
+    "comuna": "Estación Central",
+    "lat": -33.45019,
+    "lon": -70.68162,
+    "rumbo": 127
+  },
+  {
+    "nombre": "Hospital El Carmen",
+    "tipo": "lugar",
+    "comuna": "Maipú",
+    "lat": -33.50907,
+    "lon": -70.77396,
+    "rumbo": 350
+  },
+  {
+    "nombre": "Clínica Santa María",
+    "tipo": "lugar",
+    "comuna": "Providencia",
+    "lat": -33.43251,
+    "lon": -70.62877,
+    "rumbo": 58
+  },
+  {
+    "nombre": "Hospital Clínico U. de Chile (J.J. Aguirre)",
+    "tipo": "lugar",
+    "comuna": "Independencia",
+    "lat": -33.42104,
+    "lon": -70.6531,
+    "rumbo": 11
+  },
+  {
+    "nombre": "Hospital Sótero del Río",
+    "tipo": "lugar",
+    "comuna": "Puente Alto",
+    "lat": -33.57688,
+    "lon": -70.58227,
+    "rumbo": 293
+  },
+  {
+    "nombre": "Bolsa de Comercio",
+    "tipo": "lugar",
+    "comuna": "Santiago",
+    "lat": -33.44241,
+    "lon": -70.65142,
+    "rumbo": 223
+  },
+  {
+    "nombre": "Corte de Apelaciones de San Miguel",
+    "tipo": "lugar",
+    "comuna": "Santiago",
+    "lat": -33.45497,
+    "lon": -70.66944,
+    "rumbo": 174
+  },
+  {
+    "nombre": "Palacio de La Moneda",
+    "tipo": "lugar",
+    "comuna": "Santiago",
+    "lat": -33.44274,
+    "lon": -70.65424,
+    "rumbo": 346
+  },
+  {
+    "nombre": "Centro de Justicia de Santiago",
+    "tipo": "lugar",
+    "comuna": "Santiago",
+    "lat": -33.4733,
+    "lon": -70.65711,
+    "rumbo": 155
+  },
+  {
+    "nombre": "Universidad Andrés Bello – Bellavista",
+    "tipo": "lugar",
+    "comuna": "Providencia",
+    "lat": -33.43456,
+    "lon": -70.63424,
+    "rumbo": 160
+  },
+  {
+    "nombre": "Universidad de las Américas (campus La Florida)",
+    "tipo": "lugar",
+    "comuna": "La Florida",
+    "lat": -33.52257,
+    "lon": -70.58369,
+    "rumbo": 6
+  },
+  {
+    "nombre": "PUC – Casa Central",
+    "tipo": "lugar",
+    "comuna": "Santiago",
+    "lat": -33.44165,
+    "lon": -70.6404,
+    "rumbo": 153
+  },
+  {
+    "nombre": "Universidad Finis Terrae",
+    "tipo": "lugar",
+    "comuna": "Providencia",
+    "lat": -33.43746,
+    "lon": -70.60844,
+    "rumbo": 345
+  },
+  {
+    "nombre": "Universidad de los Andes",
+    "tipo": "lugar",
+    "comuna": "Las Condes",
+    "lat": -33.40425,
+    "lon": -70.50655,
+    "rumbo": 114
+  },
+  {
+    "nombre": "INACAP Apoquindo",
+    "tipo": "lugar",
+    "comuna": "Las Condes",
+    "lat": -33.40747,
+    "lon": -70.55209,
+    "rumbo": 353
+  },
+  {
+    "nombre": "Santiago College",
+    "tipo": "lugar",
+    "comuna": "Lo Barnechea",
+    "lat": -33.33959,
+    "lon": -70.54584,
+    "rumbo": 90
+  },
+  {
+    "nombre": "Instituto Nacional",
+    "tipo": "lugar",
+    "comuna": "Santiago",
+    "lat": -33.44531,
+    "lon": -70.65011,
+    "rumbo": 265
+  },
+  {
+    "nombre": "Catedral Evangélica de Chile",
+    "tipo": "lugar",
+    "comuna": "Estación Central",
+    "lat": -33.45308,
+    "lon": -70.68479,
+    "rumbo": 260
+  },
+  {
+    "nombre": "Sinagoga Bicur Joilim",
+    "tipo": "lugar",
+    "comuna": "Santiago",
+    "lat": -33.45913,
+    "lon": -70.64121,
+    "rumbo": 343
+  },
+  {
+    "nombre": "Santuario Padre Hurtado",
+    "tipo": "lugar",
+    "comuna": "Estación Central",
+    "lat": -33.46257,
+    "lon": -70.68667,
+    "rumbo": 351
+  },
+  {
+    "nombre": "Estación Central (ferrocarriles)",
+    "tipo": "lugar",
+    "comuna": "Estación Central",
+    "lat": -33.45098,
+    "lon": -70.67936,
+    "rumbo": 170
+  },
+  {
+    "nombre": "Terminal Sur / Alameda (buses)",
+    "tipo": "lugar",
+    "comuna": "Estación Central",
+    "lat": -33.4531,
+    "lon": -70.68652,
+    "rumbo": 159
+  },
+  {
+    "nombre": "Mercado Tirso de Molina",
+    "tipo": "lugar",
+    "comuna": "Recoleta",
+    "lat": -33.43217,
+    "lon": -70.65056,
+    "rumbo": 15
+  },
+  {
+    "nombre": "Parque Balmaceda",
+    "tipo": "lugar",
+    "comuna": "Providencia",
+    "lat": -33.43423,
+    "lon": -70.62834,
+    "rumbo": 325
+  },
+  {
+    "nombre": "Parque O'Higgins",
+    "tipo": "lugar",
+    "comuna": "Santiago",
+    "lat": -33.46085,
+    "lon": -70.65692,
+    "rumbo": 27
+  },
+  {
+    "nombre": "Av. Simón Bolívar",
+    "tipo": "calle",
+    "comuna": "Ñuñoa",
+    "lat": -33.44448,
+    "lon": -70.5365,
+    "rumbo": 404
+  },
+  {
+    "nombre": "Av. Irarrázaval",
+    "tipo": "calle",
+    "comuna": "Ñuñoa",
+    "lat": -33.45327,
+    "lon": -70.57449,
+    "rumbo": 454
+  },
+  {
+    "nombre": "Av. Alonso de Córdova",
+    "tipo": "calle",
+    "comuna": "Las Condes",
+    "lat": -33.40542,
+    "lon": -70.58609,
+    "rumbo": 33
+  },
+  {
+    "nombre": "José Joaquín Pérez",
+    "tipo": "calle",
+    "comuna": "Cerro Navia",
+    "lat": -33.42932,
+    "lon": -70.72555,
+    "rumbo": 105
+  },
+  {
+    "nombre": "Av. Eyzaguirre",
+    "tipo": "calle",
+    "comuna": "Puente Alto",
+    "lat": -33.60226,
+    "lon": -70.53273,
+    "rumbo": 197
+  },
+  {
+    "nombre": "Av. Presidente Sebastián Piñera Echenique",
+    "tipo": "calle",
+    "comuna": "Las Condes",
+    "lat": -33.42889,
+    "lon": -70.54161,
+    "rumbo": 500
+  },
+  {
+    "nombre": "Av. Nueva Providencia",
+    "tipo": "calle",
+    "comuna": "Providencia",
+    "lat": -33.42099,
+    "lon": -70.6071,
+    "rumbo": 216
+  },
+  {
+    "nombre": "Av. Santa María",
+    "tipo": "calle",
+    "comuna": "Vitacura",
+    "lat": -33.37408,
+    "lon": -70.5479,
+    "rumbo": 94
+  },
+  {
+    "nombre": "Martín de Zamora",
+    "tipo": "calle",
+    "comuna": "Las Condes",
+    "lat": -33.42093,
+    "lon": -70.57893,
+    "rumbo": 212
+  },
+  {
+    "nombre": "Morandé",
+    "tipo": "calle",
+    "comuna": "Santiago",
+    "lat": -33.44412,
+    "lon": -70.65302,
+    "rumbo": 353
+  },
+  {
+    "nombre": "Catedral",
+    "tipo": "calle",
+    "comuna": "Santiago",
+    "lat": -33.43832,
+    "lon": -70.66022,
+    "rumbo": 261
+  },
+  {
+    "nombre": "Av. Presidente Salvador Allende Gossens",
+    "tipo": "calle",
+    "comuna": "San Joaquín",
+    "lat": -33.48705,
+    "lon": -70.67002,
+    "rumbo": 133
+  },
+  {
+    "nombre": "Compañía de Jesús",
+    "tipo": "calle",
+    "comuna": "Santiago",
+    "lat": -33.43935,
+    "lon": -70.65944,
+    "rumbo": 257
+  },
+  {
+    "nombre": "Av. Beauchef",
+    "tipo": "calle",
+    "comuna": "Santiago",
+    "lat": -33.47081,
+    "lon": -70.66341,
+    "rumbo": 538
+  },
+  {
+    "nombre": "Av. Gabriela",
+    "tipo": "calle",
+    "comuna": "Puente Alto",
+    "lat": -33.5766,
+    "lon": -70.57013,
+    "rumbo": 443
+  },
+  {
+    "nombre": "Av. Salvador",
+    "tipo": "calle",
+    "comuna": "Ñuñoa",
+    "lat": -33.4535,
+    "lon": -70.62058,
+    "rumbo": 531
+  },
+  {
+    "nombre": "Av. Vitacura",
+    "tipo": "calle",
+    "comuna": "Vitacura",
+    "lat": -33.37874,
+    "lon": -70.53793,
+    "rumbo": 290
+  },
+  {
+    "nombre": "Ureta Cox",
+    "tipo": "calle",
+    "comuna": "San Joaquín",
+    "lat": -33.50008,
+    "lon": -70.62376,
+    "rumbo": 267
+  },
+  {
+    "nombre": "Exposición",
+    "tipo": "calle",
+    "comuna": "Estación Central",
+    "lat": -33.45556,
+    "lon": -70.67814,
+    "rumbo": 183
+  },
+  {
+    "nombre": "Av. Pedro Aguirre Cerda",
+    "tipo": "calle",
+    "comuna": "Cerrillos",
+    "lat": -33.49405,
+    "lon": -70.70544,
+    "rumbo": 408
+  },
+  {
+    "nombre": "Av. Teniente Cruz",
+    "tipo": "calle",
+    "comuna": "Pudahuel",
+    "lat": -33.4459,
+    "lon": -70.74058,
+    "rumbo": 313
+  },
+  {
+    "nombre": "Av. Macul",
+    "tipo": "calle",
+    "comuna": "Macul",
+    "lat": -33.49415,
+    "lon": -70.59963,
+    "rumbo": 347
+  },
+  {
+    "nombre": "Av. Dorsal",
+    "tipo": "calle",
+    "comuna": "Renca",
+    "lat": -33.39991,
+    "lon": -70.69605,
+    "rumbo": 277
+  },
+  {
+    "nombre": "Av. Lo Espejo",
+    "tipo": "calle",
+    "comuna": "San Bernardo",
+    "lat": -33.5277,
+    "lon": -70.71621,
+    "rumbo": 114
+  },
+  {
+    "nombre": "Av. Antonio Varas",
+    "tipo": "calle",
+    "comuna": "Providencia",
+    "lat": -33.45098,
+    "lon": -70.60975,
+    "rumbo": 525
+  },
+  {
+    "nombre": "Av. Ossa",
+    "tipo": "calle",
+    "comuna": "La Reina",
+    "lat": -33.44382,
+    "lon": -70.57211,
+    "rumbo": 534
+  },
+  {
+    "nombre": "Av. La Florida",
+    "tipo": "calle",
+    "comuna": "La Florida",
+    "lat": -33.51039,
+    "lon": -70.58789,
+    "rumbo": 348
+  },
+  {
+    "nombre": "Av. Tomás Moro",
+    "tipo": "calle",
+    "comuna": "Las Condes",
+    "lat": -33.41754,
+    "lon": -70.55296,
+    "rumbo": 352
+  },
+  {
+    "nombre": "Av. El Parrón",
+    "tipo": "calle",
+    "comuna": "La Cisterna",
+    "lat": -33.52069,
+    "lon": -70.67717,
+    "rumbo": 324
+  },
+  {
+    "nombre": "Av. Providencia",
+    "tipo": "calle",
+    "comuna": "Providencia",
+    "lat": -33.42758,
+    "lon": -70.61734,
+    "rumbo": 241
+  },
+  {
+    "nombre": "Camino La Pirámide",
+    "tipo": "calle",
+    "comuna": "Huechuraba",
+    "lat": -33.38451,
+    "lon": -70.60469,
+    "rumbo": 349
+  },
+  {
+    "nombre": "Av. Recoleta",
+    "tipo": "calle",
+    "comuna": "Recoleta",
+    "lat": -33.42005,
+    "lon": -70.64417,
+    "rumbo": 195
+  },
+  {
+    "nombre": "Av. Rodrigo de Araya",
+    "tipo": "calle",
+    "comuna": "Ñuñoa",
+    "lat": -33.47355,
+    "lon": -70.58695,
+    "rumbo": 536
+  },
+  {
+    "nombre": "Av. José Alcalde Délano",
+    "tipo": "calle",
+    "comuna": "Lo Barnechea",
+    "lat": -33.35481,
+    "lon": -70.52738,
+    "rumbo": 283
+  },
+  {
+    "nombre": "Av. Mapocho",
+    "tipo": "calle",
+    "comuna": "Quinta Normal",
+    "lat": -33.43209,
+    "lon": -70.6619,
+    "rumbo": 88
+  },
+  {
+    "nombre": "Av. Echeñique",
+    "tipo": "calle",
+    "comuna": "La Reina",
+    "lat": -33.442,
+    "lon": -70.54211,
+    "rumbo": 497
+  },
+  {
+    "nombre": "Av. Mariano Sánchez Fontecilla",
+    "tipo": "calle",
+    "comuna": "Peñalolén",
+    "lat": -33.43579,
+    "lon": -70.57794,
+    "rumbo": 301
+  },
+  {
+    "nombre": "Av. Suecia",
+    "tipo": "calle",
+    "comuna": "Providencia",
+    "lat": -33.44652,
+    "lon": -70.60086,
+    "rumbo": 173
+  },
+  {
+    "nombre": "Av. Nueva Costanera",
+    "tipo": "calle",
+    "comuna": "Vitacura",
+    "lat": -33.39076,
+    "lon": -70.59666,
+    "rumbo": 355
+  },
+  {
+    "nombre": "Av. Neptuno",
+    "tipo": "calle",
+    "comuna": "Lo Prado",
+    "lat": -33.41514,
+    "lon": -70.71598,
+    "rumbo": 397
+  },
+  {
+    "nombre": "Av. Fermín Vivaceta",
+    "tipo": "calle",
+    "comuna": "Independencia",
+    "lat": -33.40216,
+    "lon": -70.67107,
+    "rumbo": 519
+  },
+  {
+    "nombre": "Rojas Magallanes",
+    "tipo": "calle",
+    "comuna": "La Florida",
+    "lat": -33.53541,
+    "lon": -70.54467,
+    "rumbo": 430
+  },
+  {
+    "nombre": "Gerónimo de Alderete",
+    "tipo": "calle",
+    "comuna": "Vitacura",
+    "lat": -33.39712,
+    "lon": -70.56041,
+    "rumbo": 158
+  },
+  {
+    "nombre": "Av. Marathon",
+    "tipo": "calle",
+    "comuna": "Macul",
+    "lat": -33.50321,
+    "lon": -70.60598,
+    "rumbo": 192
+  },
+  {
+    "nombre": "Av. Camilo Henríquez",
+    "tipo": "calle",
+    "comuna": "Puente Alto",
+    "lat": -33.56526,
+    "lon": -70.55515,
+    "rumbo": 186
+  },
+  {
+    "nombre": "Av. Ecuador",
+    "tipo": "calle",
+    "comuna": "Estación Central",
+    "lat": -33.45607,
+    "lon": -70.70603,
+    "rumbo": 203
+  },
+  {
+    "nombre": "Av. Miraflores (Renca)",
+    "tipo": "calle",
+    "comuna": "Renca",
+    "lat": -33.40184,
+    "lon": -70.74878,
+    "rumbo": 303
+  },
+  {
+    "nombre": "Av. El Rodeo",
+    "tipo": "calle",
+    "comuna": "Lo Barnechea",
+    "lat": -33.35274,
+    "lon": -70.5014,
+    "rumbo": 219
+  },
+  {
+    "nombre": "Av. Lo Errázuriz",
+    "tipo": "calle",
+    "comuna": "Cerrillos",
+    "lat": -33.50196,
+    "lon": -70.69743,
+    "rumbo": 51
+  },
+  {
+    "nombre": "Av. Príncipe de Gales",
+    "tipo": "calle",
+    "comuna": "La Reina",
+    "lat": -33.43918,
+    "lon": -70.55511,
+    "rumbo": 263
+  }
+]

@@ -107,8 +107,8 @@ button {
   display: none;
 }
 
-/* Street View: el panorama ocupa la mitad izquierda y el mapa la derecha; en el celular, arriba y abajo.
-   Mientras se ve el panorama, la pregunta flota sobre él para no tapar el mapa. */
+/* Street View: el panorama ocupa la mitad izquierda y el mapa la derecha. Mientras se ve el panorama, la pregunta
+   flota sobre él para no tapar el mapa. En el celular se ve uno a la vez: el panorama a pantalla completa o el mapa. */
 #panorama {
   position: absolute;
   z-index: 1050;
@@ -127,18 +127,62 @@ body.con-panorama #panel {
   left: 12px;
   width: min(300px, 44vw);
 }
+body.con-panorama .leaflet-top.leaflet-left {
+  left: 50vw;
+}
+#botonesDePanorama {
+  position: absolute;
+  z-index: 1060;
+  top: calc(var(--top-h) + 12px + env(safe-area-inset-top));
+  right: calc(50vw + 12px);
+  display: flex;
+  gap: 8px;
+}
+#botonesDePanorama[hidden] {
+  display: none;
+}
+#botonesDePanorama button {
+  border: 0;
+  border-radius: 10px;
+  padding: 8px 12px;
+  background: rgba(255, 255, 255, 0.92);
+  color: var(--ink);
+  font: inherit;
+  font-size: 14px;
+  cursor: pointer;
+  box-shadow: var(--shadow);
+}
+#alternarVista {
+  display: none;
+}
 @media (max-width: 760px) {
   #panorama {
     right: 0;
-    bottom: auto;
     width: auto;
-    height: 42%;
-    border-radius: 0 0 14px 14px;
+  }
+  body.con-panorama.ver-mapa #panorama {
+    visibility: hidden;
+    pointer-events: none;
+  }
+  body.con-panorama:not(.ver-mapa) #panel {
+    display: none;
   }
   body.con-panorama #panel {
     right: 0;
     left: 0;
     width: auto;
+  }
+  body.con-panorama .leaflet-top.leaflet-left {
+    left: 0;
+  }
+  #botonesDePanorama {
+    right: 12px;
+  }
+  #alternarVista {
+    display: inline-block;
+  }
+  body.ver-mapa #volverAlInicio {
+    display: none;
   }
 }
 @media (max-width: 760px) {
@@ -1064,15 +1108,4 @@ table.board.clickable tr[data-open]:hover td {
 .length-row select {
   width: auto;
   padding: 5px 8px;
-}
-
-/* Los botones de zoom del mapa quedan al borde del panorama, no debajo de él. */
-body.con-panorama .leaflet-top.leaflet-left {
-  left: 50vw;
-}
-@media (max-width: 760px) {
-  body.con-panorama .leaflet-top.leaflet-left {
-    left: 0;
-    top: calc(42% + 12px);
-  }
 }
