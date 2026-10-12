@@ -1,10 +1,10 @@
 import { defineConfig } from 'vite'
-import { localApi } from './dev/localApi.js'
-import { serviceWorker } from './dev/serviceWorkerPlugin.js'
+import { apiLocal } from './desarrollo/apiLocal.js'
+import { serviceWorker } from './desarrollo/pluginServiceWorker.js'
 
 export default defineConfig({
   plugins: [
-    localApi({ dataDir: process.env.LOCAL_DB_DIR ?? '.local/db' }),
+    apiLocal({ dataDir: process.env.LOCAL_DB_DIR ?? '.local/db' }),
     serviceWorker({ source: 'src/service-worker.js', publicDir: 'public' }),
   ],
   server: { port: 5173 },
