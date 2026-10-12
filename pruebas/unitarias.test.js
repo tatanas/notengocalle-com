@@ -142,22 +142,25 @@ test('lo fallado pesa más que lo nuevo, y lo dominado pesa menos', () => {
 })
 
 test('un puntaje es mejor con más aciertos o, a igual número, con menos tiempo', () => {
-  assert.equal(esMejorPuntaje({ correct: 12, ms: 90000 }, { correct: 11, ms: 30000 }), true)
-  assert.equal(esMejorPuntaje({ correct: 12, ms: 30000 }, { correct: 12, ms: 40000 }), true)
-  assert.equal(esMejorPuntaje({ correct: 12, ms: 40000 }, { correct: 12, ms: 40000 }), false)
-  assert.equal(esMejorPuntaje({ correct: 10, ms: 10000 }, { correct: 12, ms: 40000 }), false)
+  assert.equal(esMejorPuntaje({ aciertos: 12, ms: 90000 }, { aciertos: 11, ms: 30000 }), true)
+  assert.equal(esMejorPuntaje({ aciertos: 12, ms: 30000 }, { aciertos: 12, ms: 40000 }), true)
+  assert.equal(esMejorPuntaje({ aciertos: 12, ms: 40000 }, { aciertos: 12, ms: 40000 }), false)
+  assert.equal(esMejorPuntaje({ aciertos: 10, ms: 10000 }, { aciertos: 12, ms: 40000 }), false)
 })
 
 test('solo pasan los puntajes con forma de ronda oficial', () => {
-  const ronda = { mode: 'com-name', category: '20', correct: 10, total: 20, ms: 60000 }
+  const ronda = { modo: 'com-name', categoria: '20', aciertos: 10, total: 20, ms: 60000 }
   assert.equal(problemaDelPuntaje(ronda), null)
-  assert.ok(problemaDelPuntaje({ ...ronda, category: '30', total: 30 }), 'ya no hay rondas de 30')
-  assert.equal(problemaDelPuntaje({ ...ronda, category: 'all', total: 179, correct: 100, ms: 600000 }), null)
-  assert.ok(problemaDelPuntaje({ ...ronda, mode: 'otro' }))
-  assert.ok(problemaDelPuntaje({ ...ronda, category: '12' }))
+  assert.ok(problemaDelPuntaje({ ...ronda, categoria: '30', total: 30 }), 'ya no hay rondas de 30')
+  assert.equal(
+    problemaDelPuntaje({ ...ronda, categoria: 'todas', total: 179, aciertos: 100, ms: 600000 }),
+    null,
+  )
+  assert.ok(problemaDelPuntaje({ ...ronda, modo: 'otro' }))
+  assert.ok(problemaDelPuntaje({ ...ronda, categoria: '12' }))
   assert.ok(problemaDelPuntaje({ ...ronda, total: 10 }), 'el largo no coincide con la categoría')
-  assert.ok(problemaDelPuntaje({ ...ronda, category: 'all', total: 3 }))
-  assert.ok(problemaDelPuntaje({ ...ronda, correct: 21 }))
+  assert.ok(problemaDelPuntaje({ ...ronda, categoria: 'todas', total: 3 }))
+  assert.ok(problemaDelPuntaje({ ...ronda, aciertos: 21 }))
   assert.ok(problemaDelPuntaje({ ...ronda, ms: 1000 }))
   assert.ok(problemaDelPuntaje({ ...ronda, ms: 7 * 60 * 60 * 1000 }))
 })
@@ -172,16 +175,16 @@ test('nombres de usuario: qué se acepta y cuándo dos son el mismo', () => {
 
 test('el largo de la ronda decide su categoría de ranking', () => {
   assert.equal(categoriaDe(15, 34), '15')
-  assert.equal(categoriaDe(34, 34), 'all')
-  assert.equal(categoriaDe(179, 179), 'all')
+  assert.equal(categoriaDe(34, 34), 'todas')
+  assert.equal(categoriaDe(179, 179), 'todas')
   assert.equal(
     categoriaDe(30, 20),
-    'all',
+    'todas',
     'si el juego tiene menos preguntas que el largo pedido, se recorre todo',
   )
-  assert.equal(categoriaHeredada({ mode: 'com-name', total: 15 }), '15')
-  assert.equal(categoriaHeredada({ mode: 'ch-all', total: 16 }), 'all')
-  assert.equal(categoriaHeredada({ mode: 'st-name', total: 179 }), 'all')
+  assert.equal(categoriaHeredada({ modo: 'com-name', total: 15 }), '15')
+  assert.equal(categoriaHeredada({ modo: 'ch-all', total: 16 }), 'todas')
+  assert.equal(categoriaHeredada({ modo: 'st-name', total: 179 }), 'todas')
 })
 
 // una calle como [[lat, lon], ...]; en Santiago 1° de latitud son más km que 1° de longitud
