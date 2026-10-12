@@ -106,6 +106,33 @@ button {
 #panel.hidden {
   display: none;
 }
+
+/* Street View: el panorama flota sobre el mapa, a la izquierda; en el celular ocupa la parte de arriba. */
+#panorama {
+  position: absolute;
+  z-index: 1050;
+  top: calc(var(--top-h) + 12px + env(safe-area-inset-top));
+  left: 12px;
+  width: min(58vw, 760px);
+  height: min(64vh, 520px);
+  border-radius: 14px;
+  overflow: hidden;
+  background: #111;
+  box-shadow: var(--shadow);
+}
+#panorama[hidden] {
+  display: none;
+}
+@media (max-width: 760px) {
+  #panorama {
+    top: calc(var(--top-h) + env(safe-area-inset-top));
+    left: 0;
+    right: 0;
+    width: auto;
+    height: 42%;
+    border-radius: 0 0 14px 14px;
+  }
+}
 @media (max-width: 760px) {
   #panel {
     top: auto;

@@ -26,6 +26,12 @@ const GRUPOS = [
     blurb: `${callesDelJuego().length} avenidas, autopistas y carreteras.`,
   },
   {
+    name: 'Street View',
+    emoji: '👀',
+    blurb:
+      'Te dejo en un punto de Santiago visto desde la calle, como en GeoGuessr, y lo ubicas en el mapa. Es una prueba: por ahora hay pocos lugares.',
+  },
+  {
     name: 'Comunas',
     emoji: '🗺️',
     blurb: 'Ubica las comunas del Gran Santiago y aprende con cuáles limita cada una.',
@@ -124,7 +130,10 @@ function selectorDeLargo(grupo, modos) {
 }
 
 function tarjetaDeGrupo(grupo) {
-  const modos = MODOS.filter(modo => modo.group === grupo.name).sort(pasosPrimero)
+  const modos = MODOS.filter(modo => modo.group === grupo.name && (modo.disponible?.() ?? true)).sort(
+    pasosPrimero,
+  )
+  if (!modos.length) return ''
   return `<div class="card">
     <h3><span class="em">${grupo.emoji}</span>${grupo.name}</h3><p>${grupo.blurb}</p>
     ${selectorDeLargo(grupo.name, modos)}
