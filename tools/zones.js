@@ -17,6 +17,8 @@ const Z=[
   c:[["^Avenida General Bustamante$","^Avenida Francisco Bilbao$"],["^Avenida Francisco Bilbao$","^Avenida Salvador$"],["^Avenida Salvador$","^Avenida Irarrázaval$"],["^Avenida Irarrázaval$","^Avenida General Bustamante$"]]},
  {name:"Barrio París-Londres",desc:"Dos calles adoquinadas de estilo europeo (París y Londres) detrás de la Iglesia de San Francisco, en la Alameda; arquitectura de los años 20 y 30.",streets:["Alameda","París","Londres","Serrano"],near:[-33.4446,-70.6484],
   c:[[AL,"^Serrano$"],[AL,"^Avenida Santa Rosa$"],["^Avenida Santa Rosa$","^París$"],["^París$","^Serrano$"]]},
+ {name:"Teleférico del San Cristóbal",desc:"",streets:[],near:[-33.42,-70.62],
+  c:[[-33.4237,-70.63456],[-33.42551,-70.63552],[-33.42647,-70.63507],[-33.42727,-70.63291],[-33.4269,-70.63176],[-33.41615,-70.61413],[-33.41535,-70.61336],[-33.41338,-70.61362],[-33.41274,-70.61457],[-33.41295,-70.61693]]},
  {name:"Barrio Lastarria",desc:"Barrio bohemio y cultural: GAM, Museo de Artes Visuales, cine El Biógrafo, restaurantes y bares; al norte, el Parque Forestal y Bellas Artes.",streets:["Alameda","Cerro Santa Lucía (Victoria Subercaseaux)","Merced / Parque Forestal","Plaza Italia"],near:[-33.438,-70.639],
   c:[[AL,"^Victoria Subercaseaux$"],["^Victoria Subercaseaux$","^Merced$"],[-33.43640,-70.63540]]},
  {name:"Barrio Bellavista",desc:"Vida nocturna, teatros y restaurantes: Patio Bellavista, La Chascona (casa de Neruda), entrada al zoológico y al funicular del San Cristóbal. Mitad Recoleta, mitad Providencia (las separa Pío Nono).",streets:["Av. Santa María (río Mapocho)","Loreto","Dominica","Faldeo del cerro San Cristóbal","Del Arzobispo"],near:[-33.432,-70.635],
