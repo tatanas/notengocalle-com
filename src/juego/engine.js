@@ -25,7 +25,7 @@ import { mostrarResultadoOficial } from '../interfaz/resultadoOficial.js'
 import { ocultarPantalla, indicador, panel, mostrarPanel, titulo, aviso } from '../interfaz/panel.js'
 
 /* Un modo define: id, group, name, desc, pool(), key(item) y ask(item, quiz).
-   Opcionales: label(item), balance(item), setup(quiz), all, keepLayer, noHint, aids, relief, chile, roomy, tall, study.
+   Opcionales: label(item), balance(item), setup(quiz), limpiar() (al salir), disponible() (si no, no aparece en el menú), all, keepLayer, noHint, aids, relief, chile, roomy, tall, study.
    noHint: sin el botón "Ver nombres". aids: en la práctica dibuja bordes de comunas y metro de ayuda (la ronda oficial, no). */
 
 export let partida = null
@@ -176,6 +176,7 @@ function comenzarRonda() {
 }
 
 export function detenerPartida() {
+  partida?.mode.limpiar?.()
   partida = null
   clearInterval(temporizadorDelIndicador)
   detenerCuentaRegresiva()
