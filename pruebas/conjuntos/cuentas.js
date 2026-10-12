@@ -54,7 +54,7 @@ export async function cuentas(navegador, { verificar }) {
 
   await pagina.click('#outcomeLogin')
   await pagina.click('#accountDialog [data-view="register"]')
-  await llenar(pagina, { name: 'Ana', password: CLAVE_DE_PRUEBA })
+  await llenar(pagina, { nombre: 'Ana', clave: CLAVE_DE_PRUEBA })
   await esperarBotonDeCuenta(pagina, 'Ana')
   await pagina.waitForFunction(() => /Puesto 1/.test(document.getElementById('officialOutcome').innerText))
   verificar(true, 'la ronda jugada sin cuenta se sube al crearla (puesto 1 de 1)')
@@ -83,13 +83,13 @@ export async function cuentas(navegador, { verificar }) {
   const segundo = await abrirPagina(navegador)
   await segundo.page.click('#btnAccount')
   await segundo.page.click('#accountDialog [data-view="register"]')
-  await llenar(segundo.page, { name: 'ana', password: CLAVE_DE_PRUEBA })
+  await llenar(segundo.page, { nombre: 'ana', clave: CLAVE_DE_PRUEBA })
   await errorDelDialogo(segundo.page)
   verificar(
     /ya está en uso/.test(await texto(segundo.page, '#accountDialog .error')),
     'no se puede registrar un nombre ya tomado',
   )
-  await llenar(segundo.page, { name: 'Beto', password: CLAVE_DE_PRUEBA })
+  await llenar(segundo.page, { nombre: 'Beto', clave: CLAVE_DE_PRUEBA })
   await segundo.page.waitForFunction(() => document.getElementById('btnAccount').innerText.includes('Beto'))
   await jugarRondaOficial(segundo.page)
   await segundo.page.waitForFunction(() =>
@@ -114,7 +114,7 @@ export async function cuentas(navegador, { verificar }) {
   verificar(true, 'cerrar sesión vuelve a "Entrar"')
 
   await pagina.click('#btnAccount')
-  await llenar(pagina, { name: 'Ana', password: 'no-es-la-clave' })
+  await llenar(pagina, { nombre: 'Ana', clave: 'no-es-la-clave' })
   await errorDelDialogo(pagina)
   verificar(
     /incorrectos/.test(await texto(pagina, '#accountDialog .error')),
@@ -133,7 +133,7 @@ export async function cuentas(navegador, { verificar }) {
   await pagina.click('#accountDialog .dialog-close')
 
   await pagina.click('#btnAccount')
-  await llenar(pagina, { name: 'Ana', password: CLAVE_DE_PRUEBA })
+  await llenar(pagina, { nombre: 'Ana', clave: CLAVE_DE_PRUEBA })
   await esperarBotonDeCuenta(pagina, 'Ana')
   verificar(true, 'se puede volver a entrar con la clave')
 

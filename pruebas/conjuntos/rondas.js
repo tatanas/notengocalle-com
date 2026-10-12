@@ -424,10 +424,10 @@ export async function categoriasRanking(navegador, { verificar }) {
     storage: { settings: { len: 20 } },
   })
   await pagina.evaluate(() =>
-    fetch('/api/register', {
+    fetch('/api/registrarse', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name: 'Cata', password: 'clave-larga-1' }),
+      body: JSON.stringify({ nombre: 'Cata', clave: 'clave-larga-1' }),
     }),
   )
   await pagina.reload({ waitUntil: 'networkidle2' })
@@ -457,7 +457,7 @@ export async function categoriasRanking(navegador, { verificar }) {
     'y se abre en la del largo recién jugado',
   )
 
-  await pagina.$eval('[data-category="all"]', pestana => pestana.click())
+  await pagina.$eval('[data-category="todas"]', pestana => pestana.click())
   await pagina.waitForSelector('#rankBody p.muted')
   verificar(
     /Nadie ha jugado/.test(await texto(pagina, '#rankBody')),

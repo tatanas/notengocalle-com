@@ -23,7 +23,7 @@ const GRUPOS = [
   {
     name: 'Calles',
     emoji: '🛣️',
-    blurb: `${callesDelJuego().length} avenidas, autopistas y carreteras. Las que cambian de nombre muestran sus tramos.`,
+    blurb: `${callesDelJuego().length} avenidas, autopistas y carreteras.`,
   },
   {
     name: 'Comunas',
@@ -196,7 +196,7 @@ const htmlDeCreditos = () =>
 const htmlDeInicio = () => `<div class="home-backdrop" aria-hidden="true"></div>
   <div class="wrap">
   <div class="hero"><h2>¿Dónde queda eso? 🏔️</h2>
-    <p>Practica comunas, lugares, calles, rutas y metro de Santiago. Lo que fallas te lo pregunta más seguido.</p></div>
+    <p>Practica comunas, lugares, calles, rutas y metro de Santiago.</p></div>
   <div class="grid">
     ${GRUPOS.map(tarjetaDeGrupo).join('')}
     <div class="card"><h3><span class="em">🏆</span>Ranking</h3>
