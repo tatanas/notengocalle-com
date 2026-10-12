@@ -52,18 +52,39 @@ export function limpiarCapa() {
 
 // ----- mapa base (vectorial); sin WebGL se cae a las teselas raster de OSM, que siempre traen nombres
 let mapaVectorial = null
-try {
-  const capaBase = L.maplibreGL({
-    style: 'https://tiles.openfreemap.org/styles/positron',
-    attribution: CREDITO_DEL_MAPA_BASE,
-  }).addTo(mapa)
-  mapaVectorial = capaBase.getMaplibreMap()
-} catch {
+let capaVectorial = null
+const agregarTeselasRaster = () =>
   L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
     maxZoom: 19,
     attribution: CREDITO_OSM,
   }).addTo(mapa)
+try {
+  capaVectorial = L.maplibreGL({
+    style: 'https://tiles.openfreemap.org/styles/positron',
+    attribution: CREDITO_DEL_MAPA_BASE,
+  }).addTo(mapa)
+  mapaVectorial = capaVectorial.getMaplibreMap()
+} catch {
+  agregarTeselasRaster()
 }
+
+// Los celulares dejan pocos contextos WebGL: si el navegador le quita el suyo al mapa (por ejemplo, por abrir
+// Street View), el mapa queda gris. Si no se recupera solo, se cambia a teselas normales, que no usan WebGL.
+const ESPERA_DE_RECUPERACION_MS = 800
+export function repararMapaBase() {
+  if (!mapaVectorial) return
+  const lienzo = mapaVectorial.getCanvas()
+  const contexto = lienzo.getContext('webgl2') ?? lienzo.getContext('webgl')
+  if (!contexto?.isContextLost()) return
+  contexto.getExtension('WEBGL_lose_context')?.restoreContext()
+  setTimeout(() => {
+    if (!mapaVectorial || !contexto.isContextLost()) return
+    capaVectorial.remove()
+    mapaVectorial = null
+    agregarTeselasRaster()
+  }, ESPERA_DE_RECUPERACION_MS)
+}
+mapaVectorial?.getCanvas().addEventListener('webglcontextlost', () => setTimeout(repararMapaBase, 1500))
 
 // ----- nombres del mapa: 'plain' sin nombres, 'streets' solo calles, 'labels' todo
 export let modoDeEtiquetas = 'plain'

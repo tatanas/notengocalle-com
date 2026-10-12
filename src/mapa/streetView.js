@@ -1,6 +1,6 @@
 import { distanciaKm } from '../nucleo/geografia.js'
 import { aviso } from '../interfaz/panel.js'
-import { encuadrarCiudad, mapa } from './mapa.js'
+import { encuadrarCiudad, mapa, repararMapaBase } from './mapa.js'
 
 // Street View viene de Google Maps: el script se carga solo cuando alguien juega un modo que lo necesita,
 // para que el resto del juego siga siendo instantáneo y sin depender de Google.
@@ -36,6 +36,37 @@ let botones = null
 let alReportar = () => {}
 let mapaEncuadrado = false
 
+// Un solo panorama para todas las preguntas: cada StreetViewPanorama nuevo abre otro contexto WebGL y, en los
+// celulares (que dejan pocos), el navegador termina quitándole el suyo al mapa base, que queda gris para siempre.
+let panorama = null
+let inicioDeLaPregunta = null
+let panoDeInicio = null
+
+function crearPanorama(StreetViewPanorama) {
+  panorama = new StreetViewPanorama(contenedor, {
+    clickToGo: false,
+    linksControl: false,
+    addressControl: false,
+    showRoadLabels: false,
+    fullscreenControl: false,
+    enableCloseButton: false,
+    motionTracking: false,
+    motionTrackingControl: false,
+    panControl: false,
+  })
+  // Las flechas del teclado también caminan: si algo lo mueve, vuelve.
+  panorama.addListener('position_changed', () => {
+    const posicion = panorama.getPosition()
+    if (!posicion || !inicioDeLaPregunta) return
+    if (distanciaKm([posicion.lat(), posicion.lng()], inicioDeLaPregunta) <= TOLERANCIA_DE_MOVIMIENTO_KM)
+      return
+    const direccion = panorama.getPov()
+    panorama.setPano(panoDeInicio)
+    panorama.setPov(direccion)
+    aviso('Aquí solo puedes mirar alrededor, no caminar.')
+  })
+}
+
 const botonAlternar = () => document.getElementById('alternarVista')
 
 // En el celular se ve el panorama o el mapa, uno a la vez.
@@ -43,6 +74,7 @@ function alternarEntrePanoramaYMapa() {
   const verMapa = document.body.classList.toggle('ver-mapa')
   botonAlternar().textContent = verMapa ? '👁 Ver panorama' : '🗺️ Abrir mapa'
   if (!verMapa) return
+  repararMapaBase()
   mapa.invalidateSize()
   if (!mapaEncuadrado) encuadrarCiudad()
   mapaEncuadrado = true
@@ -96,36 +128,19 @@ export async function mostrarPanorama(
   botonAlternar().textContent = '🗺️ Abrir mapa'
   contenedor.hidden = false
   botones.hidden = false
-  const panorama = new StreetViewPanorama(contenedor, {
-    pano: lugar.pano,
-    pov: { heading: rumbo, pitch: 0 },
-    clickToGo: false,
-    linksControl: false,
-    addressControl: false,
-    showRoadLabels: false,
-    fullscreenControl: false,
-    enableCloseButton: false,
-    motionTracking: false,
-    motionTrackingControl: false,
-    panControl: false,
-  })
-
-  // Las flechas del teclado también caminan: si algo lo mueve, vuelve.
-  panorama.addListener('position_changed', () => {
-    const posicion = panorama.getPosition()
-    if (!posicion || distanciaKm([posicion.lat(), posicion.lng()], inicio) <= TOLERANCIA_DE_MOVIMIENTO_KM)
-      return
-    const direccion = panorama.getPov()
-    panorama.setPano(lugar.pano)
-    panorama.setPov(direccion)
-    aviso('Aquí solo puedes mirar alrededor, no caminar.')
-  })
+  if (!panorama) crearPanorama(StreetViewPanorama)
+  inicioDeLaPregunta = inicio
+  panoDeInicio = lugar.pano
+  panorama.setPano(lugar.pano)
+  panorama.setPov({ heading: rumbo, pitch: 0 })
+  panorama.setVisible(true)
   return inicio
 }
 
 export function ocultarPanorama() {
   if (contenedor) contenedor.hidden = true
   if (botones) botones.hidden = true
+  inicioDeLaPregunta = null
   document.body.classList.remove('con-panorama', 'ver-mapa')
   alReportar = () => {}
 }
