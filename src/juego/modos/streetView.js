@@ -7,7 +7,7 @@ import LUGARES from '../../datos/lugaresStreetView.json'
 import { PUNTOS_MAXIMOS, esAciertoDeStreetView, puntajeDeStreetView } from '../../dominio/streetView.js'
 import { describirUbicacion } from '../../dominio/ubicacion.js'
 import { COLORES, dibujarCalle, iconoDiv } from '../../mapa/dibujo.js'
-import { capa, encuadrar, encuadrarCiudad, mapa } from '../../mapa/mapa.js'
+import { capa, encuadrar, encuadrarCiudad, mapa, repararMapaBase } from '../../mapa/mapa.js'
 import { mostrarPanorama, ocultarPanorama, streetViewDisponible } from '../../mapa/streetView.js'
 import { aviso, mostrarPanel } from '../../interfaz/panel.js'
 import { encabezadoDePregunta, partida, responder, saltarPregunta } from '../engine.js'
@@ -86,6 +86,7 @@ registrarModo({
     }
     if (partida !== q || q.answered) return ocultarPanorama()
     mostrarPanel(encabezadoDePregunta(q) + textoDeLaPregunta)
+    repararMapaBase()
     encuadrarCiudad()
     mapa.on('click', evento => {
       if (q.answered) return
