@@ -244,12 +244,24 @@ test('las alternativas que más se parecen pesan más', () => {
   )
 })
 
-test('"¿Dónde estás?": puntaje completo cerca, baja hasta la mitad y se acaba a los 150 m', () => {
-  assert.equal(puntajeDeStreetView(0), 100)
-  assert.equal(puntajeDeStreetView(0.02), 100)
-  assert.equal(puntajeDeStreetView(0.085), 75)
-  assert.equal(puntajeDeStreetView(0.15), 50)
-  assert.equal(puntajeDeStreetView(0.151), 0)
-  assert.equal(esAciertoDeStreetView(0.15), true)
-  assert.equal(esAciertoDeStreetView(0.2), false)
+test('"¿Dónde estás?": de 0 a 5 puntos según la distancia, y 3 o más cuenta como acierto', () => {
+  const puntosA = metros => puntajeDeStreetView(metros / 1000)
+  assert.deepEqual(
+    [0, 49, 50, 99, 100, 299, 300, 599, 600, 999, 1000, 5000].map(puntosA),
+    [5, 5, 4, 4, 3, 3, 2, 2, 1, 1, 0, 0],
+  )
+  assert.equal(esAciertoDeStreetView(0.299), true)
+  assert.equal(esAciertoDeStreetView(0.3), false)
+})
+
+test('en Street View el ranking suma puntos: el máximo es 5 por pregunta', () => {
+  const ronda = { modo: 'sv-ubicar', categoria: '20', aciertos: 61, total: 100, ms: 90000 }
+  assert.equal(problemaDelPuntaje(ronda), null)
+  assert.ok(problemaDelPuntaje({ ...ronda, aciertos: 101 }), 'más puntos que el máximo')
+  assert.ok(problemaDelPuntaje({ ...ronda, total: 20 }), 'el máximo de 20 preguntas es 100, no 20')
+  assert.ok(problemaDelPuntaje({ ...ronda, ms: 2000 }), 'imposible de rápido')
+  assert.equal(
+    problemaDelPuntaje({ ...ronda, categoria: 'todas', total: 1345, aciertos: 900, ms: 900000 }),
+    null,
+  )
 })

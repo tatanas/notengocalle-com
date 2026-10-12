@@ -1,6 +1,7 @@
 import * as autenticacion from './autenticacion.js'
 import { ErrorHttp, prohibido, invalido, noEncontrado, noDisponible } from './errores.js'
 import * as puntajes from './puntajes.js'
+import * as reportes from './reportes.js'
 import { claveFiltrada } from './claves.js'
 import { usuarioDeSesion } from './sesiones.js'
 
@@ -13,6 +14,7 @@ const RUTAS = {
   'POST /api/puntajes': puntajes.enviarPuntaje,
   'GET /api/tabla': puntajes.tablaDePosiciones,
   'GET /api/lideres': puntajes.lideres,
+  'POST /api/reportes': reportes.reportarPunto,
 }
 
 const BYTES_MAXIMOS_DE_CUERPO = 10_000

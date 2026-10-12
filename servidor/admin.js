@@ -1,5 +1,6 @@
 // Tareas de administración contra la base de producción. Necesita DATABASE_URL en el entorno:
 //   node servidor/admin.js usuarios
+//   node servidor/admin.js reportes          puntos de Street View que los jugadores marcaron como túnel
 //   node servidor/admin.js clave <nombre> <nueva>   cambia la clave de alguien y cierra sus sesiones
 //   node servidor/admin.js borrar <nombre>      borra la cuenta con sus puntajes
 import { llaveDeUsuario } from '../compartido/cuentas.js'
@@ -14,6 +15,14 @@ const TAREAS = {
        group by usuarios.id order by usuarios.creado_en`,
     )
     console.table(usuarios)
+  },
+
+  async reportes(db) {
+    const reportes = await db.query(
+      `select lugar, lat, lon, motivo, count(*)::int as veces, max(creado_en)::date as ultimo
+       from reportes_de_puntos group by lugar, lat, lon, motivo order by veces desc, ultimo desc`,
+    )
+    console.table(reportes)
   },
 
   async clave(db, nombre, claveNueva) {
@@ -32,6 +41,8 @@ const TAREAS = {
 const [tarea, nombre, extra] = process.argv.slice(2)
 const db = conectarBaseDeProduccion()
 if (!db) throw new Error('Falta DATABASE_URL (la cadena de conexión de Neon).')
-if (!TAREAS[tarea] || (tarea !== 'usuarios' && !nombre) || (tarea === 'clave' && !extra))
-  throw new Error('Uso: node servidor/admin.js usuarios | clave <nombre> <nueva> | borrar <nombre>')
+if (!TAREAS[tarea] || (!['usuarios', 'reportes'].includes(tarea) && !nombre) || (tarea === 'clave' && !extra))
+  throw new Error(
+    'Uso: node servidor/admin.js usuarios | reportes | clave <nombre> <nueva> | borrar <nombre>',
+  )
 await TAREAS[tarea](db, nombre, extra)

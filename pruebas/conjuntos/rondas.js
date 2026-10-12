@@ -107,11 +107,13 @@ export async function rondasOficiales(navegador, { verificar }) {
   const { page: pagina, errors: errores } = await abrirPagina(navegador, {
     storage: { settings: { scope: 'all', len: 20 } },
   })
-  const ofrecidos = await pagina.$$eval('[data-official]', botones =>
-    botones.map(boton => boton.dataset.official),
-  )
+  // Street View carga el script de Google y gasta cuota: se prueba a mano.
+  const ofrecidos = (
+    await pagina.$$eval('[data-official]', botones => botones.map(boton => boton.dataset.official))
+  ).filter(id => !id.startsWith('sv-'))
+  const oficialesSinStreetView = MODOS_OFICIALES.filter(id => !id.startsWith('sv-'))
   verificar(
-    ofrecidos.length === MODOS_OFICIALES.length && ofrecidos.every(id => MODOS_OFICIALES.includes(id)),
+    ofrecidos.length === oficialesSinStreetView.length && ofrecidos.every(id => MODOS_OFICIALES.includes(id)),
     `los ${ofrecidos.length} juegos del menú tienen ronda oficial definida`,
   )
   const incorrectas = []
@@ -261,12 +263,17 @@ export async function disenoMenu(navegador, { verificar }) {
     etiquetas.map(etiqueta => etiqueta.innerText.trim()),
   )
   verificar(!categorias.includes('Metro'), 'y ya no es una categoría de los lugares emblemáticos')
-  const grandes = await pagina.$$eval('.mode-row .mode.ranked', botones => botones.length)
-  const chicos = await pagina.$$eval('.mode-row .practice', botones =>
-    botones.map(boton => boton.innerText.trim()),
+  // Street View solo aparece si hay llave de Google: se cuenta aparte.
+  const grandes = await pagina.$$eval(
+    '.mode-row .mode.ranked',
+    botones => botones.filter(boton => !boton.dataset.official.startsWith('sv-')).length,
   )
+  const chicos = await pagina.$$eval('.mode-row .practice', botones =>
+    botones.filter(boton => !boton.dataset.mode.startsWith('sv-')).map(boton => boton.innerText.trim()),
+  )
+  const cantidadEsperada = MODOS_OFICIALES.filter(id => !id.startsWith('sv-')).length
   verificar(
-    grandes === MODOS_OFICIALES.length && chicos.length === MODOS_OFICIALES.length,
+    grandes === cantidadEsperada && chicos.length === cantidadEsperada,
     `cada juego tiene botón grande (oficial) y chico (práctica): ${grandes} y ${chicos.length}`,
   )
   verificar(

@@ -29,7 +29,7 @@ const GRUPOS = [
     name: 'Street View',
     emoji: '👀',
     blurb:
-      'Te dejo parado en un punto de Santiago visto desde la calle, como en GeoGuessr, y lo ubicas en el mapa: lugares emblemáticos y las calles del juego.',
+      'Te dejo parado en un punto de Santiago visto desde la calle y lo ubicas en el mapa.',
   },
   {
     name: 'Comunas',

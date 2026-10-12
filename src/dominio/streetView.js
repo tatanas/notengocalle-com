@@ -1,14 +1,17 @@
-// Cómo se puntúa "¿Dónde estás?": ubicación exacta = puntaje completo; hasta cierta distancia, el puntaje baja
-// de a poco hasta la mitad; más allá, nada.
-export const PUNTOS_MAXIMOS = 100
-export const DISTANCIA_PERFECTA_KM = 0.02
-export const DISTANCIA_MAXIMA_KM = 0.15
+// Cómo se puntúa "¿Dónde estás?": de 0 a 5 puntos según qué tan cerca quedó el toque del punto exacto.
+export const PUNTOS_MAXIMOS = 5
 
-export const esAciertoDeStreetView = distanciaKm => distanciaKm <= DISTANCIA_MAXIMA_KM
+// [distancia (km) a la que se acaba el tramo, puntos]
+const TRAMOS = [
+  [0.05, 5],
+  [0.1, 4],
+  [0.3, 3],
+  [0.6, 2],
+  [1, 1],
+]
 
-export function puntajeDeStreetView(distanciaKm) {
-  if (distanciaKm <= DISTANCIA_PERFECTA_KM) return PUNTOS_MAXIMOS
-  if (distanciaKm > DISTANCIA_MAXIMA_KM) return 0
-  const avance = (distanciaKm - DISTANCIA_PERFECTA_KM) / (DISTANCIA_MAXIMA_KM - DISTANCIA_PERFECTA_KM)
-  return Math.round(PUNTOS_MAXIMOS * (1 - avance / 2))
-}
+export const puntajeDeStreetView = distanciaKm => TRAMOS.find(([limite]) => distanciaKm < limite)?.[1] ?? 0
+
+// Con 3 puntos o más (a menos de 300 m) la pregunta cuenta como acertada.
+const PUNTOS_PARA_ACERTAR = 3
+export const esAciertoDeStreetView = distanciaKm => puntajeDeStreetView(distanciaKm) >= PUNTOS_PARA_ACERTAR

@@ -92,6 +92,16 @@ create index if not exists puntajes_por_categoria on puntajes (modo, categoria, 
 
 create index if not exists puntajes_por_usuario on puntajes (usuario_id, creado_en);
 
+-- Puntos de Street View que los jugadores marcaron como malos (túneles).
+create table if not exists reportes_de_puntos (
+  id        integer generated always as identity primary key,
+  lugar     text not null,
+  lat       double precision not null,
+  lon       double precision not null,
+  motivo    text not null,
+  creado_en timestamptz not null default now()
+);
+
 create table if not exists intentos_fallidos (
   llave_de_nombre text not null,
   en              timestamptz not null default now()
