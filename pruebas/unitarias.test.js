@@ -1,4 +1,5 @@
 // Pruebas de la lógica pura que comparten navegador y servidor: node --test tests/unit.test.js
+import { esAciertoDeStreetView, puntajeDeStreetView } from '../src/dominio/streetView.js'
 import assert from 'node:assert/strict'
 import { test } from 'node:test'
 import { llaveDeUsuario, PATRON_DE_USUARIO } from '../compartido/cuentas.js'
@@ -241,4 +242,14 @@ test('las alternativas que más se parecen pesan más', () => {
     peso({ straightness: 0, angleDiff: 0 }),
     'con calles curvas la orientación no pesa',
   )
+})
+
+test('"¿Dónde estás?": puntaje completo cerca, baja hasta la mitad y se acaba a los 150 m', () => {
+  assert.equal(puntajeDeStreetView(0), 100)
+  assert.equal(puntajeDeStreetView(0.02), 100)
+  assert.equal(puntajeDeStreetView(0.085), 75)
+  assert.equal(puntajeDeStreetView(0.15), 50)
+  assert.equal(puntajeDeStreetView(0.151), 0)
+  assert.equal(esAciertoDeStreetView(0.15), true)
+  assert.equal(esAciertoDeStreetView(0.2), false)
 })
