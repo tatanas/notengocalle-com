@@ -45,7 +45,7 @@ registrarModo({
     )
     let verdadero
     try {
-      verdadero = await mostrarPanorama(lugar)
+      verdadero = await mostrarPanorama(lugar.puntos[Math.floor(Math.random() * lugar.puntos.length)])
     } catch {
       aviso('No pude cargar Street View. Revisa tu conexión.')
       return saltarPregunta()
@@ -81,9 +81,9 @@ registrarModo({
       encuadrar(L.latLngBounds([adivinado, verdadero]).pad(0.3), 18)
 
       const nombresDeCalles = calles.map(calle => `<b>${escaparHtml(calle.name)}</b>`).join(' y ')
-      const dondeEstabas = nombresDeCalles
-        ? `<p>Estabas sobre ${nombresDeCalles}.</p>`
-        : `<p class="muted">${escaparHtml(lugar.nombre)}</p>`
+      const cercaDelLugar =
+        lugar.tipo === 'lugar' ? `<p class="muted">Cerca de ${escaparHtml(lugar.nombre)}.</p>` : ''
+      const dondeEstabas = (nombresDeCalles ? `<p>Estabas sobre ${nombresDeCalles}.</p>` : '') + cercaDelLugar
       const cerca =
         enLaCalle && !acierto ? '<p>Estabas en la calle correcta, pero en otro punto de ella.</p>' : ''
       responder(

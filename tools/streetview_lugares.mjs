@@ -1,8 +1,9 @@
-// Arma la lista de lugares del juego "¿Dónde estás?" (Street View): 100 puntos entre lugares emblemáticos y calles,
-// cada uno comprobado contra Street View (que haya panorama a nivel de calle, que no sea un túnel).
+// Arma los lugares del juego "¿Dónde estás?" (Street View): los lugares emblemáticos más importantes, con un punto
+// fijo cada uno, y todas las calles, con hasta 3 puntos repartidos por la calle (cada vez que sale la calle, el juego
+// elige uno al azar). Cada punto se comprueba contra Street View: solo panoramas oficiales de Google.
 // Necesita la llave de Google en .env.local y se ejecuta desde la raíz del proyecto:
 //   node tools/streetview_lugares.mjs
-// Escribe src/datos/lugaresStreetView.json. Usa la API de Google: son unas pocas centenas de consultas.
+// Escribe src/datos/lugaresStreetView.json. Son unas mil consultas de metadatos a la API de Google.
 import fs from 'node:fs'
 
 process.env.URL_BASE = 'http://localhost:8765' // la llave solo autoriza localhost
@@ -17,7 +18,7 @@ const datos = (() => {
   return ventana.DATA
 })()
 
-// ----- azar con semilla, para que la lista salga igual cada vez
+// ----- azar con semilla, para que el resultado salga igual cada vez
 function azarConSemilla(semilla) {
   let estado = semilla
   return () => {
@@ -27,15 +28,7 @@ function azarConSemilla(semilla) {
     return ((t ^ (t >>> 14)) >>> 0) / 4294967296
   }
 }
-const azar = azarConSemilla(20261012)
-const mezclar = lista => {
-  const copia = [...lista]
-  for (let i = copia.length - 1; i > 0; i--) {
-    const j = Math.floor(azar() * (i + 1))
-    ;[copia[i], copia[j]] = [copia[j], copia[i]]
-  }
-  return copia
-}
+const azar = azarConSemilla(20261013)
 
 // ----- geometría (km, proyección plana válida en Santiago)
 const KM_LAT = 111.2
@@ -58,6 +51,27 @@ function distanciaYRumboALinea(punto, lineas) {
 }
 const rumboHacia = (desde, hacia) =>
   ((Math.atan2((hacia[1] - desde[1]) * KM_LON, (hacia[0] - desde[0]) * KM_LAT) * 180) / Math.PI + 360) % 360
+
+// Un punto al azar sobre el trazado de una calle, con probabilidad proporcional al largo de cada tramo.
+function puntoAlAzarEnLaCalle(calle) {
+  const tramos = []
+  let total = 0
+  for (const linea of calle.lines)
+    for (let i = 0; i < linea.length - 1; i++) {
+      const largo = distanciaKm(linea[i], linea[i + 1])
+      tramos.push({ a: linea[i], b: linea[i + 1], largo })
+      total += largo
+    }
+  let objetivo = azar() * total
+  for (const tramo of tramos) {
+    if (objetivo <= tramo.largo) {
+      const t = tramo.largo ? objetivo / tramo.largo : 0
+      return [tramo.a[0] + t * (tramo.b[0] - tramo.a[0]), tramo.a[1] + t * (tramo.b[1] - tramo.a[1])]
+    }
+    objetivo -= tramo.largo
+  }
+  return tramos[0].a
+}
 
 // ----- Street View desde una página con la llave
 const detener = await iniciarServidor({ reconstruir: false })
@@ -90,7 +104,7 @@ async function panoramaCerca(lat, lon, radio) {
           sources: ['google'],
         })
         const l = r.data.location
-        return { lat: l.latLng.lat(), lon: l.latLng.lng(), pano: l.pano, descripcion: l.description ?? '' }
+        return { lat: l.latLng.lat(), lon: l.latLng.lng(), pano: l.pano }
       } catch {
         return null
       }
@@ -100,17 +114,12 @@ async function panoramaCerca(lat, lon, radio) {
     radio,
   )
 }
-const esTunel = descripcion => /t[uú]nel|subterr|hundid|paso bajo|bajo nivel/i.test(descripcion)
+const redondear = x => +x.toFixed(5)
+const punto = (panorama, rumbo) => ({ lat: redondear(panorama.lat), lon: redondear(panorama.lon), rumbo: Math.round(rumbo) })
 
 const resultado = []
-const nombresUsados = new Set()
-const redondear = x => +x.toFixed(5)
-function agregar(nombre, tipo, comuna, panorama, rumbo) {
-  nombresUsados.add(nombre)
-  resultado.push({ nombre, tipo, comuna, lat: redondear(panorama.lat), lon: redondear(panorama.lon), rumbo: Math.round(rumbo) })
-}
 
-// ----- los tres lugares de prueba de siempre (ya revisados a mano)
+// ----- los lugares emblemáticos más importantes, uno por lugar
 const MANUALES = [
   { nombre: 'Kennedy con Las Tranqueras', comuna: 'Vitacura', lat: -33.39089, lon: -70.55333, rumbo: 180 },
   { nombre: 'Rotonda Atenas', comuna: 'Las Condes', lat: -33.41717, lon: -70.5531, rumbo: 180 },
@@ -119,82 +128,100 @@ const MANUALES = [
 for (const manual of MANUALES) {
   const panorama = await panoramaCerca(manual.lat, manual.lon, 40)
   if (!panorama) throw new Error('Sin cobertura en ' + manual.nombre)
-  agregar(manual.nombre, 'lugar', manual.comuna, panorama, manual.rumbo)
+  resultado.push({ nombre: manual.nombre, tipo: 'lugar', comuna: manual.comuna, puntos: [punto(panorama, manual.rumbo)] })
 }
 
-// ----- lugares emblemáticos
-const CUPOS = {
-  'Malls y edificios': 7,
-  'Centro histórico': 6,
-  Deporte: 5,
-  Cultura: 5,
-  Salud: 4,
-  'Gobierno y justicia': 4,
-  Universidades: 6,
-  Colegios: 2,
-  Religión: 3,
-  Transporte: 2,
-  'Restaurantes y bares': 1,
-  'Cerros y parques': 2,
-}
-const EXCLUIDOS = /Teleférico|Cerro |Valle Nevado|Farellones|Quebrada/
-let rechazadosPorTunel = 0
-for (const [categoria, cupo] of Object.entries(CUPOS)) {
-  let elegidos = 0
-  const candidatos = mezclar(
-    datos.landmarks.filter(
-      l => l.cat === categoria && !EXCLUIDOS.test(l.name) && (categoria !== 'Cerros y parques' || /^Parque/.test(l.name)),
-    ),
-  )
-  for (const lugar of candidatos) {
-    if (elegidos >= cupo) break
-    if (nombresUsados.has(lugar.name)) continue
-    const panorama = await panoramaCerca(lugar.lat, lugar.lon, 60)
-    if (!panorama) continue
-    if (esTunel(panorama.descripcion)) {
-      rechazadosPorTunel++
-      continue
-    }
-    const rumbo = distanciaKm([panorama.lat, panorama.lon], [lugar.lat, lugar.lon]) < 0.015 ? azar() * 360 : rumboHacia([panorama.lat, panorama.lon], [lugar.lat, lugar.lon])
-    agregar(lugar.name, 'lugar', lugar.comuna, panorama, rumbo)
-    elegidos++
+const IMPORTANTES = [
+  // centro histórico y gobierno
+  'Plaza de Armas', 'Mercado Central', 'La Vega Central', 'Estación Mapocho', 'Biblioteca Nacional', 'Teatro Municipal',
+  'Plaza Italia (Plaza Baquedano)', 'Paseo Ahumada', 'Cementerio General', 'Palacio de La Moneda',
+  'Barrio Cívico / Paseo Bulnes', 'Ex Congreso Nacional', 'Palacio de Tribunales', 'Banco Central de Chile',
+  'Bolsa de Comercio', 'Municipalidad de Santiago', 'Escuela Militar', 'Cancillería (ex Hotel Carrera)',
+  // deporte
+  'Estadio Monumental (Colo-Colo)', 'Estadio Nacional (selección chilena; hace de local la U. de Chile)',
+  'Claro Arena (U. Católica)', 'Estadio Santa Laura (Unión Española)',
+  'Estadio Bicentenario de La Florida (Audax Italiano)', 'Movistar Arena (Santander Arena)', 'Club Hípico',
+  'Hipódromo Chile', 'Estadio Español',
+  // malls y edificios
+  'Costanera Center / Gran Torre Santiago', 'Torre Entel', 'Sanhattan (El Golf / Isidora Goyenechea)', 'Parque Arauco',
+  'Alto Las Condes', 'Mall Plaza Egaña', 'Mall Plaza Vespucio', 'Mall Florida Center', 'Mall Plaza Oeste',
+  'Mall Plaza Norte', 'Mall Arauco Maipú', 'Mall Plaza Tobalaba', 'Apumanque', 'MUT (Mercado Urbano Tobalaba)',
+  // cultura
+  'Museo de Bellas Artes', 'GAM', 'Museo de la Memoria', 'Museo Nacional de Historia Natural', 'Museo Precolombino',
+  'Museo Interactivo Mirador (MIM)', 'Fantasilandia', 'La Chascona (casa de Neruda)', 'Teatro Caupolicán',
+  'Matucana 100', 'Museo Nacional Aeronáutico',
+  // salud
+  'Clínica Las Condes', 'Clínica Alemana', 'Clínica Santa María', 'Hospital Clínico UC (Marcoleta)',
+  'Hospital Clínico U. de Chile (J.J. Aguirre)', 'Posta Central', 'Hospital del Salvador', 'Hospital Sótero del Río',
+  'Hospital Militar',
+  // universidades y colegios
+  'PUC – Casa Central', 'PUC – Campus San Joaquín', 'PUC – Campus Oriente', 'U. de Chile – Casa Central',
+  'U. de Chile – Beauchef (FCFM)', 'U. de Chile – Juan Gómez Millas', 'USACH', 'Universidad del Desarrollo (UDD)',
+  'Universidad de los Andes', 'Universidad Finis Terrae', 'Universidad Adolfo Ibáñez (campus principal)',
+  'Universidad Diego Portales', 'Universidad Alberto Hurtado', 'Universidad Andrés Bello – República',
+  'UTFSM – Campus San Joaquín', 'Duoc UC – sede San Carlos de Apoquindo', 'Instituto Nacional', 'Liceo 1 Javiera Carrera',
+  "Saint George's College", 'Colegio Alemán de Santiago',
+  // religión
+  'Templo Votivo de Maipú', "Templo Bahá'í", 'Basílica de Lourdes', 'Santuario Padre Hurtado',
+  'Templo Mayor de los Mormones', 'Catedral Metropolitana', 'Mezquita As-Salam',
+  // transporte
+  'Estación Central (ferrocarriles)', 'Aeropuerto Arturo Merino Benítez', 'Terminal Sur / Alameda (buses)',
+  'Terminal San Borja',
+  // parques
+  'Parque Forestal', 'Parque Bicentenario', 'Parque Araucano', "Parque O'Higgins", 'Parque Quinta Normal',
+  'Parque Balmaceda', 'Parque Bustamante', 'Parque Almagro', 'Parque Juan Pablo II', 'Pueblito Los Dominicos',
+  'Cerro Santa Lucía', 'Zoológico Nacional',
+  // restaurantes y barrios
+  'Fuente Alemana', 'La Piojera', 'Mercado Tirso de Molina', 'Barrio Lastarria', 'Barrio Bellavista', 'Barrio Italia',
+  'Barrio Yungay', 'Barrio Brasil', 'Patronato', 'Persa Bío Bío', 'Plaza Ñuñoa', 'Plaza de Maipú', 'Plaza de Puente Alto',
+]
+let sinCobertura = []
+for (const nombre of IMPORTANTES) {
+  const lugar = datos.landmarks.find(l => l.name === nombre)
+  if (!lugar) {
+    console.log('  no existe en los datos:', nombre)
+    continue
   }
-  console.log(`${categoria}: ${elegidos}/${cupo}`)
+  // Los recintos grandes (estadios, parques, malls) tienen su calle más lejos del punto central.
+  const panorama = (await panoramaCerca(lugar.lat, lugar.lon, 60)) ?? (await panoramaCerca(lugar.lat, lugar.lon, 220))
+  if (!panorama) {
+    sinCobertura.push(nombre)
+    continue
+  }
+  const cerca = distanciaKm([panorama.lat, panorama.lon], [lugar.lat, lugar.lon]) < 0.015
+  const rumbo = cerca ? azar() * 360 : rumboHacia([panorama.lat, panorama.lon], [lugar.lat, lugar.lon])
+  resultado.push({ nombre: lugar.name, tipo: 'lugar', comuna: lugar.comuna, puntos: [punto(panorama, rumbo)] })
 }
+console.log(`lugares: ${resultado.length} (sin cobertura: ${sinCobertura.join(', ') || 'ninguno'})`)
 
-// ----- calles: un punto al azar de cada una, con panorama sobre la calle misma
-const comunasUrbanas = new Set(datos.comunas.features.filter(f => f.properties.group === 'core').map(f => f.properties.name))
-const calles = mezclar(
-  datos.streets.filter(
-    c => (!c.kind || c.kind === 'calle') && c.km >= 1 && c.km <= 20 && comunasUrbanas.has(c.comunas[0]),
-  ),
-)
-const porComuna = {}
-const META_DE_CALLES = 100 - resultado.length
-let hechas = 0
+// ----- calles: hasta 3 puntos por calle, lejos uno del otro y sobre la calle misma
+const PUNTOS_POR_CALLE = 3
+const INTENTOS_POR_CALLE = 14
+const SEPARACION_MINIMA_KM = 0.4
+const MARGEN_SOBRE_LA_CALLE_KM = 0.03
+const calles = datos.streets.filter(calle => !calle.kind || calle.kind === 'calle')
+const callesIncompletas = []
 for (const calle of calles) {
-  if (hechas >= META_DE_CALLES) break
-  const comuna = calle.comunas[0]
-  if ((porComuna[comuna] ?? 0) >= 4) continue
-  const lineaLarga = calle.lines.reduce((a, b) => (b.length > a.length ? b : a))
-  for (let intento = 0; intento < 5; intento++) {
-    const punto = lineaLarga[Math.floor(lineaLarga.length * (0.15 + azar() * 0.7))]
-    const panorama = await panoramaCerca(punto[0], punto[1], 30)
-    if (!panorama || esTunel(panorama.descripcion)) {
-      if (panorama) rechazadosPorTunel++
-      continue
-    }
+  const puntos = []
+  for (let intento = 0; intento < INTENTOS_POR_CALLE && puntos.length < PUNTOS_POR_CALLE; intento++) {
+    const candidato = puntoAlAzarEnLaCalle(calle)
+    const panorama = await panoramaCerca(candidato[0], candidato[1], 30)
+    if (!panorama) continue
     const sobreLaCalle = distanciaYRumboALinea([panorama.lat, panorama.lon], calle.lines)
-    if (sobreLaCalle.km > 0.03) continue
-    agregar(calle.name, 'calle', comuna, panorama, sobreLaCalle.rumbo + (azar() < 0.5 ? 0 : 180))
-    porComuna[comuna] = (porComuna[comuna] ?? 0) + 1
-    hechas++
-    break
+    if (sobreLaCalle.km > MARGEN_SOBRE_LA_CALLE_KM) continue
+    if (puntos.some(otro => distanciaKm([otro.lat, otro.lon], [panorama.lat, panorama.lon]) < SEPARACION_MINIMA_KM)) continue
+    puntos.push(punto(panorama, sobreLaCalle.rumbo + (azar() < 0.5 ? 0 : 180)))
   }
+  if (!puntos.length) {
+    callesIncompletas.push(calle.name)
+    continue
+  }
+  if (puntos.length < PUNTOS_POR_CALLE) console.log(`  ${calle.name}: ${puntos.length} punto(s)`)
+  resultado.push({ nombre: calle.name, tipo: 'calle', comuna: calle.comunas[0], puntos })
 }
-console.log(`calles: ${hechas}/${META_DE_CALLES}; descartados por túnel: ${rechazadosPorTunel}`)
+console.log(`calles: ${calles.length - callesIncompletas.length}/${calles.length}; sin cobertura: ${callesIncompletas.join(', ') || 'ninguna'}`)
 
-fs.writeFileSync('src/datos/lugaresStreetView.json', JSON.stringify(resultado, null, 1))
+fs.writeFileSync('src/datos/lugaresStreetView.json', JSON.stringify(resultado))
 console.log('Total:', resultado.length, 'lugares escritos en src/datos/lugaresStreetView.json')
 await navegador.close()
 await detener()
