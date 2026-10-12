@@ -238,11 +238,13 @@ export function answer(ok, feedbackHtml, { points = null, partial = false } = {}
   setTimeout(() => feedback.scrollIntoView({ block: 'nearest', behavior: 'smooth' }), 30)
 }
 
-function verdict(percent) {
+const NO_STREET_GROUPS = ['Comunas', 'Metro', 'Calles']
+
+function verdict(percent, group) {
   if (percent >= 90) return '¡Te la sabes! 🏆'
   if (percent >= 70) return 'Muy bien 👏'
   if (percent >= 40) return 'Vas mejorando 💪'
-  return 'A seguir practicando 🗺️'
+  return NO_STREET_GROUPS.includes(group) ? 'no teni calle :(' : 'A seguir practicando 🗺️'
 }
 
 function personalBestHtml(total, previous, isBest) {
@@ -270,7 +272,7 @@ function endQuiz() {
   const closingNote = ranked
     ? 'Las rondas oficiales usan las mismas reglas para todos: Gran Santiago, todas las categorías, sin tus calles propias y sin ayudas.'
     : 'Las preguntas que fallas aparecen más seguido en las próximas rondas.'
-  showPanel(`<h3 class="tight">${verdict(percent)}</h3>
+  showPanel(`<h3 class="tight">${verdict(percent, mode.group)}</h3>
     <p class="result-score">${ok} / ${total} <span class="muted">(${percent}%)</span></p>
     <p class="tight">⏱ <b>${formatTime(ms)}</b> <span class="muted">· ${secondsPerQuestion} s por pregunta</span></p>
     ${personalBestHtml(total, previous, isBest)}

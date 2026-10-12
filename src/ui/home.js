@@ -23,7 +23,7 @@ const GROUPS = [
   {
     name: 'Calles',
     emoji: '🛣️',
-    blurb: `${quizStreets().length} avenidas, autopistas y carreteras, más ríos y canales. Las que cambian de nombre muestran sus tramos.`,
+    blurb: `${quizStreets().length} avenidas, autopistas y carreteras. Las que cambian de nombre muestran sus tramos.`,
   },
   {
     name: 'Comunas',
@@ -88,7 +88,7 @@ function modeRow(mode) {
     return `<div class="mode-row"><button class="mode" data-mode="${mode.id}">${label}</button></div>`
   return `<div class="mode-row">
     <button class="mode ranked" data-official="${mode.id}" title="Ronda oficial: cuenta para el ranking">${label}</button>
-    <button class="practice" data-mode="${mode.id}" title="Ronda de práctica, sin ranking" aria-label="Práctica de ${escapeHtml(mode.name)}">Práctica</button>
+    <button class="practice" data-mode="${mode.id}" title="Práctica: ronda sin ranking, con ayudas" aria-label="Práctica de ${escapeHtml(mode.name)}">🏋️</button>
   </div>`
 }
 
@@ -188,13 +188,14 @@ const creditsHtml = () =>
     ${link('https://commons.wikimedia.org', 'Wikimedia Commons')} y ${link('https://panoramax.fr', 'Panoramax')}.
     Datos generados el ${escapeHtml(DATA.built)}.</p>`
 
-const homeHtml = () => `<div class="wrap">
+const homeHtml = () => `<div class="home-backdrop" aria-hidden="true"></div>
+  <div class="wrap">
   <div class="hero"><h2>¿Dónde queda eso? 🏔️</h2>
     <p>Practica comunas, lugares, calles, rutas y metro de Santiago. Lo que fallas te lo pregunta más seguido.</p></div>
   <div class="grid">
     ${GROUPS.map(groupCard).join('')}
     <div class="card"><h3><span class="em">🏆</span>Ranking</h3>
-      <p>El botón grande de cada juego es su ronda oficial: mismas reglas para todos y cuenta para el ranking (con cuenta), con el número de preguntas que tengas elegido en la tarjeta del juego. <b>Práctica</b> es una ronda con ayudas (modo fácil o difícil) que aprende de lo que fallas.</p>
+      <p>El botón grande de cada juego es su ronda oficial: mismas reglas para todos y cuenta para el ranking (con cuenta), con el número de preguntas que tengas elegido en la tarjeta del juego. El botón 🏋️ es la <b>práctica</b>: una ronda con ayudas (bordes de comunas y líneas del metro) que aprende de lo que fallas.</p>
       <button class="btn wide" id="goRanking">Ver ranking</button></div>
     <div class="card"><h3><span class="em">🔎</span>Explorar</h3>
       <p>Mapa interactivo con comunas, metro, calles y lugares. Para estudiar antes de jugar.</p>

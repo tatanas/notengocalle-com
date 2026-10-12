@@ -242,8 +242,8 @@ export async function menuLayout(browser, { check }) {
     `cada juego tiene botón grande (oficial) y chico (práctica): ${big} y ${small.length}`,
   )
   check(
-    small.every(label => label === 'Práctica'),
-    'el botón chico dice "Práctica"',
+    small.every(label => label === '🏋️'),
+    'el botón chico es la pesa 🏋️ (práctica)',
   )
 
   await page.click('[data-mode="com-name"]')
