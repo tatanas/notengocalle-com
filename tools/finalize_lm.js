@@ -4,6 +4,8 @@ const comunaOf=(lon,lat)=>{const p=turf.point([lon,lat]);for(const f of comunas.
 const geo=JSON.parse(fs.readFileSync('landmarks_geo.json'));
 const CAR=require('./careers.js');
 const DROP=['Colegio SEK','Colegio Manquehue','Confitería Torres','Casa Piedra','Disquería Funtracks','AudioMusica (Chile España)'];
+// Se descartan por su nombre original o por el que muestran (ver F).
+DROP.push("PUC – Campus Lo Contador","U. de Chile – Facultad de Derecho","U. de Chile – FEN","U. de Chile – FAU (Arquitectura)","U. de Chile – Campus Sur (Agronomía)","UAI – sede Presidente Errázuriz","Universidad Gabriela Mistral","Universidad San Sebastián – Los Leones","UNAB – La Casona","UTFSM – Campus Vitacura","Duoc UC – sede Antonio Varas","Duoc UC – Plaza Oeste","Duoc UC – sede Puente Alto","Duoc UC – sede San Bernardo","INACAP Renca","INACAP Puente Alto","INACAP Ñuñoa","AIEP – sede Bellavista","AIEP – sede San Joaquín","AIEP – sede Maipú","AIEP – sede San Bernardo","Santo Tomás – sede Estación Central","Santo Tomás – sede Puente Alto","Universidad de las Américas (campus Maipú)","Universidad de las Américas (campus Santiago)","Universidad Mayor – campus Alameda","Universidad Mayor – campus Oriente","UTEM – Campus Macul","Universidad Central – Campus Santa Isabel","Universidad Autónoma – Providencia","Universidad Católica Silva Henríquez – Campus Lo Cañas","Universidad Bernardo O'Higgins","Universidad Academia de Humanismo Cristiano","Embajada de Estados Unidos","Plaza Las Lilas","Plaza San Enrique","Plaza Egaña","Plaza de Renca","Plaza de Quilicura","El Cruceral (Pirque)","Quinchamalí","Lo Ovalle (sector)","El Llano Subercaseaux","Villa Frei","Lo Cañas","Jardín del Este","Prince of Wales Country Club","Teatro Oriente","Teatro UC","Colegio Craighouse","Teleférico Bicentenario (estación Canal San Carlos)","Parque Brasil","Parque Juan XXIII","Parque André Jarlán","Parque Laguna Carén","Parque Inés de Suárez","Parque Mahuida","Parque Aguas de Ramón","Quebrada de Macul");
 const F={
 "UAI – sede Vitacura":{ll:[-33.37979,-70.58650],obvious:true},
 "Universidad Andrés Bello – Bellavista":{ll:[-33.43496,-70.63407],alt:["Recoleta","Providencia"]},
@@ -31,7 +33,7 @@ const F={
 "Duoc UC – sede Alameda":{"ll":[-33.44894,-70.67008]},
 "Duoc UC – sede Padre Alonso de Ovalle":{"ll":[-33.44731,-70.65759]},
 "Quebrada de Macul":{ll:[-33.49300,-70.51793]},
-"Teleférico del San Cristóbal (estación Oasis)":{ll:[-33.41455,-70.61553]},"Teleférico Bicentenario (estación Canal San Carlos)":{ll:[-33.41691,-70.60509]},
+"Teleférico del San Cristóbal (estación Oasis)":{ll:[-33.41455,-70.61553],name:"Teleférico del San Cristóbal",desc:"Teleférico del Parque Metropolitano: sale de la estación Oasis, en Av. El Cerro (Pedro de Valdivia Norte), y sube al cerro San Cristóbal pasando por Tupahue hasta la Cumbre. El perímetro cubre su recorrido."},"Teleférico Bicentenario (estación Canal San Carlos)":{ll:[-33.41691,-70.60509]},
 "Catedral Metropolitana":{ll:[-33.43780,-70.65150]},
 "Estadio Nacional":{name:"Estadio Nacional (selección chilena; hace de local la U. de Chile)",pk:"l:Estadio Nacional"},
 "Claro Arena (ex San Carlos de Apoquindo)":{name:"Claro Arena (U. Católica)",pk:"l:Claro Arena (ex San Carlos de Apoquindo)"},
@@ -117,12 +119,13 @@ const F={
 "Parque Arauco":{alt:["Las Condes","Vitacura"]},
 "Club de Golf Los Leones":{alt:["Las Condes","Vitacura"]},
 "Cerro Manquehue":{alt:["Vitacura","Lo Barnechea","Huechuraba"]},
+"Parque Padre Hurtado":{name:"Parque Padre Hurtado (Intercomunal)",pk:"l:Parque Padre Hurtado"},
 "Stade Français":{desc:"Club deportivo en Sánchez Fontecilla, Las Condes."},
 };
 const out=[];let id=0;
 for(const g of geo){
-  if(DROP.includes(g.name))continue;
   const f=F[g.name]||{};
+  if(DROP.includes(g.name)||DROP.includes(f.name))continue;
   let lat=g.lat,lon=g.lon;if(f.ll)[lat,lon]=f.ll;
   if(lat==null){console.log('NO COORDS',g.name);continue;}
   const comuna=comunaOf(lon,lat);
