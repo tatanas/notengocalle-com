@@ -28,8 +28,7 @@ const GRUPOS = [
   {
     name: 'Street View',
     emoji: '👀',
-    blurb:
-      'Te dejo parado en un punto de Santiago visto desde la calle y lo ubicas en el mapa.',
+    blurb: 'Te dejo parado en un punto de Santiago visto desde la calle y lo ubicas en el mapa.',
   },
   {
     name: 'Comunas',
