@@ -38,6 +38,8 @@ Los juegos que se retiraron del menú (fronteras, metro, cerros, fotos, barrios,
 - En producción la base es Neon con su driver HTTP; en local y en las pruebas es PGlite. El SQL es el mismo, pero **el camino con Neon real no se ha probado todavía** (a la fecha de este cambio no había base creada).
 - El límite de solicitudes por IP declarado en `netlify/functions/api.js` (`rateLimit`) tampoco se ha visto funcionar: verificarlo en el primer despliegue.
 
+- **Llave de Google Maps** (modo de Street View, en preparación): variable `GOOGLE_MAPS_KEY` (Netlify, o `.env.local` en tu computador; ver `.env.example`). Vite la deja en el código como `__LLAVE_DE_GOOGLE_MAPS__`. Es pública pero restringida por dominio y por API en Google Cloud; si Netlify frena el despliegue por "secrets scanning", agregar `SECRETS_SCAN_OMIT_KEYS=GOOGLE_MAPS_KEY`.
+
 ## Estado y decisiones de contenido (resumen)
 
 - Largos de ronda: solo 20 o todas (las regiones y las comunas siempre van completas). Las marcas antiguas de 10, 20 y 30 siguen en la base pero ya no salen en el ranking.

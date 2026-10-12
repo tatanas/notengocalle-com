@@ -10,7 +10,12 @@ const rules = {
 }
 
 // L y maplibregl los cargan los <script> de public/vendor antes que el código del juego.
-const browser = { ...globals.browser, L: 'readonly', maplibregl: 'readonly' }
+const browser = {
+  ...globals.browser,
+  L: 'readonly',
+  maplibregl: 'readonly',
+  __LLAVE_DE_GOOGLE_MAPS__: 'readonly',
+}
 
 export default [
   { ignores: ['dist/', 'public/', 'tools/', 'node_modules/', '.local/'] },
@@ -21,5 +26,9 @@ export default [
     rules,
   },
   // Las pruebas corren en Node, pero pasan funciones que se ejecutan dentro de la página.
-  { files: ['pruebas/**/*.js'], languageOptions: { globals: { ...globals.node, ...globals.browser } }, rules },
+  {
+    files: ['pruebas/**/*.js'],
+    languageOptions: { globals: { ...globals.node, ...globals.browser } },
+    rules,
+  },
 ]

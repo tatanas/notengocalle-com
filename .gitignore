@@ -6,6 +6,8 @@ dist/
 .local/
 .netlify/
 .env
+.env.local
+.env.*.local
 # capturas de las pruebas de navegador
 pruebas/capturas/
 tools/shots/
