@@ -7,7 +7,7 @@ dist/
 .netlify/
 .env
 # capturas de las pruebas de navegador
-tests/shots/
+pruebas/capturas/
 tools/shots/
 tools/sheets*/
 

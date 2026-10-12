@@ -8,15 +8,15 @@
   },
   "scripts": {
     "dev": "vite",
-    "build": "node server/migrate.js && vite build",
+    "build": "node servidor/migrar.js && vite build",
     "preview": "vite preview",
     "lint": "eslint .",
-    "format": "prettier --write src server shared dev tests netlify *.js",
+    "format": "prettier --write src servidor compartido desarrollo pruebas netlify *.js",
     "test": "npm run lint && npm run test:unit && npm run test:e2e:changed",
     "test:full": "npm run lint && npm run test:unit && npm run test:e2e",
-    "test:unit": "node --test tests/unit.test.js tests/api.test.js",
-    "test:e2e": "node tests/run.js",
-    "test:e2e:changed": "node tests/run.js --changed"
+    "test:unit": "node --test pruebas/unitarias.test.js pruebas/api.test.js",
+    "test:e2e": "node pruebas/ejecutar.js",
+    "test:e2e:changed": "node pruebas/ejecutar.js --changed"
   },
   "dependencies": {
     "@neondatabase/serverless": "^1.0.0"

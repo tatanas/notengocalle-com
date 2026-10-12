@@ -1,7 +1,7 @@
-import { createApi } from '../../server/api.js'
-import { connectProductionDatabase } from '../../server/database.js'
+import { crearApi } from '../../servidor/api.js'
+import { conectarBaseDeProduccion } from '../../servidor/baseDeDatos.js'
 
-export default createApi(connectProductionDatabase())
+export default crearApi(conectarBaseDeProduccion())
 
 export const config = {
   path: '/api/*',
