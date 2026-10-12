@@ -5,6 +5,7 @@ import { reportarPunto } from '../../cuenta/reportes.js'
 import { vias } from '../../datos/datos.js'
 import LUGARES from '../../datos/lugaresStreetView.json'
 import { PUNTOS_MAXIMOS, esAciertoDeStreetView, puntajeDeStreetView } from '../../dominio/streetView.js'
+import { describirUbicacion } from '../../dominio/ubicacion.js'
 import { COLORES, dibujarCalle, iconoDiv } from '../../mapa/dibujo.js'
 import { capa, encuadrar, encuadrarCiudad, mapa } from '../../mapa/mapa.js'
 import { mostrarPanorama, ocultarPanorama, streetViewDisponible } from '../../mapa/streetView.js'
@@ -26,7 +27,7 @@ const callesBajoElPunto = punto =>
     .slice(0, MAXIMO_DE_CALLES_MOSTRADAS)
     .map(({ calle }) => calle)
 
-const textoDeLaPregunta = `<div class="q-prompt">Mira alrededor (no puedes caminar) y <b>toca en el mapa</b> dónde estás parado.</div>`
+const textoDeLaPregunta = `<div class="q-prompt">Mira alrededor y <b>toca en el mapa</b> dónde estás parado.</div>`
 
 // Los puntos que alguien reportó como túnel no vuelven a salir en este dispositivo.
 const llaveDelPunto = punto => `${punto.lat},${punto.lon}`
@@ -109,15 +110,16 @@ registrarModo({
       }).addTo(capa)
       encuadrar(L.latLngBounds([adivinado, verdadero]).pad(0.3), 18)
 
-      const nombresDeCalles = calles.map(calle => `<b>${escaparHtml(calle.name)}</b>`).join(' y ')
-      const cercaDelLugar =
-        lugar.tipo === 'lugar' ? `<p class="muted">Cerca de ${escaparHtml(lugar.nombre)}.</p>` : ''
-      const dondeEstabas = (nombresDeCalles ? `<p>Estabas sobre ${nombresDeCalles}.</p>` : '') + cercaDelLugar
+      const descripcion = describirUbicacion(verdadero, calles)
+      const sector =
+        lugar.tipo === 'lugar' && !descripcion.includes(escaparHtml(lugar.nombre))
+          ? ` En el sector de <b>${escaparHtml(lugar.nombre)}</b>.`
+          : ''
       const cerca =
         enLaCalle && !acierto ? '<p>Estabas en la calle correcta, pero en otro punto de ella.</p>' : ''
       responder(
         acierto,
-        `<p>Quedaste a <b>${formatearKm(distancia)}</b> (+${puntos} de ${PUNTOS_MAXIMOS} puntos).</p>${dondeEstabas}${cerca}`,
+        `<p>Quedaste a <b>${formatearKm(distancia)}</b> (+${puntos} de ${PUNTOS_MAXIMOS} puntos).</p><p>${descripcion}${sector}</p>${cerca}`,
         { points: puntos, partial: !acierto && (puntos > 0 || enLaCalle) },
       )
     })

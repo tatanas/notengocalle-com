@@ -247,11 +247,11 @@ test('las alternativas que más se parecen pesan más', () => {
 test('"¿Dónde estás?": de 0 a 5 puntos según la distancia, y 3 o más cuenta como acierto', () => {
   const puntosA = metros => puntajeDeStreetView(metros / 1000)
   assert.deepEqual(
-    [0, 49, 50, 99, 100, 299, 300, 599, 600, 999, 1000, 5000].map(puntosA),
+    [0, 100, 101, 500, 501, 1000, 1001, 1500, 1501, 2000, 2001, 9000].map(puntosA),
     [5, 5, 4, 4, 3, 3, 2, 2, 1, 1, 0, 0],
   )
-  assert.equal(esAciertoDeStreetView(0.299), true)
-  assert.equal(esAciertoDeStreetView(0.3), false)
+  assert.equal(esAciertoDeStreetView(1), true)
+  assert.equal(esAciertoDeStreetView(1.001), false)
 })
 
 test('en Street View el ranking suma puntos: el máximo es 5 por pregunta', () => {
