@@ -12,7 +12,7 @@ import { hidePanel, showScreen, title } from './panel.js'
 
 const PERIOD_LABELS = { all: 'Histórico', week: 'Últimos 7 días' }
 const ALL_GAMES = ''
-const DEFAULT_CATEGORY = '15'
+const DEFAULT_CATEGORY = '20'
 
 // Qué tabla se está mirando: un juego (o el resumen de líderes), el largo de la ronda y el período.
 const view = { mode: ALL_GAMES, category: DEFAULT_CATEGORY, period: 'all', ...store.get('ranking', {}) }
@@ -51,7 +51,7 @@ const periodChipsHtml = () =>
     )
     .join('')
 
-// Pestañas por largo de ronda: cada una es un ranking aparte, porque 15 preguntas y todas no se pueden comparar.
+// Pestañas por largo de ronda: cada una es un ranking aparte, porque 20 preguntas y todas no se pueden comparar.
 function categoryTabsHtml() {
   const tabs = categoriesOf(view.mode).map(category => {
     const players = view.mode ? playersByCategory[category] : null
@@ -174,13 +174,13 @@ function render() {
   else $('#rankBody').innerHTML = '<p class="muted">El ranking no está disponible en este momento.</p>'
 }
 
-// Se abre en el juego y el largo de la ronda recién jugada, si vienen de un resultado.
+// Se abre en "Líderes de cada juego", salvo que vengan de un resultado: ahí, en el juego y el largo de la ronda recién jugada.
 function openRanking(modeId, category) {
   stopQuiz()
   clearLayer()
   hidePanel()
   title.textContent = 'Ranking'
-  if (modeId !== undefined) view.mode = modeId
+  view.mode = modeId ?? ALL_GAMES
   if (category !== undefined) view.category = category
   if (view.mode && !rankedModes().some(mode => mode.id === view.mode)) view.mode = ALL_GAMES
   keepCategoryValid()

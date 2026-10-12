@@ -15,6 +15,8 @@ const AL="^Avenida Libertador Bernardo O.Higgins$",SM="^Avenida Santa María$",V
 const Z=[
  {name:"Barrio Italia",desc:"Tiendas de diseño, anticuarios, cafés y restaurantes en casonas antiguas, en torno a Av. Italia y Condell.",streets:["Av. Francisco Bilbao","Av. Salvador","Av. Irarrázaval","Av. General Bustamante"],near:[-33.447,-70.626],
   c:[["^Avenida General Bustamante$","^Avenida Francisco Bilbao$"],["^Avenida Francisco Bilbao$","^Avenida Salvador$"],["^Avenida Salvador$","^Avenida Irarrázaval$"],["^Avenida Irarrázaval$","^Avenida General Bustamante$"]]},
+ {name:"Barrio París-Londres",desc:"Dos calles adoquinadas de estilo europeo (París y Londres) detrás de la Iglesia de San Francisco, en la Alameda; arquitectura de los años 20 y 30.",streets:["Alameda","París","Londres","Serrano"],near:[-33.4446,-70.6484],
+  c:[[AL,"^Serrano$"],[AL,"^Avenida Santa Rosa$"],["^Avenida Santa Rosa$","^París$"],["^París$","^Serrano$"]]},
  {name:"Barrio Lastarria",desc:"Barrio bohemio y cultural: GAM, Museo de Artes Visuales, cine El Biógrafo, restaurantes y bares; al norte, el Parque Forestal y Bellas Artes.",streets:["Alameda","Cerro Santa Lucía (Victoria Subercaseaux)","Merced / Parque Forestal","Plaza Italia"],near:[-33.438,-70.639],
   c:[[AL,"^Victoria Subercaseaux$"],["^Victoria Subercaseaux$","^Merced$"],[-33.43640,-70.63540]]},
  {name:"Barrio Bellavista",desc:"Vida nocturna, teatros y restaurantes: Patio Bellavista, La Chascona (casa de Neruda), entrada al zoológico y al funicular del San Cristóbal. Mitad Recoleta, mitad Providencia (las separa Pío Nono).",streets:["Av. Santa María (río Mapocho)","Loreto","Dominica","Faldeo del cerro San Cristóbal","Del Arzobispo"],near:[-33.432,-70.635],

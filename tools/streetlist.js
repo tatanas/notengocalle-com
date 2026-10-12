@@ -139,6 +139,7 @@ module.exports=[
 ["Av. Pedro Aguirre Cerda","^Avenida Pedro Aguirre Cerda$","Cerrillos / Estación Central / Maipú: el antiguo Camino a Melipilla; sale hacia el surponiente junto al ex aeródromo de Cerrillos.",[-70.694,-33.481],{bt:1}],
 ["Camino a Melipilla","^Camino a Melipilla$","Maipú: continuación de Av. Pedro Aguirre Cerda hacia el surponiente, rumbo a Padre Hurtado y Melipilla.",null,{bt:1}],
 ["Paseo Ahumada","^Ahumada$","Santiago Centro: la peatonal comercial más conocida, de la Alameda a la Plaza de Armas.",[-70.6505,-33.440],{bt:1}],
+["Nueva York","^Nueva York$","Santiago Centro: calle corta, peatonal, entre la Alameda y Moneda, junto a la Bolsa de Comercio y a una cuadra de Paseo Ahumada.",[-70.6508,-33.4430],{bt:1,gap:0.3}],
 ["Paseo Estado","^Estado$","Santiago Centro: peatonal paralela a Ahumada, de la Alameda a la Plaza de Armas.",[-70.649,-33.440],{bt:1}],
 ["Bandera","^Bandera$","Santiago Centro: norte–sur, una cuadra al poniente de Ahumada; bancos, Tribunales, ex Congreso y el Paseo Bandera.",[-70.652,-33.440],{bt:1}],
 ["Compañía de Jesús","^Compañía de Jesús$","Santiago Centro: oriente–poniente, pasa por el costado sur de la Catedral y la Plaza de Armas y sigue hacia el Barrio Brasil.",null,{bt:1}],

@@ -87,7 +87,7 @@ registerMode({
   roomy: true,
   group: 'Calles',
   name: 'Encuentra la calle',
-  desc: 'Toca sobre la calle que te pido. El margen es el ancho de un dedo: más estricto cuanto más acercas el mapa.',
+  desc: 'Toca sobre la calle que te pido.',
   pool: () => quizStreets(),
   key: s => s.name,
   ask(s, q) {

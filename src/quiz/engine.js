@@ -1,8 +1,8 @@
 import { OFFICIAL_RULES, RANKED_MODES, categoryOf } from '../../shared/ranked.js'
 import { adaptiveWeight, bests, record, saveBest, weightedSample } from '../core/progress.js'
-import { applyRoundRules, lengthFor, saveSettings, settings } from '../core/store.js'
+import { applyRoundRules, lengthFor } from '../core/store.js'
 import { $, escapeHtml, formatTime } from '../core/util.js'
-import { clearAids, redrawAids } from '../map/aids.js'
+import { clearAids } from '../map/aids.js'
 import {
   clearLayer,
   forgetViewAdjustments,
@@ -21,7 +21,7 @@ import { hideScreen, hud, panel, showPanel, title, toast } from '../ui/panel.js'
 
 /* Un modo define: id, group, name, desc, pool(), key(item) y ask(item, quiz).
    Opcionales: label(item), balance(item), setup(quiz), all, keepLayer, noHint, aids, relief, chile, roomy, tall, study.
-   noHint: sin el botón "Ver nombres". aids: ofrece el modo fácil / difícil (bordes de comunas y metro). */
+   noHint: sin el botón "Ver nombres". aids: en la práctica dibuja bordes de comunas y metro de ayuda (la ronda oficial, no). */
 
 export let quiz = null
 let hudTimer = null
@@ -85,32 +85,6 @@ const HintControl = L.Control.extend({
 })
 const hintControl = new HintControl()
 
-// Un solo botón para todas las ayudas de la práctica: fácil las dibuja, difícil no. En una ronda oficial no hay botón.
-const AidsControl = L.Control.extend({
-  options: { position: 'topleft' },
-  onAdd() {
-    this.button = L.DomUtil.create('button', 'maptoggle')
-    this.button.type = 'button'
-    L.DomEvent.disableClickPropagation(this.button)
-    this.button.onclick = () => {
-      settings.easy = !settings.easy
-      saveSettings()
-      redrawAids()
-      this.refresh()
-    }
-    this.refresh()
-    return this.button
-  },
-  refresh() {
-    if (!this.button) return
-    this.button.textContent = settings.easy ? '🟢 Modo fácil' : '🔴 Modo difícil'
-    this.button.title = settings.easy
-      ? 'Fácil: se ven los bordes de las comunas y las líneas del metro. Toca para pasar a difícil.'
-      : 'Difícil: sin bordes de comunas ni líneas del metro. Toca para pasar a fácil.'
-  },
-})
-const aidsControl = new AidsControl()
-
 const restartButton = $('#btnRestart')
 
 function updateHud() {
@@ -153,8 +127,6 @@ export function startQuiz(mode, { ranked = false, category = null } = {}) {
   hideScreen()
   title.textContent = mode.name
   setLabelMode('plain')
-  if (!ranked && mode.aids) aidsControl.addTo(map)
-  aidsControl.refresh()
   if (!ranked && !mode.noHint && !mode.study) hintControl.addTo(map)
   hintControl.reset()
   setRelief(!!mode.relief)
@@ -200,7 +172,6 @@ export function stopQuiz() {
   stopCountdown()
   applyRoundRules(null)
   map.removeControl(hintControl)
-  map.removeControl(aidsControl)
   clearAids()
   forgetViewAdjustments()
   setRoomyPanning(false)

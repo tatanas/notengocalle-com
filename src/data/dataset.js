@@ -1,4 +1,4 @@
-import { distanceKm, pointInFeature } from '../core/geo.js'
+import { distanceKm, nearestPointOnLines, pointInFeature } from '../core/geo.js'
 import { settings, store } from '../core/store.js'
 
 // window.DATA viene de public/data/data.js, que genera el pipeline de tools/ (ver ARQUITECTURA.md).
@@ -82,6 +82,25 @@ ZONES.forEach((zone, index) => {
   if (landmark.cat === 'Barrios') landmark.desc = zone.desc
 })
 
+// Los ríos y canales son lugares con forma de línea: se aciertan tocando cerca de su cauce, y no tienen una comuna.
+const WATER_CENTER = [-33.45, -70.65]
+for (const stream of DATA.streets.filter(street => street.kind === 'agua')) {
+  const nearestToCity = nearestPointOnLines(WATER_CENTER, stream.lines).point
+  DATA.landmarks.push({
+    id: 'w' + stream.id,
+    name: stream.name,
+    cat: 'Ríos y canales',
+    desc: stream.hint,
+    lat: nearestToCity[0],
+    lon: nearestToCity[1],
+    comuna: stream.comunas[0],
+    alt: stream.comunas.slice(1),
+    pk: 's:' + stream.name,
+    line: stream.lines,
+    obvious: true,
+  })
+}
+
 for (const peak of cerros.filter(peak => FEATURED_PEAKS.includes(peak.name)))
   DATA.landmarks.push({
     id: 'k' + peak.id,
@@ -158,7 +177,7 @@ for (const street of DATA.streets.filter(street => street.custom))
 
 export const streetByName = Object.fromEntries(DATA.streets.map(street => [street.name, street]))
 const allRoads = DATA.streets.filter(isRoad)
-const allQuizStreets = DATA.streets.filter(street => street.kind !== 'tren')
+const allQuizStreets = allRoads
 export const roads = () => (settings.ownStreets ? allRoads : allRoads.filter(isOfficial))
 export const quizStreets = () => (settings.ownStreets ? allQuizStreets : allQuizStreets.filter(isOfficial))
 

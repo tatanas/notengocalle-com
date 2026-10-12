@@ -21,22 +21,22 @@ export const store = {
 const DEFAULT_PREFERENCES = {
   scope: 'core',
   // Preguntas por ronda: la de cada grupo de juegos (lengths) o, si no eligió, esta (len).
-  len: 15,
+  len: 20,
   lengths: {},
   cats: null,
   lines: null,
   strict: false,
   ownStreets: true,
-  // Modo fácil: se dibujan los bordes de las comunas y las líneas del metro como ayuda.
-  easy: true,
+  // La práctica siempre es fácil (bordes de las comunas y líneas del metro); las rondas oficiales, difíciles.
 }
 const ALL_LENGTH = 999
-// Antes se podía elegir 10, 20 o 30: ahora solo 15 o todas.
+// Antes se podía elegir 10, 15 o 30: ahora solo 20 o todas.
 const simplifiedLength = length => (length >= ALL_LENGTH ? ALL_LENGTH : DEFAULT_PREFERENCES.len)
 const saved = store.get('settings', {})
 const preferences = {
   ...DEFAULT_PREFERENCES,
   ...saved,
+  easy: true,
   len: simplifiedLength(saved.len ?? DEFAULT_PREFERENCES.len),
   lengths: Object.fromEntries(
     Object.entries(saved.lengths ?? {}).map(([group, length]) => [group, simplifiedLength(length)]),

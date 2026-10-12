@@ -3,7 +3,7 @@ const comunas=JSON.parse(fs.readFileSync('comunas_s.geojson'));
 const comunaOf=(lon,lat)=>{const p=turf.point([lon,lat]);for(const f of comunas.features)if(turf.booleanPointInPolygon(p,f))return f.properties.name;return null;};
 const geo=JSON.parse(fs.readFileSync('landmarks_geo.json'));
 const CAR=require('./careers.js');
-const DROP=['Colegio SEK','Colegio Manquehue','Confitería Torres','Casa Piedra'];
+const DROP=['Colegio SEK','Colegio Manquehue','Confitería Torres','Casa Piedra','Disquería Funtracks','AudioMusica (Chile España)'];
 const F={
 "UAI – sede Vitacura":{ll:[-33.37979,-70.58650],obvious:true},
 "Universidad Andrés Bello – Bellavista":{ll:[-33.43496,-70.63407],alt:["Recoleta","Providencia"]},

@@ -1,8 +1,8 @@
 import { distanceKm, distanceToPolyline } from '../core/geo.js'
 import { settings } from '../core/store.js'
 import { escapeHtml } from '../core/util.js'
-import { DATA } from '../data/dataset.js'
-import { COLORS } from '../map/draw.js'
+import { DATA, streetByName } from '../data/dataset.js'
+import { COLORS, drawStreet } from '../map/draw.js'
 import { layer, setLabelMode } from '../map/map.js'
 import { photoHtml } from '../ui/photos.js'
 import { comunasText } from './metro.js'
@@ -20,7 +20,7 @@ const CATEGORY_EMOJI = {
   'Restaurantes y bares': '🍽️',
   'Gobierno y justicia': '🏛️',
   Religión: '🛐',
-  Metro: '🚇',
+  'Ríos y canales': '🌊',
   'Centro histórico': '🏛️',
 }
 const emojiOf = landmark => CATEGORY_EMOJI[landmark.cat] || '📍'
@@ -50,8 +50,9 @@ export function landmarkInfo(landmark) {
     ${photoHtml(landmark.pk || 'l:' + landmark.name)}`
 }
 
-// Al responder: el perímetro del barrio.
+// Al responder: el perímetro del barrio o el cauce del río o canal.
 export function showZone(landmark) {
+  if (landmark.line) drawStreet(streetByName[landmark.name], COLORS.ok)
   if (!landmark.zone) return
   L.polygon(landmark.zone.poly, {
     pane: 'comunas',
@@ -113,19 +114,29 @@ export function showLandmarksNear(landmark, max = 8) {
   ).forEach(addEmojiMarker)
 }
 
-export function landmarksAlong(street, max = 8) {
-  const alongside = nearestLandmarks(
+// Un lugar está "en" la calle solo si queda pegado a ella; más allá, a lo más "cerca".
+const BESIDE_KM = 0.05
+const NEARBY_KM = 0.3
+
+export function landmarksBeside(street, max = 8) {
+  const withinReach = nearestLandmarks(
     landmark => distanceToPolyline(positionOf(landmark), street.lines),
     -1,
-    0.5,
+    NEARBY_KM,
   )
-  return pickSpaced(alongside, max)
+  const spaced = pickSpaced(withinReach, max)
+  const isBeside = landmark => distanceToPolyline(positionOf(landmark), street.lines) <= BESIDE_KM
+  return { beside: spaced.filter(isBeside), nearby: spaced.filter(landmark => !isBeside(landmark)) }
 }
 
+const namesOf = landmarks =>
+  landmarks.map(landmark => `${emojiOf(landmark)} ${escapeHtml(landmark.name)}`).join(' · ')
+
 export function showLandmarksAlong(street) {
-  const landmarks = landmarksAlong(street)
-  landmarks.forEach(addEmojiMarker)
-  if (!landmarks.length) return ''
-  const list = landmarks.map(landmark => `${emojiOf(landmark)} ${escapeHtml(landmark.name)}`).join(' · ')
-  return `<p><b>En esta calle:</b> ${list}</p>`
+  const { beside, nearby } = landmarksBeside(street)
+  beside.concat(nearby).forEach(addEmojiMarker)
+  const lines = []
+  if (beside.length) lines.push(`<p><b>En esta calle:</b> ${namesOf(beside)}</p>`)
+  if (nearby.length) lines.push(`<p><b>Cerca (no sobre la calle):</b> ${namesOf(nearby)}</p>`)
+  return lines.join('')
 }
