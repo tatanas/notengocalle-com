@@ -346,8 +346,23 @@ button {
   display: none;
 }
 .wrap {
+  position: relative;
   max-width: 980px;
   margin: 0 auto;
+}
+/* Foto de Santiago al fondo del menú: se desvanece hacia el gris de la página y se va con el desplazamiento. */
+.home-backdrop {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: min(40vw, 520px);
+  min-height: 220px;
+  background: url('./santiago.webp') center top / cover no-repeat;
+  opacity: 0.4;
+  pointer-events: none;
+  -webkit-mask-image: linear-gradient(to bottom, #000 45%, transparent 100%);
+  mask-image: linear-gradient(to bottom, #000 45%, transparent 100%);
 }
 .hero {
   margin: 4px 0 14px;
@@ -783,12 +798,12 @@ h3.tight {
 }
 .practice {
   flex: 0 0 auto;
-  width: 72px;
+  width: 56px;
   border: 1px solid var(--line);
   border-radius: 10px;
   background: var(--bg);
   cursor: pointer;
-  font-size: 13px;
+  font-size: 22px;
   color: var(--muted);
 }
 .practice:hover {

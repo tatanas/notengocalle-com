@@ -384,6 +384,8 @@ regiones) y caen en la categoría "todas"; no hay nada que actualizar si ese tam
 | ------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `npm run lint`      | nombres no definidos, imports sobrantes                                                                                                                                                                   |
 | `npm run test:unit` | `unit.test.js` (geometría, sorteo, reglas compartidas) y `api.test.js` (el servidor completo contra un Postgres en memoria)                                                                               |
+| `npm test`          | lint + unitarias + las suites de navegador que corresponden a lo modificado (`tests/selection.js`; si el cambio es amplio, corre todo)                                                                    |
+| `npm run test:full` | lint + unitarias + todas las suites de navegador (más de 10 minutos)                                                                                                                                      |
 | `npm run test:e2e`  | Chrome real sobre el build: recorre todos los juegos en escritorio y celular, el cronómetro, las calles propias, el inicio de las 17 rondas oficiales, las fotos y el flujo completo de cuentas y ranking |
 
 `node tests/run.js smoke accounts` corre solo algunas suites; `--no-build` reutiliza `dist/`; `--dev` sirve el
