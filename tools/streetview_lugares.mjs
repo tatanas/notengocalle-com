@@ -73,6 +73,40 @@ function puntoAlAzarEnLaCalle(calle) {
   return tramos[0].a
 }
 
+// ----- túneles: OpenStreetMap sabe qué calles van bajo tierra; un panorama sobre ellas se descarta
+const TUNELES = []
+for (const archivo of fs.readdirSync('tools/btiles')) {
+  const datosOsm = JSON.parse(fs.readFileSync('tools/btiles/' + archivo, 'utf8'))
+  for (const via of datosOsm.elements)
+    if (via.type === 'way' && via.geometry && via.tags?.highway && via.tags.tunnel === 'yes')
+      TUNELES.push(via.geometry.map(p => [p.lat, p.lon]))
+}
+// Se puede caminar hasta 80 m desde el punto de partida: un túnel más cerca que eso ya es alcanzable.
+const DISTANCIA_A_UN_TUNEL_KM = 0.1
+// Túneles que OpenStreetMap no marca como tales (descubiertos jugando): [lat, lon, radio en km].
+const ZONAS_EXCLUIDAS = [
+  [-33.41274, -70.5826, 0.25], // Los Militares, túnel bajo la avenida
+]
+const cajaDe = linea => ({
+  minLat: Math.min(...linea.map(p => p[0])) - 0.0013,
+  maxLat: Math.max(...linea.map(p => p[0])) + 0.0013,
+  minLon: Math.min(...linea.map(p => p[1])) - 0.0013,
+  maxLon: Math.max(...linea.map(p => p[1])) + 0.0013,
+})
+const TUNELES_CON_CAJA = TUNELES.map(linea => ({ linea, caja: cajaDe(linea) }))
+const estaEnUnTunel = panorama =>
+  ZONAS_EXCLUIDAS.some(([lat, lon, radio]) => distanciaKm([panorama.lat, panorama.lon], [lat, lon]) <= radio) ||
+  TUNELES_CON_CAJA.some(
+    ({ linea, caja }) =>
+      panorama.lat >= caja.minLat &&
+      panorama.lat <= caja.maxLat &&
+      panorama.lon >= caja.minLon &&
+      panorama.lon <= caja.maxLon &&
+      distanciaYRumboALinea([panorama.lat, panorama.lon], [linea]).km <= DISTANCIA_A_UN_TUNEL_KM,
+  )
+let descartadosPorTunel = 0
+console.log('tramos de túnel en los datos de OpenStreetMap:', TUNELES.length)
+
 // ----- Street View desde una página con la llave
 const detener = await iniciarServidor({ reconstruir: false })
 const navegador = await abrirNavegador()
@@ -115,7 +149,7 @@ async function panoramaCerca(lat, lon, radio) {
   )
 }
 const redondear = x => +x.toFixed(5)
-const punto = (panorama, rumbo) => ({ lat: redondear(panorama.lat), lon: redondear(panorama.lon), rumbo: Math.round(rumbo) })
+const punto = (panorama, rumbo) => ({ lat: redondear(panorama.lat), lon: redondear(panorama.lon), rumbo: ((Math.round(rumbo) % 360) + 360) % 360 })
 
 const resultado = []
 
@@ -125,10 +159,24 @@ const MANUALES = [
   { nombre: 'Rotonda Atenas', comuna: 'Las Condes', lat: -33.41717, lon: -70.5531, rumbo: 180 },
   { nombre: 'Frente al Estadio Nacional', comuna: 'Ñuñoa', lat: -33.46211, lon: -70.61037, rumbo: 180 },
 ]
+const DESPLAZAMIENTOS = [[0, 0], [0.0007, 0], [-0.0007, 0], [0, 0.0009], [0, -0.0009], [0.0014, 0], [-0.0014, 0], [0, 0.0018], [0, -0.0018], [0.0021, 0], [-0.0021, 0], [0.0028, 0], [-0.0028, 0]]
 for (const manual of MANUALES) {
-  const panorama = await panoramaCerca(manual.lat, manual.lon, 40)
-  if (!panorama) throw new Error('Sin cobertura en ' + manual.nombre)
-  resultado.push({ nombre: manual.nombre, tipo: 'lugar', comuna: manual.comuna, puntos: [punto(panorama, manual.rumbo)] })
+  let elegido = null
+  for (const [dLat, dLon] of DESPLAZAMIENTOS) {
+    const panorama = await panoramaCerca(manual.lat + dLat, manual.lon + dLon, 40)
+    if (!panorama) continue
+    if (estaEnUnTunel(panorama)) {
+      descartadosPorTunel++
+      continue
+    }
+    elegido = panorama
+    break
+  }
+  if (!elegido) {
+    console.log('  se omite (todo alrededor está cerca de un túnel):', manual.nombre)
+    continue
+  }
+  resultado.push({ nombre: manual.nombre, tipo: 'lugar', comuna: manual.comuna, puntos: [punto(elegido, manual.rumbo)] })
 }
 
 const IMPORTANTES = [
@@ -184,7 +232,8 @@ for (const nombre of IMPORTANTES) {
   }
   // Los recintos grandes (estadios, parques, malls) tienen su calle más lejos del punto central.
   const panorama = (await panoramaCerca(lugar.lat, lugar.lon, 60)) ?? (await panoramaCerca(lugar.lat, lugar.lon, 220))
-  if (!panorama) {
+  if (!panorama || estaEnUnTunel(panorama)) {
+    if (panorama) descartadosPorTunel++
     sinCobertura.push(nombre)
     continue
   }
@@ -207,6 +256,10 @@ for (const calle of calles) {
     const candidato = puntoAlAzarEnLaCalle(calle)
     const panorama = await panoramaCerca(candidato[0], candidato[1], 30)
     if (!panorama) continue
+    if (estaEnUnTunel(panorama)) {
+      descartadosPorTunel++
+      continue
+    }
     const sobreLaCalle = distanciaYRumboALinea([panorama.lat, panorama.lon], calle.lines)
     if (sobreLaCalle.km > MARGEN_SOBRE_LA_CALLE_KM) continue
     if (puntos.some(otro => distanciaKm([otro.lat, otro.lon], [panorama.lat, panorama.lon]) < SEPARACION_MINIMA_KM)) continue
@@ -220,6 +273,7 @@ for (const calle of calles) {
   resultado.push({ nombre: calle.name, tipo: 'calle', comuna: calle.comunas[0], puntos })
 }
 console.log(`calles: ${calles.length - callesIncompletas.length}/${calles.length}; sin cobertura: ${callesIncompletas.join(', ') || 'ninguna'}`)
+console.log('panoramas descartados por estar en un túnel:', descartadosPorTunel)
 
 fs.writeFileSync('src/datos/lugaresStreetView.json', JSON.stringify(resultado))
 console.log('Total:', resultado.length, 'lugares escritos en src/datos/lugaresStreetView.json')

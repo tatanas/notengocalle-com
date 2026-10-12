@@ -30,7 +30,13 @@ export const MODOS_OFICIALES = [
   'pn-reg',
   'pn-photo',
   'cx',
+  'sv-ubicar',
 ]
+
+// Cuánto vale cada pregunta: casi todos los juegos suman 1 por acierto; Street View suma de 0 a 5 según la distancia.
+// En esos juegos "aciertos" son los puntos de la ronda y "total" el máximo posible (preguntas × puntos).
+const PUNTOS_POR_PREGUNTA = { 'sv-ubicar': 5 }
+export const puntosPorPregunta = modo => PUNTOS_POR_PREGUNTA[modo] ?? 1
 
 // Categorías de ranking según el largo de la ronda: 20 preguntas o "todas" las del juego.
 export const TODAS_LAS_PREGUNTAS = 'todas'
@@ -59,15 +65,17 @@ const PREGUNTAS_MAXIMAS = 2000
 export function problemaDelPuntaje({ modo, categoria, aciertos, total, ms }) {
   if (!MODOS_OFICIALES.includes(modo)) return 'modo desconocido'
   if (!CATEGORIAS_DE_RONDA.includes(categoria)) return 'categoría desconocida'
-  if (!Number.isInteger(total)) return 'largo de la ronda no válido'
+  const porPregunta = puntosPorPregunta(modo)
+  if (!Number.isInteger(total) || total % porPregunta) return 'largo de la ronda no válido'
+  const preguntas = total / porPregunta
   if (
     categoria === TODAS_LAS_PREGUNTAS
-      ? total < PREGUNTAS_MINIMAS || total > PREGUNTAS_MAXIMAS
-      : total !== +categoria
+      ? preguntas < PREGUNTAS_MINIMAS || preguntas > PREGUNTAS_MAXIMAS
+      : preguntas !== +categoria
   )
     return 'la ronda no tiene el largo de su categoría'
   if (!Number.isInteger(aciertos) || aciertos < 0 || aciertos > total) return 'aciertos fuera de rango'
-  if (!Number.isInteger(ms) || ms < total * MS_RESPUESTA_HUMANA_MAS_RAPIDA || ms > MS_RONDA_MAS_LENTA)
+  if (!Number.isInteger(ms) || ms < preguntas * MS_RESPUESTA_HUMANA_MAS_RAPIDA || ms > MS_RONDA_MAS_LENTA)
     return 'tiempo fuera de rango'
   return null
 }

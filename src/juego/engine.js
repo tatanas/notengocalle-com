@@ -33,6 +33,9 @@ let temporizadorDelIndicador = null
 
 const llaveDeEstadistica = (modo, elemento) => modo.id + ':' + modo.key(elemento)
 
+// Lo máximo que se puede sumar en una ronda de tantas preguntas.
+const maximoDe = (modo, preguntas) => preguntas * (modo.puntosPorPregunta ?? 1)
+
 export const tieneRondaOficial = modo => MODOS_OFICIALES.includes(modo.id)
 
 const SEGUNDOS_DE_CUENTA_REGRESIVA = 3
@@ -96,7 +99,7 @@ function actualizarIndicador() {
   if (!partida || partida.mode.study) return
   const respondida = partida.i + (partida.answered ? 1 : 0)
   const transcurrido = partida.ms + (partida.t0 && !partida.answered ? Date.now() - partida.t0 : 0)
-  indicador.textContent = `${partida.ok}/${respondida} ✓ · ⏱ ${formatearTiempo(transcurrido)}`
+  indicador.textContent = `${partida.ok}/${maximoDe(partida.mode, respondida)} ✓ · ⏱ ${formatearTiempo(transcurrido)}`
 }
 
 // category: solo para empezar una ronda oficial de un largo concreto (desde el ranking); si no, se usa el largo
@@ -233,9 +236,11 @@ export function responder(ok, htmlDelComentario, { points: puntos = null, partia
   const elemento = q.items[q.i]
   const contadas = ok && !q.hinted
   registrar(llaveDeEstadistica(q.mode, elemento), contadas)
-  if (contadas) q.ok++
-  else q.misses.push(q.mode.label ? q.mode.label(elemento) : q.mode.key(elemento))
-  if (puntos != null) q.pts += puntos
+  const sumaPuntos = !!q.mode.puntosPorPregunta
+  if (sumaPuntos) q.ok += puntos ?? 0
+  else if (contadas) q.ok++
+  if (!contadas) q.misses.push(q.mode.label ? q.mode.label(elemento) : q.mode.key(elemento))
+  if (puntos != null && !sumaPuntos) q.pts += puntos
   actualizarIndicador()
 
   const esUltima = q.i + 1 >= q.items.length
@@ -248,7 +253,7 @@ export function responder(ok, htmlDelComentario, { points: puntos = null, partia
   setTimeout(() => comentario.scrollIntoView({ block: 'nearest', behavior: 'smooth' }), 30)
 }
 
-const GRUPOS_SIN_CALLE = ['Comunas', 'Metro', 'Calles']
+const GRUPOS_SIN_CALLE = ['Comunas', 'Metro', 'Calles', 'Street View']
 
 function veredicto(porcentaje, grupo) {
   if (porcentaje >= 90) return '¡Te la sabes! 🏆'
@@ -257,16 +262,17 @@ function veredicto(porcentaje, grupo) {
   return GRUPOS_SIN_CALLE.includes(grupo) ? 'no teni calle :(' : 'A seguir practicando 🗺️'
 }
 
-function htmlDeMejorPersonal(total, anterior, esMejor) {
+function htmlDeMejorPersonal(total, maximo, anterior, esMejor) {
   if (!esMejor)
-    return `<p class="muted tight">Tu récord en rondas de ${total}: ${anterior.ok}/${total} en ${formatearTiempo(anterior.ms)}</p>`
+    return `<p class="muted tight">Tu récord en rondas de ${total}: ${anterior.ok}/${maximo} en ${formatearTiempo(anterior.ms)}</p>`
   if (!anterior) return `<p class="muted tight">Primera marca en rondas de ${total} preguntas.</p>`
-  return `<p class="tight">🏅 <b>¡Nuevo récord!</b> <span class="muted">Antes: ${anterior.ok}/${total} en ${formatearTiempo(anterior.ms)}</span></p>`
+  return `<p class="tight">🏅 <b>¡Nuevo récord!</b> <span class="muted">Antes: ${anterior.ok}/${maximo} en ${formatearTiempo(anterior.ms)}</span></p>`
 }
 
 function terminarPartida() {
   const { mode: modo, ranked: oficial, category: categoria, ok, ms, pts, misses: fallos } = partida
   const total = partida.items.length
+  const maximo = maximoDe(modo, total)
   detenerPartida()
   limpiarCapa()
   fijarModoDeEtiquetas('plain')
@@ -277,15 +283,15 @@ function terminarPartida() {
   const esMejor = !anterior || ok > anterior.ok || (ok === anterior.ok && ms < anterior.ms)
   if (esMejor) guardarMejor(llaveDeMejor, { ok, ms, d: Date.now() })
 
-  const porcentaje = Math.round((ok / total) * 100)
+  const porcentaje = Math.round((ok / maximo) * 100)
   const segundosPorPregunta = (ms / total / 1000).toFixed(1).replace('.', ',')
   const notaFinal = oficial
     ? 'Las rondas oficiales usan las mismas reglas para todos: Gran Santiago, todas las categorías, sin tus calles propias y sin ayudas.'
     : 'Las preguntas que fallas aparecen más seguido en las próximas rondas.'
   mostrarPanel(`<h3 class="tight">${veredicto(porcentaje, modo.group)}</h3>
-    <p class="result-score">${ok} / ${total} <span class="muted">(${porcentaje}%)</span></p>
+    <p class="result-score">${ok} / ${maximo} <span class="muted">(${porcentaje}%)</span></p>
     <p class="tight">⏱ <b>${formatearTiempo(ms)}</b> <span class="muted">· ${segundosPorPregunta} s por pregunta</span></p>
-    ${htmlDeMejorPersonal(total, anterior, esMejor)}
+    ${htmlDeMejorPersonal(total, maximo, anterior, esMejor)}
     ${pts ? `<p class="muted">Puntaje: ${Math.round(pts)}</p>` : ''}
     ${oficial ? '<div id="officialOutcome" class="outcome"></div>' : ''}
     ${fallos.length ? `<p class="muted" style="margin-bottom:4px">Para repasar:</p><p style="margin-top:0">${fallos.map(escaparHtml).join(' · ')}</p>` : ''}
@@ -300,7 +306,10 @@ function terminarPartida() {
   $('#menu').onclick = () => navegar('home')
   if ($('#goOfficial')) $('#goOfficial').onclick = () => iniciarPartida(modo, { ranked: true })
   if (oficial)
-    mostrarResultadoOficial({ modo: modo.id, categoria, aciertos: ok, total, ms }, $('#officialOutcome'))
+    mostrarResultadoOficial(
+      { modo: modo.id, categoria, aciertos: ok, total: maximo, ms },
+      $('#officialOutcome'),
+    )
 }
 
 // Reiniciar una ronda oficial a medias: otras preguntas, mismo juego y mismo largo, otra vez con cuenta regresiva.

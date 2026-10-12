@@ -1,8 +1,10 @@
 import { distanciaALinea, distanciaKm } from '../../nucleo/geografia.js'
+import { almacen } from '../../nucleo/almacen.js'
 import { escaparHtml, formatearKm } from '../../nucleo/utilidades.js'
+import { reportarPunto } from '../../cuenta/reportes.js'
 import { vias } from '../../datos/datos.js'
 import LUGARES from '../../datos/lugaresStreetView.json'
-import { esAciertoDeStreetView, puntajeDeStreetView } from '../../dominio/streetView.js'
+import { PUNTOS_MAXIMOS, esAciertoDeStreetView, puntajeDeStreetView } from '../../dominio/streetView.js'
 import { COLORES, dibujarCalle, iconoDiv } from '../../mapa/dibujo.js'
 import { capa, encuadrar, encuadrarCiudad, mapa } from '../../mapa/mapa.js'
 import { mostrarPanorama, ocultarPanorama, streetViewDisponible } from '../../mapa/streetView.js'
@@ -24,18 +26,44 @@ const callesBajoElPunto = punto =>
     .slice(0, MAXIMO_DE_CALLES_MOSTRADAS)
     .map(({ calle }) => calle)
 
-const textoDeLaPregunta = `<div class="q-prompt">Mira alrededor y <b>toca en el mapa</b> dónde estás parado.</div>`
+const textoDeLaPregunta = `<div class="q-prompt">Mira alrededor (no puedes caminar) y <b>toca en el mapa</b> dónde estás parado.</div>`
+
+// Los puntos que alguien reportó como túnel no vuelven a salir en este dispositivo.
+const llaveDelPunto = punto => `${punto.lat},${punto.lon}`
+const reportados = new Set(almacen.get('puntosReportados', []))
+const puntosDisponibles = lugar => lugar.puntos.filter(punto => !reportados.has(llaveDelPunto(punto)))
+const lugaresDisponibles = () => LUGARES.filter(lugar => puntosDisponibles(lugar).length)
+const alAzar = lista => lista[Math.floor(Math.random() * lista.length)]
+
+// Cambia la pregunta actual por otra que no haya salido en la ronda (no se pierde ni se acorta la ronda).
+function reemplazarPregunta(q) {
+  ocultarPanorama()
+  const usados = new Set(q.items.map(lugar => lugar.nombre))
+  const candidatos = lugaresDisponibles().filter(lugar => !usados.has(lugar.nombre))
+  if (!candidatos.length) return saltarPregunta()
+  q.items[q.i] = alAzar(candidatos)
+  q.mode.ask(q.items[q.i], q)
+}
+
+function reportarTunel(lugar, punto, q) {
+  reportados.add(llaveDelPunto(punto))
+  almacen.set('puntosReportados', [...reportados])
+  reportarPunto({ lugar: lugar.nombre, lat: punto.lat, lon: punto.lon, motivo: 'tunel' })
+  aviso('Gracias: ese punto no volverá a salir.')
+  reemplazarPregunta(q)
+}
 
 registrarModo({
   id: 'sv-ubicar',
   roomy: true,
+  puntosPorPregunta: PUNTOS_MAXIMOS,
   noHint: true,
   balance: lugar => lugar.comuna,
   group: 'Street View',
   name: '¿Dónde estás?',
-  desc: 'Te dejo parado en un punto de Santiago visto desde la calle: mira alrededor y toca en el mapa dónde estás.',
+  desc: 'Miras el Street View y tocas en el mapa dónde estás. De 0 a 5 puntos por pregunta.',
   disponible: streetViewDisponible,
-  pool: () => LUGARES,
+  pool: lugaresDisponibles,
   key: lugar => lugar.nombre,
   label: lugar => lugar.nombre,
   limpiar: ocultarPanorama,
@@ -43,9 +71,10 @@ registrarModo({
     mostrarPanel(
       encabezadoDePregunta(q) + textoDeLaPregunta + '<p class="muted tight">Cargando Street View…</p>',
     )
+    const punto = alAzar(puntosDisponibles(lugar))
     let verdadero
     try {
-      verdadero = await mostrarPanorama(lugar.puntos[Math.floor(Math.random() * lugar.puntos.length)])
+      verdadero = await mostrarPanorama(punto, { alReportarTunel: () => reportarTunel(lugar, punto, q) })
     } catch {
       aviso('No pude cargar Street View. Revisa tu conexión.')
       return saltarPregunta()
@@ -88,8 +117,8 @@ registrarModo({
         enLaCalle && !acierto ? '<p>Estabas en la calle correcta, pero en otro punto de ella.</p>' : ''
       responder(
         acierto,
-        `<p>Quedaste a <b>${formatearKm(distancia)}</b> (+${puntos} pts).</p>${dondeEstabas}${cerca}`,
-        { points: puntos, partial: enLaCalle && !acierto },
+        `<p>Quedaste a <b>${formatearKm(distancia)}</b> (+${puntos} de ${PUNTOS_MAXIMOS} puntos).</p>${dondeEstabas}${cerca}`,
+        { points: puntos, partial: !acierto && (puntos > 0 || enLaCalle) },
       )
     })
   },

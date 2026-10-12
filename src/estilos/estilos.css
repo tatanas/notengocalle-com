@@ -181,7 +181,7 @@ body.con-panorama .leaflet-top.leaflet-left {
   #alternarVista {
     display: inline-block;
   }
-  body.ver-mapa #volverAlInicio {
+  body.ver-mapa #reportarTunel {
     display: none;
   }
 }
