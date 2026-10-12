@@ -139,7 +139,16 @@ if (mapaVectorial) {
 }
 
 // ----- encuadres: dejan libre la parte del mapa que tapa el panel
+// Con Street View a la vista, el panorama ocupa la mitad izquierda (la parte de arriba en el celular).
+function rellenoConPanorama(panorama) {
+  return innerWidth <= ANCHO_CELULAR
+    ? { paddingTopLeft: [20, panorama.offsetHeight + 20], paddingBottomRight: [20, panel.offsetHeight + 16] }
+    : { paddingTopLeft: [panorama.offsetWidth + 20, 20], paddingBottomRight: [20, 20] }
+}
+
 function relleno() {
+  const panorama = document.getElementById('panorama')
+  if (panorama && !panorama.hidden) return rellenoConPanorama(panorama)
   if (panel.classList.contains('hidden')) return { padding: [20, 20] }
   return innerWidth <= ANCHO_CELULAR
     ? { paddingTopLeft: [20, 20], paddingBottomRight: [20, panel.offsetHeight + 16] }

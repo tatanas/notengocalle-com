@@ -3,7 +3,8 @@ import { fileURLToPath } from 'node:url'
 import puppeteer from 'puppeteer-core'
 import { build, createServer, preview } from 'vite'
 
-export const URL_BASE = 'http://127.0.0.1:8765'
+// Con URL_BASE=http://localhost:8765 se prueba como localhost (la llave de Google solo autoriza ese dominio).
+export const URL_BASE = process.env.URL_BASE ?? 'http://127.0.0.1:8765'
 export const CAPTURAS = fileURLToPath(new URL('./capturas/', import.meta.url))
 
 const RUTAS_DE_CHROME = [

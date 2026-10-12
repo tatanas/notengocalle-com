@@ -57,6 +57,7 @@ export async function mostrarPanorama({ lat, lon, rumbo = Math.random() * 360 })
   const lugar = resultado.data.location
   const caja = contenedorDelPanorama()
   caja.hidden = false
+  document.body.classList.add('con-panorama')
   new StreetViewPanorama(caja, {
     pano: lugar.pano,
     pov: { heading: rumbo, pitch: 0 },
@@ -73,4 +74,5 @@ export async function mostrarPanorama({ lat, lon, rumbo = Math.random() * 360 })
 
 export function ocultarPanorama() {
   if (contenedor) contenedor.hidden = true
+  document.body.classList.remove('con-panorama')
 }

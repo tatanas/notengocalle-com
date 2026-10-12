@@ -10,8 +10,8 @@ import { registrarModo } from '../registry.js'
 
 // Lugares de prueba. rumbo: hacia dónde mira al partir (0 = norte, 90 = oriente); sin él, mira al azar.
 const LUGARES = [
-  { nombre: 'Kennedy con Las Tranqueras', lat: -33.39147, lon: -70.55336 },
-  { nombre: 'Rotonda Atenas', lat: -33.41794, lon: -70.55305 },
+  { nombre: 'Kennedy con Las Tranqueras', lat: -33.39089, lon: -70.55333, rumbo: 180 },
+  { nombre: 'Rotonda Atenas', lat: -33.41717, lon: -70.5531, rumbo: 180 },
   { nombre: 'Frente al Estadio Nacional', lat: -33.46211, lon: -70.61037, rumbo: 180 },
 ]
 
@@ -29,6 +29,7 @@ const calleDeUnPunto = punto =>
 
 registrarModo({
   id: 'sv-ubicar',
+  roomy: true,
   noHint: true,
   group: 'Street View',
   name: '¿Dónde estás?',
@@ -44,7 +45,6 @@ registrarModo({
         `<div class="q-prompt">Mira alrededor y <b>toca en el mapa</b> dónde crees que estás.</div>
          <p class="muted tight">Cargando Street View…</p>`,
     )
-    if (q.i === 0) encuadrarCiudad()
     let verdadero
     try {
       verdadero = await mostrarPanorama(lugar)
@@ -57,6 +57,7 @@ registrarModo({
       return saltarPregunta()
     }
     if (partida !== q || q.answered) return ocultarPanorama()
+    encuadrarCiudad()
     mostrarPanel(
       encabezadoDePregunta(q) +
         `<div class="q-prompt">Mira alrededor y <b>toca en el mapa</b> dónde crees que estás.</div>`,
