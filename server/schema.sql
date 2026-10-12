@@ -24,7 +24,7 @@ create table if not exists scores (
   created_at timestamptz not null default now()
 );
 
--- Categoría de ranking según el largo de la ronda: '10', '15', '20', '30' o 'all' (todas las preguntas del juego).
+-- Categoría de ranking según el largo de la ronda: '20' o 'all' (antes también '10', '15' y '30') (todas las preguntas del juego).
 -- Las rondas guardadas antes de que existiera se clasifican por su largo, sin perder ninguna.
 alter table scores add column if not exists category text;
 

@@ -1,4 +1,4 @@
-import { distanceKm, pointInPolygon } from '../../core/geo.js'
+import { distanceKm, nearestPointOnLines, pointInPolygon } from '../../core/geo.js'
 import { settings } from '../../core/store.js'
 import { escapeHtml, formatKm } from '../../core/util.js'
 import { comunaByName, comunas, inScope, labelPoint, scopeComunas } from '../../data/dataset.js'
@@ -10,13 +10,16 @@ import { showPanel } from '../../ui/panel.js'
 import { answer, questionHeader } from '../engine.js'
 import { registerMode } from '../registry.js'
 
+// Un río o canal se acierta tocando cerca de su cauce.
+const STREAM_TAP_KM = 0.4
+
 registerMode({
   id: 'lm-loc',
   aids: true,
   balance: l => l.comuna,
   group: 'Lugares emblemáticos',
   name: 'Ubícalo en el mapa',
-  desc: 'Toca dónde crees que está el lugar. Cuenta como correcto a menos de 1,5 km.',
+  desc: 'Toca dónde crees que está el lugar.',
   cats: true,
   pool: landmarkPool,
   key: l => l.name,
@@ -30,10 +33,11 @@ registerMode({
     if (q.i === 0) fitCity()
     map.on('click', e => {
       if (q.answered) return
-      const you = [e.latlng.lat, e.latlng.lng],
-        ans = [l.lat, l.lon],
-        d = distanceKm(you, ans)
-      const lim = l.tol || (settings.strict ? 0.8 : 1.5),
+      const you = [e.latlng.lat, e.latlng.lng]
+      const onStream = l.line ? nearestPointOnLines(you, l.line) : null
+      const ans = onStream ? onStream.point : [l.lat, l.lon]
+      const d = onStream ? onStream.km : distanceKm(you, ans)
+      const lim = l.line ? STREAM_TAP_KM : l.tol || (settings.strict ? 0.8 : 1.5),
         ok = d <= lim || !!(l.zone && pointInPolygon(you, l.zone.poly))
       showZone(l)
       showLandmarksNear(l)

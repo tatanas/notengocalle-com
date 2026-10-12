@@ -23,7 +23,7 @@ module.exports=function(streets,comunas){
   const comunasAt=(lat,lon)=>{const p=[lon,lat];return bufs.filter(o=>lon>=o.bb[0]&&lon<=o.bb[2]&&lat>=o.bb[1]&&lat<=o.bb[3]&&turf.booleanPointInPolygon(p,o.b)).map(o=>o.n);};
   // metros por comuna
   for(const s of streets){const per={};const sm=samples(s.lines);for(const p of sm){for(const c of comunasAt(p[0],p[1]))per[c]=(per[c]||0)+50;}
-    s.cl=Object.fromEntries(Object.entries(per).map(([k,v])=>[k,Math.round(v)]));s.comunas=Object.entries(per).filter(([,v])=>v>=300).sort((a,b)=>b[1]-a[1]).map(([k])=>k);
+    s.cl=Object.fromEntries(Object.entries(per).map(([k,v])=>[k,Math.round(v)]));s.comunas=Object.entries(per).filter(([,v])=>v>=300).sort((a,b)=>b[1]-a[1]).map(([k])=>k); if(!s.comunas.length)s.comunas=Object.entries(per).sort((a,b)=>b[1]-a[1]).slice(0,1).map(([k])=>k);
     s.samp=sm.filter((_,i)=>i%6==0);s.dense=sm.filter((_,i)=>i%2==0);}
   // pares paralelos / que se juntan
   const bbox=s=>{let a=1e9,b=1e9,c=-1e9,d=-1e9;for(const l of s.lines)for(const p of l){a=Math.min(a,p[0]);c=Math.max(c,p[0]);b=Math.min(b,p[1]);d=Math.max(d,p[1]);}return[a,b,c,d];};

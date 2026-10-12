@@ -21,7 +21,6 @@ export const RANKED_MODES = [
   'mt-name',
   'st-name',
   'st-find',
-  'st-text',
   'rs-any-car',
   'rs-any-tp',
   'ch-find',
@@ -33,9 +32,9 @@ export const RANKED_MODES = [
   'cx',
 ]
 
-// Categorías de ranking según el largo de la ronda: 15 preguntas o "todas" las del juego.
+// Categorías de ranking según el largo de la ronda: 20 preguntas o "todas" las del juego.
 export const ALL_QUESTIONS = 'all'
-export const ROUND_CATEGORIES = ['15', ALL_QUESTIONS]
+export const ROUND_CATEGORIES = ['20', ALL_QUESTIONS]
 
 export const categoryLabel = category => (category === ALL_QUESTIONS ? 'Todas' : category)
 
@@ -44,7 +43,7 @@ export const categoryOf = (size, poolSize) => (size >= poolSize ? ALL_QUESTIONS 
 
 // Los puntajes enviados antes de que existieran las categorías no la traen.
 export const legacyCategory = ({ mode, total }) =>
-  mode.endsWith('-all') || total > 15 ? ALL_QUESTIONS : String(total)
+  mode.endsWith('-all') || total > 20 ? ALL_QUESTIONS : String(total)
 
 export const PERIODS = ['all', 'week']
 

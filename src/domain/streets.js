@@ -2,15 +2,14 @@ import { distanceKm, nearestBy } from '../core/geo.js'
 import { angleBetween, lookalikeWeight, streetShape } from '../core/lookalike.js'
 import { weightedSample } from '../core/progress.js'
 import { store } from '../core/store.js'
-import { escapeHtml, shuffle } from '../core/util.js'
-import { DATA, isPara, isRoad, parallelPartnersOf, roads, streetByName } from '../data/dataset.js'
+import { escapeHtml } from '../core/util.js'
+import { isPara, isRoad, parallelPartnersOf, roads, streetByName } from '../data/dataset.js'
 import { SEGMENT_COLORS } from '../map/draw.js'
 import { quiz } from '../quiz/engine.js'
 
 export const STREET_QUESTION = {
   calle: '¿Qué calle está marcada en azul?',
   autopista: '¿Qué autopista o carretera está marcada en azul?',
-  agua: '¿Qué río o canal está marcado en azul?',
   tren: '¿Qué es lo que está marcado en azul?',
 }
 
@@ -61,8 +60,6 @@ function lookalikes(street) {
 // Alternativas incorrectas que cuesten: calles cercanas que apuntan hacia el mismo lado (Holanda, Suecia, Luis Thayer
 // Ojeda), las que van una dentro de la otra (Eduardo Frei y la Ruta 5) y las que el jugador ha confundido antes.
 export function streetDistractors(street, count = 3) {
-  if (street.kind === 'agua')
-    return shuffle(DATA.streets.filter(other => other.kind === 'agua' && other !== street)).slice(0, count)
   const picked = weightedSample(lookalikes(street), count, { weightOf: candidate => candidate.weight }).map(
     candidate => candidate.street,
   )

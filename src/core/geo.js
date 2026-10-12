@@ -11,6 +11,30 @@ export const distanceKmAnyLatitude = (a, b) =>
     (a[1] - b[1]) * KM_PER_DEG_LAT * Math.cos((b[0] * Math.PI) / 180),
   )
 
+// El punto de unas líneas más cercano a `point`, y a cuántos km queda.
+export function nearestPointOnLines(point, lines) {
+  let best = { km: Infinity, point: null }
+  for (const line of lines)
+    for (let i = 0; i < line.length - 1; i++) {
+      const ax = (line[i][1] - point[1]) * KM_PER_DEG_LON
+      const ay = (line[i][0] - point[0]) * KM_PER_DEG_LAT
+      const dx = (line[i + 1][1] - point[1]) * KM_PER_DEG_LON - ax
+      const dy = (line[i + 1][0] - point[0]) * KM_PER_DEG_LAT - ay
+      const lengthSq = dx * dx + dy * dy
+      const t = lengthSq ? Math.max(0, Math.min(1, -(ax * dx + ay * dy) / lengthSq)) : 0
+      const km = Math.hypot(ax + t * dx, ay + t * dy)
+      if (km < best.km)
+        best = {
+          km,
+          point: [
+            line[i][0] + t * (line[i + 1][0] - line[i][0]),
+            line[i][1] + t * (line[i + 1][1] - line[i][1]),
+          ],
+        }
+    }
+  return best
+}
+
 // lines = [[[lat, lon], ...], ...]
 export function distanceToPolyline(point, lines) {
   let best = Infinity

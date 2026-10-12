@@ -38,7 +38,7 @@ export async function accounts(browser, { check }) {
     /sin cuenta/.test(await text(page, '#officialOutcome')),
     'una ronda oficial sin cuenta avisa que aún no está en el ranking',
   )
-  check(/15 preguntas|\/ 15/.test(await text(page, '#panel')), 'la ronda oficial tiene 15 preguntas')
+  check(/20 preguntas|\/ 20/.test(await text(page, '#panel')), 'la ronda oficial tiene 20 preguntas')
 
   await page.click('#outcomeLogin')
   await page.click('#accountDialog [data-view="register"]')

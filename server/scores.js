@@ -12,7 +12,7 @@ const BOARD_SIZE = 50
 const MAX_ROUNDS_PER_WINDOW = 40
 const ROUND_WINDOW_MINUTES = 10
 const WEEK_MS = 7 * 24 * 60 * 60 * 1000
-const DEFAULT_CATEGORY = '15'
+const DEFAULT_CATEGORY = '20'
 
 function periodStart(url) {
   const period = url.searchParams.get('period') || 'all'

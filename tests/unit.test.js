@@ -142,7 +142,7 @@ test('un puntaje es mejor con más aciertos o, a igual número, con menos tiempo
 })
 
 test('solo pasan los puntajes con forma de ronda oficial', () => {
-  const round = { mode: 'com-name', category: '15', correct: 10, total: 15, ms: 60000 }
+  const round = { mode: 'com-name', category: '20', correct: 10, total: 20, ms: 60000 }
   assert.equal(scoreProblem(round), null)
   assert.ok(scoreProblem({ ...round, category: '30', total: 30 }), 'ya no hay rondas de 30')
   assert.equal(scoreProblem({ ...round, category: 'all', total: 179, correct: 100, ms: 600000 }), null)
@@ -150,7 +150,7 @@ test('solo pasan los puntajes con forma de ronda oficial', () => {
   assert.ok(scoreProblem({ ...round, category: '12' }))
   assert.ok(scoreProblem({ ...round, total: 10 }), 'el largo no coincide con la categoría')
   assert.ok(scoreProblem({ ...round, category: 'all', total: 3 }))
-  assert.ok(scoreProblem({ ...round, correct: 16 }))
+  assert.ok(scoreProblem({ ...round, correct: 21 }))
   assert.ok(scoreProblem({ ...round, ms: 1000 }))
   assert.ok(scoreProblem({ ...round, ms: 7 * 60 * 60 * 1000 }))
 })

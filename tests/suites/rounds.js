@@ -9,7 +9,7 @@ const seconds = hud => {
 // El cronómetro solo cuenta el tiempo de pensar, y el récord personal se guarda y se muestra.
 export async function timer(browser, { check }) {
   const { page, errors } = await openPage(browser)
-  await page.select('[data-length-group="Calles"]', '15')
+  await page.select('[data-length-group="Calles"]', '20')
   await page.click('[data-mode="st-name"]')
   await page.waitForSelector('.opt:not([disabled])')
   await sleep(1200)
@@ -25,15 +25,15 @@ export async function timer(browser, { check }) {
   await clickNext(page)
   await playRoundOfChoices(page, { thinkMs: 60 })
   const result = await text(page, '#panel')
-  check(/\/ 15/.test(result), 'la ronda respeta el largo elegido (15 preguntas)')
-  check(/Primera marca en rondas de 15/.test(result), 'la primera ronda queda como marca personal')
+  check(/\/ 20/.test(result), 'la ronda respeta el largo elegido (20 preguntas)')
+  check(/Primera marca en rondas de 20/.test(result), 'la primera ronda queda como marca personal')
 
   await page.click('#again')
   await playRoundOfChoices(page, { thinkMs: 60 })
   check(/récord/i.test(await text(page, '#panel')), 'la segunda ronda se compara con el récord')
 
   await page.click('#menu')
-  check(/¿Qué calle es\?\s+30/.test(await text(page, 'table.stats')), 'el progreso suma las 30 respuestas')
+  check(/¿Qué calle es\?\s+40/.test(await text(page, 'table.stats')), 'el progreso suma las 40 respuestas')
   check(!errors.length, `sin errores en la consola${errors.length ? ': ' + errors.join(' | ') : ''}`)
   await page.close()
 }
@@ -87,7 +87,7 @@ export async function ownStreets(browser, { check }) {
 
 // Cada juego con ranking debe poder iniciar su ronda oficial con el largo que el servidor espera.
 export async function officialRounds(browser, { check }) {
-  const { page, errors } = await openPage(browser, { storage: { settings: { scope: 'all', len: 15 } } })
+  const { page, errors } = await openPage(browser, { storage: { settings: { scope: 'all', len: 20 } } })
   const offered = await page.$$eval('[data-official]', buttons =>
     buttons.map(button => button.dataset.official),
   )
@@ -102,7 +102,7 @@ export async function officialRounds(browser, { check }) {
     const started = await page.waitForSelector('.q-head', { timeout: 8000 }).catch(() => null)
     const header = started ? await text(page, '.q-head') : ''
     const total = +(header.match(/de (\d+)/) || [])[1]
-    const expected = { 'com-name': 34, 'com-all': 34, 'ch-all': 16, 'ch-find': 16 }[id] ?? 15
+    const expected = { 'com-name': 34, 'com-all': 34, 'ch-all': 16, 'ch-find': 16 }[id] ?? 20
     if (total !== expected || !/Ronda oficial/.test(header)) wrong.push(`${id} (${total || 'no partió'})`)
   }
   check(
@@ -118,7 +118,7 @@ export async function photos(browser, { check }) {
   const { page, errors } = await openPage(browser)
   await page.click('[data-mode="pn-photo"]')
   await page.waitForSelector('.ph img')
-  for (let question = 0; question < 15 && !(await exists(page, '.phnav.next')); question++) {
+  for (let question = 0; question < 20 && !(await exists(page, '.phnav.next')); question++) {
     await page.click('.opt:not([disabled])')
     await clickNext(page)
     await page.waitForSelector('.ph img')
@@ -301,7 +301,7 @@ const mapButtons = page =>
   page.$$eval('button.maptoggle', buttons => buttons.map(button => button.innerText.trim()))
 const metroLines = page => page.$$eval('.leaflet-metro-pane path', paths => paths.length)
 
-// Un solo botón de modo fácil / difícil activa o apaga los bordes de comunas y las líneas del metro; solo en práctica.
+// La práctica es siempre el modo fácil (bordes de comunas y líneas del metro); la ronda oficial, el difícil.
 export async function easyHard(browser, { check }) {
   const { page, errors } = await openPage(browser)
   await page.click('[data-mode="lm-loc"]')
@@ -309,31 +309,20 @@ export async function easyHard(browser, { check }) {
   await sleep(500)
   const buttons = await mapButtons(page)
   check(
-    /Modo fácil/.test(buttons[0] ?? ''),
-    `la práctica ofrece el botón de modo fácil / difícil (${buttons.join(' | ')})`,
+    buttons.length === 1 && /Ver nombres/.test(buttons[0]),
+    `la práctica ya no tiene botón de modo fácil / difícil, solo "Ver nombres" (${buttons.join(' | ')})`,
   )
-  check(/Ver nombres/.test(buttons[1] ?? ''), 'y debajo, "Ver nombres", donde sigue existiendo')
-  check((await metroLines(page)) > 0, 'en modo fácil se dibujan las líneas del metro')
-  await page.$eval('.maptoggle', button => button.click())
-  await sleep(200)
-  check(/Modo difícil/.test((await mapButtons(page))[0]), 'al tocarlo pasa a modo difícil')
-  check((await metroLines(page)) === 0, 'en modo difícil no hay líneas del metro')
+  check((await metroLines(page)) > 0, 'la práctica dibuja las líneas del metro')
 
   await goHome(page)
-  await page.reload({ waitUntil: 'networkidle2' })
   await page.click('[data-mode="com-name"]')
   await page.waitForSelector('.q-head')
-  const comunas = await mapButtons(page)
-  check(/Modo difícil/.test(comunas[0] ?? ''), 'el modo elegido se recuerda al volver a jugar')
-  check(comunas.length === 1, 'en el juego de comunas ya no está "Ver nombres"')
+  check((await mapButtons(page)).length === 0, 'en el juego de comunas no hay ningún botón sobre el mapa')
 
   await goHome(page)
   await page.click('[data-official="lm-loc"]')
   await page.waitForSelector('#panel .q-head', { timeout: 8000 })
-  check(
-    (await mapButtons(page)).length === 0,
-    'una ronda oficial no muestra ni el modo fácil / difícil ni "Ver nombres"',
-  )
+  check((await mapButtons(page)).length === 0, 'una ronda oficial no muestra ni ayudas ni "Ver nombres"')
   check((await metroLines(page)) === 0, 'y se juega sin ayudas')
   check(!errors.length, `sin errores en la consola${errors.length ? ': ' + errors.join(' | ') : ''}`)
   await page.close()
@@ -383,9 +372,9 @@ export async function restartRound(browser, { check }) {
   await page.close()
 }
 
-// Cada largo de ronda tiene su ranking: una ronda de 15 preguntas cae en la pestaña "15", no en la de "Todas".
+// Cada largo de ronda tiene su ranking: una ronda de 20 preguntas cae en la pestaña "20", no en la de "Todas".
 export async function rankingCategories(browser, { check }) {
-  const { page, errors } = await openPage(browser, { storage: { settings: { len: 15 } } })
+  const { page, errors } = await openPage(browser, { storage: { settings: { len: 20 } } })
   await page.evaluate(() =>
     fetch('/api/register', {
       method: 'POST',
@@ -399,8 +388,8 @@ export async function rankingCategories(browser, { check }) {
   await playRoundOfChoices(page)
   await page.waitForFunction(() => /Puesto/.test(document.getElementById('officialOutcome')?.innerText ?? ''))
   check(
-    /con 15 preguntas/.test(await text(page, '#officialOutcome')),
-    'el resultado dice en qué largo quedó (15 preguntas)',
+    /con 20 preguntas/.test(await text(page, '#officialOutcome')),
+    'el resultado dice en qué largo quedó (20 preguntas)',
   )
 
   await page.click('#outcomeRanking')
@@ -409,26 +398,26 @@ export async function rankingCategories(browser, { check }) {
     items.map(item => item.innerText.replace(/\s+/g, ' ').trim()),
   )
   check(
-    tabs.length === 2 && /^15/.test(tabs[0]) && /^Todas/.test(tabs[1]),
-    `el ranking tiene pestañas 15 y Todas (${tabs.join(' | ')})`,
+    tabs.length === 2 && /^20/.test(tabs[0]) && /^Todas/.test(tabs[1]),
+    `el ranking tiene pestañas 20 y Todas (${tabs.join(' | ')})`,
   )
-  check(/^15 1$/.test(tabs[0]), 'la pestaña "15" muestra que tiene 1 jugador')
+  check(/^20 1$/.test(tabs[0]), 'la pestaña "20" muestra que tiene 1 jugador')
   check(
-    await page.$eval('.tab.on', tab => tab.dataset.category === '15'),
+    await page.$eval('.tab.on', tab => tab.dataset.category === '20'),
     'y se abre en la del largo recién jugado',
   )
 
   await page.$eval('[data-category="all"]', tab => tab.click())
   await page.waitForSelector('#rankBody p.muted')
   check(/Nadie ha jugado/.test(await text(page, '#rankBody')), 'la pestaña "Todas" está vacía: no se mezclan')
-  await page.$eval('[data-category="15"]', tab => tab.click())
+  await page.$eval('[data-category="20"]', tab => tab.click())
   await page.waitForSelector('table.board tr.me')
-  check(true, 'y la de 15 sigue mostrando la marca')
+  check(true, 'y la de 20 sigue mostrando la marca')
 
   await page.click('#rankPlay')
   await page.waitForSelector('#panel .q-head', { timeout: 8000 })
   check(
-    /de 15$/.test((await text(page, '#panel .q-head')).split('\n')[0].trim()),
+    /de 20$/.test((await text(page, '#panel .q-head')).split('\n')[0].trim()),
     'jugar desde el ranking usa el largo de la pestaña',
   )
   check(!errors.length, `sin errores en la consola${errors.length ? ': ' + errors.join(' | ') : ''}`)

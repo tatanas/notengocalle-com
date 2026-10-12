@@ -435,7 +435,7 @@ export const GENERATORS = {
     const KM = dn === 'norte' || dn === 'sur' ? KM_PER_DEG_LAT : KM_PER_DEG_LON
     const pool = shuffle(
       DATA.landmarks.filter(
-        l => comunaByName[l.comuna] && comunaByName[l.comuna].properties.group === 'core',
+        l => !l.line && comunaByName[l.comuna] && comunaByName[l.comuna].properties.group === 'core',
       ),
     )
     const ch = []
@@ -498,7 +498,7 @@ export const GENERATORS = {
   },
   nearestCerro() {
     const urb = cerros.filter(c => c.tipo === 'Cerros islas')
-    const l = pick(DATA.landmarks)
+    const l = pick(DATA.landmarks.filter(landmark => !landmark.line))
     const ds = urb.map(c => ({ c, d: distanceKm([l.lat, l.lon], [c.lat, c.lon]) })).sort((a, b) => a.d - b.d)
     if (ds[0].d > 5 || ds[1].d - ds[0].d < 1.5) return null
     const corr = ds[0].c.name
