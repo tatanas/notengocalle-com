@@ -1,7 +1,8 @@
-// Le pone nivel (1 fácil, 2 medio, 3 difícil) a cada pregunta de src/datos/lugaresStreetView.json.
-// Fácil: los grandes ejes y autopistas, las principales avenidas de cada sector (incluido el poniente) y los lugares más conocidos.
-// Medio: lo anterior, las avenidas largas (5 km o más) y lugares de categorías muy conocidas.
-// Difícil: todo. Se corre después de tools/streetview_lugares.mjs:  node tools/niveles_streetview.mjs
+// Le pone nivel (1 fácil, 2 medio, 3 difícil, 4 extremo) a cada pregunta de src/datos/lugaresStreetView.json.
+// Fácil: un puñado (unas 25) de las calles y lugares que todo el mundo conoce.
+// Medio: los grandes ejes y autopistas, las principales avenidas de cada sector (incluido el poniente) y los lugares más conocidos.
+// Difícil: lo anterior, las avenidas largas (5 km o más) y lugares de categorías muy conocidas.
+// Extremo: todo. Se corre después de tools/streetview_lugares.mjs:  node tools/niveles_streetview.mjs
 import fs from 'node:fs'
 
 const ARCHIVO = 'src/datos/lugaresStreetView.json'
@@ -11,6 +12,16 @@ const datos = (() => {
   return ventana.DATA
 })()
 
+const CALLES_MUY_FACILES = [
+  "Alameda (Av. Libertador Bernardo O'Higgins)", 'Av. Vicuña Mackenna', 'Av. Providencia', 'Av. Apoquindo', 'Av. Las Condes',
+  'Av. Presidente Kennedy', 'Gran Avenida (José Miguel Carrera)', 'Av. Santa Rosa', 'Av. Irarrázaval', 'Costanera Norte',
+  'Américo Vespucio', 'Autopista Central', 'Av. San Pablo',
+]
+const LUGARES_MUY_FACILES = [
+  'Plaza de Armas', 'Palacio de La Moneda', 'Estación Mapocho', 'Plaza Italia (Plaza Baquedano)', 'Cerro Santa Lucía',
+  'Costanera Center / Gran Torre Santiago', 'Estación Central (ferrocarriles)', 'Parque Arauco', 'Alto Las Condes',
+  'Estadio Nacional (selección chilena; hace de local la U. de Chile)', 'Mercado Central',
+]
 const CALLES_FACILES = [
   // los grandes ejes de la ciudad
   "Alameda (Av. Libertador Bernardo O'Higgins)",
@@ -76,16 +87,18 @@ const largoDeCalle = nombre => datos.streets.find(calle => calle.name === nombre
 
 function nivelDe(pregunta) {
   if (pregunta.tipo === 'calle') {
-    if (CALLES_FACILES.includes(pregunta.nombre)) return 1
-    return largoDeCalle(pregunta.nombre) >= LARGO_DE_AVENIDA_LARGA_KM ? 2 : 3
+    if (CALLES_MUY_FACILES.includes(pregunta.nombre)) return 1
+    if (CALLES_FACILES.includes(pregunta.nombre)) return 2
+    return largoDeCalle(pregunta.nombre) >= LARGO_DE_AVENIDA_LARGA_KM ? 3 : 4
   }
   const referencia = pregunta.referencia ?? pregunta.nombre
-  if (LUGARES_FACILES.includes(referencia)) return 1
-  return CATEGORIAS_MEDIAS.includes(categoriaDeLugar(referencia)) ? 2 : 3
+  if (LUGARES_MUY_FACILES.includes(referencia)) return 1
+  if (LUGARES_FACILES.includes(referencia)) return 2
+  return CATEGORIAS_MEDIAS.includes(categoriaDeLugar(referencia)) ? 3 : 4
 }
 
 const preguntas = JSON.parse(fs.readFileSync(ARCHIVO, 'utf8'))
-const cuenta = { 1: 0, 2: 0, 3: 0 }
+const cuenta = { 1: 0, 2: 0, 3: 0, 4: 0 }
 for (const pregunta of preguntas) {
   pregunta.nivel = nivelDe(pregunta)
   cuenta[pregunta.nivel]++
@@ -94,4 +107,4 @@ const faltantes = [...CALLES_FACILES].filter(nombre => !preguntas.some(p => p.no
 const lugaresFaltantes = LUGARES_FACILES.filter(nombre => !preguntas.some(p => p.referencia === nombre))
 if (faltantes.length || lugaresFaltantes.length) console.log('Sin pregunta:', [...faltantes, ...lugaresFaltantes].join(' | '))
 fs.writeFileSync(ARCHIVO, JSON.stringify(preguntas))
-console.log(`Nivel 1: ${cuenta[1]} · nivel 2: ${cuenta[2]} · nivel 3: ${cuenta[3]} (acumulados: fácil ${cuenta[1]}, medio ${cuenta[1] + cuenta[2]}, difícil ${preguntas.length})`)
+console.log(`Por nivel: ${cuenta[1]} · ${cuenta[2]} · ${cuenta[3]} · ${cuenta[4]} (acumulados: fácil ${cuenta[1]}, medio ${cuenta[1] + cuenta[2]}, difícil ${cuenta[1] + cuenta[2] + cuenta[3]}, extremo ${preguntas.length})`)

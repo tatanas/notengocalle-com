@@ -122,6 +122,7 @@ const NIVELES_DE_STREET_VIEW = [
   ['facil', 'Fácil'],
   ['medio', 'Medio'],
   ['dificil', 'Difícil'],
+  ['extremo', 'Extremo'],
 ]
 
 // Cuántas preguntas por ronda, en la tarjeta del juego. Los juegos que siempre recorren todo su conjunto
@@ -142,7 +143,7 @@ function selectorDeNivel(grupo) {
     ([valor, etiqueta]) =>
       `<option value="${valor}" ${valor === ajustes.nivelStreetView ? 'selected' : ''}>${etiqueta}</option>`,
   )
-  return `<label class="length-row">Nivel (la ronda oficial es siempre difícil) <select id="nivelStreetView">${opciones.join('')}</select></label>`
+  return `<label class="length-row">Nivel (la ronda oficial es siempre extremo) <select id="nivelStreetView">${opciones.join('')}</select></label>`
 }
 
 function tarjetaDeGrupo(grupo) {

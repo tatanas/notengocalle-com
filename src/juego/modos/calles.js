@@ -1,4 +1,4 @@
-import { distanciaALinea } from '../../nucleo/geografia.js'
+import { distanciaALinea, puntoMasCercanoEnLineas } from '../../nucleo/geografia.js'
 import { escaparHtml, formatearKm, mezclar } from '../../nucleo/utilidades.js'
 import {
   DATOS,
@@ -85,6 +85,13 @@ const TOQUE_MAXIMO_KM = 0.25
 // Si otra calle del juego queda más cerca del toque que la pedida por más de esto, se tocó esa otra.
 const OTRA_MAS_CERCA_KM = 0.03
 
+// Cerca de un cruce se perdona más: si la otra calle llega a la pedida a menos de esto del toque, no se puede saber a cuál apuntabas.
+const CRUCE_CERCANO_KM = 0.12
+const TOQUE_MINIMO_EN_CRUCE_KM = 0.12
+
+const seCruzanCercaDe = (punto, calle, otra) =>
+  distanciaALinea(puntoMasCercanoEnLineas(punto, otra.lines).point, calle.lines) <= CRUCE_CERCANO_KM
+
 const toleranciaDeToqueKm = latlng => Math.min(TOQUE_MAXIMO_KM, Math.max(TOQUE_MINIMO_KM, kmDeDedo(latlng)))
 
 registrarModo({
@@ -117,8 +124,9 @@ registrarModo({
           cerca = o
         }
       }
-      const tolerancia = toleranciaDeToqueKm(e.latlng)
-      const ok = d <= tolerancia && !(cerca !== s && nd < d - OTRA_MAS_CERCA_KM)
+      const enCruce = cerca !== s && seCruzanCercaDe(p, s, cerca)
+      const tolerancia = Math.max(toleranciaDeToqueKm(e.latlng), enCruce ? TOQUE_MINIMO_EN_CRUCE_KM : 0)
+      const ok = d <= tolerancia && (enCruce || !(cerca !== s && nd < d - OTRA_MAS_CERCA_KM))
       L.marker(p, { icon: iconoDiv('pin you'), pane: 'points' }).addTo(capa)
       dibujarCalle(s, ok ? COLORES.ok : COLORES.street)
       fijarModoDeEtiquetas('labels')
