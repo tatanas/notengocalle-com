@@ -435,13 +435,13 @@ body.con-panorama .leaflet-top.leaflet-left {
   top: 0;
   left: 0;
   right: 0;
-  height: min(40vw, 520px);
+  height: min(52vw, 680px);
   min-height: 220px;
   background: url('./santiago.webp') center top / cover no-repeat;
-  opacity: 0.4;
+  opacity: 0.5;
   pointer-events: none;
-  -webkit-mask-image: linear-gradient(to bottom, #000 45%, transparent 100%);
-  mask-image: linear-gradient(to bottom, #000 45%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to bottom, #000 70%, transparent 100%);
+  mask-image: linear-gradient(to bottom, #000 70%, transparent 100%);
 }
 .hero {
   margin: 4px 0 14px;
