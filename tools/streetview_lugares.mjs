@@ -1,6 +1,6 @@
-// Arma los lugares del juego "¿Dónde estás?" (Street View): todas las calles, con hasta 3 puntos repartidos por la
-// calle (cada vez que sale la calle, el juego elige uno al azar), y un punto en la calle más cercana a cada lugar
-// emblemático importante (no dentro del recinto: estacionamientos, patios o estaciones de metro no sirven para
+// Arma los lugares del juego "¿Dónde estás?" (Street View): todas las calles, con varios puntos repartidos a lo largo
+// de cada una (uno cada ~1,2 km; cada vez que sale la calle, el juego elige uno al azar, para ir conociendo cómo se ve en
+// distintos tramos), y hasta 3 puntos en las calles más cercanas a cada lugar emblemático importante, por lados distintos (no dentro del recinto: estacionamientos, patios o estaciones de metro no sirven para
 // aprender a ubicarse en la ciudad). Cada punto se comprueba contra Street View: panorama oficial de Google, al aire
 // libre, sobre una calle pública y lejos de túneles.
 // Necesita la llave de Google en .env.local y se ejecuta desde la raíz del proyecto:
@@ -57,8 +57,8 @@ function distanciaYRumboALinea(punto, lineas) {
 const rumboHacia = (desde, hacia) =>
   ((Math.atan2((hacia[1] - desde[1]) * KM_LON, (hacia[0] - desde[0]) * KM_LAT) * 180) / Math.PI + 360) % 360
 
-// Un punto al azar sobre el trazado de una calle, con probabilidad proporcional al largo de cada tramo.
-function puntoAlAzarEnLaCalle(calle) {
+// Un punto sobre el trazado de una calle a cierta fracción (0 a 1) de su largo total.
+function puntoEnLaCalle(calle, fraccion) {
   const tramos = []
   let total = 0
   for (const linea of calle.lines)
@@ -67,7 +67,7 @@ function puntoAlAzarEnLaCalle(calle) {
       tramos.push({ a: linea[i], b: linea[i + 1], largo })
       total += largo
     }
-  let objetivo = azar() * total
+  let objetivo = fraccion * total
   for (const tramo of tramos) {
     if (objetivo <= tramo.largo) {
       const t = tramo.largo ? objetivo / tramo.largo : 0
@@ -292,11 +292,14 @@ const IMPORTANTES = [
 
 // Desde el centro del lugar se busca hacia afuera, en anillos, el panorama válido más cercano: así el punto queda en la
 // calle del frente y no dentro del recinto.
-const ANILLOS_KM = process.env.SV_LUGARES ? [0, 0.06, 0.12, 0.2, 0.3, 0.5, 0.8] : [0, 0.06, 0.12, 0.2, 0.3]
+const ANILLOS_KM = [0, 0.06, 0.12, 0.2, 0.3]
+const ANILLOS_LEJANOS_KM = [0.5, 0.8] // solo si no se encontró nada más cerca y se pidió a mano con SV_LUGARES
 const DIRECCIONES = 8
 const RADIO_DE_BUSQUEDA_M = 40
-async function panoramaEnLaCalleCercaDe(lugar) {
-  for (const anillo of ANILLOS_KM) {
+const PUNTOS_POR_LUGAR = 3
+const SEPARACION_ENTRE_PUNTOS_DE_UN_LUGAR_KM = 0.06
+async function panoramasEnAnillos(lugar, anillos, elegidos) {
+  for (const anillo of anillos) {
     const candidatos = []
     for (let i = 0; i < (anillo === 0 ? 1 : DIRECCIONES); i++) {
       const angulo = (2 * Math.PI * i) / DIRECCIONES
@@ -305,12 +308,20 @@ async function panoramaEnLaCalleCercaDe(lugar) {
       const panorama = await panoramaUtil(lat, lon, anillo === 0 ? 60 : RADIO_DE_BUSQUEDA_M)
       if (panorama) candidatos.push(panorama)
     }
-    if (candidatos.length)
-      return candidatos.reduce((mejor, actual) =>
-        distanciaKm([actual.lat, actual.lon], [lugar.lat, lugar.lon]) < distanciaKm([mejor.lat, mejor.lon], [lugar.lat, lugar.lon]) ? actual : mejor,
+    candidatos.sort((a, b) => distanciaKm([a.lat, a.lon], [lugar.lat, lugar.lon]) - distanciaKm([b.lat, b.lon], [lugar.lat, lugar.lon]))
+    for (const candidato of candidatos)
+      if (
+        elegidos.length < PUNTOS_POR_LUGAR &&
+        elegidos.every(otro => distanciaKm([otro.lat, otro.lon], [candidato.lat, candidato.lon]) >= SEPARACION_ENTRE_PUNTOS_DE_UN_LUGAR_KM)
       )
+        elegidos.push(candidato)
+    if (elegidos.length >= PUNTOS_POR_LUGAR) break
   }
-  return null
+  return elegidos
+}
+const panoramasEnLasCallesCercaDe = async lugar => {
+  const elegidos = await panoramasEnAnillos(lugar, ANILLOS_KM, [])
+  return elegidos.length || !process.env.SV_LUGARES ? elegidos : panoramasEnAnillos(lugar, ANILLOS_LEJANOS_KM, elegidos)
 }
 const sinCalleCerca = []
 for (const nombre of SOLO_LUGARES ?? (PARCIAL ? [] : IMPORTANTES)) {
@@ -319,13 +330,13 @@ for (const nombre of SOLO_LUGARES ?? (PARCIAL ? [] : IMPORTANTES)) {
     console.log('  no existe en los datos:', nombre)
     continue
   }
-  const panorama = await panoramaEnLaCalleCercaDe(lugar)
-  if (!panorama) {
+  const panoramas = await panoramasEnLasCallesCercaDe(lugar)
+  if (!panoramas.length) {
     sinCalleCerca.push(nombre)
     continue
   }
-  const rumbo = rumboHacia([panorama.lat, panorama.lon], [lugar.lat, lugar.lon])
-  resultado.push({ nombre: 'Cerca de ' + lugar.name, tipo: 'lugar', referencia: lugar.name, comuna: lugar.comuna, puntos: [punto(panorama, rumbo)] })
+  const puntos = panoramas.map(panorama => punto(panorama, rumboHacia([panorama.lat, panorama.lon], [lugar.lat, lugar.lon])))
+  resultado.push({ nombre: 'Cerca de ' + lugar.name, tipo: 'lugar', referencia: lugar.name, comuna: lugar.comuna, puntos })
 }
 console.log('lugares:', resultado.length, '| sin calle pública cerca:', sinCalleCerca.join(', ') || 'ninguno')
 
@@ -350,10 +361,14 @@ if (CON_EXTRAS)
     resultado.push({ nombre: extra.nombre, tipo: 'lugar', referencia: lugar.name, comuna: lugar.comuna, puntos: [punto(elegido, rumboHacia([elegido.lat, elegido.lon], [lugar.lat, lugar.lon]))] })
   }
 
-// ----- calles: hasta 3 puntos por calle, lejos uno del otro y sobre la calle misma
-const PUNTOS_POR_CALLE = 3
-const INTENTOS_POR_CALLE = 14
-const SEPARACION_MINIMA_KM = 0.4
+// ----- calles: un punto cada ~1,2 km (entre 3 y 14), repartidos por toda su longitud y sobre la calle misma
+const KM_POR_PUNTO = 1.2
+const MINIMO_DE_PUNTOS_POR_CALLE = 3
+const MAXIMO_DE_PUNTOS_POR_CALLE = 14
+const REINTENTOS_POR_TRAMO = 3
+const SEPARACION_MINIMA_KM = 0.3
+const puntosParaCalle = calle =>
+  Math.max(MINIMO_DE_PUNTOS_POR_CALLE, Math.min(MAXIMO_DE_PUNTOS_POR_CALLE, Math.round(calle.km / KM_POR_PUNTO)))
 const MARGEN_SOBRE_LA_CALLE_KM = 0.03
 const calles = datos.streets.filter(calle =>
   PARCIAL ? SOLO_CALLES?.includes(calle.name) : !calle.kind || calle.kind === 'calle',
@@ -361,20 +376,24 @@ const calles = datos.streets.filter(calle =>
 const callesIncompletas = []
 for (const calle of calles) {
   const puntos = []
-  for (let intento = 0; intento < INTENTOS_POR_CALLE && puntos.length < PUNTOS_POR_CALLE; intento++) {
-    const candidato = puntoAlAzarEnLaCalle(calle)
-    const panorama = await panoramaUtil(candidato[0], candidato[1], 30)
-    if (!panorama) continue
-    const sobreLaCalle = distanciaYRumboALinea([panorama.lat, panorama.lon], calle.lines)
-    if (sobreLaCalle.km > MARGEN_SOBRE_LA_CALLE_KM) continue
-    if (puntos.some(otro => distanciaKm([otro.lat, otro.lon], [panorama.lat, panorama.lon]) < SEPARACION_MINIMA_KM)) continue
-    puntos.push(punto(panorama, sobreLaCalle.rumbo + (azar() < 0.5 ? 0 : 180)))
-  }
+  const cantidad = puntosParaCalle(calle)
+  // un tramo por punto: dentro de cada uno se elige un lugar al azar, así quedan repartidos por toda la calle
+  for (let tramo = 0; tramo < cantidad; tramo++)
+    for (let intento = 0; intento < REINTENTOS_POR_TRAMO; intento++) {
+      const candidato = puntoEnLaCalle(calle, (tramo + azar()) / cantidad)
+      const panorama = await panoramaUtil(candidato[0], candidato[1], 30)
+      if (!panorama) continue
+      const sobreLaCalle = distanciaYRumboALinea([panorama.lat, panorama.lon], calle.lines)
+      if (sobreLaCalle.km > MARGEN_SOBRE_LA_CALLE_KM) continue
+      if (puntos.some(otro => distanciaKm([otro.lat, otro.lon], [panorama.lat, panorama.lon]) < SEPARACION_MINIMA_KM)) continue
+      puntos.push(punto(panorama, sobreLaCalle.rumbo + (azar() < 0.5 ? 0 : 180)))
+      break
+    }
   if (!puntos.length) {
     callesIncompletas.push(calle.name)
     continue
   }
-  if (puntos.length < PUNTOS_POR_CALLE) console.log(`  ${calle.name}: ${puntos.length} punto(s)`)
+  if (puntos.length < MINIMO_DE_PUNTOS_POR_CALLE) console.log(`  ${calle.name}: ${puntos.length} punto(s)`)
   resultado.push({ nombre: calle.name, tipo: 'calle', comuna: calle.comunas[0], puntos })
 }
 console.log(`calles: ${calles.length - callesIncompletas.length}/${calles.length}; sin cobertura: ${callesIncompletas.join(', ') || 'ninguna'}`)
