@@ -48,7 +48,6 @@ export function describirUbicacion(punto, calles) {
   if (calles.length === 1) partes.push(`en ${negrita(calles[0].name)}`)
   else if (calles.length > 1)
     partes.push(`en la esquina de ${unirConCon(calles.map(calle => negrita(calle.name)))}`)
-  partes.push(`en la esquina de ${calles.map(calle => negrita(calle.name)).join(' con ')}`)
 
   const cercano = lugarMasCercano(punto)
   if (cercano)

@@ -112,9 +112,10 @@ registrarModo({
       encuadrar(L.latLngBounds([adivinado, verdadero]).pad(0.3), 18)
 
       const descripcion = describirUbicacion(verdadero, calles)
+      const referencia = lugar.referencia ?? lugar.nombre
       const sector =
-        lugar.tipo === 'lugar' && !descripcion.includes(escaparHtml(lugar.nombre))
-          ? ` En el sector de <b>${escaparHtml(lugar.nombre)}</b>.`
+        lugar.tipo === 'lugar' && !descripcion.includes(escaparHtml(referencia))
+          ? ` En el sector de <b>${escaparHtml(referencia)}</b>.`
           : ''
       const cerca =
         enLaCalle && !acierto ? '<p>Estabas en la calle correcta, pero en otro punto de ella.</p>' : ''

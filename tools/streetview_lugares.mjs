@@ -1,6 +1,8 @@
-// Arma los lugares del juego "¿Dónde estás?" (Street View): los lugares emblemáticos más importantes, con un punto
-// fijo cada uno, y todas las calles, con hasta 3 puntos repartidos por la calle (cada vez que sale la calle, el juego
-// elige uno al azar). Cada punto se comprueba contra Street View: solo panoramas oficiales de Google.
+// Arma los lugares del juego "¿Dónde estás?" (Street View): todas las calles, con hasta 3 puntos repartidos por la
+// calle (cada vez que sale la calle, el juego elige uno al azar), y un punto en la calle más cercana a cada lugar
+// emblemático importante (no dentro del recinto: estacionamientos, patios o estaciones de metro no sirven para
+// aprender a ubicarse en la ciudad). Cada punto se comprueba contra Street View: panorama oficial de Google, al aire
+// libre, sobre una calle pública y lejos de túneles.
 // Necesita la llave de Google en .env.local y se ejecuta desde la raíz del proyecto:
 //   node tools/streetview_lugares.mjs
 // Escribe src/datos/lugaresStreetView.json. Son unas mil consultas de metadatos a la API de Google.
@@ -107,6 +109,44 @@ const estaEnUnTunel = panorama =>
 let descartadosPorTunel = 0
 console.log('tramos de túnel en los datos de OpenStreetMap:', TUNELES.length)
 
+// ----- calles públicas de OpenStreetMap: un punto válido tiene que estar sobre una de ellas (no en un estacionamiento,
+// un patio o un acceso privado)
+const TIPOS_DE_CALLE_PUBLICA = new Set([
+  'trunk', 'primary', 'secondary', 'tertiary', 'unclassified', 'residential', 'living_street', 'pedestrian',
+  'trunk_link', 'primary_link', 'secondary_link', 'tertiary_link',
+])
+const TAMANO_DE_CELDA = 0.002
+const celdas = new Map()
+const llaveDeCelda = (lat, lon) => Math.floor(lat / TAMANO_DE_CELDA) + ':' + Math.floor(lon / TAMANO_DE_CELDA)
+for (const archivo of fs.readdirSync('tools/btiles')) {
+  const datosOsm = JSON.parse(fs.readFileSync('tools/btiles/' + archivo, 'utf8'))
+  for (const via of datosOsm.elements) {
+    const etiquetas = via.tags
+    if (via.type !== 'way' || !via.geometry || !TIPOS_DE_CALLE_PUBLICA.has(etiquetas?.highway)) continue
+    if (['private', 'no'].includes(etiquetas.access) || etiquetas.service) continue
+    const linea = via.geometry.map(p => [p.lat, p.lon])
+    const vistas = new Set()
+    for (const [lat, lon] of linea) {
+      const llave = llaveDeCelda(lat, lon)
+      if (vistas.has(llave)) continue
+      vistas.add(llave)
+      if (!celdas.has(llave)) celdas.set(llave, [])
+      celdas.get(llave).push(linea)
+    }
+  }
+}
+const DISTANCIA_A_UNA_CALLE_PUBLICA_KM = 0.015
+function estaSobreUnaCalle(panorama) {
+  const celdaLat = Math.floor(panorama.lat / TAMANO_DE_CELDA)
+  const celdaLon = Math.floor(panorama.lon / TAMANO_DE_CELDA)
+  for (let dLat = -1; dLat <= 1; dLat++)
+    for (let dLon = -1; dLon <= 1; dLon++)
+      for (const linea of celdas.get(celdaLat + dLat + ':' + (celdaLon + dLon)) ?? [])
+        if (distanciaYRumboALinea([panorama.lat, panorama.lon], [linea]).km <= DISTANCIA_A_UNA_CALLE_PUBLICA_KM) return true
+  return false
+}
+console.log('celdas con calles públicas:', celdas.size)
+
 // ----- Street View desde una página con la llave
 const detener = await iniciarServidor({ reconstruir: false })
 const navegador = await abrirNavegador()
@@ -127,33 +167,57 @@ await pagina.evaluate(async () => {
   await google.maps.importLibrary('streetView')
 })
 
+// Solo vale un panorama que sea a la vez oficial de Google y al aire libre: el mismo que devuelven las dos búsquedas
+// (así se descartan interiores, como estaciones de metro, y fotos de usuarios).
 async function panoramaCerca(lat, lon, radio) {
   return pagina.evaluate(
     async (latitud, longitud, radioM) => {
-      try {
-        const r = await new google.maps.StreetViewService().getPanorama({
-          location: { lat: latitud, lng: longitud },
-          radius: radioM,
-          preference: 'nearest',
-          sources: ['google'],
-        })
-        const l = r.data.location
-        return { lat: l.latLng.lat(), lon: l.latLng.lng(), pano: l.pano }
-      } catch {
-        return null
+      const buscar = async fuente => {
+        try {
+          const r = await new google.maps.StreetViewService().getPanorama({
+            location: { lat: latitud, lng: longitud },
+            radius: radioM,
+            preference: 'nearest',
+            sources: [fuente],
+          })
+          return r.data.location
+        } catch {
+          return null
+        }
       }
+      const oficial = await buscar('google')
+      if (!oficial) return null
+      const alAireLibre = await buscar('outdoor')
+      if (!alAireLibre || alAireLibre.pano !== oficial.pano) return null
+      return { lat: oficial.latLng.lat(), lon: oficial.latLng.lng(), pano: oficial.pano }
     },
     lat,
     lon,
     radio,
   )
 }
+
+// Un panorama sirve si además queda sobre una calle pública y lejos de túneles.
+let descartados = { tunel: 0, noEsCalle: 0 }
+async function panoramaUtil(lat, lon, radio) {
+  const panorama = await panoramaCerca(lat, lon, radio)
+  if (!panorama) return null
+  if (estaEnUnTunel(panorama)) {
+    descartados.tunel++
+    return null
+  }
+  if (!estaSobreUnaCalle(panorama)) {
+    descartados.noEsCalle++
+    return null
+  }
+  return panorama
+}
 const redondear = x => +x.toFixed(5)
 const punto = (panorama, rumbo) => ({ lat: redondear(panorama.lat), lon: redondear(panorama.lon), rumbo: ((Math.round(rumbo) % 360) + 360) % 360 })
 
 const resultado = []
 
-// ----- los lugares emblemáticos más importantes, uno por lugar
+// ----- puntos de referencia fijos (revisados a mano) y puntos sobre la calle más cercana a cada lugar importante
 const MANUALES = [
   { nombre: 'Kennedy con Las Tranqueras', comuna: 'Vitacura', lat: -33.39089, lon: -70.55333, rumbo: 180 },
   { nombre: 'Rotonda Atenas', comuna: 'Las Condes', lat: -33.41717, lon: -70.5531, rumbo: 180 },
@@ -163,20 +227,14 @@ const DESPLAZAMIENTOS = [[0, 0], [0.0007, 0], [-0.0007, 0], [0, 0.0009], [0, -0.
 for (const manual of MANUALES) {
   let elegido = null
   for (const [dLat, dLon] of DESPLAZAMIENTOS) {
-    const panorama = await panoramaCerca(manual.lat + dLat, manual.lon + dLon, 40)
-    if (!panorama) continue
-    if (estaEnUnTunel(panorama)) {
-      descartadosPorTunel++
-      continue
-    }
-    elegido = panorama
-    break
+    elegido = await panoramaUtil(manual.lat + dLat, manual.lon + dLon, 40)
+    if (elegido) break
   }
   if (!elegido) {
-    console.log('  se omite (todo alrededor está cerca de un túnel):', manual.nombre)
+    console.log('  se omite (no hay un buen panorama alrededor):', manual.nombre)
     continue
   }
-  resultado.push({ nombre: manual.nombre, tipo: 'lugar', comuna: manual.comuna, puntos: [punto(elegido, manual.rumbo)] })
+  resultado.push({ nombre: manual.nombre, tipo: 'lugar', referencia: manual.nombre, comuna: manual.comuna, puntos: [punto(elegido, manual.rumbo)] })
 }
 
 const IMPORTANTES = [
@@ -223,25 +281,45 @@ const IMPORTANTES = [
   'Fuente Alemana', 'La Piojera', 'Mercado Tirso de Molina', 'Barrio Lastarria', 'Barrio Bellavista', 'Barrio Italia',
   'Barrio Yungay', 'Barrio Brasil', 'Patronato', 'Persa Bío Bío', 'Plaza Ñuñoa', 'Plaza de Maipú', 'Plaza de Puente Alto',
 ]
-let sinCobertura = []
+
+// Desde el centro del lugar se busca hacia afuera, en anillos, el panorama válido más cercano: así el punto queda en la
+// calle del frente y no dentro del recinto.
+const ANILLOS_KM = [0, 0.06, 0.12, 0.2, 0.3]
+const DIRECCIONES = 8
+const RADIO_DE_BUSQUEDA_M = 40
+async function panoramaEnLaCalleCercaDe(lugar) {
+  for (const anillo of ANILLOS_KM) {
+    const candidatos = []
+    for (let i = 0; i < (anillo === 0 ? 1 : DIRECCIONES); i++) {
+      const angulo = (2 * Math.PI * i) / DIRECCIONES
+      const lat = lugar.lat + (anillo * Math.cos(angulo)) / KM_LAT
+      const lon = lugar.lon + (anillo * Math.sin(angulo)) / KM_LON
+      const panorama = await panoramaUtil(lat, lon, anillo === 0 ? 60 : RADIO_DE_BUSQUEDA_M)
+      if (panorama) candidatos.push(panorama)
+    }
+    if (candidatos.length)
+      return candidatos.reduce((mejor, actual) =>
+        distanciaKm([actual.lat, actual.lon], [lugar.lat, lugar.lon]) < distanciaKm([mejor.lat, mejor.lon], [lugar.lat, lugar.lon]) ? actual : mejor,
+      )
+  }
+  return null
+}
+const sinCalleCerca = []
 for (const nombre of IMPORTANTES) {
   const lugar = datos.landmarks.find(l => l.name === nombre)
   if (!lugar) {
     console.log('  no existe en los datos:', nombre)
     continue
   }
-  // Los recintos grandes (estadios, parques, malls) tienen su calle más lejos del punto central.
-  const panorama = (await panoramaCerca(lugar.lat, lugar.lon, 60)) ?? (await panoramaCerca(lugar.lat, lugar.lon, 220))
-  if (!panorama || estaEnUnTunel(panorama)) {
-    if (panorama) descartadosPorTunel++
-    sinCobertura.push(nombre)
+  const panorama = await panoramaEnLaCalleCercaDe(lugar)
+  if (!panorama) {
+    sinCalleCerca.push(nombre)
     continue
   }
-  const cerca = distanciaKm([panorama.lat, panorama.lon], [lugar.lat, lugar.lon]) < 0.015
-  const rumbo = cerca ? azar() * 360 : rumboHacia([panorama.lat, panorama.lon], [lugar.lat, lugar.lon])
-  resultado.push({ nombre: lugar.name, tipo: 'lugar', comuna: lugar.comuna, puntos: [punto(panorama, rumbo)] })
+  const rumbo = rumboHacia([panorama.lat, panorama.lon], [lugar.lat, lugar.lon])
+  resultado.push({ nombre: 'Cerca de ' + lugar.name, tipo: 'lugar', referencia: lugar.name, comuna: lugar.comuna, puntos: [punto(panorama, rumbo)] })
 }
-console.log(`lugares: ${resultado.length} (sin cobertura: ${sinCobertura.join(', ') || 'ninguno'})`)
+console.log('lugares:', resultado.length, '| sin calle pública cerca:', sinCalleCerca.join(', ') || 'ninguno')
 
 // ----- calles: hasta 3 puntos por calle, lejos uno del otro y sobre la calle misma
 const PUNTOS_POR_CALLE = 3
@@ -254,12 +332,8 @@ for (const calle of calles) {
   const puntos = []
   for (let intento = 0; intento < INTENTOS_POR_CALLE && puntos.length < PUNTOS_POR_CALLE; intento++) {
     const candidato = puntoAlAzarEnLaCalle(calle)
-    const panorama = await panoramaCerca(candidato[0], candidato[1], 30)
+    const panorama = await panoramaUtil(candidato[0], candidato[1], 30)
     if (!panorama) continue
-    if (estaEnUnTunel(panorama)) {
-      descartadosPorTunel++
-      continue
-    }
     const sobreLaCalle = distanciaYRumboALinea([panorama.lat, panorama.lon], calle.lines)
     if (sobreLaCalle.km > MARGEN_SOBRE_LA_CALLE_KM) continue
     if (puntos.some(otro => distanciaKm([otro.lat, otro.lon], [panorama.lat, panorama.lon]) < SEPARACION_MINIMA_KM)) continue
@@ -273,7 +347,7 @@ for (const calle of calles) {
   resultado.push({ nombre: calle.name, tipo: 'calle', comuna: calle.comunas[0], puntos })
 }
 console.log(`calles: ${calles.length - callesIncompletas.length}/${calles.length}; sin cobertura: ${callesIncompletas.join(', ') || 'ninguna'}`)
-console.log('panoramas descartados por estar en un túnel:', descartadosPorTunel)
+console.log('panoramas descartados:', descartados)
 
 fs.writeFileSync('src/datos/lugaresStreetView.json', JSON.stringify(resultado))
 console.log('Total:', resultado.length, 'lugares escritos en src/datos/lugaresStreetView.json')
