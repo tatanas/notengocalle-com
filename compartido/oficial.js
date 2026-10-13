@@ -9,6 +9,7 @@ export const REGLAS_OFICIALES = {
   strict: false,
   ownStreets: false,
   easy: false,
+  nivelStreetView: 'dificil',
 }
 
 // Juegos con ranking.
@@ -42,6 +43,15 @@ export const puntosPorPregunta = modo => PUNTOS_POR_PREGUNTA[modo] ?? 1
 export const TODAS_LAS_PREGUNTAS = 'todas'
 export const CATEGORIAS_DE_RONDA = ['20', TODAS_LAS_PREGUNTAS]
 
+// Las rondas son de 20 preguntas, salvo en los juegos que se juegan más largo y por eso van de a menos.
+const LARGO_NORMAL = { 'sv-ubicar': 10 }
+export const largoNormalDe = modo => LARGO_NORMAL[modo] ?? 20
+export const categoriasValidasDe = modo => [String(largoNormalDe(modo)), TODAS_LAS_PREGUNTAS]
+// Lo que se puede pedir al ranking: cualquiera de los largos que algún juego use.
+export const CATEGORIAS_DE_CONSULTA = [
+  ...new Set([...Object.values(LARGO_NORMAL).map(String), ...CATEGORIAS_DE_RONDA]),
+]
+
 export const etiquetaDeCategoria = categoria => (categoria === TODAS_LAS_PREGUNTAS ? 'Todas' : categoria)
 
 // Una ronda que recorre todo el conjunto del juego es "todas", sin importar cuántas sean.
@@ -64,7 +74,7 @@ const PREGUNTAS_MAXIMAS = 2000
 
 export function problemaDelPuntaje({ modo, categoria, aciertos, total, ms }) {
   if (!MODOS_OFICIALES.includes(modo)) return 'modo desconocido'
-  if (!CATEGORIAS_DE_RONDA.includes(categoria)) return 'categoría desconocida'
+  if (!categoriasValidasDe(modo).includes(categoria)) return 'categoría desconocida'
   const porPregunta = puntosPorPregunta(modo)
   if (!Number.isInteger(total) || total % porPregunta) return 'largo de la ronda no válido'
   const preguntas = total / porPregunta

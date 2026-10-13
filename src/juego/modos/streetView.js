@@ -1,5 +1,5 @@
 import { distanciaALinea, distanciaKm } from '../../nucleo/geografia.js'
-import { almacen } from '../../nucleo/almacen.js'
+import { ajustes, almacen } from '../../nucleo/almacen.js'
 import { escaparHtml, formatearKm } from '../../nucleo/utilidades.js'
 import { reportarPunto } from '../../cuenta/reportes.js'
 import { vias } from '../../datos/datos.js'
@@ -33,7 +33,11 @@ const textoDeLaPregunta = `<div class="q-prompt">Mira alrededor y <b>toca en el 
 const llaveDelPunto = punto => `${punto.lat},${punto.lon}`
 const reportados = new Set(almacen.get('puntosReportados', []))
 const puntosDisponibles = lugar => lugar.puntos.filter(punto => !reportados.has(llaveDelPunto(punto)))
-const lugaresDisponibles = () => LUGARES.filter(lugar => puntosDisponibles(lugar).length)
+const NIVEL_MAXIMO = { facil: 1, medio: 2, dificil: 3 }
+const lugaresDisponibles = () =>
+  LUGARES.filter(
+    lugar => lugar.nivel <= NIVEL_MAXIMO[ajustes.nivelStreetView] && puntosDisponibles(lugar).length,
+  )
 const alAzar = lista => lista[Math.floor(Math.random() * lista.length)]
 
 // Cambia la pregunta actual por otra que no haya salido en la ronda (no se pierde ni se acorta la ronda).

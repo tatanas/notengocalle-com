@@ -3,7 +3,14 @@ import { esAciertoDeStreetView, puntajeDeStreetView } from '../src/dominio/stree
 import assert from 'node:assert/strict'
 import { test } from 'node:test'
 import { llaveDeUsuario, PATRON_DE_USUARIO } from '../compartido/cuentas.js'
-import { categoriaDe, esMejorPuntaje, categoriaHeredada, problemaDelPuntaje } from '../compartido/oficial.js'
+import {
+  categoriaDe,
+  categoriasValidasDe,
+  esMejorPuntaje,
+  categoriaHeredada,
+  largoNormalDe,
+  problemaDelPuntaje,
+} from '../compartido/oficial.js'
 import {
   distanciaKm,
   distanciaKmCualquierLatitud,
@@ -254,14 +261,25 @@ test('"¿Dónde estás?": de 0 a 5 puntos según la distancia, y 3 o más cuenta
   assert.equal(esAciertoDeStreetView(1.001), false)
 })
 
-test('en Street View el ranking suma puntos: el máximo es 5 por pregunta', () => {
-  const ronda = { modo: 'sv-ubicar', categoria: '20', aciertos: 61, total: 100, ms: 90000 }
+test('en Street View el ranking suma puntos: 10 preguntas de hasta 5 puntos', () => {
+  const ronda = { modo: 'sv-ubicar', categoria: '10', aciertos: 31, total: 50, ms: 90000 }
   assert.equal(problemaDelPuntaje(ronda), null)
-  assert.ok(problemaDelPuntaje({ ...ronda, aciertos: 101 }), 'más puntos que el máximo')
-  assert.ok(problemaDelPuntaje({ ...ronda, total: 20 }), 'el máximo de 20 preguntas es 100, no 20')
-  assert.ok(problemaDelPuntaje({ ...ronda, ms: 2000 }), 'imposible de rápido')
+  assert.ok(problemaDelPuntaje({ ...ronda, aciertos: 51 }), 'más puntos que el máximo')
+  assert.ok(problemaDelPuntaje({ ...ronda, total: 10 }), 'el máximo de 10 preguntas es 50, no 10')
+  assert.ok(
+    problemaDelPuntaje({ ...ronda, categoria: '20', total: 100 }),
+    'Street View no tiene rondas de 20',
+  )
+  assert.ok(problemaDelPuntaje({ ...ronda, ms: 1000 }), 'imposible de rápido')
   assert.equal(
     problemaDelPuntaje({ ...ronda, categoria: 'todas', total: 1345, aciertos: 900, ms: 900000 }),
     null,
   )
+})
+
+test('cada juego tiene su largo normal de ronda', () => {
+  assert.equal(largoNormalDe('sv-ubicar'), 10)
+  assert.equal(largoNormalDe('st-name'), 20)
+  assert.deepEqual(categoriasValidasDe('sv-ubicar'), ['10', 'todas'])
+  assert.deepEqual(categoriasValidasDe('st-name'), ['20', 'todas'])
 })

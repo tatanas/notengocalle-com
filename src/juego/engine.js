@@ -1,6 +1,7 @@
 import {
   REGLAS_OFICIALES,
   MODOS_OFICIALES,
+  largoNormalDe,
   TODAS_LAS_PREGUNTAS,
   categoriaDe,
 } from '../../compartido/oficial.js'
@@ -38,6 +39,7 @@ const maximoDe = (modo, preguntas) => preguntas * (modo.puntosPorPregunta ?? 1)
 
 export const tieneRondaOficial = modo => MODOS_OFICIALES.includes(modo.id)
 
+const LARGO_DE_TODAS = 999
 const SEGUNDOS_DE_CUENTA_REGRESIVA = 3
 let temporizadorDeCuenta = null
 
@@ -112,7 +114,9 @@ export function iniciarPartida(modo, { ranked: oficial = false, category: catego
     ? categoria === TODAS_LAS_PREGUNTAS
       ? conjunto.length
       : +categoria
-    : largoPara(modo.group)
+    : largoPara(modo.group) >= LARGO_DE_TODAS
+      ? LARGO_DE_TODAS
+      : largoNormalDe(modo.id)
   const tamano = modo.all ? conjunto.length : Math.min(pedidas, conjunto.length)
   if (!conjunto.length) {
     aplicarReglasDeRonda(null)
