@@ -5,6 +5,9 @@
 // libre, sobre una calle pública y lejos de túneles.
 // Necesita la llave de Google en .env.local y se ejecuta desde la raíz del proyecto:
 //   node tools/streetview_lugares.mjs
+// Para agregar o rehacer solo algunas preguntas sin tocar el resto (se mezclan con las que ya existen):
+//   SV_CALLES="Costanera Norte|Américo Vespucio" SV_EXTRAS=1 node tools/streetview_lugares.mjs
+// y después correr tools/niveles_streetview.mjs.
 // Escribe src/datos/lugaresStreetView.json. Son unas mil consultas de metadatos a la API de Google.
 import fs from 'node:fs'
 
@@ -96,7 +99,7 @@ const cajaDe = linea => ({
   maxLon: Math.max(...linea.map(p => p[1])) + 0.0013,
 })
 const TUNELES_CON_CAJA = TUNELES.map(linea => ({ linea, caja: cajaDe(linea) }))
-const estaEnUnTunel = panorama =>
+const estaEnUnTunel = (panorama, distanciaMaxima = DISTANCIA_A_UN_TUNEL_KM) =>
   ZONAS_EXCLUIDAS.some(([lat, lon, radio]) => distanciaKm([panorama.lat, panorama.lon], [lat, lon]) <= radio) ||
   TUNELES_CON_CAJA.some(
     ({ linea, caja }) =>
@@ -104,7 +107,7 @@ const estaEnUnTunel = panorama =>
       panorama.lat <= caja.maxLat &&
       panorama.lon >= caja.minLon &&
       panorama.lon <= caja.maxLon &&
-      distanciaYRumboALinea([panorama.lat, panorama.lon], [linea]).km <= DISTANCIA_A_UN_TUNEL_KM,
+      distanciaYRumboALinea([panorama.lat, panorama.lon], [linea]).km <= distanciaMaxima,
   )
 let descartadosPorTunel = 0
 console.log('tramos de túnel en los datos de OpenStreetMap:', TUNELES.length)
@@ -112,7 +115,7 @@ console.log('tramos de túnel en los datos de OpenStreetMap:', TUNELES.length)
 // ----- calles públicas de OpenStreetMap: un punto válido tiene que estar sobre una de ellas (no en un estacionamiento,
 // un patio o un acceso privado)
 const TIPOS_DE_CALLE_PUBLICA = new Set([
-  'trunk', 'primary', 'secondary', 'tertiary', 'unclassified', 'residential', 'living_street', 'pedestrian',
+  'motorway', 'motorway_link', 'trunk', 'primary', 'secondary', 'tertiary', 'unclassified', 'residential', 'living_street', 'pedestrian',
   'trunk_link', 'primary_link', 'secondary_link', 'tertiary_link',
 ])
 const TAMANO_DE_CELDA = 0.002
@@ -199,10 +202,10 @@ async function panoramaCerca(lat, lon, radio) {
 
 // Un panorama sirve si además queda sobre una calle pública y lejos de túneles.
 let descartados = { tunel: 0, noEsCalle: 0 }
-async function panoramaUtil(lat, lon, radio) {
+async function panoramaUtil(lat, lon, radio, distanciaAUnTunelKm = DISTANCIA_A_UN_TUNEL_KM) {
   const panorama = await panoramaCerca(lat, lon, radio)
   if (!panorama) return null
-  if (estaEnUnTunel(panorama)) {
+  if (estaEnUnTunel(panorama, distanciaAUnTunelKm)) {
     descartados.tunel++
     return null
   }
@@ -216,6 +219,10 @@ const redondear = x => +x.toFixed(5)
 const punto = (panorama, rumbo) => ({ lat: redondear(panorama.lat), lon: redondear(panorama.lon), rumbo: ((Math.round(rumbo) % 360) + 360) % 360 })
 
 const resultado = []
+// Modo parcial: solo las calles de SV_CALLES y/o los puntos extra, mezclados con lo que ya hay en el archivo.
+const SOLO_CALLES = process.env.SV_CALLES?.split('|')
+const CON_EXTRAS = process.env.SV_EXTRAS === '1'
+const PARCIAL = !!SOLO_CALLES || CON_EXTRAS
 
 // ----- puntos de referencia fijos (revisados a mano) y puntos sobre la calle más cercana a cada lugar importante
 const MANUALES = [
@@ -224,7 +231,7 @@ const MANUALES = [
   { nombre: 'Frente al Estadio Nacional', comuna: 'Ñuñoa', lat: -33.46211, lon: -70.61037, rumbo: 180 },
 ]
 const DESPLAZAMIENTOS = [[0, 0], [0.0007, 0], [-0.0007, 0], [0, 0.0009], [0, -0.0009], [0.0014, 0], [-0.0014, 0], [0, 0.0018], [0, -0.0018], [0.0021, 0], [-0.0021, 0], [0.0028, 0], [-0.0028, 0]]
-for (const manual of MANUALES) {
+for (const manual of PARCIAL ? [] : MANUALES) {
   let elegido = null
   for (const [dLat, dLon] of DESPLAZAMIENTOS) {
     elegido = await panoramaUtil(manual.lat + dLat, manual.lon + dLon, 40)
@@ -305,7 +312,7 @@ async function panoramaEnLaCalleCercaDe(lugar) {
   return null
 }
 const sinCalleCerca = []
-for (const nombre of IMPORTANTES) {
+for (const nombre of PARCIAL ? [] : IMPORTANTES) {
   const lugar = datos.landmarks.find(l => l.name === nombre)
   if (!lugar) {
     console.log('  no existe en los datos:', nombre)
@@ -321,12 +328,35 @@ for (const nombre of IMPORTANTES) {
 }
 console.log('lugares:', resultado.length, '| sin calle pública cerca:', sinCalleCerca.join(', ') || 'ninguno')
 
+// ----- puntos extra: sobre una calle, mirando a un lugar importante
+const EXTRAS = [{ nombre: 'Providencia frente al Costanera Center', calle: 'Av. Providencia', referencia: 'Costanera Center / Gran Torre Santiago' }]
+if (CON_EXTRAS)
+  for (const extra of EXTRAS) {
+    const lugar = datos.landmarks.find(l => l.name === extra.referencia)
+    const calle = datos.streets.find(c => c.name === extra.calle)
+    const vertices = calle.lines.flat()
+    const masCercano = vertices.reduce((mejor, v) => (distanciaKm(v, [lugar.lat, lugar.lon]) < distanciaKm(mejor, [lugar.lat, lugar.lon]) ? v : mejor))
+    let elegido = null
+    for (const [dLat, dLon] of [[0, 0], [0.0003, 0], [-0.0003, 0], [0, 0.0004], [0, -0.0004], [0.0006, 0], [-0.0006, 0]]) {
+      // Estos puntos se piden a mano: se acepta estar más cerca de un túnel (basta con no estar dentro de él).
+      elegido = await panoramaUtil(masCercano[0] + dLat, masCercano[1] + dLon, 30, 0.02)
+      if (elegido) break
+    }
+    if (!elegido) {
+      console.log('  sin panorama para', extra.nombre)
+      continue
+    }
+    resultado.push({ nombre: extra.nombre, tipo: 'lugar', referencia: lugar.name, comuna: lugar.comuna, puntos: [punto(elegido, rumboHacia([elegido.lat, elegido.lon], [lugar.lat, lugar.lon]))] })
+  }
+
 // ----- calles: hasta 3 puntos por calle, lejos uno del otro y sobre la calle misma
 const PUNTOS_POR_CALLE = 3
 const INTENTOS_POR_CALLE = 14
 const SEPARACION_MINIMA_KM = 0.4
 const MARGEN_SOBRE_LA_CALLE_KM = 0.03
-const calles = datos.streets.filter(calle => !calle.kind || calle.kind === 'calle')
+const calles = datos.streets.filter(calle =>
+  PARCIAL ? SOLO_CALLES?.includes(calle.name) : !calle.kind || calle.kind === 'calle',
+)
 const callesIncompletas = []
 for (const calle of calles) {
   const puntos = []
@@ -349,6 +379,11 @@ for (const calle of calles) {
 console.log(`calles: ${calles.length - callesIncompletas.length}/${calles.length}; sin cobertura: ${callesIncompletas.join(', ') || 'ninguna'}`)
 console.log('panoramas descartados:', descartados)
 
+if (PARCIAL) {
+  const nuevos = new Set(resultado.map(pregunta => pregunta.nombre))
+  const existentes = JSON.parse(fs.readFileSync('src/datos/lugaresStreetView.json', 'utf8')).filter(pregunta => !nuevos.has(pregunta.nombre))
+  resultado.unshift(...existentes)
+}
 fs.writeFileSync('src/datos/lugaresStreetView.json', JSON.stringify(resultado))
 console.log('Total:', resultado.length, 'lugares escritos en src/datos/lugaresStreetView.json')
 await navegador.close()

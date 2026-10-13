@@ -1,5 +1,5 @@
 // Le pone nivel (1 fácil, 2 medio, 3 difícil) a cada pregunta de src/datos/lugaresStreetView.json.
-// Fácil: una calle famosa por comuna, unas pocas históricas y los lugares más conocidos.
+// Fácil: los grandes ejes y autopistas, las principales avenidas de cada sector (incluido el poniente) y los lugares más conocidos.
 // Medio: lo anterior, las avenidas largas (5 km o más) y lugares de categorías muy conocidas.
 // Difícil: todo. Se corre después de tools/streetview_lugares.mjs:  node tools/niveles_streetview.mjs
 import fs from 'node:fs'
@@ -12,46 +12,61 @@ const datos = (() => {
 })()
 
 const CALLES_FACILES = [
-  // una por comuna, la más famosa o concurrida
-  "Alameda (Av. Libertador Bernardo O'Higgins)", // Santiago
+  // los grandes ejes de la ciudad
+  "Alameda (Av. Libertador Bernardo O'Higgins)",
+  'Av. Vicuña Mackenna',
   'Av. Providencia',
-  'Av. Apoquindo', // Las Condes
-  'Av. Vitacura',
-  'Av. Irarrázaval', // Ñuñoa
-  'Av. Príncipe de Gales', // La Reina
-  'Av. La Dehesa', // Lo Barnechea
-  'Av. Tobalaba', // Peñalolén
-  'Av. Vicuña Mackenna', // La Florida
-  'Av. Macul',
-  'Av. Presidente Salvador Allende Gossens', // San Joaquín
-  'Gran Avenida (José Miguel Carrera)', // San Miguel
-  'Av. El Parrón', // La Cisterna
-  'Av. Santa Rosa', // La Pintana
-  'Av. Concha y Toro', // Puente Alto
-  'Av. Padre Hurtado (sur)', // San Bernardo
-  'Av. Pajaritos', // Maipú
-  'Av. Pedro Aguirre Cerda', // Cerrillos
-  'Av. Carlos Valdovinos', // Pedro Aguirre Cerda
-  'Av. Las Rejas', // Estación Central
-  'Av. Mapocho', // Quinta Normal
-  'José Joaquín Pérez', // Cerro Navia
-  'Av. San Pablo', // Pudahuel
-  'Av. Neptuno', // Lo Prado
-  'Av. José Miguel Infante', // Renca
-  'Av. Independencia', // Conchalí
-  'Av. Fermín Vivaceta', // Independencia
-  'Av. Recoleta',
-  'Av. El Salto', // Huechuraba
-  // históricas o muy transitadas
-  'Paseo Ahumada',
+  'Av. Apoquindo',
+  'Av. Las Condes',
   'Av. Presidente Kennedy',
+  'Gran Avenida (José Miguel Carrera)',
+  'Av. Santa Rosa',
+  'Av. Irarrázaval',
+  'Av. Grecia',
+  'Av. Departamental',
+  'Av. Independencia',
+  'Av. Recoleta',
+  'Pío Nono',
   'Av. Matta (Manuel Antonio Matta)',
+  'Av. Tobalaba',
+  'Av. Quilín',
+  'Av. Vitacura',
+  'Av. Pedro de Valdivia',
+  'Av. Manquehue',
+  'Paseo Ahumada',
+  // autopistas
+  'Costanera Norte',
+  'Américo Vespucio',
+  'Autopista Central',
+  'Autopista del Sol (Ruta 78)',
+  'Ruta 68 (a Valparaíso)',
+  // poniente
+  'Av. San Pablo',
+  'Av. Pajaritos',
+  'Av. Gladys Marín',
+  'Av. 5 de Abril',
+  'Av. Las Rejas',
+  'Av. Teniente Cruz',
+  'Camino a Melipilla',
+  'Av. General Velásquez',
+  'Av. Matucana',
+  'Av. Carrascal',
+  // sur, norte y oriente
+  'Av. La Florida',
+  'Av. Concha y Toro',
+  'Av. Macul',
+  'Av. Príncipe de Gales',
+  'Av. La Dehesa',
+  'Av. Padre Hurtado (sur)',
+  'Av. Presidente Salvador Allende Gossens',
+  'Av. José Miguel Infante',
 ]
 const LUGARES_FACILES = [
-  'Plaza de Armas', 'Palacio de La Moneda', 'Estación Mapocho', 'Mercado Central', 'Plaza Italia (Plaza Baquedano)',
-  'Cerro Santa Lucía', 'Costanera Center / Gran Torre Santiago', 'Parque Arauco', 'Alto Las Condes',
-  'Estadio Nacional (selección chilena; hace de local la U. de Chile)', 'PUC – Casa Central', 'Mall Plaza Vespucio',
-  'Terminal Sur / Alameda (buses)', 'Zoológico Nacional',
+  'Plaza de Armas', 'Palacio de La Moneda', 'Barrio Cívico / Paseo Bulnes', 'Estación Mapocho', 'Mercado Central',
+  'Plaza Italia (Plaza Baquedano)', 'Cerro Santa Lucía', 'Costanera Center / Gran Torre Santiago', 'Parque Arauco',
+  'Alto Las Condes', 'Estadio Nacional (selección chilena; hace de local la U. de Chile)', 'PUC – Casa Central',
+  'Mall Plaza Vespucio', 'Estación Central (ferrocarriles)', 'Terminal Sur / Alameda (buses)', 'Zoológico Nacional',
+  'Templo Votivo de Maipú', 'Mall Arauco Maipú', 'Mall Plaza Norte', 'Parque Bicentenario',
 ]
 const CATEGORIAS_MEDIAS = ['Centro histórico', 'Gobierno y justicia', 'Deporte', 'Malls y edificios', 'Cerros y parques', 'Transporte']
 const LARGO_DE_AVENIDA_LARGA_KM = 5
