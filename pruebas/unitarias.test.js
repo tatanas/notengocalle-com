@@ -271,15 +271,15 @@ test('en Street View el ranking suma puntos: 10 preguntas de hasta 5 puntos', ()
     'Street View no tiene rondas de 20',
   )
   assert.ok(problemaDelPuntaje({ ...ronda, ms: 1000 }), 'imposible de rápido')
-  assert.equal(
+  assert.ok(
     problemaDelPuntaje({ ...ronda, categoria: 'todas', total: 1345, aciertos: 900, ms: 900000 }),
-    null,
+    'Street View no tiene ronda de todas',
   )
 })
 
 test('cada juego tiene su largo normal de ronda', () => {
   assert.equal(largoNormalDe('sv-ubicar'), 10)
   assert.equal(largoNormalDe('st-name'), 20)
-  assert.deepEqual(categoriasValidasDe('sv-ubicar'), ['10', 'todas'])
+  assert.deepEqual(categoriasValidasDe('sv-ubicar'), ['10'])
   assert.deepEqual(categoriasValidasDe('st-name'), ['20', 'todas'])
 })

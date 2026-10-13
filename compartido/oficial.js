@@ -46,7 +46,11 @@ export const CATEGORIAS_DE_RONDA = ['20', TODAS_LAS_PREGUNTAS]
 // Las rondas son de 20 preguntas, salvo en los juegos que se juegan más largo y por eso van de a menos.
 const LARGO_NORMAL = { 'sv-ubicar': 10 }
 export const largoNormalDe = modo => LARGO_NORMAL[modo] ?? 20
-export const categoriasValidasDe = modo => [String(largoNormalDe(modo)), TODAS_LAS_PREGUNTAS]
+// Hay juegos con demasiadas preguntas para recorrerlas todas: su ronda siempre es del largo normal.
+const SIN_RONDA_DE_TODAS = new Set(['sv-ubicar'])
+export const tieneRondaDeTodas = modo => !SIN_RONDA_DE_TODAS.has(modo)
+export const categoriasValidasDe = modo =>
+  tieneRondaDeTodas(modo) ? [String(largoNormalDe(modo)), TODAS_LAS_PREGUNTAS] : [String(largoNormalDe(modo))]
 // Lo que se puede pedir al ranking: cualquiera de los largos que algún juego use.
 export const CATEGORIAS_DE_CONSULTA = [
   ...new Set([...Object.values(LARGO_NORMAL).map(String), ...CATEGORIAS_DE_RONDA]),

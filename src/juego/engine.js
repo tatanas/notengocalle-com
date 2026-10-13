@@ -2,6 +2,7 @@ import {
   REGLAS_OFICIALES,
   MODOS_OFICIALES,
   largoNormalDe,
+  tieneRondaDeTodas,
   TODAS_LAS_PREGUNTAS,
   categoriaDe,
 } from '../../compartido/oficial.js'
@@ -114,7 +115,7 @@ export function iniciarPartida(modo, { ranked: oficial = false, category: catego
     ? categoria === TODAS_LAS_PREGUNTAS
       ? conjunto.length
       : +categoria
-    : largoPara(modo.group) >= LARGO_DE_TODAS
+    : largoPara(modo.group) >= LARGO_DE_TODAS && tieneRondaDeTodas(modo.id)
       ? LARGO_DE_TODAS
       : largoNormalDe(modo.id)
   const tamano = modo.all ? conjunto.length : Math.min(pedidas, conjunto.length)

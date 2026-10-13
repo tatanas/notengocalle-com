@@ -1,5 +1,5 @@
 import { mejores, reiniciarProgreso, estadisticas } from '../nucleo/progreso.js'
-import { largoNormalDe } from '../../compartido/oficial.js'
+import { largoNormalDe, tieneRondaDeTodas } from '../../compartido/oficial.js'
 import { largoPara, guardarAjustes, ajustes } from '../nucleo/almacen.js'
 import { $, escaparHtml, formatearTiempo } from '../nucleo/utilidades.js'
 import {
@@ -128,7 +128,7 @@ const NIVELES_DE_STREET_VIEW = [
 // Cuántas preguntas por ronda, en la tarjeta del juego. Los juegos que siempre recorren todo su conjunto
 // (las comunas: son pocas) no lo ofrecen.
 function selectorDeLargo(grupo, modos) {
-  if (modos.every(modo => modo.all)) return ''
+  if (modos.every(modo => modo.all || !tieneRondaDeTodas(modo.id))) return ''
   const opciones = OPCIONES_DE_LARGO.map(
     eleccion =>
       `<option value="${eleccion}" ${eleccion === largoPara(grupo) ? 'selected' : ''}>${eleccion === 999 ? 'Todas' : largoNormalDe(modos[0].id)}</option>`,
