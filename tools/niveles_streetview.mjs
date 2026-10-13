@@ -1,5 +1,5 @@
 // Le pone nivel (1 fácil, 2 medio, 3 difícil, 4 extremo) a cada pregunta de src/datos/lugaresStreetView.json.
-// Fácil: un puñado (unas 25) de las calles y lugares que todo el mundo conoce.
+// Fácil: un puñado (unas 25) de las calles y lugares que todo el mundo conoce, sobre todo del centro (casi nada del oriente ni autopistas).
 // Medio: los grandes ejes y autopistas, las principales avenidas de cada sector (incluido el poniente) y los lugares más conocidos.
 // Difícil: lo anterior, las avenidas largas (5 km o más) y lugares de categorías muy conocidas.
 // Extremo: todo. Se corre después de tools/streetview_lugares.mjs:  node tools/niveles_streetview.mjs
@@ -13,14 +13,15 @@ const datos = (() => {
 })()
 
 const CALLES_MUY_FACILES = [
-  "Alameda (Av. Libertador Bernardo O'Higgins)", 'Av. Vicuña Mackenna', 'Av. Providencia', 'Av. Apoquindo', 'Av. Las Condes',
-  'Av. Presidente Kennedy', 'Gran Avenida (José Miguel Carrera)', 'Av. Santa Rosa', 'Av. Irarrázaval', 'Costanera Norte',
-  'Américo Vespucio', 'Autopista Central', 'Av. San Pablo',
+  "Alameda (Av. Libertador Bernardo O'Higgins)", 'Av. Vicuña Mackenna', 'Av. Providencia', 'Av. Apoquindo', 'Pío Nono',
+  'Paseo Ahumada', 'Av. Santa Rosa', 'Gran Avenida (José Miguel Carrera)', 'Av. Irarrázaval', 'Av. San Pablo',
+  'Av. Independencia', 'Av. Recoleta',
 ]
 const LUGARES_MUY_FACILES = [
   'Plaza de Armas', 'Palacio de La Moneda', 'Estación Mapocho', 'Plaza Italia (Plaza Baquedano)', 'Cerro Santa Lucía',
-  'Costanera Center / Gran Torre Santiago', 'Estación Central (ferrocarriles)', 'Parque Arauco', 'Alto Las Condes',
-  'Estadio Nacional (selección chilena; hace de local la U. de Chile)', 'Mercado Central',
+  'Costanera Center / Gran Torre Santiago', 'Estación Central (ferrocarriles)', 'Mercado Central', 'La Vega Central',
+  'Cerro San Cristóbal (cumbre, Virgen)', 'Cementerio General',
+  'Estadio Nacional (selección chilena; hace de local la U. de Chile)',
 ]
 const CALLES_FACILES = [
   // los grandes ejes de la ciudad

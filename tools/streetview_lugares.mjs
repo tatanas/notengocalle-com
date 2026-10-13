@@ -6,7 +6,7 @@
 // Necesita la llave de Google en .env.local y se ejecuta desde la raíz del proyecto:
 //   node tools/streetview_lugares.mjs
 // Para agregar o rehacer solo algunas preguntas sin tocar el resto (se mezclan con las que ya existen):
-//   SV_CALLES="Costanera Norte|Américo Vespucio" SV_EXTRAS=1 node tools/streetview_lugares.mjs
+//   SV_CALLES="Costanera Norte|Américo Vespucio" SV_EXTRAS=1 SV_LUGARES="Templo Bahá'í" node tools/streetview_lugares.mjs
 // y después correr tools/niveles_streetview.mjs.
 // Escribe src/datos/lugaresStreetView.json. Son unas mil consultas de metadatos a la API de Google.
 import fs from 'node:fs'
@@ -222,7 +222,8 @@ const resultado = []
 // Modo parcial: solo las calles de SV_CALLES y/o los puntos extra, mezclados con lo que ya hay en el archivo.
 const SOLO_CALLES = process.env.SV_CALLES?.split('|')
 const CON_EXTRAS = process.env.SV_EXTRAS === '1'
-const PARCIAL = !!SOLO_CALLES || CON_EXTRAS
+const SOLO_LUGARES = process.env.SV_LUGARES?.split('|')
+const PARCIAL = !!SOLO_CALLES || CON_EXTRAS || !!SOLO_LUGARES
 
 // ----- puntos de referencia fijos (revisados a mano) y puntos sobre la calle más cercana a cada lugar importante
 const MANUALES = [
@@ -291,7 +292,7 @@ const IMPORTANTES = [
 
 // Desde el centro del lugar se busca hacia afuera, en anillos, el panorama válido más cercano: así el punto queda en la
 // calle del frente y no dentro del recinto.
-const ANILLOS_KM = [0, 0.06, 0.12, 0.2, 0.3]
+const ANILLOS_KM = process.env.SV_LUGARES ? [0, 0.06, 0.12, 0.2, 0.3, 0.5, 0.8] : [0, 0.06, 0.12, 0.2, 0.3]
 const DIRECCIONES = 8
 const RADIO_DE_BUSQUEDA_M = 40
 async function panoramaEnLaCalleCercaDe(lugar) {
@@ -312,7 +313,7 @@ async function panoramaEnLaCalleCercaDe(lugar) {
   return null
 }
 const sinCalleCerca = []
-for (const nombre of PARCIAL ? [] : IMPORTANTES) {
+for (const nombre of SOLO_LUGARES ?? (PARCIAL ? [] : IMPORTANTES)) {
   const lugar = datos.landmarks.find(l => l.name === nombre)
   if (!lugar) {
     console.log('  no existe en los datos:', nombre)
