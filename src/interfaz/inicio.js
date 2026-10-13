@@ -247,6 +247,13 @@ const htmlDeInicio = () => `<div class="home-backdrop" aria-hidden="true"></div>
 const valoresMarcados = (contenedor, atributo) =>
   [...contenedor.querySelectorAll('input:checked')].map(entrada => entrada.dataset[atributo])
 
+// Un ajuste que cambia lo que se juega vuelve a dibujar el menú, pero sin mandar al usuario arriba.
+function redibujarInicioSinSaltar() {
+  const posicion = vistaDePantalla.scrollTop
+  abrirInicio()
+  vistaDePantalla.scrollTop = posicion
+}
+
 function conectarAjustes() {
   const lineas = $('#setLines')
   for (const entrada of lineas.querySelectorAll('input'))
@@ -254,7 +261,7 @@ function conectarAjustes() {
       const elegidos = valoresMarcados(lineas, 'line')
       ajustes.lines = !elegidos.length || elegidos.length === IDS_DE_LINEA.length ? null : elegidos
       guardarAjustes()
-      abrirInicio()
+      redibujarInicioSinSaltar()
     }
 
   const alcance = $('#setScope')
@@ -262,7 +269,7 @@ function conectarAjustes() {
   alcance.onchange = () => {
     ajustes.scope = alcance.value
     guardarAjustes()
-    abrirInicio()
+    redibujarInicioSinSaltar()
   }
 
   for (const selectorElegido of vistaDePantalla.querySelectorAll('[data-length-group]'))
