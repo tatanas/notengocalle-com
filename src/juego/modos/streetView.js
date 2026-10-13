@@ -33,7 +33,7 @@ const textoDeLaPregunta = `<div class="q-prompt">Mira alrededor y <b>toca en el 
 const llaveDelPunto = punto => `${punto.lat},${punto.lon}`
 const reportados = new Set(almacen.get('puntosReportados', []))
 const puntosDisponibles = lugar => lugar.puntos.filter(punto => !reportados.has(llaveDelPunto(punto)))
-const NIVEL_MAXIMO = { facil: 1, medio: 2, dificil: 3 }
+const NIVEL_MAXIMO = { facil: 1, medio: 2, dificil: 3, extremo: 4 }
 const lugaresDisponibles = () =>
   LUGARES.filter(
     lugar => lugar.nivel <= NIVEL_MAXIMO[ajustes.nivelStreetView] && puntosDisponibles(lugar).length,
