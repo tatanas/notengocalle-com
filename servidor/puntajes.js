@@ -1,7 +1,7 @@
 import {
   PERIODOS,
   MODOS_OFICIALES,
-  CATEGORIAS_DE_RONDA,
+  CATEGORIAS_DE_CONSULTA,
   esMejorPuntaje,
   categoriaHeredada,
   problemaDelPuntaje,
@@ -22,7 +22,8 @@ function inicioDelPeriodo(url) {
 
 function categoriaDe(url) {
   const categoria = url.searchParams.get('categoria') || CATEGORIA_POR_DEFECTO
-  if (!CATEGORIAS_DE_RONDA.includes(categoria)) throw invalido('categoria_invalida', 'Categoría desconocida')
+  if (!CATEGORIAS_DE_CONSULTA.includes(categoria))
+    throw invalido('categoria_invalida', 'Categoría desconocida')
   return categoria
 }
 
@@ -82,13 +83,16 @@ export async function tablaDePosiciones({ db, url, usuario }) {
   return { datos: { ...datos, jugadas: await categoriasJugadas(db, modo, desde) } }
 }
 
+// En el resumen de todos los juegos, "20 preguntas" incluye a los juegos de rondas más cortas (hoy, de 10).
+const categoriasDelResumen = categoria => (categoria === '20' ? ['20', '10'] : [categoria, categoria])
+
 // Por cada juego: quién va primero en la categoría pedida y, si hay sesión, en qué puesto va el usuario.
 export async function lideres({ db, url, usuario }) {
   const idDeUsuario = usuario?.id ?? null
   const filas = await db.query(
     `select * from (${POSICIONES}) posiciones
-     where categoria = $2 and (puesto = 1 or usuario_id = $3) order by modo, puesto, en`,
-    [inicioDelPeriodo(url), categoriaDe(url), idDeUsuario],
+     where categoria in ($2, $3) and (puesto = 1 or usuario_id = $4) order by modo, puesto, en`,
+    [inicioDelPeriodo(url), ...categoriasDelResumen(categoriaDe(url)), idDeUsuario],
   )
   const modos = {}
   for (const fila of filas) {

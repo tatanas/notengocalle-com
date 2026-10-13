@@ -1,4 +1,5 @@
 import { mejores, reiniciarProgreso, estadisticas } from '../nucleo/progreso.js'
+import { largoNormalDe } from '../../compartido/oficial.js'
 import { largoPara, guardarAjustes, ajustes } from '../nucleo/almacen.js'
 import { $, escaparHtml, formatearTiempo } from '../nucleo/utilidades.js'
 import {
@@ -117,15 +118,31 @@ const pasosPrimero = (a, b) => (b.id.startsWith('rs-') ? 1 : 0) - (a.id.startsWi
 
 const OPCIONES_DE_LARGO = [20, 999]
 
+const NIVELES_DE_STREET_VIEW = [
+  ['facil', 'Fácil'],
+  ['medio', 'Medio'],
+  ['dificil', 'Difícil'],
+]
+
 // Cuántas preguntas por ronda, en la tarjeta del juego. Los juegos que siempre recorren todo su conjunto
 // (las comunas: son pocas) no lo ofrecen.
 function selectorDeLargo(grupo, modos) {
   if (modos.every(modo => modo.all)) return ''
   const opciones = OPCIONES_DE_LARGO.map(
     eleccion =>
-      `<option value="${eleccion}" ${eleccion === largoPara(grupo) ? 'selected' : ''}>${eleccion === 999 ? 'Todas' : eleccion}</option>`,
+      `<option value="${eleccion}" ${eleccion === largoPara(grupo) ? 'selected' : ''}>${eleccion === 999 ? 'Todas' : largoNormalDe(modos[0].id)}</option>`,
   )
   return `<label class="length-row">Preguntas por ronda <select data-length-group="${escaparHtml(grupo)}">${opciones.join('')}</select></label>`
+}
+
+// Qué tan completas son las preguntas de Street View en la práctica; la ronda oficial siempre usa todas.
+function selectorDeNivel(grupo) {
+  if (grupo !== 'Street View') return ''
+  const opciones = NIVELES_DE_STREET_VIEW.map(
+    ([valor, etiqueta]) =>
+      `<option value="${valor}" ${valor === ajustes.nivelStreetView ? 'selected' : ''}>${etiqueta}</option>`,
+  )
+  return `<label class="length-row">Nivel (la ronda oficial es siempre difícil) <select id="nivelStreetView">${opciones.join('')}</select></label>`
 }
 
 function tarjetaDeGrupo(grupo) {
@@ -136,6 +153,7 @@ function tarjetaDeGrupo(grupo) {
   return `<div class="card">
     <h3><span class="em">${grupo.emoji}</span>${grupo.name}</h3><p>${grupo.blurb}</p>
     ${selectorDeLargo(grupo.name, modos)}
+    ${selectorDeNivel(grupo.name)}
     ${grupo.name === 'Metro' ? fichasDeLineasDeMetro() : ''}
     <div class="modes">${modos.map(filaDeModo).join('')}</div>
   </div>`
@@ -249,6 +267,13 @@ function conectarAjustes() {
   for (const selectorElegido of vistaDePantalla.querySelectorAll('[data-length-group]'))
     selectorElegido.onchange = () => {
       ajustes.lengths = { ...ajustes.lengths, [selectorElegido.dataset.lengthGroup]: +selectorElegido.value }
+      guardarAjustes()
+    }
+
+  const nivelStreetView = $('#nivelStreetView')
+  if (nivelStreetView)
+    nivelStreetView.onchange = () => {
+      ajustes.nivelStreetView = nivelStreetView.value
       guardarAjustes()
     }
 

@@ -1,4 +1,9 @@
-import { CATEGORIAS_DE_RONDA, TODAS_LAS_PREGUNTAS, etiquetaDeCategoria } from '../../compartido/oficial.js'
+import {
+  CATEGORIAS_DE_RONDA,
+  TODAS_LAS_PREGUNTAS,
+  categoriasValidasDe,
+  etiquetaDeCategoria,
+} from '../../compartido/oficial.js'
 import { pedirTabla, pedirLideres } from '../cuenta/puntajes.js'
 import { cuentasDisponibles, usuario } from '../cuenta/sesion.js'
 import { almacen } from '../nucleo/almacen.js'
@@ -26,8 +31,10 @@ const vista = {
 let jugadoresPorCategoria = {}
 
 // Los juegos que recorren siempre todo su conjunto (las comunas) no tienen largos: solo "todas".
-const categoriasDe = idDeModo =>
-  idDeModo && modoPorId(idDeModo)?.all ? [TODAS_LAS_PREGUNTAS] : CATEGORIAS_DE_RONDA
+const categoriasDe = idDeModo => {
+  if (!idDeModo) return CATEGORIAS_DE_RONDA
+  return modoPorId(idDeModo)?.all ? [TODAS_LAS_PREGUNTAS] : categoriasValidasDe(idDeModo)
+}
 
 const modosOficiales = () => MODOS.filter(tieneRondaOficial)
 const gruposDe = modos => [...new Set(modos.map(modo => modo.group))]
@@ -149,7 +156,7 @@ async function cargarTabla() {
 function mantenerCategoriaValida() {
   const validas = categoriasDe(vista.modo)
   if (!validas.includes(vista.categoria))
-    vista.categoria = validas.length === 1 ? validas[0] : CATEGORIA_POR_DEFECTO
+    vista.categoria = validas.includes(CATEGORIA_POR_DEFECTO) ? CATEGORIA_POR_DEFECTO : validas[0]
 }
 
 function elegirVista(cambio) {
