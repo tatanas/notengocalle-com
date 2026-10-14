@@ -507,8 +507,11 @@ body.con-panorama .leaflet-top.leaflet-left {
   mask-image: linear-gradient(to bottom, #000 70%, transparent 100%);
 }
 .hero {
-  margin: 4px auto 14px;
+  margin: 4px 0 14px;
+}
+.hero.inicio {
   max-width: 760px;
+  margin-inline: auto;
 }
 .hero h2 {
   margin: 0 0 4px;
@@ -1081,6 +1084,11 @@ button.chip {
 table.board td:first-child {
   width: 34px;
   color: var(--muted);
+}
+/* En el resumen de líderes la primera columna es el nombre del juego, no un puesto */
+table.board.clickable td:first-child {
+  width: 24%;
+  color: inherit;
 }
 table.board tr.me td {
   background: var(--pri-soft);

@@ -237,7 +237,7 @@ const htmlDeCreditos = () =>
 
 const htmlDeInicio = () => `<div class="home-backdrop" aria-hidden="true"></div>
   <div class="wrap">
-  <div class="hero"><h2>¿Dónde queda eso? 🏔️</h2>
+  <div class="hero inicio"><h2>¿Dónde queda eso? 🏔️</h2>
     <p>Practica comunas, lugares, calles, rutas y metro de Santiago.</p></div>
   <div class="grid">
     ${GRUPOS.map(tarjetaDeGrupo).join('')}

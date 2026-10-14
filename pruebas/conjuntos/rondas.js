@@ -41,9 +41,10 @@ export async function cronometro(navegador, { verificar }) {
   await jugarRondaDeAlternativas(pagina, { thinkMs: 60 })
   verificar(/récord/i.test(await texto(pagina, '#panel')), 'la segunda ronda se compara con el récord')
 
-  await pagina.click('#menu')
+  await pagina.click('#btnProgreso')
+  await pagina.waitForSelector('table.stats', { timeout: 3000 })
   verificar(
-    /¿Qué calle es\?\s+40/.test(await texto(pagina, 'table.stats')),
+    /¿Qué calle es esta\?\s+40/.test(await texto(pagina, 'table.stats')),
     'el progreso suma las 40 respuestas',
   )
   verificar(!errores.length, `sin errores en la consola${errores.length ? ': ' + errores.join(' | ') : ''}`)
@@ -124,7 +125,8 @@ export async function rondasOficiales(navegador, { verificar }) {
     const iniciado = await pagina.waitForSelector('.q-head', { timeout: 8000 }).catch(() => null)
     const encabezado = iniciado ? await texto(pagina, '.q-head') : ''
     const total = +(encabezado.match(/de (\d+)/) || [])[1]
-    const esperado = { 'com-name': 34, 'com-all': 34, 'ch-all': 16, 'ch-find': 16 }[id] ?? 20
+    // Las comunas se piden según el alcance elegido (aquí, toda la RM: 52).
+    const esperado = { 'com-name': 52, 'com-all': 52, 'ch-all': 16, 'ch-find': 16 }[id] ?? 20
     if (total !== esperado || !/Ronda oficial/.test(encabezado))
       incorrectas.push(`${id} (${total || 'no partió'})`)
   }
