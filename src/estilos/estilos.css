@@ -155,6 +155,29 @@ body.con-panorama .leaflet-top.leaflet-left {
 #alternarVista {
   display: none;
 }
+/* Recorriendo una calle (escritorio): el panel se achica a la derecha, con solo el nombre de la calle y "Siguiente". */
+.recorrido-titulo {
+  display: none;
+}
+@media (min-width: 761px) {
+  body.recorriendo #panel {
+    left: auto;
+    right: 12px;
+    width: 250px;
+    padding: 10px 12px;
+  }
+  body.recorriendo #panel > :not(.fb) {
+    display: none;
+  }
+  body.recorriendo #panel .fb > :not(h4):not(.recorrido-titulo):not(.next) {
+    display: none;
+  }
+  body.recorriendo .recorrido-titulo {
+    display: block;
+    font-weight: 700;
+    margin: 2px 0 8px;
+  }
+}
 @media (max-width: 760px) {
   #panorama {
     right: 0;

@@ -144,10 +144,25 @@ export async function mostrarPanorama(
   return inicio
 }
 
+// En escritorio el panorama tapa la mitad izquierda del mapa: al empezar a recorrer una calle, lo que estaba al centro
+// del mapa pasa al centro de la mitad visible, y se devuelve al cerrar.
+const CORRIMIENTO_DE_RECORRIDO = () =>
+  window.matchMedia('(min-width: 761px)').matches ? window.innerWidth / 4 : 0
+let corrimientoAplicado = 0
+
+export function marcarRecorrido() {
+  if (document.body.classList.contains('recorriendo')) return
+  document.body.classList.add('recorriendo')
+  corrimientoAplicado = CORRIMIENTO_DE_RECORRIDO()
+  mapa.panBy([-corrimientoAplicado, 0], { animate: false })
+}
+
 export function ocultarPanorama() {
+  if (corrimientoAplicado) mapa.panBy([corrimientoAplicado, 0], { animate: false })
+  corrimientoAplicado = 0
   if (contenedor) contenedor.hidden = true
   if (botones) botones.hidden = true
   inicioDeLaPregunta = null
-  document.body.classList.remove('con-panorama', 'ver-mapa')
+  document.body.classList.remove('con-panorama', 'ver-mapa', 'recorriendo')
   alReportar = () => {}
 }
