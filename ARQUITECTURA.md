@@ -156,7 +156,7 @@ Hay dos formas de jugar el mismo modo:
 
 |                | Práctica                                                            | Ronda oficial (botón grande)                  |
 | -------------- | ------------------------------------------------------------------- | --------------------------------------------- |
-| Ajustes        | los del jugador (comunas, largo, categorías, líneas, modo estricto) | fijos: `REGLAS_OFICIALES` en `compartido/oficial.js` |
+| Ajustes        | los del jugador (comunas, largo, categorías, líneas) | fijos: `REGLAS_OFICIALES` en `compartido/oficial.js` |
 | Ayudas         | siempre modo fácil (bordes de comunas y metro) y "Ver nombres"      | ninguna: siempre difícil, sin botones         |
 | Sorteo         | ponderado por lo que el jugador falla                               | parejo para todos                             |
 | Calles propias | incluidas                                                           | excluidas                                     |

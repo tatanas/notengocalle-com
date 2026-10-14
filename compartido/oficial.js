@@ -9,8 +9,6 @@ export const REGLAS_OFICIALES = {
   strict: false,
   ownStreets: false,
   easy: false,
-  nivelStreetView: 'extremo',
-  puntoEnCalle: false,
 }
 
 // Juegos con ranking.
@@ -22,6 +20,7 @@ export const MODOS_OFICIALES = [
   'mt-find',
   'mt-name',
   'st-name',
+  'st-punto',
   'st-find',
   'rs-any-car',
   'rs-any-tp',
@@ -48,16 +47,68 @@ export const CATEGORIAS_DE_RONDA = ['20', TODAS_LAS_PREGUNTAS]
 const LARGO_NORMAL = { 'sv-ubicar': 10 }
 export const largoNormalDe = modo => LARGO_NORMAL[modo] ?? 20
 // Hay juegos con demasiadas preguntas para recorrerlas todas: su ronda siempre es del largo normal.
-const SIN_RONDA_DE_TODAS = new Set(['sv-ubicar'])
+const SIN_RONDA_DE_TODAS = new Set(['sv-ubicar', 'rs-any-car', 'rs-any-tp'])
 export const tieneRondaDeTodas = modo => !SIN_RONDA_DE_TODAS.has(modo)
-export const categoriasValidasDe = modo =>
-  tieneRondaDeTodas(modo) ? [String(largoNormalDe(modo)), TODAS_LAS_PREGUNTAS] : [String(largoNormalDe(modo))]
-// Lo que se puede pedir al ranking: cualquiera de los largos que algún juego use.
+
+// Algunos juegos no se separan por largo sino por un ajuste del jugador, y cada valor tiene su propio ranking:
+// Street View por nivel de dificultad (siempre 10 preguntas) y los de comunas por alcance (cuántas comunas hay).
+export const NIVELES_DE_STREET_VIEW = ['facil', 'medio', 'dificil', 'extremo']
+export const ALCANCES_DE_COMUNAS = ['core', 'peri', 'all']
+// Cuántas comunas tiene cada alcance (public/data/data.js; lo comprueba una prueba unitaria).
+export const COMUNAS_POR_ALCANCE = { core: 34, peri: 42, all: 52 }
+const AJUSTE_DE_CATEGORIA = {
+  'sv-ubicar': { ajuste: 'nivelStreetView', valores: NIVELES_DE_STREET_VIEW },
+  'com-name': { ajuste: 'scope', valores: ALCANCES_DE_COMUNAS },
+  'com-all': { ajuste: 'scope', valores: ALCANCES_DE_COMUNAS },
+}
+// { ajuste, valores } si la categoría del ranking de este juego es un ajuste del jugador; si no, null.
+export const ajusteDeCategoria = modo => AJUSTE_DE_CATEGORIA[modo] ?? null
+
+const ETIQUETA_DE_CATEGORIA = {
+  [TODAS_LAS_PREGUNTAS]: 'Todas',
+  facil: 'Fácil',
+  medio: 'Medio',
+  dificil: 'Difícil',
+  extremo: 'Extremo',
+  core: 'Gran Santiago',
+  peri: 'Con periferia',
+  all: 'Toda la RM',
+}
+export const etiquetaDeCategoria = categoria => ETIQUETA_DE_CATEGORIA[categoria] ?? categoria
+
+export const categoriasValidasDe = modo => {
+  const delAjuste = ajusteDeCategoria(modo)
+  if (delAjuste) return delAjuste.valores
+  return tieneRondaDeTodas(modo)
+    ? [String(largoNormalDe(modo)), TODAS_LAS_PREGUNTAS]
+    : [String(largoNormalDe(modo))]
+}
+// Lo que se puede pedir al ranking: cualquiera de los largos y ajustes que algún juego use.
 export const CATEGORIAS_DE_CONSULTA = [
-  ...new Set([...Object.values(LARGO_NORMAL).map(String), ...CATEGORIAS_DE_RONDA]),
+  ...new Set([
+    ...Object.values(LARGO_NORMAL).map(String),
+    ...CATEGORIAS_DE_RONDA,
+    ...NIVELES_DE_STREET_VIEW,
+    ...ALCANCES_DE_COMUNAS,
+  ]),
 ]
 
-export const etiquetaDeCategoria = categoria => (categoria === TODAS_LAS_PREGUNTAS ? 'Todas' : categoria)
+// Cuántas preguntas tiene una ronda de esta categoría (null = las que sean: "todas").
+export function preguntasDeCategoria(modo, categoria) {
+  if (modo === 'sv-ubicar') return largoNormalDe(modo)
+  if (ajusteDeCategoria(modo)) return COMUNAS_POR_ALCANCE[categoria]
+  return categoria === TODAS_LAS_PREGUNTAS ? null : +categoria
+}
+
+// Cómo se nombra la categoría al contar dónde quedó la ronda: "con 20 preguntas", "en el nivel Fácil"…
+export function textoDeCategoria(modo, categoria) {
+  if (categoria === TODAS_LAS_PREGUNTAS) return 'todas las preguntas'
+  if (ajusteDeCategoria(modo))
+    return modo === 'sv-ubicar'
+      ? `el nivel ${etiquetaDeCategoria(categoria)}`
+      : etiquetaDeCategoria(categoria)
+  return `${categoria} preguntas`
+}
 
 // Una ronda que recorre todo el conjunto del juego es "todas", sin importar cuántas sean.
 export const categoriaDe = (tamano, tamanoDelConjunto) =>
@@ -83,10 +134,11 @@ export function problemaDelPuntaje({ modo, categoria, aciertos, total, ms }) {
   const porPregunta = puntosPorPregunta(modo)
   if (!Number.isInteger(total) || total % porPregunta) return 'largo de la ronda no válido'
   const preguntas = total / porPregunta
+  const preguntasEsperadas = preguntasDeCategoria(modo, categoria)
   if (
     categoria === TODAS_LAS_PREGUNTAS
       ? preguntas < PREGUNTAS_MINIMAS || preguntas > PREGUNTAS_MAXIMAS
-      : preguntas !== +categoria
+      : preguntas !== preguntasEsperadas
   )
     return 'la ronda no tiene el largo de su categoría'
   if (!Number.isInteger(aciertos) || aciertos < 0 || aciertos > total) return 'aciertos fuera de rango'

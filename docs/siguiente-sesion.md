@@ -4,9 +4,9 @@ Pensado para una sesión nueva de Claude (o de cualquiera) que quiera avanzar **
 Orden de lectura: este archivo → `CLAUDE.md` (decisiones de contenido y forma de trabajar) → solo lo que necesites de `ARQUITECTURA.md` y `docs/streetview.md`.
 
 ## Estado (octubre 2026)
-- 18 juegos, todos con ronda oficial y ranking; cuentas y ranking con Neon (producción) o PGlite (local). `npm test` pasa.
+- 19 juegos, todos con ronda oficial y ranking; cuentas y ranking con Neon (producción) o PGlite (local). `npm test` pasa.
 - Street View ("¿Dónde estás?") completo: 4 niveles, rondas de 10, puntos repartidos por calle, cerros con recinto, pistas. Ver `docs/streetview.md`.
-- Juegos de calles: `st-find` perdona los cruces; `st-name` tiene "solo un punto de la calle" (práctica); ambos permiten recorrer la calle en Street View al responder.
+- Juegos de calles: `st-find` perdona los cruces; `st-punto` es la versión "difícil" de `st-name` (marca solo un punto); los tres permiten recorrer la calle en Street View al responder.
 - **Sin probar a mano** (las pruebas automáticas no juegan Street View): recorrer la calle en celular y escritorio, que "Cerrar Street View" devuelva bien el mapa, el recinto del San Cristóbal
   y que las pistas se lean bien al responder. Es lo primero que conviene mirar jugando.
 
@@ -31,7 +31,9 @@ node servidor/admin.js reportes     túneles reportados por los jugadores
 | Agregar/quitar un lugar emblemático | `tools/lmlist.js` y el flujo de `ARQUITECTURA.md` (pipeline) |
 | Cambiar niveles de Street View | listas de `tools/niveles_streetview.mjs`; selector en `src/interfaz/inicio.js`; `NIVEL_MAXIMO` en `src/juego/modos/streetView.js` |
 | Reglas de "Encuentra la calle" | `src/juego/modos/calles.js` (constantes arriba de `st-find`) |
-| "Un solo punto" de `st-name` | `puntoParaPreguntar` en `src/dominio/calles.js`; ajuste `puntoEnCalle` en `src/nucleo/almacen.js` |
+| Juego `st-punto` | `registrarNombreDeCalle` en `src/juego/modos/calles.js`; el punto: `puntoParaPreguntar` en `src/dominio/calles.js` |
+| Rankings por ajuste (nivel de Street View, alcance de comunas) | `ajusteDeCategoria` y `COMUNAS_POR_ALCANCE` en `compartido/oficial.js`; el motor lo aplica en `iniciarPartida` (`src/juego/engine.js`) |
+| Menú / barra superior / Mi progreso | `src/interfaz/inicio.js`, `index.html` (botones 🏆🔎📊), `src/interfaz/progreso.js` |
 | Visor de Street View | `src/mapa/streetView.js` (un solo panorama reutilizado; modo `caminable`) |
 | Rondas oficiales / largos / categorías | `compartido/oficial.js` (lo comparten navegador y servidor) |
 | Puntajes y ranking del servidor | `servidor/puntajes.js`, `servidor/api.js` |
@@ -55,7 +57,7 @@ node servidor/admin.js reportes     túneles reportados por los jugadores
 6. `tools/` está desordenado (~100 archivos); ordenar solo si se puede volver a correr cada script.
 
 ## Decisiones recientes del dueño (para no discutirlas de nuevo)
-- Street View: no caminar durante la pregunta; ronda siempre de 10; sin "todas"; la ronda oficial es el nivel extremo; el fácil es chico (~24) y céntrico; priorizar calles y lugares históricos sobre recintos.
+- Street View: no caminar durante la pregunta; ronda siempre de 10; sin "todas"; la ronda oficial varía por nivel (botón grande = práctica, chico 🏆 = oficial); el fácil es chico (~24) y céntrico; priorizar calles y lugares históricos sobre recintos.
 - Street View en cerros grandes: vale cualquier toque dentro del cerro. Evitar letreros (cruces) en lo posible.
 - El punto de la pregunta debe cambiar entre partidas: nadie debe ganar memorizando una foto.
 - Calles agregadas: Rolando Petersen, Camino a Lonquén (se tomó éste porque no hay "Av. Lonquén"), Isabel La Católica, Candelaria Goyenechea, Luis Carrera, Alonso de Camargo, Presidente Errázuriz y Alexander Fleming (de vuelta).

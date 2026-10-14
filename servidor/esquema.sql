@@ -88,6 +88,12 @@ update puntajes set categoria = 'todas' where categoria = 'all';
 
 alter table puntajes alter column categoria set not null;
 
+-- Street View se separa por nivel y no por largo: las rondas de 10 que había eran todas de lo que hoy es el nivel extremo.
+update puntajes set categoria = 'extremo' where modo = 'sv-ubicar' and categoria = '10';
+
+-- Los juegos de comunas se separan por alcance (core, peri, all): las rondas de antes eran todas del Gran Santiago.
+update puntajes set categoria = 'core' where modo in ('com-name', 'com-all') and categoria = 'todas';
+
 create index if not exists puntajes_por_categoria on puntajes (modo, categoria, creado_en);
 
 create index if not exists puntajes_por_usuario on puntajes (usuario_id, creado_en);

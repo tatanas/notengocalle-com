@@ -97,7 +97,7 @@ export async function cuentas(navegador, { verificar }) {
   )
   verificar(true, 'el segundo jugador entra a un ranking de 2')
   await segundo.page.click('#menu')
-  await segundo.page.click('#goRanking')
+  await segundo.page.click('#btnRanking')
   await segundo.page.select('#rankMode', '')
   await segundo.page.waitForSelector('table.board [data-open="st-name"]')
   verificar(

@@ -1,12 +1,14 @@
 import {
   CATEGORIAS_DE_RONDA,
   TODAS_LAS_PREGUNTAS,
+  ajusteDeCategoria,
   categoriasValidasDe,
   etiquetaDeCategoria,
+  textoDeCategoria,
 } from '../../compartido/oficial.js'
 import { pedirTabla, pedirLideres } from '../cuenta/puntajes.js'
 import { cuentasDisponibles, usuario } from '../cuenta/sesion.js'
-import { almacen } from '../nucleo/almacen.js'
+import { ajustes, almacen } from '../nucleo/almacen.js'
 import { $, escaparHtml, formatearTiempo } from '../nucleo/utilidades.js'
 import { limpiarCapa } from '../mapa/mapa.js'
 import { tieneRondaOficial, iniciarPartida, detenerPartida } from '../juego/engine.js'
@@ -33,6 +35,7 @@ let jugadoresPorCategoria = {}
 // Los juegos que recorren siempre todo su conjunto (las comunas) no tienen largos: solo "todas".
 const categoriasDe = idDeModo => {
   if (!idDeModo) return CATEGORIAS_DE_RONDA
+  if (ajusteDeCategoria(idDeModo)) return categoriasValidasDe(idDeModo)
   return modoPorId(idDeModo)?.all ? [TODAS_LAS_PREGUNTAS] : categoriasValidasDe(idDeModo)
 }
 
@@ -74,22 +77,19 @@ function htmlDePestanasDeCategoria() {
   return `<div class="tabs" role="tablist" aria-label="Número de preguntas">${pestanas.join('')}</div>`
 }
 
-const textoDeCategoria = categoria =>
-  categoria === TODAS_LAS_PREGUNTAS ? 'todas las preguntas' : `${categoria} preguntas`
-
 const filaDeTabla = entrada =>
   `<tr class="${soyYo(entrada) ? 'me' : ''}"><td>${entrada.puesto}</td><td>${escaparHtml(entrada.nombre)}</td><td>${puntaje(entrada)}</td><td>${formatearTiempo(entrada.ms)}</td><td class="muted">${fechaCorta(entrada.en)}</td></tr>`
 
 function htmlDeTabla({ filas, jugadores, yo }) {
   if (!filas.length)
-    return `<p class="muted">Nadie ha jugado esta ronda (${textoDeCategoria(vista.categoria)}) en este período. ¡Puedes ser el primero!</p>`
+    return `<p class="muted">Nadie ha jugado esta ronda (${textoDeCategoria(vista.modo, vista.categoria)}) en este período. ¡Puedes ser el primero!</p>`
   const sobreLaTabla =
     yo && !filas.some(soyYo)
       ? `<tr><td colspan="5" class="muted">…</td></tr>${filaDeTabla({ ...yo, nombre: usuario.nombre })}`
       : ''
   return `<table class="stats board"><tr><th>#</th><th>Jugador</th><th>Aciertos</th><th>Tiempo</th><th>Fecha</th></tr>
     ${filas.map(filaDeTabla).join('')}${sobreLaTabla}</table>
-    <p class="muted" style="font-size:12.5px">${jugadores} ${jugadores === 1 ? 'jugador' : 'jugadores'} en ${textoDeCategoria(vista.categoria)}. Cuenta la mejor ronda de cada uno.</p>`
+    <p class="muted" style="font-size:12.5px">${jugadores} ${jugadores === 1 ? 'jugador' : 'jugadores'} en ${textoDeCategoria(vista.modo, vista.categoria)}. Cuenta la mejor ronda de cada uno.</p>`
 }
 
 function htmlDeLideres({ modos }) {
@@ -106,7 +106,7 @@ function htmlDeLideres({ modos }) {
 
 function htmlDePie() {
   const jugar = vista.modo
-    ? `<button class="btn" id="rankPlay">🏆 Jugar la ronda oficial (${textoDeCategoria(vista.categoria)})</button>`
+    ? `<button class="btn" id="rankPlay">🏆 Jugar la ronda oficial (${textoDeCategoria(vista.modo, vista.categoria)})</button>`
     : ''
   const iniciarSesionEnRanking = usuario
     ? ''
@@ -156,7 +156,10 @@ async function cargarTabla() {
 function mantenerCategoriaValida() {
   const validas = categoriasDe(vista.modo)
   if (!validas.includes(vista.categoria))
-    vista.categoria = validas.includes(CATEGORIA_POR_DEFECTO) ? CATEGORIA_POR_DEFECTO : validas[0]
+    vista.categoria =
+      [ajustes[ajusteDeCategoria(vista.modo)?.ajuste], CATEGORIA_POR_DEFECTO].find(c =>
+        validas.includes(c),
+      ) ?? validas[0]
 }
 
 function elegirVista(cambio) {

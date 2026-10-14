@@ -1,9 +1,11 @@
 // Pruebas de la lógica pura que comparten navegador y servidor: node --test tests/unit.test.js
 import { esAciertoDeStreetView, puntajeDeStreetView } from '../src/dominio/streetView.js'
 import assert from 'node:assert/strict'
+import { readFileSync } from 'node:fs'
 import { test } from 'node:test'
 import { llaveDeUsuario, PATRON_DE_USUARIO } from '../compartido/cuentas.js'
 import {
+  COMUNAS_POR_ALCANCE,
   categoriaDe,
   categoriasValidasDe,
   esMejorPuntaje,
@@ -157,7 +159,7 @@ test('un puntaje es mejor con más aciertos o, a igual número, con menos tiempo
 })
 
 test('solo pasan los puntajes con forma de ronda oficial', () => {
-  const ronda = { modo: 'com-name', categoria: '20', aciertos: 10, total: 20, ms: 60000 }
+  const ronda = { modo: 'ch-city', categoria: '20', aciertos: 10, total: 20, ms: 60000 }
   assert.equal(problemaDelPuntaje(ronda), null)
   assert.ok(problemaDelPuntaje({ ...ronda, categoria: '30', total: 30 }), 'ya no hay rondas de 30')
   assert.equal(
@@ -261,14 +263,21 @@ test('"¿Dónde estás?": de 0 a 5 puntos según la distancia, y 3 o más cuenta
   assert.equal(esAciertoDeStreetView(1.001), false)
 })
 
-test('en Street View el ranking suma puntos: 10 preguntas de hasta 5 puntos', () => {
-  const ronda = { modo: 'sv-ubicar', categoria: '10', aciertos: 31, total: 50, ms: 90000 }
+test('en Street View el ranking suma puntos: 10 preguntas de hasta 5 puntos, por nivel', () => {
+  const ronda = { modo: 'sv-ubicar', categoria: 'extremo', aciertos: 31, total: 50, ms: 90000 }
   assert.equal(problemaDelPuntaje(ronda), null)
   assert.ok(problemaDelPuntaje({ ...ronda, aciertos: 51 }), 'más puntos que el máximo')
   assert.ok(problemaDelPuntaje({ ...ronda, total: 10 }), 'el máximo de 10 preguntas es 50, no 10')
   assert.ok(
     problemaDelPuntaje({ ...ronda, categoria: '20', total: 100 }),
     'Street View no tiene rondas de 20',
+  )
+  assert.ok(problemaDelPuntaje({ ...ronda, categoria: '10' }), 'ya no hay categoría 10: se separa por nivel')
+  for (const nivel of ['facil', 'medio', 'dificil'])
+    assert.equal(problemaDelPuntaje({ ...ronda, categoria: nivel }), null)
+  assert.ok(
+    problemaDelPuntaje({ ...ronda, categoria: 'facil', total: 100 }),
+    'un nivel siempre son 10 preguntas',
   )
   assert.ok(problemaDelPuntaje({ ...ronda, ms: 1000 }), 'imposible de rápido')
   assert.ok(
@@ -280,6 +289,29 @@ test('en Street View el ranking suma puntos: 10 preguntas de hasta 5 puntos', ()
 test('cada juego tiene su largo normal de ronda', () => {
   assert.equal(largoNormalDe('sv-ubicar'), 10)
   assert.equal(largoNormalDe('st-name'), 20)
-  assert.deepEqual(categoriasValidasDe('sv-ubicar'), ['10'])
+  assert.deepEqual(categoriasValidasDe('sv-ubicar'), ['facil', 'medio', 'dificil', 'extremo'])
+  assert.deepEqual(categoriasValidasDe('rs-any-car'), ['20'])
   assert.deepEqual(categoriasValidasDe('st-name'), ['20', 'todas'])
+})
+
+test('los juegos de comunas se separan por alcance, con su cantidad de comunas', () => {
+  assert.deepEqual(categoriasValidasDe('com-name'), ['core', 'peri', 'all'])
+  const ronda = { modo: 'com-name', categoria: 'peri', aciertos: 30, total: 42, ms: 90000 }
+  assert.equal(problemaDelPuntaje(ronda), null)
+  assert.ok(problemaDelPuntaje({ ...ronda, total: 34 }), 'con periferia son 42 comunas, no 34')
+  assert.ok(
+    problemaDelPuntaje({ ...ronda, categoria: 'todas' }),
+    'ya no existe la categoría todas en comunas',
+  )
+  assert.equal(problemaDelPuntaje({ ...ronda, categoria: 'core', total: 34 }), null)
+})
+
+test('las comunas por alcance coinciden con los datos del juego', () => {
+  const ventana = {}
+  new Function('window', readFileSync('public/data/data.js', 'utf8'))(ventana)
+  const grupos = ventana.DATA.comunas.features.map(rasgo => rasgo.properties.group)
+  const contar = (...admitidos) => grupos.filter(grupo => admitidos.includes(grupo)).length
+  assert.equal(contar('core'), COMUNAS_POR_ALCANCE.core)
+  assert.equal(contar('core', 'peri'), COMUNAS_POR_ALCANCE.peri)
+  assert.equal(contar('core', 'peri', 'rural'), COMUNAS_POR_ALCANCE.all)
 })

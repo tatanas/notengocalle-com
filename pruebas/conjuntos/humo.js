@@ -39,7 +39,9 @@ export async function humo(navegador, { verificar }, { celular = false, solo = n
   } = await abrirPagina(navegador, { celular })
   await pagina.screenshot({ path: CAPTURAS + prefijo + 'home.png' })
 
-  const ofrecidos = await pagina.$$eval('[data-mode]', botones => botones.map(boton => boton.dataset.mode))
+  const ofrecidos = [
+    ...new Set(await pagina.$$eval('[data-mode]', botones => botones.map(boton => boton.dataset.mode))),
+  ]
   verificar(ofrecidos.length >= 15, `el menú ofrece ${ofrecidos.length} juegos`)
   const modos = solo ? ofrecidos.filter(id => solo.some(prefijo => id.startsWith(prefijo))) : ofrecidos
 
@@ -75,7 +77,7 @@ export async function humo(navegador, { verificar }, { celular = false, solo = n
 
   durante('explorar')
   await irAlInicio(pagina)
-  await pagina.click('#goExplore')
+  await pagina.click('#btnExplorar')
   await dormir(1500)
   await pagina.screenshot({ path: CAPTURAS + prefijo + 'explore.png' })
   await pagina.evaluate(() => {

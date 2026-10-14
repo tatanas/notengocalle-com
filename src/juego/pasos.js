@@ -141,13 +141,12 @@ export function preguntarPasos(q, cfg) {
   )
   dibujar()
 }
-export function registrarModoDePasosEnAuto(id, nombre, descripcion, filtro) {
+export function registrarModoDePasosEnAuto(id, nombre, filtro) {
   registrarModo({
     id,
     group: 'Ruteo',
     aids: true,
     name: nombre,
-    desc: descripcion,
     balance: r => (otroExtremo(r) || {}).comuna,
     pool: () => (DATOS.steps || []).filter(filtro),
     key: r => r.k,
@@ -187,13 +186,12 @@ export const htmlDePasoDeTransporte = v => {
     .join('')
   return `${m[1] === 'Micro' ? '🚌' : m[1] === 'Metro' ? '🚇' : '🚆'} ${pildoras} hasta <b>${escaparHtml(m[3])}</b>`
 }
-export function registrarModoDePasosEnTransporte(id, nombre, descripcion, filtro) {
+export function registrarModoDePasosEnTransporte(id, nombre, filtro) {
   registrarModo({
     id,
     group: 'Ruteo',
     aids: true,
     name: nombre,
-    desc: descripcion,
     balance: r => (otroExtremo(r) || {}).comuna,
     pool: () => (DATOS.transit || []).filter(filtro),
     key: r => r.k,

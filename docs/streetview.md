@@ -5,10 +5,10 @@ Todo lo de Street View en un solo lugar. Para el resto del proyecto: `ARQUITECTU
 ## Qué es y cómo se juega
 - Te deja en un panorama de Google Street View (se mira 360°, **no se camina**); se toca en el mapa dónde estás.
 - **0 a 5 puntos por pregunta** (`src/dominio/streetView.js`): ≤100 m 5, ≤500 m 4, ≤1 km 3, ≤1,5 km 2, ≤2 km 1, más 0. Con 3 o más cuenta como acierto.
-- **Rondas siempre de 10 preguntas** (no hay "todas": `tieneRondaDeTodas` en `compartido/oficial.js`). Ranking por puntos (máximo 5 × 10), categoría `10`.
-- **4 niveles en la práctica** (`ajustes.nivelStreetView`: `facil|medio|dificil|extremo`, campo `nivel` 1–4 de cada pregunta en el JSON,
+- **Rondas siempre de 10 preguntas** (no hay "todas": `tieneRondaDeTodas` en `compartido/oficial.js`). Ranking por puntos (máximo 5 × 10), **una tabla por nivel** (las categorías de ranking de este juego son `facil|medio|dificil|extremo`, no el largo).
+- **4 niveles** (en la práctica y en la ronda oficial) (`ajustes.nivelStreetView`: `facil|medio|dificil|extremo`, campo `nivel` 1–4 de cada pregunta en el JSON,
   calculado por `node tools/niveles_streetview.mjs`; ahí están las listas editables). Fácil ≈ 24 preguntas (lo más conocido, sobre todo del centro,
-  sin autopistas), medio ≈ 67, difícil ≈ 162, extremo = todas. **La ronda oficial siempre es extremo** (`REGLAS_OFICIALES`).
+  sin autopistas), medio ≈ 67, difícil ≈ 162, extremo = todas. **La ronda oficial usa el nivel elegido en la tarjeta** (en el menú, el botón grande es la práctica y el chico 🏆 es la oficial; el nivel viaja como `categoria` al servidor; antes la oficial era siempre extremo y esas marcas se migraron a `extremo` en `servidor/esquema.sql`).
 - Al responder se describe dónde estabas (`src/dominio/ubicacion.js`: calle, esquina, lugar cercano, barrio, metro, comuna) y se marcan las calles bajo el punto.
 - **Cerros grandes** (`src/datos/recintos.json`, polígonos): si el punto está dentro del polígono de su lugar (hoy Cerro San Cristóbal y Santa Lucía),
   vale cualquier toque dentro del cerro (distancia 0).
@@ -17,9 +17,9 @@ Todo lo de Street View en un solo lugar. Para el resto del proyecto: `ARQUITECTU
 - En el celular se alterna entre panorama y mapa. Los letreros de calles de Google no se pueden ocultar (la API no deja); por eso se evitan los puntos cerca de cruces.
 
 ## Recorrer la calle (juegos de calles)
-Tras responder en `st-name` y `st-find` aparece "🚶 Recorrer la calle en Street View" (`src/interfaz/recorrerCalle.js`): abre el mismo visor
+Tras responder en `st-name`, `st-punto` y `st-find` aparece "🚶 Recorrer la calle en Street View" (`src/interfaz/recorrerCalle.js`): abre el mismo visor
 en modo `caminable: true` (se puede caminar, con nombres de calles), empezando en un punto de esa calle del JSON (en `st-find`, el más cercano a donde tocaste).
-Se cierra con "✖ Cerrar Street View" o al pasar a la siguiente pregunta. Solo aparece si hay llave de Google.
+Mientras caminas, un punto azul en el mapa muestra dónde estás (el mapa lo sigue). Se cierra con "✖ Cerrar Street View" o al pasar a la siguiente pregunta. Solo aparece si hay llave de Google.
 
 ## Los datos y cómo regenerarlos
 - `src/datos/lugaresStreetView.json`: lista de preguntas `{ nombre, tipo: 'calle'|'lugar', referencia?, comuna, nivel, puntos: [{ lat, lon, rumbo, pista? }] }`.

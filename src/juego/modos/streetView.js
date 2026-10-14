@@ -68,7 +68,6 @@ registrarModo({
   balance: lugar => lugar.comuna,
   group: 'Street View',
   name: '¿Dónde estás?',
-  desc: 'Miras el Street View y tocas en el mapa dónde estás. De 0 a 5 puntos por pregunta.',
   disponible: streetViewDisponible,
   pool: lugaresDisponibles,
   key: lugar => lugar.nombre,
