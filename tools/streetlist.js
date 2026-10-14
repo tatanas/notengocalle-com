@@ -40,7 +40,6 @@ module.exports=[
 ["Av. Eliodoro Yáñez","Eliodoro Yáñez","Providencia: oriente–poniente al sur de Av. Providencia, hasta Tobalaba."],
 ["Av. Pocuro","^Avenida Pocuro$","Providencia: oriente–poniente con ciclovía, hasta Tobalaba."],
 ["Av. Diagonal Oriente","^Diagonal Oriente$|^Doctor Pedro Lautaro Ferrer$|^Avenida Jaime Guzmán Errázuriz$|^Avenida Presidente José Batlle y Ordóñez$","Diagonal que cruza el límite Providencia–Ñuñoa de norponiente a suroriente, desde Antonio Varas hasta Plaza Egaña. Va cambiando de nombre: Diagonal Oriente, Pedro Lautaro Ferrer, Jaime Guzmán Errázuriz (Campus Oriente UC), José Batlle y Ordóñez y de nuevo Diagonal Oriente.",[-70.595,-33.447],{bt:1,gap:1.5,trMin:0.5}],
-["Av. Mariano Sánchez Fontecilla","Sánchez Fontecilla","Corre junto al Canal San Carlos por el lado oriente, frente a Av. Tobalaba (que va por el lado poniente), desde Las Condes hacia el sur por La Reina, Peñalolén y La Florida. Está cortada en varios tramos.",[-70.590,-33.427],{gap:3.5}],
 ["Av. José Arrieta","José Arrieta","Peñalolén/La Reina: oriente–poniente hacia la precordillera."],
 ["Av. Vicuña Mackenna","Vicuña Mackenna","Norte–sur desde Plaza Italia hasta Puente Alto: Ñuñoa, San Joaquín (Campus UC), Macul, La Florida. L5 y L4 van por tramos de ella."],
 ["Av. Macul","^Avenida Macul$","Norte–sur por Macul y La Florida, desde Irarrázaval al sur."],

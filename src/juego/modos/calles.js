@@ -80,7 +80,7 @@ registrarModo({
           v === s.name,
           `${extra}<p><b>${escaparHtml(s.name)}</b></p><p class="muted">${escaparHtml(s.hint)}</p>${htmlDeTramosConNombre(s)}${htmlDeCercanos}<p class="muted">Pasa por: ${s.comunas.map(escaparHtml).join(', ')}</p>${htmlDeFoto('s:' + s.name)}${htmlDeRecorrerCalle()}`,
         )
-        conectarRecorrerCalle(s)
+        conectarRecorrerCalle(s, marcado?.punto)
         // El encuadre va después de la respuesta: así cuenta con el tamaño final del panel.
         encuadrar(mostrado, 14)
       },
@@ -164,7 +164,7 @@ registrarModo({
         ok,
         `${ok ? '' : `<p>Quedaste a ${formatearKm(d)} de la calle.</p>`}${extra}<p class="muted">${escaparHtml(s.hint)}</p>${htmlDeTramosConNombre(s)}${htmlDeCercanos}${htmlDeFoto('s:' + s.name)}${htmlDeRecorrerCalle()}`,
       )
-      conectarRecorrerCalle(s, p)
+      conectarRecorrerCalle(s, puntoMasCercanoEnLineas(p, s.lines).point)
       if (!ok) encuadrar(L.latLngBounds(s.bb).extend(p).pad(0.15), 14)
     })
   },

@@ -1,4 +1,3 @@
-import { distanciaKm } from '../nucleo/geografia.js'
 import { verticeMedioDeCalle } from '../datos/datos.js'
 import LUGARES from '../datos/lugaresStreetView.json'
 import { mostrarPanorama, streetViewDisponible } from '../mapa/streetView.js'
@@ -13,27 +12,23 @@ export const htmlDeRecorrerCalle = () =>
     ? '<button class="btn sec wide" id="recorrerCalle">🚶 Recorrer la calle en Street View</button>'
     : ''
 
-// Se llama justo después de responder(): el botón ya está en el panel. cercaDe = dónde tocó el jugador, si tocó.
-export function conectarRecorrerCalle(calle, cercaDe = null) {
+// Se llama justo después de responder(): el botón ya está en el panel.
+// inicio = [lat, lon] exacto donde partir (el punto marcado en el mapa o el que tocó el jugador); sin él, un punto al azar de la calle.
+export function conectarRecorrerCalle(calle, inicio = null) {
   const boton = document.getElementById('recorrerCalle')
   if (!boton) return
   boton.onclick = async () => {
     const puntos = puntosDeLaCalle(calle)
-    const elegido = cercaDe
-      ? puntos.reduce(
-          (mejor, actual) =>
-            distanciaKm([actual.lat, actual.lon], cercaDe) < distanciaKm([mejor.lat, mejor.lon], cercaDe)
-              ? actual
-              : mejor,
-          puntos[0],
-        )
-      : puntos[Math.floor(Math.random() * puntos.length)]
-    const [lat, lon] = elegido ? [elegido.lat, elegido.lon] : verticeMedioDeCalle(calle)
+    const alAzar = puntos[Math.floor(Math.random() * puntos.length)]
+    const [lat, lon] = inicio ?? (alAzar ? [alAzar.lat, alAzar.lon] : verticeMedioDeCalle(calle))
     boton.disabled = true
     try {
-      const inicio = await mostrarPanorama({ lat, lon, rumbo: elegido?.rumbo }, { caminable: true })
-      if (!inicio) return aviso('No hay Street View en esta calle.')
-      if (elegido?.pista) aviso(`Este tramo: ${elegido.pista}.`)
+      const partida = await mostrarPanorama(
+        { lat, lon, rumbo: inicio ? undefined : alAzar?.rumbo },
+        { caminable: true },
+      )
+      if (!partida) return aviso('No hay Street View en esta calle.')
+      if (!inicio && alAzar?.pista) aviso(`Este tramo: ${alAzar.pista}.`)
     } catch {
       aviso('No pude cargar Street View. Revisa tu conexión.')
     } finally {
