@@ -27,7 +27,7 @@ registrarModo({
   aids: true,
   group: 'Metro',
   name: 'Encuentra la estación',
-  desc: 'Toca dónde está la estación que te pido. No se dibujan las estaciones, y en las rondas oficiales tampoco las líneas.',
+  desc: 'Incluye todas las líneas',
   pool: conjuntoDeMetro,
   key: s => s.name,
   ask(s, q) {
@@ -99,7 +99,7 @@ registrarModo({
   aids: true,
   group: 'Metro',
   name: '¿Cuál es esta estación?',
-  desc: 'Te marco una estación en el mapa; eliges cuál es entre las alternativas.',
+  desc: 'Incluye todas las líneas',
   pool: conjuntoDeMetro,
   key: s => s.name,
   ask(s, q) {

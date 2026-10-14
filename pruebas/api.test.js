@@ -121,19 +121,19 @@ test('tras muchos intentos fallidos se bloquea ese nombre por un rato', async ()
 })
 
 test('solo se guardan puntajes con sesión y con forma de ronda oficial', async () => {
-  assert.equal((await cliente()('POST', '/puntajes', ronda('com-name', 10, 60000))).estado, 401)
+  assert.equal((await cliente()('POST', '/puntajes', ronda('ch-city', 10, 60000))).estado, 401)
   const { llamar } = await registrado('Seba')
   const rechazados = [
     ronda('no-existe', 10, 60000),
-    ronda('com-name', 10, 60000, 15, '20'),
-    ronda('com-name', 10, 60000, 20, 'cuarenta'),
-    ronda('com-name', 10, 60000, 15, '15'),
-    ronda('com-name', 10, 60000, 5, 'todas'),
-    ronda('com-name', 21, 60000),
-    ronda('com-name', -1, 60000),
-    ronda('com-name', 10.5, 60000),
-    ronda('com-name', 10, 100),
-    ronda('com-name', 10, '60000'),
+    ronda('ch-city', 10, 60000, 15, '20'),
+    ronda('ch-city', 10, 60000, 20, 'cuarenta'),
+    ronda('ch-city', 10, 60000, 15, '15'),
+    ronda('ch-city', 10, 60000, 5, 'todas'),
+    ronda('ch-city', 21, 60000),
+    ronda('ch-city', -1, 60000),
+    ronda('ch-city', 10.5, 60000),
+    ronda('ch-city', 10, 100),
+    ronda('ch-city', 10, '60000'),
   ]
   for (const malo of rechazados)
     assert.equal(
@@ -141,7 +141,7 @@ test('solo se guardan puntajes con sesión y con forma de ronda oficial', async 
       'puntaje_invalido',
       JSON.stringify(malo),
     )
-  assert.equal((await llamar('POST', '/puntajes', ronda('com-all', 34, 90000, 34))).estado, 201)
+  assert.equal((await llamar('POST', '/puntajes', ronda('ch-all', 34, 90000, 34))).estado, 201)
   assert.equal((await llamar('POST', '/puntajes', ronda('st-name', 40, 120000, 179, 'todas'))).estado, 201)
   assert.equal((await llamar('POST', '/puntajes', ronda('lm-loc', 20, 60000, 30))).estado, 201)
   assert.equal((await db.query('select * from puntajes')).length, 3)
@@ -152,7 +152,7 @@ test('el ranking ordena por aciertos y luego por tiempo, con la mejor ronda de c
   const beto = await registrado('Beto')
   const caro = await registrado('Caro')
 
-  const primero = await ana.llamar('POST', '/puntajes', ronda('com-name', 12, 50000))
+  const primero = await ana.llamar('POST', '/puntajes', ronda('ch-city', 12, 50000))
   assert.deepEqual(primero.datos, {
     categoria: '20',
     puesto: 1,
@@ -161,9 +161,9 @@ test('el ranking ordena por aciertos y luego por tiempo, con la mejor ronda de c
     mejor: { aciertos: 12, total: 20, ms: 50000 },
   })
 
-  await beto.llamar('POST', '/puntajes', ronda('com-name', 14, 90000))
-  await caro.llamar('POST', '/puntajes', ronda('com-name', 14, 70000))
-  const peor = await ana.llamar('POST', '/puntajes', ronda('com-name', 9, 20000))
+  await beto.llamar('POST', '/puntajes', ronda('ch-city', 14, 90000))
+  await caro.llamar('POST', '/puntajes', ronda('ch-city', 14, 70000))
+  const peor = await ana.llamar('POST', '/puntajes', ronda('ch-city', 9, 20000))
   assert.deepEqual(peor.datos, {
     categoria: '20',
     puesto: 3,
@@ -171,11 +171,11 @@ test('el ranking ordena por aciertos y luego por tiempo, con la mejor ronda de c
     mejoro: false,
     mejor: { aciertos: 12, total: 20, ms: 50000 },
   })
-  const rondaMejor = await ana.llamar('POST', '/puntajes', ronda('com-name', 14, 60000))
+  const rondaMejor = await ana.llamar('POST', '/puntajes', ronda('ch-city', 14, 60000))
   assert.equal(rondaMejor.datos.puesto, 1)
   assert.equal(rondaMejor.datos.mejoro, true)
 
-  const tabla = (await beto.llamar('GET', '/tabla?modo=com-name')).datos
+  const tabla = (await beto.llamar('GET', '/tabla?modo=ch-city')).datos
   assert.deepEqual(
     tabla.filas.map(fila => [fila.puesto, fila.nombre, fila.aciertos, fila.ms]),
     [
@@ -186,48 +186,48 @@ test('el ranking ordena por aciertos y luego por tiempo, con la mejor ronda de c
   )
   assert.equal(tabla.jugadores, 3)
   assert.equal(tabla.yo.puesto, 3)
-  assert.equal((await cliente()('GET', '/tabla?modo=com-name')).datos.yo, null)
+  assert.equal((await cliente()('GET', '/tabla?modo=ch-city')).datos.yo, null)
 })
 
 test('cada juego tiene su propio ranking y el resumen muestra al líder de cada uno', async () => {
   const ana = await registrado('Ana')
   const beto = await registrado('Beto')
-  await ana.llamar('POST', '/puntajes', ronda('com-name', 10, 50000))
-  await beto.llamar('POST', '/puntajes', ronda('com-name', 12, 50000))
+  await ana.llamar('POST', '/puntajes', ronda('ch-city', 10, 50000))
+  await beto.llamar('POST', '/puntajes', ronda('ch-city', 12, 50000))
   await ana.llamar('POST', '/puntajes', ronda('st-name', 8, 40000))
 
   const { modos } = (await ana.llamar('GET', '/lideres')).datos
-  assert.deepEqual(Object.keys(modos).sort(), ['com-name', 'st-name'])
-  assert.equal(modos['com-name'].lider.nombre, 'Beto')
-  assert.equal(modos['com-name'].jugadores, 2)
-  assert.equal(modos['com-name'].yo.puesto, 2)
+  assert.deepEqual(Object.keys(modos).sort(), ['ch-city', 'st-name'])
+  assert.equal(modos['ch-city'].lider.nombre, 'Beto')
+  assert.equal(modos['ch-city'].jugadores, 2)
+  assert.equal(modos['ch-city'].yo.puesto, 2)
   assert.equal(modos['st-name'].lider.nombre, 'Ana')
   assert.equal(modos['st-name'].yo.puesto, 1)
-  assert.equal((await cliente()('GET', '/lideres')).datos.modos['com-name'].yo, null)
+  assert.equal((await cliente()('GET', '/lideres')).datos.modos['ch-city'].yo, null)
 })
 
 test('el período "semana" solo cuenta los últimos 7 días', async () => {
   const ana = await registrado('Ana')
   const beto = await registrado('Beto')
-  await ana.llamar('POST', '/puntajes', ronda('com-name', 20, 30000))
-  await beto.llamar('POST', '/puntajes', ronda('com-name', 10, 50000))
+  await ana.llamar('POST', '/puntajes', ronda('ch-city', 20, 30000))
+  await beto.llamar('POST', '/puntajes', ronda('ch-city', 10, 50000))
   await db.query(`update puntajes set creado_en = now() - interval '10 days' where aciertos = 20`)
 
   const nombres = async periodo =>
-    (await ana.llamar('GET', `/tabla?modo=com-name&periodo=${periodo}`)).datos.filas.map(fila => fila.nombre)
+    (await ana.llamar('GET', `/tabla?modo=ch-city&periodo=${periodo}`)).datos.filas.map(fila => fila.nombre)
   assert.deepEqual(await nombres('todo'), ['Ana', 'Beto'])
   assert.deepEqual(await nombres('semana'), ['Beto'])
-  assert.equal((await ana.llamar('GET', '/tabla?modo=com-name&periodo=siempre')).estado, 400)
+  assert.equal((await ana.llamar('GET', '/tabla?modo=ch-city&periodo=siempre')).estado, 400)
   assert.equal((await ana.llamar('GET', '/tabla?modo=inventado')).estado, 400)
 })
 
 test('un POST desde otro sitio se rechaza', async () => {
   const { llamar } = await registrado('Seba')
-  const ajeno = await llamar('POST', '/puntajes', ronda('com-name', 10, 60000), {
+  const ajeno = await llamar('POST', '/puntajes', ronda('ch-city', 10, 60000), {
     origin: 'https://otro-sitio.test',
   })
   assert.equal(ajeno.estado, 403)
-  const propio = await llamar('POST', '/puntajes', ronda('com-name', 10, 60000), {
+  const propio = await llamar('POST', '/puntajes', ronda('ch-city', 10, 60000), {
     origin: 'https://juego.test',
   })
   assert.equal(propio.estado, 201)
@@ -351,8 +351,8 @@ test('cada largo de ronda (20 o todas) tiene su propio ranking, y se avisa qué 
 
 test('las rondas de una categoría no se mezclan con las de otra al comparar la mejor marca', async () => {
   const { llamar } = await registrado('Ana')
-  assert.equal((await llamar('POST', '/puntajes', ronda('com-name', 14, 60000, 20))).datos.mejoro, true)
-  const otro = await llamar('POST', '/puntajes', ronda('com-name', 5, 60000, 12, 'todas'))
+  assert.equal((await llamar('POST', '/puntajes', ronda('ch-city', 14, 60000, 20))).datos.mejoro, true)
+  const otro = await llamar('POST', '/puntajes', ronda('ch-city', 5, 60000, 12, 'todas'))
   assert.equal(otro.datos.mejoro, true, 'la primera de "todas" es marca propia aunque sea peor que la de 20')
   assert.equal(otro.datos.puesto, 1)
 })
@@ -366,11 +366,11 @@ test('un puntaje sin categoría (de antes de que existiera) se clasifica por su 
     ms,
   })
   assert.equal(
-    (await llamar('POST', '/puntajes', heredado(ronda('com-name', 10, 60000)))).datos.categoria,
+    (await llamar('POST', '/puntajes', heredado(ronda('ch-city', 10, 60000)))).datos.categoria,
     '20',
   )
   assert.equal(
-    (await llamar('POST', '/puntajes', heredado(ronda('com-all', 30, 90000, 34)))).datos.categoria,
+    (await llamar('POST', '/puntajes', heredado(ronda('ch-all', 30, 90000, 34)))).datos.categoria,
     'todas',
   )
   assert.equal(
@@ -395,10 +395,11 @@ test('al actualizar la base no se pierde ninguna marca: las anteriores quedan en
   await consulta('create table failed_logins (name_key text not null, at timestamptz not null default now())')
   await consulta("insert into users (name, name_key, password_hash) values ('Ana', 'ana', 'x')")
   const antes = [
-    ['com-all', 33, 34, 70000],
-    ['com-name', 12, 15, 55000],
+    ['ch-all', 33, 34, 70000],
+    ['ch-city', 12, 15, 55000],
     ['ch-all', 16, 16, 40000],
     ['lm-loc', 20, 30, 120000],
+    ['com-name', 30, 34, 80000],
   ]
   for (const [modo, correctas, total, ms] of antes)
     await consulta('insert into scores (user_id, mode, correct, total, ms) values (1, $1, $2, $3, $4)', [
@@ -416,16 +417,17 @@ test('al actualizar la base no se pierde ninguna marca: las anteriores quedan en
   assert.deepEqual(
     filas.map(fila => [fila.modo, fila.categoria, fila.aciertos, fila.total, fila.ms]),
     [
-      ['com-all', 'todas', 33, 34, 70000],
-      ['com-name', '15', 12, 15, 55000],
+      ['ch-all', 'todas', 33, 34, 70000],
+      ['ch-city', '15', 12, 15, 55000],
       ['ch-all', 'todas', 16, 16, 40000],
       ['lm-loc', '30', 20, 30, 120000],
+      ['com-name', 'core', 30, 34, 80000], // los juegos de comunas se separan por alcance
     ],
   )
 
   // y siguen apareciendo en el ranking
   const api = crearApi(actualizada, { estaFiltrada: async () => false })
-  const respuesta = await api(new Request('https://juego.test/api/tabla?modo=com-all&categoria=todas'))
+  const respuesta = await api(new Request('https://juego.test/api/tabla?modo=ch-all&categoria=todas'))
   const tabla = await respuesta.json()
   assert.deepEqual(
     tabla.filas.map(fila => [fila.nombre, fila.aciertos, fila.total]),

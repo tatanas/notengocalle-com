@@ -15,8 +15,7 @@ registrarModo({
   noHint: true,
   aids: true,
   group: 'Comunas',
-  name: '¿Qué comuna es?',
-  desc: 'Te marco una comuna y eliges su nombre.',
+  name: '¿Qué comuna es esta?',
   pool: () => comunasDelAlcance(),
   key: f => f.properties.name,
   ask(f, q) {

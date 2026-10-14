@@ -248,13 +248,13 @@ export async function disenoMenu(navegador, { verificar }) {
   const titulos = await pagina.$eval('.grid', cuadricula =>
     [...cuadricula.querySelectorAll('.card h3')].map(titulo => titulo.innerText.trim()),
   )
-  const orden = ['Calles', 'Comunas', 'Lugares emblemáticos', 'Ruteo', 'Ranking', 'Explorar']
+  const orden = ['Calles', 'Comunas', 'Lugares emblemáticos', 'Ruteo']
   const posiciones = orden.map(nombre =>
     titulos.findIndex(encabezadoDeTarjeta => encabezadoDeTarjeta.endsWith(nombre)),
   )
   verificar(
     posiciones.every((posicion, i) => posicion >= 0 && (i === 0 || posicion > posiciones[i - 1])),
-    `las tarjetas salen en el orden Calles, Comunas, Lugares emblemáticos, Ruteo, Ranking, Explorar (${titulos.join(' · ')})`,
+    `las tarjetas salen en el orden Calles, Comunas, Lugares emblemáticos, Ruteo (${titulos.join(' · ')})`,
   )
   verificar(
     titulos.some(encabezadoDeTarjeta => encabezadoDeTarjeta.endsWith('Metro')),
@@ -264,19 +264,27 @@ export async function disenoMenu(navegador, { verificar }) {
     etiquetas.map(etiqueta => etiqueta.innerText.trim()),
   )
   verificar(!categorias.includes('Metro'), 'y ya no es una categoría de los lugares emblemáticos')
-  // Street View solo aparece si hay llave de Google: se cuenta aparte.
+  // Street View solo aparece si hay llave de Google: se cuenta aparte (su práctica es el botón grande y la oficial el chico).
+  // En Metro la práctica no va al lado sino abajo, con las líneas elegidas.
   const grandes = await pagina.$$eval(
     '.mode-row .mode.ranked',
     botones => botones.filter(boton => !boton.dataset.official.startsWith('sv-')).length,
   )
   const chicos = await pagina.$$eval('.mode-row .practice', botones =>
-    botones.filter(boton => !boton.dataset.mode.startsWith('sv-')).map(boton => boton.innerText.trim()),
+    botones.map(boton => boton.innerText.trim()),
   )
-  const cantidadEsperada = MODOS_OFICIALES.filter(id => !id.startsWith('sv-')).length
+  const sinStreetView = MODOS_OFICIALES.filter(id => !id.startsWith('sv-'))
+  const cantidadEsperada = sinStreetView.length
+  const chicosEsperados = sinStreetView.filter(id => !id.startsWith('mt-')).length
   verificar(
-    grandes === cantidadEsperada && chicos.length === cantidadEsperada,
-    `cada juego tiene botón grande (oficial) y chico (práctica): ${grandes} y ${chicos.length}`,
+    grandes === cantidadEsperada && chicos.length === chicosEsperados,
+    `cada juego tiene botón grande (oficial) y chico (práctica), salvo el metro: ${grandes} y ${chicos.length}`,
   )
+  const practicaDelMetro = await pagina.$$eval(
+    '.card .separador ~ .modes [data-mode^="mt-"]',
+    botones => botones.length,
+  )
+  verificar(practicaDelMetro === 2, 'el metro tiene su subsección de práctica con los dos juegos')
   verificar(
     chicos.every(etiqueta => etiqueta === '🏋️'),
     'el botón chico es la pesa 🏋️ (práctica)',
@@ -296,6 +304,14 @@ export async function disenoMenu(navegador, { verificar }) {
     !(await pagina.$eval('#countdown', caja => !caja.hidden)),
     'la cuenta regresiva se cierra al empezar',
   )
+  await irAlInicio(pagina)
+  verificar(
+    (await pagina.$$eval('#btnRanking, #btnExplorar, #btnProgreso', botones => botones.length)) === 3,
+    'Ranking, Explorar y Mi progreso están en la barra superior',
+  )
+  await pagina.click('#btnProgreso')
+  await pagina.waitForSelector('#resetStats', { timeout: 2000 })
+  verificar(/Mi progreso/.test(await texto(pagina, '#title')), 'Mi progreso abre su propia página')
   verificar(!errores.length, `sin errores en la consola${errores.length ? ': ' + errores.join(' | ') : ''}`)
   await pagina.close()
 }
@@ -485,14 +501,13 @@ export async function categoriasRanking(navegador, { verificar }) {
   await pagina.close()
 }
 
-// "¿Qué calle es?" con un solo punto marcado (ajuste de la práctica): sin trazado completo, con un pin, y la ronda oficial no cambia.
+// "¿Qué calle es esta? (difícil)" marca solo un punto de la calle; el otro juego destaca la calle completa.
 export async function puntoEnCalle(navegador, { verificar }) {
   const { page: pagina, errors: errores } = await abrirPagina(navegador)
-  await pagina.$eval('#setPunto', casilla => casilla.click())
-  await pagina.click('[data-mode="st-name"]')
+  const prompt = () => pagina.$eval('.q-prompt', nodo => nodo.innerText)
+  await pagina.click('[data-mode="st-punto"]')
   await pagina.waitForSelector('.q-head')
   await dormir(500)
-  const prompt = () => pagina.$eval('.q-prompt', nodo => nodo.innerText)
   verificar(/punto marcado/.test(await prompt()), `la pregunta habla de un punto: «${await prompt()}»`)
   verificar(!!(await pagina.$('.pin.ans')), 'el punto está marcado en el mapa')
   await responderComoSea(pagina)
@@ -500,9 +515,10 @@ export async function puntoEnCalle(navegador, { verificar }) {
   verificar(true, 'se puede responder y sale "Siguiente"')
 
   await irAlInicio(pagina)
-  await pagina.click('[data-official="st-name"]')
-  await pagina.waitForSelector('#panel .q-head', { timeout: 8000 })
-  verificar(!/punto marcado/.test(await prompt()), 'la ronda oficial sigue marcando la calle entera')
+  await pagina.click('[data-mode="st-name"]')
+  await pagina.waitForSelector('.q-head')
+  await dormir(300)
+  verificar(!/punto marcado/.test(await prompt()), 'el otro juego marca la calle entera')
   verificar(!errores.length, `sin errores en la consola${errores.length ? ': ' + errores.join(' | ') : ''}`)
   await pagina.close()
 }

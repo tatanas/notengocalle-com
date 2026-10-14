@@ -1,7 +1,7 @@
-import { mejores, reiniciarProgreso, estadisticas } from '../nucleo/progreso.js'
+import { estadisticas } from '../nucleo/progreso.js'
 import { largoNormalDe, tieneRondaDeTodas } from '../../compartido/oficial.js'
-import { largoPara, guardarAjustes, ajustes } from '../nucleo/almacen.js'
-import { $, escaparHtml, formatearTiempo } from '../nucleo/utilidades.js'
+import { aplicarReglasDeRonda, largoPara, guardarAjustes, ajustes } from '../nucleo/almacen.js'
+import { $, escaparHtml } from '../nucleo/utilidades.js'
 import {
   CATEGORIAS,
   CHILE,
@@ -17,7 +17,7 @@ import { limpiarCapa, fijarChile, fijarRelieve } from '../mapa/mapa.js'
 import { tieneRondaOficial, iniciarPartida, detenerPartida } from '../juego/engine.js'
 import { MODOS, modoPorId } from '../juego/registry.js'
 import { mostrarMisCalles } from './misCalles.js'
-import { definirPantalla, navegar } from './navegacion.js'
+import { definirPantalla } from './navegacion.js'
 import { NOMBRE_DE_LA_APP, ocultarPanel, vistaDePantalla, mostrarPantalla, titulo } from './panel.js'
 
 const GRUPOS = [
@@ -34,7 +34,7 @@ const GRUPOS = [
   {
     name: 'Comunas',
     emoji: '🗺️',
-    blurb: 'Ubica las comunas del Gran Santiago y aprende con cuáles limita cada una.',
+    blurb: 'Ubica las comunas del Gran Santiago',
   },
   {
     name: 'Lugares emblemáticos',
@@ -44,12 +44,13 @@ const GRUPOS = [
   {
     name: 'Metro',
     emoji: '🚇',
-    blurb: `${estaciones.length} estaciones de las líneas L1 a L6, con sus combinaciones. Elige con qué líneas jugar.`,
+    blurb: `${estaciones.length} estaciones de las líneas L1 a L6, con sus combinaciones.`,
   },
   {
     name: 'Ruteo',
     emoji: '🧭',
-    blurb: `Arma rutas paso a paso: ${(DATOS.steps || []).length} en auto entre dos puntos cualquiera y ${(DATOS.transit || []).length} en micro y metro. En Explorar puedes ver los recorridos de micro más importantes.`,
+    blurb:
+      'Arma rutas paso a paso: en auto entre dos puntos cualquiera y en micro y metro. En Explorar puedes ver los recorridos de micro más importantes.',
   },
   {
     name: 'Chile',
@@ -85,18 +86,63 @@ function dominio(modo) {
   return `${Math.round((dominados / elementos.length) * 100)}% dominado`
 }
 
+const TODAS_LAS_LINEAS = { lines: null }
+
+// Los juegos de metro de la parte de arriba de su tarjeta usan siempre todas las líneas, y su "% dominado" también.
+function conTodasLasLineas(calcular) {
+  aplicarReglasDeRonda(TODAS_LAS_LINEAS)
+  try {
+    return calcular()
+  } finally {
+    aplicarReglasDeRonda(null)
+  }
+}
+
+function etiquetaDeModo(modo, { todasLasLineas = false, conDescripcion = true } = {}) {
+  const descripcion = conDescripcion && modo.desc ? `<br><small>${escaparHtml(modo.desc)}</small>` : ''
+  const dominado = todasLasLineas ? conTodasLasLineas(() => dominio(modo)) : dominio(modo)
+  return `<span><b>${escaparHtml(modo.name)}</b>${descripcion}</span>
+      <span class="mastery">${dominado}</span>`
+}
+
 // El botón grande es la ronda oficial (cuenta para el ranking); el chico, una ronda de práctica.
-// Un juego sin ronda oficial deja su único botón como práctica.
+// Un juego sin ronda oficial deja su único botón como práctica. Excepciones: en Street View la práctica es la grande y la
+// oficial la chica (usa el nivel elegido); y en Metro la práctica va aparte, abajo, con las líneas elegidas.
 function filaDeModo(modo) {
-  const etiqueta = `<span><b>${escaparHtml(modo.name)}</b><br><small>${escaparHtml(modo.desc)}</small></span>
-      <span class="mastery">${dominio(modo)}</span>`
+  const etiqueta = etiquetaDeModo(modo, { todasLasLineas: modo.group === 'Metro' })
   if (!tieneRondaOficial(modo))
     return `<div class="mode-row"><button class="mode" data-mode="${modo.id}">${etiqueta}</button></div>`
+  if (modo.group === 'Street View')
+    return `<div class="mode-row">
+    <button class="mode" data-mode="${modo.id}" title="Práctica: ronda sin ranking">${etiqueta}</button>
+    <button class="oficial-chico" data-official="${modo.id}" title="Ronda oficial: cuenta para el ranking, en el nivel elegido" aria-label="Ronda oficial de ${escaparHtml(modo.name)}">🏆</button>
+  </div>`
+  const botonOficial = `<button class="mode ranked" data-official="${modo.id}" title="Ronda oficial: cuenta para el ranking">${etiqueta}</button>`
+  if (modo.group === 'Metro') return `<div class="mode-row">${botonOficial}</div>`
   return `<div class="mode-row">
-    <button class="mode ranked" data-official="${modo.id}" title="Ronda oficial: cuenta para el ranking">${etiqueta}</button>
+    ${botonOficial}
     <button class="practice" data-mode="${modo.id}" title="Práctica: ronda sin ranking, con ayudas" aria-label="Práctica de ${escaparHtml(modo.name)}">🏋️</button>
   </div>`
 }
+
+// Práctica del metro: las líneas que elija el jugador.
+const filaDePracticaDeMetro = modo =>
+  `<div class="mode-row"><button class="mode" data-mode="${modo.id}">${etiquetaDeModo(modo, { conDescripcion: false })}</button></div>`
+
+function subseccionDePracticaDeMetro(modos) {
+  return `<hr class="separador"><h4 class="subseccion">Práctica</h4>
+    ${fichasDeLineasDeMetro()}
+    <div class="modes">${modos.map(filaDePracticaDeMetro).join('')}</div>`
+}
+
+// La periferia (Colina, Lampa, Padre Hurtado, Pirque, Buin…) cambia qué comunas hay en los juegos de comunas, y cada
+// alcance tiene su propio ranking.
+const selectorDeAlcance = () => `<label class="length-row" for="setScope">Comunas incluidas</label>
+    <select id="setScope">
+      <option value="core">Gran Santiago (34 comunas)</option>
+      <option value="peri">Gran Santiago + periferia (Colina, Lampa, Padre Hurtado, Pirque, Buin…)</option>
+      <option value="all">Toda la Región Metropolitana (52)</option>
+    </select>`
 
 function fichasDeLineasDeMetro() {
   const fichas = IDS_DE_LINEA.map(id => {
@@ -109,13 +155,8 @@ function fichasDeLineasDeMetro() {
       on ? `background:${color};border-color:${color};color:#fff` : '',
     )
   })
-  return `<div class="chips" id="setLines" style="margin-bottom:10px">${fichas.join('')}
-    <span class="muted" style="font-size:12px;align-self:center">← líneas con las que jugar</span></div>`
+  return `<div class="chips" id="setLines" style="margin-bottom:10px">${fichas.join('')}</div>`
 }
-
-// En la práctica de "¿Qué calle es?": marcar solo un punto de la calle, para no aprender solo su forma.
-const fichaDePuntoEnCalle = () =>
-  `<div style="margin-bottom:10px">${pastilla('Marcar solo un punto de la calle en «¿Qué calle es?» (práctica)', ajustes.puntoEnCalle, 'id="setPunto"')}</div>`
 
 // Los juegos paso a paso van primero dentro de su grupo.
 const pasosPrimero = (a, b) => (b.id.startsWith('rs-') ? 1 : 0) - (a.id.startsWith('rs-') ? 1 : 0)
@@ -147,7 +188,31 @@ function selectorDeNivel(grupo) {
     ([valor, etiqueta]) =>
       `<option value="${valor}" ${valor === ajustes.nivelStreetView ? 'selected' : ''}>${etiqueta}</option>`,
   )
-  return `<label class="length-row">Nivel (la ronda oficial es siempre extremo) <select id="nivelStreetView">${opciones.join('')}</select></label>`
+  return `<label class="length-row">Nivel <select id="nivelStreetView">${opciones.join('')}</select></label>`
+}
+
+// Lugares emblemáticos: qué categorías preguntar y qué tan estricto es el margen (solo en la práctica).
+function ajustesDeLugares() {
+  const elegidos = ajustes.cats || CATEGORIAS
+  const fichasDeCategoria = CATEGORIAS.map(categoria =>
+    pastilla(escaparHtml(categoria), elegidos.includes(categoria), `data-cat="${escaparHtml(categoria)}"`),
+  )
+  return `<label>Categorías de lugares emblemáticos</label>
+    <div class="chips" id="setCats">${fichasDeCategoria.join('')}</div>
+    <p class="muted nota">Las categorías valen solo para la práctica; las rondas oficiales preguntan todas.</p>`
+}
+
+// Todo lo configurable de un grupo va al final de su tarjeta, bajo una raya.
+function ajustesDeLaTarjeta(grupo, modos) {
+  const opciones = [
+    selectorDeLargo(grupo.name, modos),
+    selectorDeNivel(grupo.name),
+    grupo.name === 'Comunas' ? selectorDeAlcance() : '',
+    grupo.name === 'Lugares emblemáticos' ? ajustesDeLugares() : '',
+  ].filter(Boolean)
+  return opciones.length
+    ? `<hr class="separador"><div class="ajustes-de-tarjeta">${opciones.join('')}</div>`
+    : ''
 }
 
 function tarjetaDeGrupo(grupo) {
@@ -157,65 +222,10 @@ function tarjetaDeGrupo(grupo) {
   if (!modos.length) return ''
   return `<div class="card">
     <h3><span class="em">${grupo.emoji}</span>${grupo.name}</h3><p>${grupo.blurb}</p>
-    ${selectorDeLargo(grupo.name, modos)}
-    ${selectorDeNivel(grupo.name)}
-    ${grupo.name === 'Metro' ? fichasDeLineasDeMetro() : ''}
-    ${grupo.name === 'Calles' ? fichaDePuntoEnCalle() : ''}
     <div class="modes">${modos.map(filaDeModo).join('')}</div>
+    ${grupo.name === 'Metro' ? subseccionDePracticaDeMetro(modos) : ''}
+    ${ajustesDeLaTarjeta(grupo, modos)}
   </div>`
-}
-
-function tarjetaDeAjustes() {
-  const elegidos = ajustes.cats || CATEGORIAS
-  const fichasDeCategoria = CATEGORIAS.map(categoria =>
-    pastilla(escaparHtml(categoria), elegidos.includes(categoria), `data-cat="${escaparHtml(categoria)}"`),
-  )
-  return `<div class="card"><h3><span class="em">⚙️</span>Ajustes</h3>
-    <label for="setScope">Comunas incluidas</label>
-    <select id="setScope">
-      <option value="core">Gran Santiago (34 comunas)</option>
-      <option value="peri">Gran Santiago + periferia (Colina, Lampa, Padre Hurtado, Pirque, Buin…)</option>
-      <option value="all">Toda la Región Metropolitana (52)</option>
-    </select>
-    <label>Categorías de lugares emblemáticos</label>
-    <div class="chips" id="setCats">${fichasDeCategoria.join('')}</div>
-    <div style="margin-top:10px">${pastilla('Modo estricto en lugares emblemáticos (800 m en vez de 1,5 km)', ajustes.strict, 'id="setStrict"')}</div>
-    <p class="muted" style="font-size:12px;margin:10px 0 0">Los demás ajustes valen solo para la práctica; las rondas oficiales usan reglas fijas.</p>
-  </div>`
-}
-
-function mejorRonda(idDeModo) {
-  const llaves = Object.keys(mejores).filter(llave => llave.startsWith(idDeModo + ':'))
-  if (!llaves.length) return '—'
-  const ultimo = llaves.sort((a, b) => mejores[b].d - mejores[a].d)[0]
-  const total = ultimo.split(':').pop()
-  return `${mejores[ultimo].ok}/${total} · ${formatearTiempo(mejores[ultimo].ms)}`
-}
-
-function htmlDeProgreso() {
-  const filas = MODOS.map(modo => {
-    const entradas = Object.keys(estadisticas)
-      .filter(llave => llave.startsWith(modo.id + ':'))
-      .map(llave => estadisticas[llave])
-    return {
-      mode: modo,
-      answers: entradas.reduce((suma, entrada) => suma + entrada.n, 0),
-      correct: entradas.reduce((suma, entrada) => suma + entrada.ok, 0),
-    }
-  }).filter(fila => fila.answers)
-  if (!filas.length) return '<p class="muted">Todavía no juegas. ¡Parte por “¿Qué comuna es?”!</p>'
-
-  const masDebiles = Object.entries(estadisticas)
-    .filter(([, entrada]) => entrada.n >= 2 && entrada.ok / entrada.n < 0.6)
-    .sort(([, a], [, b]) => a.ok / a.n - b.ok / b.n)
-    .slice(0, 10)
-    .map(([llave]) => escaparHtml(llave.split(':').slice(1).join(':')))
-  const filasDeTabla = filas.map(
-    ({ mode: modo, answers: respuestas, correct: correctas }) =>
-      `<tr><td>${escaparHtml(modo.name)}</td><td>${respuestas}</td><td>${Math.round((correctas / respuestas) * 100)}%</td><td>${mejorRonda(modo.id)}</td></tr>`,
-  )
-  return `<table class="stats"><tr><th>Modo</th><th>Respuestas</th><th>Acierto</th><th>Mejor ronda</th></tr>${filasDeTabla.join('')}</table>
-    ${masDebiles.length ? `<p class="muted" style="margin:10px 0 4px">Tus puntos débiles:</p><p style="margin:0;font-size:13.5px">${masDebiles.join(' · ')}</p>` : ''}`
 }
 
 const htmlDeCreditos = () =>
@@ -231,20 +241,11 @@ const htmlDeInicio = () => `<div class="home-backdrop" aria-hidden="true"></div>
     <p>Practica comunas, lugares, calles, rutas y metro de Santiago.</p></div>
   <div class="grid">
     ${GRUPOS.map(tarjetaDeGrupo).join('')}
-    <div class="card"><h3><span class="em">🏆</span>Ranking</h3>
-      <p>El botón grande de cada juego es su ronda oficial: mismas reglas para todos y cuenta para el ranking (con cuenta), con el número de preguntas que tengas elegido en la tarjeta del juego. El botón 🏋️ es la <b>práctica</b>: una ronda con ayudas (bordes de comunas y líneas del metro) que aprende de lo que fallas.</p>
-      <button class="btn wide" id="goRanking">Ver ranking</button></div>
-    <div class="card"><h3><span class="em">🔎</span>Explorar</h3>
-      <p>Mapa interactivo con comunas, metro, calles y lugares. Para estudiar antes de jugar.</p>
-      <button class="btn wide" id="goExplore">Abrir mapa</button></div>
   </div>
   <div class="grid settings">
-    ${tarjetaDeAjustes()}
     <div class="card"><h3><span class="em">➕</span>Mis calles</h3>
       <p>Agrega calles que te importan a ti (la de tu casa, la de un amigo). Aparecen en los juegos de calles y se guardan solo en este navegador.</p>
       <div id="myst"></div></div>
-    <div class="card"><h3><span class="em">📊</span>Tu progreso</h3>${htmlDeProgreso()}
-      <div class="row" style="margin-top:10px"><button class="btn sec small" id="resetStats">Borrar progreso</button></div></div>
   </div>
   ${htmlDeCreditos()}
 </div>`
@@ -283,14 +284,6 @@ function conectarAjustes() {
       guardarAjustes()
     }
 
-  const soloUnPunto = $('#setPunto')
-  if (soloUnPunto)
-    soloUnPunto.onchange = evento => {
-      ajustes.puntoEnCalle = evento.target.checked
-      evento.target.parentElement.classList.toggle('on', evento.target.checked)
-      guardarAjustes()
-    }
-
   const nivelStreetView = $('#nivelStreetView')
   if (nivelStreetView)
     nivelStreetView.onchange = () => {
@@ -299,25 +292,13 @@ function conectarAjustes() {
     }
 
   const categorias = $('#setCats')
-  for (const entrada of categorias.querySelectorAll('input'))
+  for (const entrada of categorias?.querySelectorAll('input') ?? [])
     entrada.onchange = () => {
       entrada.parentElement.classList.toggle('on', entrada.checked)
       const elegidos = valoresMarcados(categorias, 'cat')
       ajustes.cats = elegidos.length === CATEGORIAS.length ? null : elegidos
       guardarAjustes()
     }
-
-  $('#setStrict').onchange = evento => {
-    ajustes.strict = evento.target.checked
-    evento.target.parentElement.classList.toggle('on', evento.target.checked)
-    guardarAjustes()
-  }
-
-  $('#resetStats').onclick = () => {
-    if (!confirm('¿Borrar todo tu progreso?')) return
-    reiniciarProgreso()
-    abrirInicio()
-  }
 }
 
 function abrirInicio() {
@@ -329,8 +310,6 @@ function abrirInicio() {
   titulo.textContent = NOMBRE_DE_LA_APP
   mostrarPantalla(htmlDeInicio())
 
-  $('#goExplore').onclick = () => navegar('explore')
-  $('#goRanking').onclick = () => navegar('ranking')
   for (const boton of vistaDePantalla.querySelectorAll('[data-mode]'))
     boton.onclick = () => iniciarPartida(modoPorId(boton.dataset.mode))
   for (const boton of vistaDePantalla.querySelectorAll('[data-official]'))

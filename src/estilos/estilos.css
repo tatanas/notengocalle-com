@@ -59,13 +59,14 @@ button {
 #topbar h1 {
   font-size: 17px;
   margin: 0;
-  flex: 1;
+  flex: 0 1 auto;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   font-weight: 650;
 }
 #hud {
+  margin-left: auto;
   font-size: 14px;
   font-weight: 600;
   white-space: nowrap;
@@ -79,6 +80,45 @@ button {
   place-items: center;
   cursor: pointer;
   color: inherit;
+}
+/* Ranking, Explorar y Mi progreso, junto al nombre: con texto en escritorio y solo el emoji en el celular */
+#navSuperior {
+  display: flex;
+  gap: 2px;
+  margin-left: 6px;
+}
+.navbtn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: transparent;
+  border: 0;
+  border-radius: 8px;
+  padding: 6px 10px;
+  color: inherit;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.navbtn:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+.navbtn .icono {
+  font-size: 18px;
+  line-height: 1;
+}
+@media (max-width: 760px) {
+  .navbtn .texto {
+    display: none;
+  }
+  .navbtn {
+    padding: 6px;
+  }
+}
+.pagina-angosta {
+  max-width: 560px;
 }
 .iconbtn:hover {
   background: rgba(255, 255, 255, 0.15);
@@ -467,7 +507,8 @@ body.con-panorama .leaflet-top.leaflet-left {
   mask-image: linear-gradient(to bottom, #000 70%, transparent 100%);
 }
 .hero {
-  margin: 4px 0 14px;
+  margin: 4px auto 14px;
+  max-width: 760px;
 }
 .hero h2 {
   margin: 0 0 4px;
@@ -477,10 +518,13 @@ body.con-panorama .leaflet-top.leaflet-left {
   margin: 0;
   color: var(--muted);
 }
+/* Las tarjetas van una sobre otra, cada una en su propia línea */
 .grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  grid-template-columns: 1fr;
   gap: 12px;
+  max-width: 760px;
+  margin-inline: auto;
 }
 .card {
   background: var(--card);
@@ -898,7 +942,8 @@ h3.tight {
 .mode.ranked:hover {
   border-color: var(--warn);
 }
-.practice {
+.practice,
+.oficial-chico {
   flex: 0 0 auto;
   width: 56px;
   border: 1px solid var(--line);
@@ -908,7 +953,8 @@ h3.tight {
   font-size: 22px;
   color: var(--muted);
 }
-.practice:hover {
+.practice:hover,
+.oficial-chico:hover {
   border-color: var(--pri);
   color: var(--ink);
 }
@@ -1013,6 +1059,15 @@ dialog .error {
 /* ranking */
 .wrap.narrow {
   max-width: 720px;
+}
+/* En escritorio el ranking usa más ancho: los nombres de usuario y los tiempos quedaban apretados. */
+@media (min-width: 761px) {
+  .wrap.narrow {
+    max-width: 1100px;
+  }
+  table.board td {
+    padding-right: 18px;
+  }
 }
 .wrap.narrow select {
   flex: 1;
@@ -1131,4 +1186,36 @@ table.board.clickable tr[data-open]:hover td {
 .length-row select {
   width: auto;
   padding: 5px 8px;
+}
+
+/* Metro: la práctica va en una subsección aparte, bajo una raya */
+.separador {
+  border: 0;
+  border-top: 1px solid var(--line);
+  margin: 14px 0 10px;
+}
+.subseccion {
+  margin: 0 0 8px;
+  font-size: 15px;
+}
+/* En Street View el botón chico es la ronda oficial */
+.oficial-chico {
+  border-color: #f2d58a;
+  background: #fffbeb;
+}
+.oficial-chico:hover {
+  border-color: var(--warn);
+}
+/* Lo configurable de cada tarjeta va al final, bajo una raya */
+.ajustes-de-tarjeta {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.ajustes-de-tarjeta .length-row {
+  margin: 0;
+}
+.ajustes-de-tarjeta .nota {
+  font-size: 12px;
+  margin: 0;
 }

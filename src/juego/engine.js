@@ -1,13 +1,14 @@
 import {
   REGLAS_OFICIALES,
   MODOS_OFICIALES,
+  ajusteDeCategoria,
   largoNormalDe,
   tieneRondaDeTodas,
   TODAS_LAS_PREGUNTAS,
   categoriaDe,
 } from '../../compartido/oficial.js'
 import { pesoAdaptativo, mejores, registrar, guardarMejor, muestraPonderada } from '../nucleo/progreso.js'
-import { aplicarReglasDeRonda, largoPara } from '../nucleo/almacen.js'
+import { ajustes, aplicarReglasDeRonda, largoPara } from '../nucleo/almacen.js'
 import { $, escaparHtml, formatearTiempo } from '../nucleo/utilidades.js'
 import { limpiarAyudas } from '../mapa/ayudas.js'
 import {
@@ -26,7 +27,7 @@ import { resguardarSalida, navegar } from '../interfaz/navegacion.js'
 import { mostrarResultadoOficial } from '../interfaz/resultadoOficial.js'
 import { ocultarPantalla, indicador, panel, mostrarPanel, titulo, aviso } from '../interfaz/panel.js'
 
-/* Un modo define: id, group, name, desc, pool(), key(item) y ask(item, quiz).
+/* Un modo define: id, group, name, desc (opcional: se muestra bajo el nombre en el menú), pool(), key(item) y ask(item, quiz).
    Opcionales: label(item), balance(item), setup(quiz), limpiar() (al salir), disponible() (si no, no aparece en el menú), all, keepLayer, noHint, aids, relief, chile, roomy, tall, study.
    noHint: sin el botón "Ver nombres". aids: en la práctica dibuja bordes de comunas y metro de ayuda (la ronda oficial, no). */
 
@@ -107,17 +108,28 @@ function actualizarIndicador() {
 
 // category: solo para empezar una ronda oficial de un largo concreto (desde el ranking); si no, se usa el largo
 // que la persona tiene elegido en sus ajustes.
-export function iniciarPartida(modo, { ranked: oficial = false, category: categoria = null } = {}) {
+export function iniciarPartida(
+  modo,
+  { ranked: oficial = false, category: categoria = null, reglas: reglasDePractica = null } = {},
+) {
   detenerPartida()
-  aplicarReglasDeRonda(oficial ? REGLAS_OFICIALES : null)
+  // En Street View y en los juegos de comunas la categoría de ranking es un ajuste (nivel, alcance): el de la pestaña
+  // del ranking o, si no, el elegido en el menú.
+  const delAjuste = ajusteDeCategoria(modo.id)
+  const variante = delAjuste ? (categoria ?? ajustes[delAjuste.ajuste]) : null
+  const reglas = oficial
+    ? { ...REGLAS_OFICIALES, ...(delAjuste && { [delAjuste.ajuste]: variante }) }
+    : reglasDePractica
+  aplicarReglasDeRonda(reglas)
   const conjunto = modo.pool()
-  const pedidas = categoria
-    ? categoria === TODAS_LAS_PREGUNTAS
-      ? conjunto.length
-      : +categoria
-    : largoPara(modo.group) >= LARGO_DE_TODAS && tieneRondaDeTodas(modo.id)
-      ? LARGO_DE_TODAS
-      : largoNormalDe(modo.id)
+  const pedidas =
+    categoria && !variante
+      ? categoria === TODAS_LAS_PREGUNTAS
+        ? conjunto.length
+        : +categoria
+      : largoPara(modo.group) >= LARGO_DE_TODAS && tieneRondaDeTodas(modo.id)
+        ? LARGO_DE_TODAS
+        : largoNormalDe(modo.id)
   const tamano = modo.all ? conjunto.length : Math.min(pedidas, conjunto.length)
   if (!conjunto.length) {
     aplicarReglasDeRonda(null)
@@ -127,7 +139,9 @@ export function iniciarPartida(modo, { ranked: oficial = false, category: catego
   partida = {
     mode: modo,
     ranked: oficial,
-    category: oficial ? categoriaDe(tamano, conjunto.length) : null,
+    category: oficial ? (variante ?? categoriaDe(tamano, conjunto.length)) : null,
+    variante,
+    reglas: reglasDePractica,
     items: muestraPonderada(conjunto, tamano, {
       weightOf: oficial ? undefined : elemento => pesoAdaptativo(llaveDeEstadistica(modo, elemento)),
       groupOf: modo.balance,
@@ -275,7 +289,17 @@ function htmlDeMejorPersonal(total, maximo, anterior, esMejor) {
 }
 
 function terminarPartida() {
-  const { mode: modo, ranked: oficial, category: categoria, ok, ms, pts, misses: fallos } = partida
+  const {
+    mode: modo,
+    ranked: oficial,
+    category: categoria,
+    variante,
+    reglas,
+    ok,
+    ms,
+    pts,
+    misses: fallos,
+  } = partida
   const total = partida.items.length
   const maximo = maximoDe(modo, total)
   detenerPartida()
@@ -283,7 +307,7 @@ function terminarPartida() {
   fijarModoDeEtiquetas('plain')
   fijarRelieve(false)
 
-  const llaveDeMejor = modo.id + ':' + total
+  const llaveDeMejor = modo.id + ':' + total + (variante ? ':' + variante : '')
   const anterior = mejores[llaveDeMejor]
   const esMejor = !anterior || ok > anterior.ok || (ok === anterior.ok && ms < anterior.ms)
   if (esMejor) guardarMejor(llaveDeMejor, { ok, ms, d: Date.now() })
@@ -307,7 +331,7 @@ function terminarPartida() {
     </div>
     <p class="muted" style="font-size:12px;margin-top:10px">${notaFinal}</p>`)
 
-  $('#again').onclick = () => iniciarPartida(modo, { ranked: oficial, category: categoria })
+  $('#again').onclick = () => iniciarPartida(modo, { ranked: oficial, category: categoria, reglas })
   $('#menu').onclick = () => navegar('home')
   if ($('#goOfficial')) $('#goOfficial').onclick = () => iniciarPartida(modo, { ranked: true })
   if (oficial)

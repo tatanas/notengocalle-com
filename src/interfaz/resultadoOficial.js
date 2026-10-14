@@ -1,14 +1,11 @@
-import { TODAS_LAS_PREGUNTAS } from '../../compartido/oficial.js'
+import { textoDeCategoria } from '../../compartido/oficial.js'
 import { entregaDe, vaciarBandejaDeSalida, enviarRondaOficial } from '../cuenta/puntajes.js'
 import { $, formatearTiempo } from '../nucleo/utilidades.js'
 import { abrirDialogoDeCuenta } from './cuenta.js'
 import { navegar } from './navegacion.js'
 
-const textoDeCategoria = categoria =>
-  categoria === TODAS_LAS_PREGUNTAS ? 'todas las preguntas' : `${categoria} preguntas`
-
-function htmlDeGuardados({ categoria, puesto, jugadores, mejoro, mejor }) {
-  const lugarEnTabla = `🏆 <b>Puesto ${puesto}</b> de ${jugadores} en el ranking de este juego con ${textoDeCategoria(categoria)}.`
+function htmlDeGuardados(modo, { categoria, puesto, jugadores, mejoro, mejor }) {
+  const lugarEnTabla = `🏆 <b>Puesto ${puesto}</b> de ${jugadores} en el ranking de este juego con ${textoDeCategoria(modo, categoria)}.`
   const personales = mejoro
     ? 'Es tu mejor ronda oficial de este largo.'
     : `Tu mejor ronda oficial de este largo sigue siendo ${mejor.aciertos}/${mejor.total} en ${formatearTiempo(mejor.ms)}.`
@@ -34,7 +31,7 @@ export async function mostrarResultadoOficial(resultado, caja) {
 function dibujar(resultado, caja, desenlace) {
   if (!caja.isConnected) return
   if (desenlace.estado === 'guardado') {
-    caja.innerHTML = htmlDeGuardados(desenlace)
+    caja.innerHTML = htmlDeGuardados(resultado.modo, desenlace)
     $('#outcomeRanking').onclick = () => navegar('ranking', resultado.modo, desenlace.categoria)
   } else if (desenlace.estado === 'invitado') {
     caja.innerHTML = HTML_DE_INVITADO

@@ -43,6 +43,31 @@ let panorama = null
 let inicioDeLaPregunta = null
 let panoDeInicio = null
 
+// Al recorrer una calle, un punto azul en el mapa sigue al jugador.
+let marcadorDePosicion = null
+const quitarMarcadorDePosicion = () => {
+  marcadorDePosicion?.remove()
+  marcadorDePosicion = null
+}
+
+function seguirEnElMapa(posicion) {
+  const lugar = [posicion.lat(), posicion.lng()]
+  if (!marcadorDePosicion) {
+    marcadorDePosicion = L.circleMarker(lugar, {
+      pane: 'points',
+      radius: 8,
+      color: '#fff',
+      weight: 3,
+      fillColor: '#2563eb',
+      fillOpacity: 1,
+    }).addTo(mapa)
+    return
+  }
+  marcadorDePosicion.setLatLng(lugar)
+  const panoramaTapa = window.matchMedia('(min-width: 761px)').matches ? window.innerWidth / 2 : 0
+  mapa.panInside(lugar, { paddingTopLeft: [panoramaTapa + 40, 70], paddingBottomRight: [270, 40] })
+}
+
 function crearPanorama(StreetViewPanorama) {
   panorama = new StreetViewPanorama(contenedor, {
     clickToGo: false,
@@ -58,6 +83,8 @@ function crearPanorama(StreetViewPanorama) {
   // Las flechas del teclado también caminan: si algo lo mueve, vuelve.
   panorama.addListener('position_changed', () => {
     const posicion = panorama.getPosition()
+    if (posicion && !inicioDeLaPregunta && document.body.classList.contains('recorriendo'))
+      seguirEnElMapa(posicion)
     if (!posicion || !inicioDeLaPregunta) return
     if (distanciaKm([posicion.lat(), posicion.lng()], inicioDeLaPregunta) <= TOLERANCIA_DE_MOVIMIENTO_KM)
       return
@@ -126,6 +153,7 @@ export async function mostrarPanorama(
   const inicio = [lugar.latLng.lat(), lugar.latLng.lng()]
 
   mapaEncuadrado = false
+  quitarMarcadorDePosicion()
   alReportar = alReportarTunel
   document.body.classList.remove('ver-mapa')
   document.body.classList.add('con-panorama')
@@ -155,9 +183,12 @@ export function marcarRecorrido() {
   document.body.classList.add('recorriendo')
   corrimientoAplicado = CORRIMIENTO_DE_RECORRIDO()
   mapa.panBy([-corrimientoAplicado, 0], { animate: false })
+  const posicion = panorama.getPosition()
+  if (posicion) seguirEnElMapa(posicion)
 }
 
 export function ocultarPanorama() {
+  quitarMarcadorDePosicion()
   if (corrimientoAplicado) mapa.panBy([corrimientoAplicado, 0], { animate: false })
   corrimientoAplicado = 0
   if (contenedor) contenedor.hidden = true
