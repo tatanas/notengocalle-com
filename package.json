@@ -16,7 +16,7 @@
     "test:full": "npm run lint && npm run test:unit && npm run test:e2e",
     "test:unit": "node --test pruebas/unitarias.test.js pruebas/api.test.js",
     "test:e2e": "node pruebas/ejecutar.js",
-    "test:e2e:changed": "node pruebas/ejecutar.js --changed"
+    "test:e2e:changed": "node pruebas/ejecutar.js --cambios"
   },
   "dependencies": {
     "@neondatabase/serverless": "^1.0.0"

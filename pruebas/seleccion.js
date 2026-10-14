@@ -12,6 +12,7 @@ const CONJUNTOS_DE_RONDAS = [
   'facil-dificil',
   'reiniciar-ronda',
   'categorias-ranking',
+  'punto-en-calle',
 ]
 const CONJUNTOS_DEL_MOTOR = [
   'cronometro',
@@ -52,6 +53,7 @@ const REGLAS = [
   [/^src\/mapa\//, ['ajuste-celular', 'facil-dificil'], true],
   [/^src\/interfaz\/(inicio|navegacion)\.js$/, ['diseno-menu'], false],
   [/^src\/interfaz\/misCalles\.js$/, ['calles-propias'], false],
+  [/^src\/(dominio\/calles|interfaz\/recorrerCalle)\.js$/, ['punto-en-calle'], true],
   [/^src\/interfaz\/(ranking|resultadoOficial|cuenta)\.js$/, CONJUNTOS_DEL_RANKING, false],
   [/^src\/cuenta\//, CONJUNTOS_DEL_RANKING, false],
   [/^(compartido|servidor|netlify)\//, CONJUNTOS_DEL_RANKING, false],
@@ -84,6 +86,7 @@ export function elegirConjuntos(archivos) {
     const prefijo = prefijoDeJuego(archivo)
     if (prefijo) {
       prefijos.add(prefijo)
+      if (prefijo === 'st-') conjuntos.add('punto-en-calle')
       hayHumo = true
       continue
     }

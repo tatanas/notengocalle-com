@@ -1,9 +1,10 @@
-import { distanciaALinea, distanciaKm } from '../../nucleo/geografia.js'
+import { distanciaALinea, distanciaKm, puntoEnPoligono } from '../../nucleo/geografia.js'
 import { ajustes, almacen } from '../../nucleo/almacen.js'
 import { escaparHtml, formatearKm } from '../../nucleo/utilidades.js'
 import { reportarPunto } from '../../cuenta/reportes.js'
 import { vias } from '../../datos/datos.js'
 import LUGARES from '../../datos/lugaresStreetView.json'
+import RECINTOS from '../../datos/recintos.json'
 import { PUNTOS_MAXIMOS, esAciertoDeStreetView, puntajeDeStreetView } from '../../dominio/streetView.js'
 import { describirUbicacion } from '../../dominio/ubicacion.js'
 import { COLORES, dibujarCalle, iconoDiv } from '../../mapa/dibujo.js'
@@ -38,6 +39,7 @@ const lugaresDisponibles = () =>
   LUGARES.filter(
     lugar => lugar.nivel <= NIVEL_MAXIMO[ajustes.nivelStreetView] && puntosDisponibles(lugar).length,
   )
+const nombreDelRecinto = lugar => (lugar.referencia ?? lugar.nombre).replace(/\s*\(.*\)/, '')
 const alAzar = lista => lista[Math.floor(Math.random() * lista.length)]
 
 // Cambia la pregunta actual por otra que no haya salido en la ronda (no se pierde ni se acorta la ronda).
@@ -95,7 +97,11 @@ registrarModo({
     mapa.on('click', evento => {
       if (q.answered) return
       const adivinado = [evento.latlng.lat, evento.latlng.lng]
-      const distancia = distanciaKm(adivinado, verdadero)
+      // En un cerro grande vale cualquier punto dentro de él: no importa en cuál rincón se estaba.
+      const recinto = RECINTOS[lugar.referencia]
+      const dentroDelRecinto = !!recinto && puntoEnPoligono(verdadero, recinto)
+      const distancia =
+        dentroDelRecinto && puntoEnPoligono(adivinado, recinto) ? 0 : distanciaKm(adivinado, verdadero)
       const acierto = esAciertoDeStreetView(distancia)
       const puntos = puntajeDeStreetView(distancia)
       const calles = callesBajoElPunto(verdadero)
@@ -103,6 +109,8 @@ registrarModo({
 
       ocultarPanorama()
       for (const calle of calles) dibujarCalle(calle, COLORES.ok, { labelText: calle.name })
+      if (dentroDelRecinto)
+        L.polygon(recinto, { pane: 'routes', color: '#16a34a', weight: 2, fillOpacity: 0.12 }).addTo(capa)
       L.marker(adivinado, { icon: iconoDiv('pin you'), pane: 'points' }).addTo(capa)
       L.marker(verdadero, { icon: iconoDiv('pin ' + (acierto ? 'good' : 'ans')), pane: 'points' })
         .addTo(capa)
@@ -123,9 +131,17 @@ registrarModo({
           : ''
       const cerca =
         enLaCalle && !acierto ? '<p>Estabas en la calle correcta, pero en otro punto de ella.</p>' : ''
+      const delRecinto = dentroDelRecinto
+        ? '<p>Estabas dentro de <b>' +
+          escaparHtml(nombreDelRecinto(lugar)) +
+          '</b>: vale cualquier punto dentro de él.</p>'
+        : ''
+      const pista = punto.pista
+        ? `<p class="muted">Para reconocer esta calle: ${escaparHtml(punto.pista)}.</p>`
+        : ''
       responder(
         acierto,
-        `<p>Quedaste a <b>${formatearKm(distancia)}</b> (+${puntos} de ${PUNTOS_MAXIMOS} puntos).</p><p>${descripcion}${sector}</p>${cerca}`,
+        `<p>Quedaste a <b>${formatearKm(distancia)}</b> (+${puntos} de ${PUNTOS_MAXIMOS} puntos).</p><p>${descripcion}${sector}</p>${delRecinto}${cerca}${pista}`,
         { points: puntos, partial: !acierto && (puntos > 0 || enLaCalle) },
       )
     })

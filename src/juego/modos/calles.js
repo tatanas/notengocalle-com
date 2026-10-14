@@ -1,4 +1,5 @@
 import { distanciaALinea, puntoMasCercanoEnLineas } from '../../nucleo/geografia.js'
+import { ajustes } from '../../nucleo/almacen.js'
 import { escaparHtml, formatearKm, mezclar } from '../../nucleo/utilidades.js'
 import {
   DATOS,
@@ -15,11 +16,14 @@ import {
   htmlDeTramosConNombre,
   anotarConfusion,
   distractoresDeCalle,
+  puntoParaPreguntar,
 } from '../../dominio/calles.js'
 import { mostrarAyudas } from '../../mapa/ayudas.js'
 import { COLORES, iconoDiv, dibujarTramosConNombre, dibujarCalle, etiquetaDeMapa } from '../../mapa/dibujo.js'
 import { kmDeDedo, encuadrar, encuadrarCiudad, capa, mapa, fijarModoDeEtiquetas } from '../../mapa/mapa.js'
 import { mostrarPanel } from '../../interfaz/panel.js'
+import { conectarRecorrerCalle, htmlDeRecorrerCalle } from '../../interfaz/recorrerCalle.js'
+import { ocultarPanorama } from '../../mapa/streetView.js'
 import { htmlDeFoto } from '../../interfaz/fotos.js'
 import { responder, encabezadoDePregunta } from '../engine.js'
 import { mostrarOpciones } from '../options.js'
@@ -35,12 +39,17 @@ registrarModo({
   desc: 'Te marco una avenida o autopista; eliges el nombre.',
   pool: () => callesDelJuego(),
   key: s => s.name,
+  limpiar: ocultarPanorama,
   ask(s, q) {
+    ocultarPanorama()
+    const marcado = ajustes.puntoEnCalle ? puntoParaPreguntar(s) : null
     mostrarPanel(
-      encabezadoDePregunta(q) + `<div class="q-prompt">${PREGUNTA_DE_CALLE[s.kind || 'calle']}</div>`,
+      encabezadoDePregunta(q) +
+        `<div class="q-prompt">${marcado ? PREGUNTA_DE_PUNTO : PREGUNTA_DE_CALLE[s.kind || 'calle']}</div>`,
     )
     mostrarAyudas({ borders: comunas.filter(esUrbana) })
-    dibujarCalle(s, COLORES.street)
+    if (marcado) marcarPuntoDeCalle(marcado)
+    else dibujarCalle(s, COLORES.street)
     const opciones = mezclar([s, ...distractoresDeCalle(s, 3)]).map(x => ({
       label: escaparHtml(x.name),
       value: x.name,
@@ -57,6 +66,7 @@ registrarModo({
         let mostrado = L.latLngBounds(s.bb).pad(0.25)
         fijarModoDeEtiquetas('labels')
         anotarConfusion(s.name, v)
+        if (marcado && v === s.name) dibujarCalle(s, COLORES.ok, { labelText: s.name })
         if (v !== s.name) {
           const w = callePorNombre[v]
           dibujarCalle(w, COLORES.bad, { labelText: w.name })
@@ -68,17 +78,28 @@ registrarModo({
         const htmlDeCercanos = mostrarLugaresAlLargo(s)
         responder(
           v === s.name,
-          `${extra}<p><b>${escaparHtml(s.name)}</b></p><p class="muted">${escaparHtml(s.hint)}</p>${htmlDeTramosConNombre(s)}${htmlDeCercanos}<p class="muted">Pasa por: ${s.comunas.map(escaparHtml).join(', ')}</p>${htmlDeFoto('s:' + s.name)}`,
+          `${extra}<p><b>${escaparHtml(s.name)}</b></p><p class="muted">${escaparHtml(s.hint)}</p>${htmlDeTramosConNombre(s)}${htmlDeCercanos}<p class="muted">Pasa por: ${s.comunas.map(escaparHtml).join(', ')}</p>${htmlDeFoto('s:' + s.name)}${htmlDeRecorrerCalle()}`,
         )
+        conectarRecorrerCalle(s)
         // El encuadre va después de la respuesta: así cuenta con el tamaño final del panel.
         encuadrar(mostrado, 14)
       },
       { one: true },
     )
     // Y el primero, después de las alternativas, por la misma razón.
-    encuadrar(L.latLngBounds(s.bb).pad(0.25), 14)
+    if (marcado) encuadrar(L.latLng(marcado.punto).toBounds(1500), 16)
+    else encuadrar(L.latLngBounds(s.bb).pad(0.25), 14)
   },
 })
+const PREGUNTA_DE_PUNTO = '¿Qué calle pasa por el punto marcado?'
+
+// El punto marcado y, si queda cerca de un cruce, la franja de calle que se pregunta.
+function marcarPuntoDeCalle({ punto, franja }) {
+  if (franja)
+    L.polyline(franja, { pane: 'routes', color: COLORES.street, weight: 7, opacity: 0.9 }).addTo(capa)
+  L.marker(punto, { icon: iconoDiv('pin ans'), pane: 'points' }).addTo(capa)
+}
+
 // El margen de acierto son unos 14 píxeles de dedo: en metros, más estricto cuanto más se acerca el mapa (entre 80 y 250 m).
 const TOQUE_MINIMO_KM = 0.08
 const TOQUE_MAXIMO_KM = 0.25
@@ -104,7 +125,9 @@ registrarModo({
   desc: 'Toca sobre la calle que te pido.',
   pool: () => callesDelJuego(),
   key: s => s.name,
+  limpiar: ocultarPanorama,
   ask(s, q) {
+    ocultarPanorama()
     mostrarPanel(
       encabezadoDePregunta(q) +
         `<div class="q-prompt">Toca cualquier punto de: <b>${escaparHtml(s.name)}</b></div>`,
@@ -139,8 +162,9 @@ registrarModo({
       const htmlDeCercanos = mostrarLugaresAlLargo(s)
       responder(
         ok,
-        `${ok ? '' : `<p>Quedaste a ${formatearKm(d)} de la calle.</p>`}${extra}<p class="muted">${escaparHtml(s.hint)}</p>${htmlDeTramosConNombre(s)}${htmlDeCercanos}${htmlDeFoto('s:' + s.name)}`,
+        `${ok ? '' : `<p>Quedaste a ${formatearKm(d)} de la calle.</p>`}${extra}<p class="muted">${escaparHtml(s.hint)}</p>${htmlDeTramosConNombre(s)}${htmlDeCercanos}${htmlDeFoto('s:' + s.name)}${htmlDeRecorrerCalle()}`,
       )
+      conectarRecorrerCalle(s, p)
       if (!ok) encuadrar(L.latLngBounds(s.bb).extend(p).pad(0.15), 14)
     })
   },

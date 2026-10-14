@@ -1,4 +1,9 @@
-import { distanciaKm, masCercanosSegun } from '../nucleo/geografia.js'
+import {
+  distanciaALinea,
+  distanciaKm,
+  masCercanosSegun,
+  puntoMasCercanoEnLineas,
+} from '../nucleo/geografia.js'
 import { anguloEntre, pesoDeParecido, formaDeCalle } from '../nucleo/parecido.js'
 import { muestraPonderada } from '../nucleo/progreso.js'
 import { almacen } from '../nucleo/almacen.js'
@@ -91,3 +96,65 @@ export const confusionesDe = nombre =>
     .filter(([llave]) => llave.split('|').includes(nombre))
     .map(([llave, veces]) => [llave.split('|').find(otro => otro !== nombre) || nombre, veces])
     .filter(([otro]) => callePorNombre[otro])
+
+// ----- "¿Qué calle es?" con un solo punto: se evitan los cruces, que dejarían dudas sobre cuál calle es.
+const MUESTRAS_POR_CALLE = 40
+const LIBRE_DE_CRUCES_KM = 0.12
+const MEDIA_FRANJA_KM = 0.15
+
+function puntoAlAzarEnLaCalle(calle) {
+  const tramos = calle.lines.flatMap(linea =>
+    linea.slice(1).map((fin, i) => ({ a: linea[i], b: fin, largo: distanciaKm(linea[i], fin) })),
+  )
+  let objetivo = Math.random() * tramos.reduce((suma, tramo) => suma + tramo.largo, 0)
+  for (const tramo of tramos) {
+    if (objetivo <= tramo.largo) {
+      const t = tramo.largo ? objetivo / tramo.largo : 0
+      return [tramo.a[0] + t * (tramo.b[0] - tramo.a[0]), tramo.a[1] + t * (tramo.b[1] - tramo.a[1])]
+    }
+    objetivo -= tramo.largo
+  }
+  return tramos[0].a
+}
+
+const distanciaALaMasCercana = (punto, calle) =>
+  Math.min(
+    ...vias()
+      .filter(otra => otra !== calle)
+      .map(otra => distanciaALinea(punto, otra.lines)),
+  )
+
+// Un punto al azar de la calle lejos de cualquier otra. Si no hay ninguno (calle corta, rodeada de otras), se usa el
+// menos malo y se marca además una franja de calle alrededor, para que se entienda de cuál se habla.
+export function puntoParaPreguntar(calle) {
+  const candidatos = Array.from({ length: MUESTRAS_POR_CALLE }, () => {
+    const punto = puntoAlAzarEnLaCalle(calle)
+    return { punto, libre: distanciaALaMasCercana(punto, calle) }
+  })
+  const libres = candidatos.filter(({ libre }) => libre >= LIBRE_DE_CRUCES_KM)
+  if (libres.length) return { punto: libres[Math.floor(Math.random() * libres.length)].punto, franja: null }
+  const mejor = candidatos.reduce((a, b) => (b.libre > a.libre ? b : a))
+  return { punto: mejor.punto, franja: franjaAlrededorDe(calle, mejor.punto) }
+}
+
+// Los vértices de la calle a hasta MEDIA_FRANJA_KM (por el trazado) a cada lado del punto.
+function franjaAlrededorDe(calle, punto) {
+  const { point: cercano } = puntoMasCercanoEnLineas(punto, calle.lines)
+  const linea = calle.lines.reduce((mejor, actual) =>
+    distanciaALinea(cercano, [actual]) < distanciaALinea(cercano, [mejor]) ? actual : mejor,
+  )
+  const indice = linea.reduce(
+    (mejor, vertice, i) => (distanciaKm(vertice, cercano) < distanciaKm(linea[mejor], cercano) ? i : mejor),
+    0,
+  )
+  const hacia = paso => {
+    const tramo = []
+    let recorrido = 0
+    for (let i = indice; i + paso >= 0 && i + paso < linea.length && recorrido < MEDIA_FRANJA_KM; i += paso) {
+      recorrido += distanciaKm(linea[i], linea[i + paso])
+      tramo.push(linea[i + paso])
+    }
+    return tramo
+  }
+  return [...hacia(-1).reverse(), linea[indice], ...hacia(1)]
+}
