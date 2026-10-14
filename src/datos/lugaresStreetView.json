@@ -1991,24 +1991,6 @@
     "nivel": 3
   },
   {
-    "nombre": "Av. Mariano Sánchez Fontecilla",
-    "tipo": "calle",
-    "comuna": "Peñalolén",
-    "puntos": [
-      { "lat": -33.47253, "lon": -70.55403, "rumbo": 19, "pista": "cerca del canal San Carlos" },
-      { "lat": -33.55978, "lon": -70.55253, "rumbo": 175, "pista": "junto a «Feria Libre»" },
-      { "lat": -33.43489, "lon": -70.57979, "rumbo": 121 },
-      { "lat": -33.42037, "lon": -70.59819, "rumbo": 131 },
-      { "lat": -33.4598, "lon": -70.55296, "rumbo": 149 },
-      { "lat": -33.49428, "lon": -70.55866, "rumbo": 183 },
-      { "lat": -33.47688, "lon": -70.55603, "rumbo": 26 },
-      { "lat": -33.46908, "lon": -70.55127, "rumbo": 213 },
-      { "lat": -33.48714, "lon": -70.55788, "rumbo": 186 },
-      { "lat": -33.54076, "lon": -70.55263, "rumbo": 169 }
-    ],
-    "nivel": 3
-  },
-  {
     "nombre": "Av. José Arrieta",
     "tipo": "calle",
     "comuna": "Peñalolén",

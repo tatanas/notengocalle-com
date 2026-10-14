@@ -164,10 +164,6 @@
     { "lat": -33.43068, "lon": -70.58582, "pista": "cerca del canal San Carlos", "tipo": "agua" },
     { "lat": -33.4364, "lon": -70.60876, "pista": "junto a Universidad Finis Terrae", "tipo": "otro" }
   ],
-  "Av. Mariano Sánchez Fontecilla": [
-    { "lat": -33.47254, "lon": -70.55401, "pista": "cerca del canal San Carlos", "tipo": "agua" },
-    { "lat": -33.55976, "lon": -70.55249, "pista": "junto a «Feria Libre»", "tipo": "feria" }
-  ],
   "Av. José Arrieta": [
     { "lat": -33.46263, "lon": -70.55171, "pista": "cerca del canal San Carlos", "tipo": "agua" },
     { "lat": -33.46549, "lon": -70.5314, "pista": "cerca del canal Las Perdices", "tipo": "agua" }
