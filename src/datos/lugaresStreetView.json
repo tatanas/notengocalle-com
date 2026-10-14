@@ -32,6 +32,18 @@
     "nivel": 1
   },
   {
+    "nombre": "Cerca de Cerro Santa Lucía",
+    "tipo": "lugar",
+    "referencia": "Cerro Santa Lucía",
+    "comuna": "Santiago",
+    "puntos": [
+      { "lat": -33.44, "lon": -70.64452, "rumbo": 86 },
+      { "lat": -33.43915, "lon": -70.64247, "rumbo": 226 },
+      { "lat": -33.43988, "lon": -70.64537, "rumbo": 92 }
+    ],
+    "nivel": 1
+  },
+  {
     "nombre": "Cerca de Plaza de Armas",
     "tipo": "lugar",
     "referencia": "Plaza de Armas",
@@ -62,8 +74,8 @@
     "comuna": "Recoleta",
     "puntos": [
       { "lat": -33.42916, "lon": -70.65031, "rumbo": 96 },
-      { "lat": -33.42918, "lon": -70.6483, "rumbo": 265 },
-      { "lat": -33.42999, "lon": -70.6486, "rumbo": 320 }
+      { "lat": -33.42999, "lon": -70.6486, "rumbo": 320 },
+      { "lat": -33.42786, "lon": -70.64914, "rumbo": 187 }
     ],
     "nivel": 1
   },
@@ -73,9 +85,9 @@
     "referencia": "Estación Mapocho",
     "comuna": "Santiago",
     "puntos": [
-      { "lat": -33.43246, "lon": -70.65501, "rumbo": 58 },
       { "lat": -33.43266, "lon": -70.65415, "rumbo": 318 },
-      { "lat": -33.43226, "lon": -70.65587, "rumbo": 89 }
+      { "lat": -33.43246, "lon": -70.65501, "rumbo": 58 },
+      { "lat": -33.43317, "lon": -70.65547, "rumbo": 38 }
     ],
     "nivel": 1
   },
@@ -86,8 +98,8 @@
     "comuna": "Santiago",
     "puntos": [
       { "lat": -33.44205, "lon": -70.64629, "rumbo": 91 },
-      { "lat": -33.44262, "lon": -70.64566, "rumbo": 0 },
-      { "lat": -33.44149, "lon": -70.6457, "rumbo": 177 }
+      { "lat": -33.44149, "lon": -70.6457, "rumbo": 177 },
+      { "lat": -33.44251, "lon": -70.64518, "rumbo": 318 }
     ],
     "nivel": 3
   },
@@ -122,7 +134,7 @@
     "comuna": "Santiago",
     "puntos": [
       { "lat": -33.4408, "lon": -70.6508, "rumbo": 223 },
-      { "lat": -33.44135, "lon": -70.65078, "rumbo": 357 },
+      { "lat": -33.44124, "lon": -70.65122, "rumbo": 39 },
       { "lat": -33.43973, "lon": -70.65091, "rumbo": 176 }
     ],
     "nivel": 3
@@ -146,7 +158,7 @@
     "comuna": "Santiago",
     "puntos": [
       { "lat": -33.44867, "lon": -70.65273, "rumbo": 332 },
-      { "lat": -33.4486, "lon": -70.65341, "rumbo": 92 },
+      { "lat": -33.44823, "lon": -70.65347, "rumbo": 123 },
       { "lat": -33.4491, "lon": -70.65197, "rumbo": 306 }
     ],
     "nivel": 2
@@ -159,7 +171,7 @@
     "puntos": [
       { "lat": -33.4383, "lon": -70.65392, "rumbo": 90 },
       { "lat": -33.43867, "lon": -70.65299, "rumbo": 317 },
-      { "lat": -33.4377, "lon": -70.65426, "rumbo": 130 }
+      { "lat": -33.43822, "lon": -70.65468, "rumbo": 95 }
     ],
     "nivel": 3
   },
@@ -195,7 +207,7 @@
     "puntos": [
       { "lat": -33.44259, "lon": -70.65105, "rumbo": 271 },
       { "lat": -33.44221, "lon": -70.65203, "rumbo": 138 },
-      { "lat": -33.44184, "lon": -70.65073, "rumbo": 225 }
+      { "lat": -33.44265, "lon": -70.65325, "rumbo": 88 }
     ],
     "nivel": 3
   },
@@ -205,8 +217,8 @@
     "referencia": "Municipalidad de Santiago",
     "comuna": "Santiago",
     "puntos": [
-      { "lat": -33.43719, "lon": -70.64983, "rumbo": 307 },
       { "lat": -33.43731, "lon": -70.65072, "rumbo": 47 },
+      { "lat": -33.43719, "lon": -70.64983, "rumbo": 307 },
       { "lat": -33.43609, "lon": -70.65029, "rumbo": 177 }
     ],
     "nivel": 3
@@ -241,8 +253,8 @@
     "comuna": "Macul",
     "puntos": [
       { "lat": -33.50647, "lon": -70.60394, "rumbo": 270 },
-      { "lat": -33.50723, "lon": -70.60408, "rumbo": 317 },
-      { "lat": -33.50575, "lon": -70.6038, "rumbo": 232 }
+      { "lat": -33.50575, "lon": -70.6038, "rumbo": 232 },
+      { "lat": -33.50723, "lon": -70.60408, "rumbo": 317 }
     ],
     "nivel": 3
   },
@@ -317,7 +329,7 @@
     "puntos": [
       { "lat": -33.40432, "lon": -70.6692, "rumbo": 86 },
       { "lat": -33.40663, "lon": -70.66644, "rumbo": 359 },
-      { "lat": -33.4022, "lon": -70.66428, "rumbo": 224 }
+      { "lat": -33.40616, "lon": -70.66882, "rumbo": 44 }
     ],
     "nivel": 3
   },
@@ -329,7 +341,7 @@
     "puntos": [
       { "lat": -33.41348, "lon": -70.57714, "rumbo": 181 },
       { "lat": -33.41377, "lon": -70.57805, "rumbo": 135 },
-      { "lat": -33.41616, "lon": -70.57722, "rumbo": 2 }
+      { "lat": -33.41276, "lon": -70.57724, "rumbo": 178 }
     ],
     "nivel": 3
   },
@@ -364,8 +376,8 @@
     "comuna": "Las Condes",
     "puntos": [
       { "lat": -33.41434, "lon": -70.59457, "rumbo": 94 },
-      { "lat": -33.41422, "lon": -70.59393, "rumbo": 257 },
-      { "lat": -33.4149, "lon": -70.59451, "rumbo": 359 }
+      { "lat": -33.4149, "lon": -70.59451, "rumbo": 359 },
+      { "lat": -33.41422, "lon": -70.59393, "rumbo": 257 }
     ],
     "nivel": 3
   },
@@ -377,7 +389,7 @@
     "puntos": [
       { "lat": -33.4028, "lon": -70.57676, "rumbo": 317 },
       { "lat": -33.40308, "lon": -70.57745, "rumbo": 10 },
-      { "lat": -33.40246, "lon": -70.57595, "rumbo": 277 }
+      { "lat": -33.40151, "lon": -70.57627, "rumbo": 226 }
     ],
     "nivel": 2
   },
@@ -388,8 +400,8 @@
     "comuna": "Las Condes",
     "puntos": [
       { "lat": -33.39296, "lon": -70.54645, "rumbo": 9 },
-      { "lat": -33.39097, "lon": -70.54762, "rumbo": 87 },
-      { "lat": -33.39177, "lon": -70.54726, "rumbo": 49 }
+      { "lat": -33.39086, "lon": -70.54444, "rumbo": 268 },
+      { "lat": -33.39097, "lon": -70.54762, "rumbo": 87 }
     ],
     "nivel": 2
   },
@@ -401,7 +413,7 @@
     "puntos": [
       { "lat": -33.45338, "lon": -70.5694, "rumbo": 1 },
       { "lat": -33.45248, "lon": -70.56829, "rumbo": 259 },
-      { "lat": -33.45268, "lon": -70.57062, "rumbo": 89 }
+      { "lat": -33.45156, "lon": -70.5694, "rumbo": 179 }
     ],
     "nivel": 3
   },
@@ -424,8 +436,8 @@
     "comuna": "La Florida",
     "puntos": [
       { "lat": -33.51272, "lon": -70.60589, "rumbo": 347 },
-      { "lat": -33.51255, "lon": -70.6066, "rumbo": 48 },
-      { "lat": -33.51282, "lon": -70.60493, "rumbo": 306 }
+      { "lat": -33.51227, "lon": -70.6069, "rumbo": 79 },
+      { "lat": -33.51334, "lon": -70.60617, "rumbo": 5 }
     ],
     "nivel": 3
   },
@@ -473,7 +485,7 @@
     "puntos": [
       { "lat": -33.5708, "lon": -70.55573, "rumbo": 316 },
       { "lat": -33.57167, "lon": -70.55754, "rumbo": 1 },
-      { "lat": -33.56928, "lon": -70.55458, "rumbo": 270 }
+      { "lat": -33.56741, "lon": -70.55558, "rumbo": 220 }
     ],
     "nivel": 3
   },
@@ -496,8 +508,8 @@
     "comuna": "Las Condes",
     "puntos": [
       { "lat": -33.41687, "lon": -70.60107, "rumbo": 187 },
-      { "lat": -33.41729, "lon": -70.60177, "rumbo": 89 },
-      { "lat": -33.41787, "lon": -70.6011, "rumbo": 358 }
+      { "lat": -33.41787, "lon": -70.6011, "rumbo": 358 },
+      { "lat": -33.41729, "lon": -70.60177, "rumbo": 89 }
     ],
     "nivel": 3
   },
@@ -509,7 +521,7 @@
     "puntos": [
       { "lat": -33.43567, "lon": -70.64396, "rumbo": 44 },
       { "lat": -33.43533, "lon": -70.64298, "rumbo": 269 },
-      { "lat": -33.43607, "lon": -70.6444, "rumbo": 43 }
+      { "lat": -33.43612, "lon": -70.64269, "rumbo": 316 }
     ],
     "nivel": 4
   },
@@ -521,7 +533,7 @@
     "puntos": [
       { "lat": -33.43938, "lon": -70.64051, "rumbo": 81 },
       { "lat": -33.43988, "lon": -70.63993, "rumbo": 0 },
-      { "lat": -33.44006, "lon": -70.64087, "rumbo": 46 }
+      { "lat": -33.43822, "lon": -70.63994, "rumbo": 180 }
     ],
     "nivel": 4
   },
@@ -555,8 +567,8 @@
     "referencia": "Museo Precolombino",
     "comuna": "Santiago",
     "puntos": [
-      { "lat": -33.4386, "lon": -70.65223, "rumbo": 176 },
-      { "lat": -33.43961, "lon": -70.65133, "rumbo": 309 },
+      { "lat": -33.43855, "lon": -70.6518, "rumbo": 215 },
+      { "lat": -33.43864, "lon": -70.65266, "rumbo": 135 },
       { "lat": -33.43902, "lon": -70.65104, "rumbo": 270 }
     ],
     "nivel": 4
@@ -579,8 +591,8 @@
     "comuna": "Santiago",
     "puntos": [
       { "lat": -33.46033, "lon": -70.66385, "rumbo": 88 },
-      { "lat": -33.46107, "lon": -70.66382, "rumbo": 49 },
-      { "lat": -33.4596, "lon": -70.66394, "rumbo": 125 }
+      { "lat": -33.4596, "lon": -70.66394, "rumbo": 125 },
+      { "lat": -33.46107, "lon": -70.66382, "rumbo": 49 }
     ],
     "nivel": 4
   },
@@ -650,9 +662,9 @@
     "referencia": "Clínica Alemana",
     "comuna": "Vitacura",
     "puntos": [
-      { "lat": -33.3925, "lon": -70.57239, "rumbo": 269 },
-      { "lat": -33.39178, "lon": -70.5723, "rumbo": 218 },
-      { "lat": -33.39328, "lon": -70.57217, "rumbo": 318 }
+      { "lat": -33.39289, "lon": -70.57235, "rumbo": 305 },
+      { "lat": -33.39211, "lon": -70.57241, "rumbo": 230 },
+      { "lat": -33.39156, "lon": -70.57405, "rumbo": 137 }
     ],
     "nivel": 4
   },
@@ -768,7 +780,7 @@
     "puntos": [
       { "lat": -33.44683, "lon": -70.59199, "rumbo": 316 },
       { "lat": -33.44408, "lon": -70.59341, "rumbo": 176 },
-      { "lat": -33.44573, "lon": -70.59114, "rumbo": 271 }
+      { "lat": -33.44751, "lon": -70.59332, "rumbo": 1 }
     ],
     "nivel": 4
   },
@@ -804,7 +816,7 @@
     "puntos": [
       { "lat": -33.46694, "lon": -70.5943, "rumbo": 228 },
       { "lat": -33.46748, "lon": -70.59388, "rumbo": 263 },
-      { "lat": -33.46684, "lon": -70.59648, "rumbo": 126 }
+      { "lat": -33.46761, "lon": -70.59686, "rumbo": 90 }
     ],
     "nivel": 4
   },
@@ -827,8 +839,8 @@
     "comuna": "Las Condes",
     "puntos": [
       { "lat": -33.39279, "lon": -70.50067, "rumbo": 313 },
-      { "lat": -33.39261, "lon": -70.49973, "rumbo": 272 },
-      { "lat": -33.3933, "lon": -70.5, "rumbo": 312 }
+      { "lat": -33.3933, "lon": -70.5, "rumbo": 312 },
+      { "lat": -33.39338, "lon": -70.50185, "rumbo": 43 }
     ],
     "nivel": 4
   },
@@ -851,8 +863,8 @@
     "comuna": "Providencia",
     "puntos": [
       { "lat": -33.43705, "lon": -70.60919, "rumbo": 87 },
-      { "lat": -33.43753, "lon": -70.60864, "rumbo": 5 },
-      { "lat": -33.437, "lon": -70.60785, "rumbo": 268 }
+      { "lat": -33.43665, "lon": -70.60796, "rumbo": 234 },
+      { "lat": -33.43637, "lon": -70.60863, "rumbo": 177 }
     ],
     "nivel": 4
   },
@@ -899,8 +911,8 @@
     "comuna": "San Joaquín",
     "puntos": [
       { "lat": -33.49182, "lon": -70.61952, "rumbo": 30 },
-      { "lat": -33.49174, "lon": -70.61811, "rumbo": 311 },
-      { "lat": -33.49109, "lon": -70.61775, "rumbo": 271 }
+      { "lat": -33.49109, "lon": -70.61775, "rumbo": 271 },
+      { "lat": -33.4903, "lon": -70.61796, "rumbo": 228 }
     ],
     "nivel": 4
   },
@@ -923,8 +935,8 @@
     "comuna": "Santiago",
     "puntos": [
       { "lat": -33.4454, "lon": -70.65009, "rumbo": 274 },
-      { "lat": -33.44577, "lon": -70.65125, "rumbo": 46 },
-      { "lat": -33.44617, "lon": -70.65071, "rumbo": 358 }
+      { "lat": -33.44617, "lon": -70.65071, "rumbo": 358 },
+      { "lat": -33.44577, "lon": -70.65125, "rumbo": 46 }
     ],
     "nivel": 4
   },
@@ -935,8 +947,8 @@
     "comuna": "Santiago",
     "puntos": [
       { "lat": -33.43912, "lon": -70.65745, "rumbo": 171 },
-      { "lat": -33.43947, "lon": -70.65807, "rumbo": 90 },
-      { "lat": -33.43947, "lon": -70.65667, "rumbo": 270 }
+      { "lat": -33.43947, "lon": -70.65667, "rumbo": 270 },
+      { "lat": -33.43985, "lon": -70.65802, "rumbo": 54 }
     ],
     "nivel": 4
   },
@@ -958,9 +970,9 @@
     "referencia": "Templo Votivo de Maipú",
     "comuna": "Maipú",
     "puntos": [
-      { "lat": -33.5108, "lon": -70.76728, "rumbo": 90 },
       { "lat": -33.50972, "lon": -70.76615, "rumbo": 181 },
-      { "lat": -33.51159, "lon": -70.76709, "rumbo": 45 }
+      { "lat": -33.51159, "lon": -70.76709, "rumbo": 45 },
+      { "lat": -33.51006, "lon": -70.76716, "rumbo": 132 }
     ],
     "nivel": 2
   },
@@ -983,8 +995,8 @@
     "comuna": "Estación Central",
     "puntos": [
       { "lat": -33.46257, "lon": -70.68667, "rumbo": 351 },
-      { "lat": -33.46156, "lon": -70.68682, "rumbo": 174 },
-      { "lat": -33.46158, "lon": -70.6858, "rumbo": 235 }
+      { "lat": -33.4616, "lon": -70.68635, "rumbo": 212 },
+      { "lat": -33.46164, "lon": -70.68718, "rumbo": 144 }
     ],
     "nivel": 4
   },
@@ -994,9 +1006,9 @@
     "referencia": "Templo Mayor de los Mormones",
     "comuna": "Providencia",
     "puntos": [
-      { "lat": -33.43657, "lon": -70.60955, "rumbo": 359 },
       { "lat": -33.43642, "lon": -70.60883, "rumbo": 298 },
-      { "lat": -33.43525, "lon": -70.60973, "rumbo": 170 }
+      { "lat": -33.43525, "lon": -70.60973, "rumbo": 170 },
+      { "lat": -33.43657, "lon": -70.60955, "rumbo": 359 }
     ],
     "nivel": 4
   },
@@ -1008,7 +1020,7 @@
     "puntos": [
       { "lat": -33.43852, "lon": -70.65148, "rumbo": 359 },
       { "lat": -33.43672, "lon": -70.65138, "rumbo": 186 },
-      { "lat": -33.43856, "lon": -70.6525, "rumbo": 48 }
+      { "lat": -33.43706, "lon": -70.6527, "rumbo": 126 }
     ],
     "nivel": 4
   },
@@ -1020,7 +1032,7 @@
     "puntos": [
       { "lat": -33.45057, "lon": -70.59842, "rumbo": 190 },
       { "lat": -33.45115, "lon": -70.59808, "rumbo": 322 },
-      { "lat": -33.45071, "lon": -70.5993, "rumbo": 92 }
+      { "lat": -33.45117, "lon": -70.59939, "rumbo": 61 }
     ],
     "nivel": 4
   },
@@ -1031,8 +1043,8 @@
     "comuna": "Estación Central",
     "puntos": [
       { "lat": -33.45133, "lon": -70.68023, "rumbo": 136 },
-      { "lat": -33.45233, "lon": -70.67793, "rumbo": 269 },
-      { "lat": -33.45237, "lon": -70.68035, "rumbo": 89 }
+      { "lat": -33.45237, "lon": -70.68035, "rumbo": 89 },
+      { "lat": -33.45308, "lon": -70.67797, "rumbo": 309 }
     ],
     "nivel": 1
   },
@@ -1068,7 +1080,7 @@
     "puntos": [
       { "lat": -33.43571, "lon": -70.64387, "rumbo": 48 },
       { "lat": -33.43607, "lon": -70.64291, "rumbo": 358 },
-      { "lat": -33.43625, "lon": -70.64439, "rumbo": 44 }
+      { "lat": -33.43639, "lon": -70.64149, "rumbo": 319 }
     ],
     "nivel": 3
   },
@@ -1103,7 +1115,7 @@
     "comuna": "Santiago",
     "puntos": [
       { "lat": -33.46085, "lon": -70.65692, "rumbo": 89 },
-      { "lat": -33.46122, "lon": -70.65638, "rumbo": 313 },
+      { "lat": -33.4614, "lon": -70.65687, "rumbo": 2 },
       { "lat": -33.46027, "lon": -70.65595, "rumbo": 232 }
     ],
     "nivel": 3
@@ -1162,7 +1174,7 @@
     "comuna": "Las Condes",
     "puntos": [
       { "lat": -33.39968, "lon": -70.56851, "rumbo": 138 },
-      { "lat": -33.40097, "lon": -70.56707, "rumbo": 316 },
+      { "lat": -33.40076, "lon": -70.56686, "rumbo": 301 },
       { "lat": -33.39924, "lon": -70.56782, "rumbo": 186 }
     ],
     "nivel": 3
@@ -1174,21 +1186,17 @@
     "comuna": "Las Condes",
     "puntos": [
       { "lat": -33.40775, "lon": -70.54041, "rumbo": 269 },
-      { "lat": -33.4085, "lon": -70.54013, "rumbo": 314 },
-      { "lat": -33.40889, "lon": -70.54104, "rumbo": 0 }
+      { "lat": -33.4066, "lon": -70.54085, "rumbo": 188 },
+      { "lat": -33.4085, "lon": -70.54013, "rumbo": 314 }
     ],
     "nivel": 3
   },
   {
-    "nombre": "Cerca de Cerro Santa Lucía",
+    "nombre": "Dentro de Cerro Santa Lucía",
     "tipo": "lugar",
     "referencia": "Cerro Santa Lucía",
     "comuna": "Santiago",
-    "puntos": [
-      { "lat": -33.44, "lon": -70.64452, "rumbo": 86 },
-      { "lat": -33.43915, "lon": -70.64247, "rumbo": 226 },
-      { "lat": -33.43988, "lon": -70.64537, "rumbo": 92 }
-    ],
+    "puntos": [{ "lat": -33.44126, "lon": -70.64364, "rumbo": 123 }],
     "nivel": 1
   },
   {
@@ -1199,7 +1207,7 @@
     "puntos": [
       { "lat": -33.43033, "lon": -70.63469, "rumbo": 42 },
       { "lat": -33.43076, "lon": -70.63409, "rumbo": 6 },
-      { "lat": -33.43084, "lon": -70.6355, "rumbo": 47 }
+      { "lat": -33.43141, "lon": -70.63401, "rumbo": 1 }
     ],
     "nivel": 2
   },
@@ -1221,9 +1229,9 @@
     "referencia": "La Piojera",
     "comuna": "Santiago",
     "puntos": [
-      { "lat": -33.43318, "lon": -70.65179, "rumbo": 217 },
       { "lat": -33.43343, "lon": -70.65273, "rumbo": 103 },
-      { "lat": -33.43398, "lon": -70.65171, "rumbo": 321 }
+      { "lat": -33.43429, "lon": -70.65216, "rumbo": 3 },
+      { "lat": -33.43318, "lon": -70.65179, "rumbo": 217 }
     ],
     "nivel": 4
   },
@@ -1246,8 +1254,8 @@
     "comuna": "Santiago",
     "puntos": [
       { "lat": -33.43821, "lon": -70.64051, "rumbo": 299 },
-      { "lat": -33.43744, "lon": -70.641, "rumbo": 182 },
-      { "lat": -33.43853, "lon": -70.64111, "rumbo": 8 }
+      { "lat": -33.43802, "lon": -70.6417, "rumbo": 85 },
+      { "lat": -33.43744, "lon": -70.641, "rumbo": 182 }
     ],
     "nivel": 4
   },
@@ -1259,7 +1267,7 @@
     "puntos": [
       { "lat": -33.43182, "lon": -70.64851, "rumbo": 124 },
       { "lat": -33.43172, "lon": -70.64753, "rumbo": 225 },
-      { "lat": -33.43105, "lon": -70.64805, "rumbo": 178 }
+      { "lat": -33.43115, "lon": -70.64705, "rumbo": 220 }
     ],
     "nivel": 4
   },
@@ -1281,8 +1289,8 @@
     "referencia": "Barrio Yungay",
     "comuna": "Santiago",
     "puntos": [
-      { "lat": -33.44327, "lon": -70.67215, "rumbo": 46 },
       { "lat": -33.44254, "lon": -70.67131, "rumbo": 222 },
+      { "lat": -33.44327, "lon": -70.67215, "rumbo": 46 },
       { "lat": -33.44256, "lon": -70.67222, "rumbo": 132 }
     ],
     "nivel": 4
@@ -1306,8 +1314,8 @@
     "comuna": "Recoleta",
     "puntos": [
       { "lat": -33.42935, "lon": -70.64414, "rumbo": 256 },
-      { "lat": -33.42988, "lon": -70.64429, "rumbo": 8 },
-      { "lat": -33.42873, "lon": -70.64415, "rumbo": 185 }
+      { "lat": -33.42917, "lon": -70.64348, "rumbo": 253 },
+      { "lat": -33.42988, "lon": -70.64429, "rumbo": 8 }
     ],
     "nivel": 4
   },
@@ -1341,9 +1349,9 @@
     "referencia": "Plaza de Maipú",
     "comuna": "Maipú",
     "puntos": [
-      { "lat": -33.51023, "lon": -70.75747, "rumbo": 86 },
-      { "lat": -33.51073, "lon": -70.75704, "rumbo": 4 },
-      { "lat": -33.50951, "lon": -70.75746, "rumbo": 151 }
+      { "lat": -33.5106, "lon": -70.75658, "rumbo": 319 },
+      { "lat": -33.50978, "lon": -70.75747, "rumbo": 137 },
+      { "lat": -33.51056, "lon": -70.75746, "rumbo": 47 }
     ],
     "nivel": 4
   },
@@ -1360,42 +1368,36 @@
     "nivel": 4
   },
   {
-    "nombre": "Cerca de Cerro San Cristóbal (cumbre, Virgen)",
+    "nombre": "Dentro de Cerro San Cristóbal",
     "tipo": "lugar",
     "referencia": "Cerro San Cristóbal (cumbre, Virgen)",
     "comuna": "Recoleta",
-    "puntos": [{ "lat": -33.42607, "lon": -70.6341, "rumbo": 45 }],
-    "nivel": 1
-  },
-  {
-    "nombre": "Cerca de Teleférico del San Cristóbal",
-    "tipo": "lugar",
-    "referencia": "Teleférico del San Cristóbal",
-    "comuna": "Providencia",
     "puntos": [
-      { "lat": -33.41546, "lon": -70.61549, "rumbo": 358 },
-      { "lat": -33.41544, "lon": -70.61648, "rumbo": 42 },
-      { "lat": -33.41321, "lon": -70.61703, "rumbo": 137 }
+      { "lat": -33.41101, "lon": -70.62164, "rumbo": 87 },
+      { "lat": -33.4195, "lon": -70.62521, "rumbo": 336 },
+      { "lat": -33.40003, "lon": -70.61921, "rumbo": 24 },
+      { "lat": -33.42255, "lon": -70.63115, "rumbo": 265 },
+      { "lat": -33.40377, "lon": -70.61811, "rumbo": 230 }
     ],
-    "nivel": 3
+    "nivel": 1
   },
   {
     "nombre": "Alameda (Av. Libertador Bernardo O'Higgins)",
     "tipo": "calle",
     "comuna": "Santiago",
     "puntos": [
-      { "lat": -33.44293, "lon": -70.64725, "rumbo": 255 },
-      { "lat": -33.45762, "lon": -70.7076, "rumbo": 74 },
-      { "lat": -33.45647, "lon": -70.70165, "rumbo": 74 },
-      { "lat": -33.44567, "lon": -70.65706, "rumbo": 253 },
-      { "lat": -33.45497, "lon": -70.6952, "rumbo": 74 },
-      { "lat": -33.44713, "lon": -70.66352, "rumbo": 76 },
-      { "lat": -33.45571, "lon": -70.69837, "rumbo": 75 },
-      { "lat": -33.44843, "lon": -70.6701, "rumbo": 72 },
-      { "lat": -33.4404, "lon": -70.64102, "rumbo": 230 },
-      { "lat": -33.45095, "lon": -70.67926, "rumbo": 77 },
-      { "lat": -33.45006, "lon": -70.67547, "rumbo": 72 },
-      { "lat": -33.45185, "lon": -70.68253, "rumbo": 255 }
+      { "lat": -33.45237, "lon": -70.68398, "rumbo": 74, "pista": "junto a una feria o mercado" },
+      { "lat": -33.4451, "lon": -70.65693, "rumbo": 75, "pista": "junto a Torre Entel" },
+      { "lat": -33.44863, "lon": -70.67044, "rumbo": 72, "pista": "junto a Duoc UC – sede Alameda" },
+      { "lat": -33.45789, "lon": -70.70773, "rumbo": 74 },
+      { "lat": -33.44353, "lon": -70.64883, "rumbo": 73 },
+      { "lat": -33.45476, "lon": -70.69426, "rumbo": 254 },
+      { "lat": -33.44694, "lon": -70.66263, "rumbo": 76 },
+      { "lat": -33.45712, "lon": -70.70445, "rumbo": 254 },
+      { "lat": -33.43815, "lon": -70.63777, "rumbo": 235 },
+      { "lat": -33.45369, "lon": -70.68949, "rumbo": 254 },
+      { "lat": -33.45025, "lon": -70.67612, "rumbo": 72 },
+      { "lat": -33.45117, "lon": -70.68016, "rumbo": 63 }
     ],
     "nivel": 1
   },
@@ -1404,10 +1406,10 @@
     "tipo": "calle",
     "comuna": "Providencia",
     "puntos": [
-      { "lat": -33.41816, "lon": -70.60159, "rumbo": 243 },
-      { "lat": -33.4347, "lon": -70.62803, "rumbo": 238 },
-      { "lat": -33.43618, "lon": -70.63099, "rumbo": 64 },
-      { "lat": -33.42391, "lon": -70.61291, "rumbo": 223 }
+      { "lat": -33.41824, "lon": -70.60131, "rumbo": 243, "pista": "cerca del canal San Carlos" },
+      { "lat": -33.42728, "lon": -70.61687, "rumbo": 55, "pista": "junto a «Mercado de Providencia»" },
+      { "lat": -33.4347, "lon": -70.62803, "rumbo": 58, "pista": "junto a Parque Balmaceda" },
+      { "lat": -33.43716, "lon": -70.63427, "rumbo": 274, "pista": "junto a Plaza Italia" }
     ],
     "nivel": 1
   },
@@ -1416,9 +1418,9 @@
     "tipo": "calle",
     "comuna": "Providencia",
     "puntos": [
-      { "lat": -33.42774, "lon": -70.61714, "rumbo": 40 },
-      { "lat": -33.42429, "lon": -70.61162, "rumbo": 46 },
-      { "lat": -33.4178, "lon": -70.60235, "rumbo": 107 }
+      { "lat": -33.41773, "lon": -70.6042, "rumbo": 72, "pista": "cerca del canal San Carlos" },
+      { "lat": -33.42739, "lon": -70.61674, "rumbo": 52, "pista": "junto a «Mercado de Providencia»" },
+      { "lat": -33.42485, "lon": -70.61237, "rumbo": 54 }
     ],
     "nivel": 4
   },
@@ -1427,14 +1429,15 @@
     "tipo": "calle",
     "comuna": "Las Condes",
     "puntos": [
-      { "lat": -33.41583, "lon": -70.59149, "rumbo": 256 },
-      { "lat": -33.40802, "lon": -70.56467, "rumbo": 74 },
-      { "lat": -33.41103, "lon": -70.57491, "rumbo": 68 },
-      { "lat": -33.40818, "lon": -70.54977, "rumbo": 265 },
-      { "lat": -33.41477, "lon": -70.58629, "rumbo": 257 },
-      { "lat": -33.40787, "lon": -70.54527, "rumbo": 265 },
-      { "lat": -33.40838, "lon": -70.55317, "rumbo": 279 },
-      { "lat": -33.41757, "lon": -70.59944, "rumbo": 71 }
+      { "lat": -33.41791, "lon": -70.60093, "rumbo": 251, "pista": "cerca del canal San Carlos" },
+      { "lat": -33.40904, "lon": -70.56842, "rumbo": 251, "pista": "junto a Apumanque" },
+      { "lat": -33.4084, "lon": -70.55228, "rumbo": 88, "pista": "junto a INACAP Apoquindo" },
+      { "lat": -33.41702, "lon": -70.59781, "rumbo": 255 },
+      { "lat": -33.40784, "lon": -70.56393, "rumbo": 74 },
+      { "lat": -33.41143, "lon": -70.57613, "rumbo": 251 },
+      { "lat": -33.40799, "lon": -70.54712, "rumbo": 85 },
+      { "lat": -33.40746, "lon": -70.56039, "rumbo": 94 },
+      { "lat": -33.41022, "lon": -70.57226, "rumbo": 70 }
     ],
     "nivel": 1
   },
@@ -1443,18 +1446,19 @@
     "tipo": "calle",
     "comuna": "Las Condes",
     "puntos": [
-      { "lat": -33.37735, "lon": -70.5276, "rumbo": 40 },
-      { "lat": -33.37409, "lon": -70.52093, "rumbo": 62 },
-      { "lat": -33.36894, "lon": -70.50294, "rumbo": 241 },
-      { "lat": -33.3704, "lon": -70.50978, "rumbo": 260 },
-      { "lat": -33.39788, "lon": -70.55111, "rumbo": 217 },
-      { "lat": -33.38794, "lon": -70.53927, "rumbo": 35 },
-      { "lat": -33.36492, "lon": -70.49583, "rumbo": 49 },
-      { "lat": -33.40317, "lon": -70.55618, "rumbo": 205 },
-      { "lat": -33.39255, "lon": -70.54357, "rumbo": 225 },
-      { "lat": -33.38043, "lon": -70.53054, "rumbo": 41 },
-      { "lat": -33.3714, "lon": -70.51414, "rumbo": 70 },
-      { "lat": -33.39535, "lon": -70.54841, "rumbo": 55 }
+      { "lat": -33.36213, "lon": -70.49352, "rumbo": 193, "pista": "cerca del río Mapocho" },
+      { "lat": -33.3734, "lon": -70.51937, "rumbo": 242, "pista": "muchas automotoras a los lados" },
+      { "lat": -33.39981, "lon": -70.55303, "rumbo": 48, "pista": "muchas automotoras a los lados" },
+      { "lat": -33.3784, "lon": -70.52845, "rumbo": 215, "pista": "muchas automotoras a los lados" },
+      { "lat": -33.37018, "lon": -70.50661, "rumbo": 84, "pista": "junto a Mall Sport" },
+      { "lat": -33.39387, "lon": -70.54494, "rumbo": 44 },
+      { "lat": -33.37513, "lon": -70.52311, "rumbo": 62 },
+      { "lat": -33.3961, "lon": -70.54937, "rumbo": 40 },
+      { "lat": -33.40519, "lon": -70.55828, "rumbo": 235 },
+      { "lat": -33.38964, "lon": -70.54056, "rumbo": 214 },
+      { "lat": -33.36645, "lon": -70.4983, "rumbo": 51 },
+      { "lat": -33.38281, "lon": -70.53317, "rumbo": 228 },
+      { "lat": -33.37134, "lon": -70.51393, "rumbo": 250 }
     ],
     "nivel": 2
   },
@@ -1463,14 +1467,15 @@
     "tipo": "calle",
     "comuna": "Las Condes",
     "puntos": [
-      { "lat": -33.40119, "lon": -70.57927, "rumbo": 63 },
-      { "lat": -33.39825, "lon": -70.57127, "rumbo": 65 },
-      { "lat": -33.39269, "lon": -70.55519, "rumbo": 68 },
-      { "lat": -33.39621, "lon": -70.56689, "rumbo": 65 },
-      { "lat": -33.38795, "lon": -70.5432, "rumbo": 246 },
-      { "lat": -33.38955, "lon": -70.54838, "rumbo": 243 },
-      { "lat": -33.39403, "lon": -70.56069, "rumbo": 68 },
-      { "lat": -33.38671, "lon": -70.53968, "rumbo": 67 }
+      { "lat": -33.40033, "lon": -70.57679, "rumbo": 61, "pista": "muchas automotoras a los lados" },
+      { "lat": -33.39856, "lon": -70.57294, "rumbo": 65 },
+      { "lat": -33.39676, "lon": -70.56834, "rumbo": 248 },
+      { "lat": -33.39295, "lon": -70.556, "rumbo": 248 },
+      { "lat": -33.395, "lon": -70.56367, "rumbo": 247 },
+      { "lat": -33.39055, "lon": -70.55099, "rumbo": 245 },
+      { "lat": -33.38813, "lon": -70.54338, "rumbo": 246 },
+      { "lat": -33.40225, "lon": -70.58112, "rumbo": 243 },
+      { "lat": -33.39383, "lon": -70.56017, "rumbo": 248 }
     ],
     "nivel": 2
   },
@@ -1479,16 +1484,18 @@
     "tipo": "calle",
     "comuna": "Vitacura",
     "puntos": [
-      { "lat": -33.39058, "lon": -70.57161, "rumbo": 63 },
-      { "lat": -33.40351, "lon": -70.59579, "rumbo": 222 },
-      { "lat": -33.37972, "lon": -70.54062, "rumbo": 246 },
-      { "lat": -33.41175, "lon": -70.6029, "rumbo": 196 },
-      { "lat": -33.41759, "lon": -70.60514, "rumbo": 19 },
-      { "lat": -33.40599, "lon": -70.59839, "rumbo": 40 },
-      { "lat": -33.38304, "lon": -70.54915, "rumbo": 66 },
-      { "lat": -33.39403, "lon": -70.57808, "rumbo": 51 },
-      { "lat": -33.38628, "lon": -70.5639, "rumbo": 250 },
-      { "lat": -33.38115, "lon": -70.54415, "rumbo": 66 }
+      { "lat": -33.41737, "lon": -70.60522, "rumbo": 199, "pista": "cerca del canal San Carlos" },
+      { "lat": -33.38004, "lon": -70.54156, "rumbo": 65, "pista": "muchas automotoras a los lados" },
+      { "lat": -33.38593, "lon": -70.5608, "rumbo": 263, "pista": "muchas automotoras a los lados" },
+      { "lat": -33.3962, "lon": -70.58129, "rumbo": 239, "pista": "muchas automotoras a los lados" },
+      { "lat": -33.38269, "lon": -70.54798, "rumbo": 246, "pista": "muchas automotoras a los lados" },
+      { "lat": -33.40262, "lon": -70.5947, "rumbo": 41 },
+      { "lat": -33.39003, "lon": -70.57055, "rumbo": 73 },
+      { "lat": -33.3977, "lon": -70.58481, "rumbo": 67 },
+      { "lat": -33.41279, "lon": -70.60315, "rumbo": 16 },
+      { "lat": -33.38756, "lon": -70.566, "rumbo": 235 },
+      { "lat": -33.40002, "lon": -70.59124, "rumbo": 247 },
+      { "lat": -33.39128, "lon": -70.57389, "rumbo": 228 }
     ],
     "nivel": 2
   },
@@ -1497,8 +1504,10 @@
     "tipo": "calle",
     "comuna": "Providencia",
     "puntos": [
-      { "lat": -33.41471, "lon": -70.60542, "rumbo": 55 },
-      { "lat": -33.41097, "lon": -70.60297, "rumbo": 209 }
+      { "lat": -33.416, "lon": -70.60669, "rumbo": 51, "pista": "cerca del canal San Carlos" },
+      { "lat": -33.4103, "lon": -70.60266, "rumbo": 28 },
+      { "lat": -33.42574, "lon": -70.62193, "rumbo": 20 },
+      { "lat": -33.4135, "lon": -70.60471, "rumbo": 30 }
     ],
     "nivel": 3
   },
@@ -1507,13 +1516,14 @@
     "tipo": "calle",
     "comuna": "Vitacura",
     "puntos": [
-      { "lat": -33.37664, "lon": -70.56543, "rumbo": 247 },
-      { "lat": -33.38421, "lon": -70.59254, "rumbo": 225 },
-      { "lat": -33.37564, "lon": -70.55562, "rumbo": 84 },
-      { "lat": -33.37992, "lon": -70.58358, "rumbo": 69 },
-      { "lat": -33.37882, "lon": -70.5763, "rumbo": 72 },
-      { "lat": -33.3815, "lon": -70.58865, "rumbo": 243 },
-      { "lat": -33.37486, "lon": -70.54418, "rumbo": 117 }
+      { "lat": -33.38721, "lon": -70.59559, "rumbo": 46, "pista": "cerca del río Mapocho" },
+      { "lat": -33.37415, "lon": -70.54644, "rumbo": 109 },
+      { "lat": -33.38372, "lon": -70.59195, "rumbo": 54 },
+      { "lat": -33.37525, "lon": -70.55273, "rumbo": 251 },
+      { "lat": -33.37966, "lon": -70.58246, "rumbo": 251 },
+      { "lat": -33.37583, "lon": -70.56065, "rumbo": 84 },
+      { "lat": -33.37926, "lon": -70.57861, "rumbo": 263 },
+      { "lat": -33.37524, "lon": -70.54339, "rumbo": 117 }
     ],
     "nivel": 3
   },
@@ -1522,20 +1532,20 @@
     "tipo": "calle",
     "comuna": "Renca",
     "puntos": [
-      { "lat": -33.42814, "lon": -70.66525, "rumbo": 295 },
-      { "lat": -33.423, "lon": -70.67905, "rumbo": 294 },
-      { "lat": -33.4129, "lon": -70.76682, "rumbo": 272 },
-      { "lat": -33.37215, "lon": -70.52551, "rumbo": 235 },
-      { "lat": -33.41275, "lon": -70.76332, "rumbo": 258 },
-      { "lat": -33.37482, "lon": -70.55098, "rumbo": 71 },
-      { "lat": -33.43514, "lon": -70.81046, "rumbo": 33 },
-      { "lat": -33.40621, "lon": -70.60481, "rumbo": 15 },
-      { "lat": -33.40833, "lon": -70.71472, "rumbo": 56 },
-      { "lat": -33.41755, "lon": -70.69058, "rumbo": 318 },
-      { "lat": -33.38208, "lon": -70.58882, "rumbo": 253 },
-      { "lat": -33.38453, "lon": -70.59235, "rumbo": 47 },
-      { "lat": -33.41172, "lon": -70.74777, "rumbo": 272 },
-      { "lat": -33.42798, "lon": -70.80569, "rumbo": 63 }
+      { "lat": -33.41003, "lon": -70.72104, "rumbo": 241, "pista": "cerca del río Mapocho" },
+      { "lat": -33.4287, "lon": -70.66419, "rumbo": 115 },
+      { "lat": -33.42012, "lon": -70.68567, "rumbo": 291 },
+      { "lat": -33.41294, "lon": -70.76608, "rumbo": 272 },
+      { "lat": -33.41472, "lon": -70.69308, "rumbo": 322 },
+      { "lat": -33.42233, "lon": -70.68043, "rumbo": 294 },
+      { "lat": -33.3765, "lon": -70.5622, "rumbo": 262 },
+      { "lat": -33.41807, "lon": -70.7909, "rumbo": 234 },
+      { "lat": -33.39972, "lon": -70.60435, "rumbo": 359 },
+      { "lat": -33.4074, "lon": -70.70774, "rumbo": 87 },
+      { "lat": -33.36898, "lon": -70.5188, "rumbo": 231 },
+      { "lat": -33.37123, "lon": -70.5236, "rumbo": 71 },
+      { "lat": -33.42585, "lon": -70.67198, "rumbo": 111 },
+      { "lat": -33.42689, "lon": -70.80301, "rumbo": 245 }
     ],
     "nivel": 2
   },
@@ -1544,20 +1554,20 @@
     "tipo": "calle",
     "comuna": "Pudahuel",
     "puntos": [
-      { "lat": -33.36785, "lon": -70.70261, "rumbo": 51 },
-      { "lat": -33.42783, "lon": -70.78435, "rumbo": 190 },
-      { "lat": -33.36568, "lon": -70.6968, "rumbo": 269 },
-      { "lat": -33.54308, "lon": -70.63095, "rumbo": 279 },
-      { "lat": -33.5361, "lon": -70.66798, "rumbo": 291 },
-      { "lat": -33.3965, "lon": -70.77222, "rumbo": 44 },
-      { "lat": -33.39621, "lon": -70.62047, "rumbo": 117 },
-      { "lat": -33.42451, "lon": -70.78044, "rumbo": 345 },
-      { "lat": -33.51605, "lon": -70.7149, "rumbo": 114 },
-      { "lat": -33.51459, "lon": -70.71786, "rumbo": 312 },
-      { "lat": -33.37427, "lon": -70.66208, "rumbo": 114 },
-      { "lat": -33.4093, "lon": -70.78253, "rumbo": 359 },
-      { "lat": -33.47549, "lon": -70.57787, "rumbo": 190 },
-      { "lat": -33.52377, "lon": -70.69679, "rumbo": 126 }
+      { "lat": -33.50995, "lon": -70.5908, "rumbo": 7, "pista": "cerca del Zanjón de la Aguada" },
+      { "lat": -33.39743, "lon": -70.61251, "rumbo": 39, "pista": "cerca del canal El Carmen" },
+      { "lat": -33.45611, "lon": -70.57162, "rumbo": 192, "pista": "junto a una feria o mercado" },
+      { "lat": -33.50088, "lon": -70.74212, "rumbo": 144 },
+      { "lat": -33.38077, "lon": -70.64484, "rumbo": 115 },
+      { "lat": -33.50939, "lon": -70.72323, "rumbo": 318 },
+      { "lat": -33.51977, "lon": -70.70392, "rumbo": 114 },
+      { "lat": -33.53673, "lon": -70.66557, "rumbo": 109 },
+      { "lat": -33.36981, "lon": -70.70582, "rumbo": 233 },
+      { "lat": -33.53259, "lon": -70.68037, "rumbo": 293 },
+      { "lat": -33.42305, "lon": -70.782, "rumbo": 329 },
+      { "lat": -33.50224, "lon": -70.58822, "rumbo": 19 },
+      { "lat": -33.45734, "lon": -70.76618, "rumbo": 319 },
+      { "lat": -33.36798, "lon": -70.67905, "rumbo": 294 }
     ],
     "nivel": 2
   },
@@ -1566,19 +1576,20 @@
     "tipo": "calle",
     "comuna": "Peñalolén",
     "puntos": [
-      { "lat": -33.43955, "lon": -70.57193, "rumbo": 318 },
-      { "lat": -33.42582, "lon": -70.59171, "rumbo": 312 },
-      { "lat": -33.42927, "lon": -70.58743, "rumbo": 316 },
-      { "lat": -33.43398, "lon": -70.58249, "rumbo": 312 },
-      { "lat": -33.42383, "lon": -70.59425, "rumbo": 314 },
-      { "lat": -33.4433, "lon": -70.56851, "rumbo": 318 },
-      { "lat": -33.47844, "lon": -70.55783, "rumbo": 27 },
-      { "lat": -33.45841, "lon": -70.55459, "rumbo": 330 },
-      { "lat": -33.51225, "lon": -70.56042, "rumbo": 349 },
-      { "lat": -33.4915, "lon": -70.55919, "rumbo": 187 },
-      { "lat": -33.46237, "lon": -70.55191, "rumbo": 330 },
-      { "lat": -33.50747, "lon": -70.561, "rumbo": 177 },
-      { "lat": -33.56016, "lon": -70.55336, "rumbo": 176 }
+      { "lat": -33.49906, "lon": -70.56031, "rumbo": 194, "pista": "cerca del canal San Carlos" },
+      { "lat": -33.51769, "lon": -70.55837, "rumbo": 348, "pista": "cerca del Zanjón de la Aguada" },
+      { "lat": -33.56008, "lon": -70.55337, "rumbo": 356, "pista": "junto a «Feria Libre»" },
+      { "lat": -33.43935, "lon": -70.57216, "rumbo": 318, "pista": "junto a «Feria Tobalaba»" },
+      { "lat": -33.51322, "lon": -70.5601, "rumbo": 344 },
+      { "lat": -33.52309, "lon": -70.55649, "rumbo": 0 },
+      { "lat": -33.42953, "lon": -70.58712, "rumbo": 316 },
+      { "lat": -33.46578, "lon": -70.55031, "rumbo": 170 },
+      { "lat": -33.49185, "lon": -70.55922, "rumbo": 186 },
+      { "lat": -33.50877, "lon": -70.56093, "rumbo": 175 },
+      { "lat": -33.47052, "lon": -70.55315, "rumbo": 214 },
+      { "lat": -33.45873, "lon": -70.55438, "rumbo": 150 },
+      { "lat": -33.45328, "lon": -70.55817, "rumbo": 150 },
+      { "lat": -33.48422, "lon": -70.5584, "rumbo": 3 }
     ],
     "nivel": 2
   },
@@ -1587,12 +1598,13 @@
     "tipo": "calle",
     "comuna": "Las Condes",
     "puntos": [
-      { "lat": -33.418, "lon": -70.55553, "rumbo": 102 },
-      { "lat": -33.41668, "lon": -70.54092, "rumbo": 80 },
-      { "lat": -33.41661, "lon": -70.56463, "rumbo": 252 },
-      { "lat": -33.41613, "lon": -70.53697, "rumbo": 84 },
-      { "lat": -33.41772, "lon": -70.54892, "rumbo": 260 },
-      { "lat": -33.41731, "lon": -70.54569, "rumbo": 82 }
+      { "lat": -33.42616, "lon": -70.59088, "rumbo": 59, "pista": "cerca del canal San Carlos" },
+      { "lat": -33.41656, "lon": -70.56407, "rumbo": 101, "pista": "junto a una feria o mercado" },
+      { "lat": -33.41802, "lon": -70.5549, "rumbo": 103 },
+      { "lat": -33.4162, "lon": -70.53613, "rumbo": 269 },
+      { "lat": -33.42539, "lon": -70.58747, "rumbo": 75 },
+      { "lat": -33.41963, "lon": -70.5746, "rumbo": 69 },
+      { "lat": -33.41648, "lon": -70.53995, "rumbo": 261 }
     ],
     "nivel": 3
   },
@@ -1601,16 +1613,20 @@
     "tipo": "calle",
     "comuna": "Las Condes",
     "puntos": [
-      { "lat": -33.42877, "lon": -70.54075, "rumbo": 262 },
-      { "lat": -33.43174, "lon": -70.58352, "rumbo": 86 },
-      { "lat": -33.43616, "lon": -70.59603, "rumbo": 81 },
-      { "lat": -33.43841, "lon": -70.60984, "rumbo": 275 },
-      { "lat": -33.43971, "lon": -70.61758, "rumbo": 81 },
-      { "lat": -33.43141, "lon": -70.57821, "rumbo": 88 },
-      { "lat": -33.43022, "lon": -70.55013, "rumbo": 82 },
-      { "lat": -33.44116, "lon": -70.62471, "rumbo": 54 },
-      { "lat": -33.44278, "lon": -70.63162, "rumbo": 90 },
-      { "lat": -33.43061, "lon": -70.55912, "rumbo": 86 }
+      { "lat": -33.43178, "lon": -70.58424, "rumbo": 262, "pista": "cerca del canal San Carlos" },
+      { "lat": -33.43126, "lon": -70.57344, "rumbo": 88, "pista": "muchas automotoras a los lados" },
+      { "lat": -33.4397, "lon": -70.61747, "rumbo": 261, "pista": "muchas automotoras a los lados" },
+      { "lat": -33.43643, "lon": -70.59797, "rumbo": 261, "pista": "muchas automotoras a los lados" },
+      { "lat": -33.43022, "lon": -70.55013, "rumbo": 262, "pista": "junto a «Feria Bilbao»" },
+      { "lat": -33.42869, "lon": -70.54013, "rumbo": 82 },
+      { "lat": -33.43092, "lon": -70.56625, "rumbo": 268 },
+      { "lat": -33.43708, "lon": -70.60149, "rumbo": 254 },
+      { "lat": -33.43384, "lon": -70.58694, "rumbo": 39 },
+      { "lat": -33.43909, "lon": -70.61369, "rumbo": 77 },
+      { "lat": -33.43135, "lon": -70.57734, "rumbo": 268 },
+      { "lat": -33.44122, "lon": -70.6248, "rumbo": 54 },
+      { "lat": -33.43056, "lon": -70.55509, "rumbo": 87 },
+      { "lat": -33.43075, "lon": -70.55916, "rumbo": 86 }
     ],
     "nivel": 3
   },
@@ -1619,15 +1635,14 @@
     "tipo": "calle",
     "comuna": "Ñuñoa",
     "puntos": [
-      { "lat": -33.4556, "lon": -70.5873, "rumbo": 87 },
-      { "lat": -33.45528, "lon": -70.59466, "rumbo": 275 },
-      { "lat": -33.45221, "lon": -70.62953, "rumbo": 287 },
-      { "lat": -33.4537, "lon": -70.60922, "rumbo": 99 },
-      { "lat": -33.45354, "lon": -70.57223, "rumbo": 274 },
-      { "lat": -33.45309, "lon": -70.61504, "rumbo": 94 },
-      { "lat": -33.45429, "lon": -70.57813, "rumbo": 85 },
-      { "lat": -33.45424, "lon": -70.60457, "rumbo": 277 },
-      { "lat": -33.45498, "lon": -70.59792, "rumbo": 99 }
+      { "lat": -33.45227, "lon": -70.62647, "rumbo": 86, "pista": "muchas automotoras a los lados" },
+      { "lat": -33.45311, "lon": -70.61839, "rumbo": 80, "pista": "muchas automotoras a los lados" },
+      { "lat": -33.45534, "lon": -70.5914, "rumbo": 94 },
+      { "lat": -33.45533, "lon": -70.5854, "rumbo": 76 },
+      { "lat": -33.45436, "lon": -70.57729, "rumbo": 83 },
+      { "lat": -33.45455, "lon": -70.60043, "rumbo": 277 },
+      { "lat": -33.45373, "lon": -70.60831, "rumbo": 277 },
+      { "lat": -33.4532, "lon": -70.61277, "rumbo": 278 }
     ],
     "nivel": 1
   },
@@ -1636,19 +1651,19 @@
     "tipo": "calle",
     "comuna": "Ñuñoa",
     "puntos": [
-      { "lat": -33.46995, "lon": -70.57311, "rumbo": 103 },
-      { "lat": -33.46217, "lon": -70.60638, "rumbo": 94 },
-      { "lat": -33.4668, "lon": -70.58267, "rumbo": 293 },
-      { "lat": -33.45758, "lon": -70.62474, "rumbo": 322 },
-      { "lat": -33.46092, "lon": -70.62154, "rumbo": 320 },
-      { "lat": -33.47219, "lon": -70.56184, "rumbo": 104 },
-      { "lat": -33.47274, "lon": -70.55791, "rumbo": 283 },
-      { "lat": -33.47946, "lon": -70.52617, "rumbo": 104 },
-      { "lat": -33.46347, "lon": -70.60344, "rumbo": 123 },
-      { "lat": -33.4651, "lon": -70.59067, "rumbo": 98 },
-      { "lat": -33.46467, "lon": -70.5998, "rumbo": 272 },
-      { "lat": -33.47672, "lon": -70.53968, "rumbo": 284 },
-      { "lat": -33.4685, "lon": -70.57855, "rumbo": 294 }
+      { "lat": -33.47375, "lon": -70.55457, "rumbo": 288, "pista": "cerca del canal San Carlos" },
+      { "lat": -33.47758, "lon": -70.53417, "rumbo": 113, "pista": "cerca del canal Las Perdices" },
+      { "lat": -33.46198, "lon": -70.61253, "rumbo": 94, "pista": "cerca del Court Central Anita Lizana" },
+      { "lat": -33.46868, "lon": -70.57751, "rumbo": 113 },
+      { "lat": -33.46481, "lon": -70.59542, "rumbo": 272 },
+      { "lat": -33.46649, "lon": -70.58345, "rumbo": 113 },
+      { "lat": -33.45874, "lon": -70.62367, "rumbo": 142 },
+      { "lat": -33.46143, "lon": -70.617, "rumbo": 95 },
+      { "lat": -33.46227, "lon": -70.60827, "rumbo": 94 },
+      { "lat": -33.47241, "lon": -70.55954, "rumbo": 103 },
+      { "lat": -33.47622, "lon": -70.54057, "rumbo": 283 },
+      { "lat": -33.46415, "lon": -70.60215, "rumbo": 123 },
+      { "lat": -33.46553, "lon": -70.5892, "rumbo": 279 }
     ],
     "nivel": 2
   },
@@ -1657,8 +1672,9 @@
     "tipo": "calle",
     "comuna": "Ñuñoa",
     "puntos": [
-      { "lat": -33.45939, "lon": -70.59796, "rumbo": 3 },
-      { "lat": -33.46741, "lon": -70.5984, "rumbo": 3 }
+      { "lat": -33.46553, "lon": -70.59833, "rumbo": 3 },
+      { "lat": -33.4625, "lon": -70.59824, "rumbo": 182 },
+      { "lat": -33.45881, "lon": -70.59804, "rumbo": 2 }
     ],
     "nivel": 4
   },
@@ -1667,9 +1683,9 @@
     "tipo": "calle",
     "comuna": "La Reina",
     "puntos": [
-      { "lat": -33.43877, "lon": -70.57336, "rumbo": 348 },
-      { "lat": -33.44246, "lon": -70.5724, "rumbo": 174 },
-      { "lat": -33.45332, "lon": -70.57095, "rumbo": 356 }
+      { "lat": -33.44523, "lon": -70.57219, "rumbo": 352 },
+      { "lat": -33.45154, "lon": -70.57076, "rumbo": 170 },
+      { "lat": -33.44161, "lon": -70.57272, "rumbo": 172 }
     ],
     "nivel": 3
   },
@@ -1678,11 +1694,11 @@
     "tipo": "calle",
     "comuna": "La Reina",
     "puntos": [
-      { "lat": -33.43988, "lon": -70.54838, "rumbo": 278 },
-      { "lat": -33.44091, "lon": -70.53898, "rumbo": 278 },
-      { "lat": -33.43939, "lon": -70.55201, "rumbo": 276 },
-      { "lat": -33.43794, "lon": -70.5724, "rumbo": 274 },
-      { "lat": -33.44048, "lon": -70.54349, "rumbo": 97 }
+      { "lat": -33.4419, "lon": -70.53467, "rumbo": 301, "pista": "cerca del canal Las Perdices" },
+      { "lat": -33.43888, "lon": -70.55447, "rumbo": 83, "pista": "junto a «Ecoferia de la Reina»" },
+      { "lat": -33.44005, "lon": -70.54713, "rumbo": 98 },
+      { "lat": -33.43871, "lon": -70.55986, "rumbo": 273 },
+      { "lat": -33.4409, "lon": -70.53958, "rumbo": 98 }
     ],
     "nivel": 2
   },
@@ -1691,8 +1707,9 @@
     "tipo": "calle",
     "comuna": "La Reina",
     "puntos": [
-      { "lat": -33.45343, "lon": -70.56922, "rumbo": 83 },
-      { "lat": -33.45245, "lon": -70.56172, "rumbo": 82 }
+      { "lat": -33.45228, "lon": -70.55942, "rumbo": 262, "pista": "cerca del canal San Carlos" },
+      { "lat": -33.45337, "lon": -70.56928, "rumbo": 263, "pista": "junto a Mall Plaza Egaña" },
+      { "lat": -33.45267, "lon": -70.56306, "rumbo": 81 }
     ],
     "nivel": 4
   },
@@ -1701,17 +1718,18 @@
     "tipo": "calle",
     "comuna": "Las Condes",
     "puntos": [
-      { "lat": -33.3796, "lon": -70.55402, "rumbo": 131 },
-      { "lat": -33.4402, "lon": -70.53553, "rumbo": 19 },
-      { "lat": -33.39511, "lon": -70.54469, "rumbo": 334 },
-      { "lat": -33.39909, "lon": -70.54443, "rumbo": 181 },
-      { "lat": -33.41694, "lon": -70.53877, "rumbo": 160 },
-      { "lat": -33.42355, "lon": -70.53798, "rumbo": 190 },
-      { "lat": -33.37743, "lon": -70.55699, "rumbo": 355 },
-      { "lat": -33.42771, "lon": -70.53895, "rumbo": 12 },
-      { "lat": -33.42032, "lon": -70.53788, "rumbo": 170 },
-      { "lat": -33.40221, "lon": -70.5443, "rumbo": 356 },
-      { "lat": -33.40618, "lon": -70.54351, "rumbo": 348 }
+      { "lat": -33.37698, "lon": -70.55731, "rumbo": 180, "pista": "cerca del río Mapocho" },
+      { "lat": -33.43855, "lon": -70.53628, "rumbo": 335, "pista": "cerca del canal Las Perdices" },
+      { "lat": -33.38495, "lon": -70.55063, "rumbo": 158, "pista": "muchas automotoras a los lados" },
+      { "lat": -33.43079, "lon": -70.53898, "rumbo": 351 },
+      { "lat": -33.41325, "lon": -70.54059, "rumbo": 333 },
+      { "lat": -33.3948, "lon": -70.5451, "rumbo": 152 },
+      { "lat": -33.38131, "lon": -70.5528, "rumbo": 158 },
+      { "lat": -33.40049, "lon": -70.54443, "rumbo": 180 },
+      { "lat": -33.418, "lon": -70.53836, "rumbo": 340 },
+      { "lat": -33.42663, "lon": -70.53867, "rumbo": 189 },
+      { "lat": -33.42305, "lon": -70.53799, "rumbo": 20 },
+      { "lat": -33.40576, "lon": -70.54369, "rumbo": 348 }
     ],
     "nivel": 3
   },
@@ -1720,14 +1738,14 @@
     "tipo": "calle",
     "comuna": "Las Condes",
     "puntos": [
-      { "lat": -33.39123, "lon": -70.5725, "rumbo": 346 },
-      { "lat": -33.38627, "lon": -70.5774, "rumbo": 317 },
-      { "lat": -33.42246, "lon": -70.56447, "rumbo": 359 },
-      { "lat": -33.42544, "lon": -70.56405, "rumbo": 343 },
-      { "lat": -33.40563, "lon": -70.56837, "rumbo": 342 },
-      { "lat": -33.40079, "lon": -70.57009, "rumbo": 343 },
-      { "lat": -33.41538, "lon": -70.56533, "rumbo": 165 },
-      { "lat": -33.41946, "lon": -70.56444, "rumbo": 1 }
+      { "lat": -33.41615, "lon": -70.56486, "rumbo": 345, "pista": "junto a una feria o mercado" },
+      { "lat": -33.39824, "lon": -70.57114, "rumbo": 164 },
+      { "lat": -33.38798, "lon": -70.57545, "rumbo": 317 },
+      { "lat": -33.42237, "lon": -70.56448, "rumbo": 179 },
+      { "lat": -33.42589, "lon": -70.56393, "rumbo": 343 },
+      { "lat": -33.40416, "lon": -70.56908, "rumbo": 344 },
+      { "lat": -33.39254, "lon": -70.57225, "rumbo": 358 },
+      { "lat": -33.41275, "lon": -70.56591, "rumbo": 166 }
     ],
     "nivel": 2
   },
@@ -1736,10 +1754,9 @@
     "tipo": "calle",
     "comuna": "Las Condes",
     "puntos": [
-      { "lat": -33.4023, "lon": -70.59273, "rumbo": 287 },
-      { "lat": -33.40461, "lon": -70.58444, "rumbo": 101 },
-      { "lat": -33.40658, "lon": -70.57521, "rumbo": 285 },
-      { "lat": -33.40565, "lon": -70.5794, "rumbo": 281 }
+      { "lat": -33.40689, "lon": -70.57599, "rumbo": 14 },
+      { "lat": -33.40466, "lon": -70.58297, "rumbo": 285 },
+      { "lat": -33.40558, "lon": -70.57911, "rumbo": 106 }
     ],
     "nivel": 3
   },
@@ -1748,9 +1765,9 @@
     "tipo": "calle",
     "comuna": "Vitacura",
     "puntos": [
-      { "lat": -33.40644, "lon": -70.59904, "rumbo": 7 },
-      { "lat": -33.39199, "lon": -70.59734, "rumbo": 320 },
-      { "lat": -33.40045, "lon": -70.59818, "rumbo": 187 }
+      { "lat": -33.40352, "lon": -70.59844, "rumbo": 187 },
+      { "lat": -33.39647, "lon": -70.59754, "rumbo": 7 },
+      { "lat": -33.39249, "lon": -70.597, "rumbo": 188 }
     ],
     "nivel": 4
   },
@@ -1759,10 +1776,9 @@
     "tipo": "calle",
     "comuna": "Vitacura",
     "puntos": [
-      { "lat": -33.37476, "lon": -70.57079, "rumbo": 165 },
-      { "lat": -33.3905, "lon": -70.57929, "rumbo": 213 },
-      { "lat": -33.38738, "lon": -70.57673, "rumbo": 215 },
-      { "lat": -33.39418, "lon": -70.58168, "rumbo": 24 }
+      { "lat": -33.37402, "lon": -70.57104, "rumbo": 345 },
+      { "lat": -33.39042, "lon": -70.57923, "rumbo": 213 },
+      { "lat": -33.38137, "lon": -70.57128, "rumbo": 34 }
     ],
     "nivel": 4
   },
@@ -1771,16 +1787,17 @@
     "tipo": "calle",
     "comuna": "Vitacura",
     "puntos": [
-      { "lat": -33.37769, "lon": -70.56458, "rumbo": 80 },
-      { "lat": -33.37684, "lon": -70.55475, "rumbo": 260 },
-      { "lat": -33.37563, "lon": -70.54572, "rumbo": 296 },
-      { "lat": -33.38915, "lon": -70.59637, "rumbo": 68 },
-      { "lat": -33.38022, "lon": -70.57387, "rumbo": 68 },
-      { "lat": -33.38177, "lon": -70.57874, "rumbo": 250 },
-      { "lat": -33.36452, "lon": -70.50422, "rumbo": 98 },
-      { "lat": -33.36606, "lon": -70.50127, "rumbo": 271 },
-      { "lat": -33.37137, "lon": -70.51979, "rumbo": 59 },
-      { "lat": -33.36769, "lon": -70.51044, "rumbo": 242 }
+      { "lat": -33.37703, "lon": -70.54296, "rumbo": 302, "pista": "cerca del río Mapocho" },
+      { "lat": -33.37841, "lon": -70.55679, "rumbo": 257 },
+      { "lat": -33.37554, "lon": -70.54935, "rumbo": 80 },
+      { "lat": -33.38852, "lon": -70.59478, "rumbo": 228 },
+      { "lat": -33.38012, "lon": -70.57356, "rumbo": 68 },
+      { "lat": -33.38174, "lon": -70.57864, "rumbo": 249 },
+      { "lat": -33.38265, "lon": -70.58252, "rumbo": 76 },
+      { "lat": -33.36384, "lon": -70.49879, "rumbo": 261 },
+      { "lat": -33.36443, "lon": -70.50694, "rumbo": 262 },
+      { "lat": -33.37399, "lon": -70.52639, "rumbo": 53 },
+      { "lat": -33.37186, "lon": -70.52124, "rumbo": 251 }
     ],
     "nivel": 3
   },
@@ -1789,13 +1806,15 @@
     "tipo": "calle",
     "comuna": "Lo Barnechea",
     "puntos": [
-      { "lat": -33.36695, "lon": -70.51283, "rumbo": 153 },
-      { "lat": -33.32869, "lon": -70.51975, "rumbo": 7 },
-      { "lat": -33.33212, "lon": -70.51991, "rumbo": 183 },
-      { "lat": -33.32402, "lon": -70.51878, "rumbo": 6 },
-      { "lat": -33.33855, "lon": -70.52086, "rumbo": 7 },
-      { "lat": -33.35278, "lon": -70.5185, "rumbo": 343 },
-      { "lat": -33.35899, "lon": -70.51716, "rumbo": 347 }
+      { "lat": -33.36652, "lon": -70.51295, "rumbo": 333, "pista": "cerca del río Mapocho" },
+      { "lat": -33.36163, "lon": -70.51538, "rumbo": 342, "pista": "muchas automotoras a los lados" },
+      { "lat": -33.35483, "lon": -70.51791, "rumbo": 343, "pista": "muchas automotoras a los lados" },
+      { "lat": -33.34897, "lon": -70.52093, "rumbo": 136 },
+      { "lat": -33.34288, "lon": -70.52149, "rumbo": 7 },
+      { "lat": -33.35901, "lon": -70.51701, "rumbo": 339 },
+      { "lat": -33.3374, "lon": -70.52086, "rumbo": 186 },
+      { "lat": -33.33446, "lon": -70.52045, "rumbo": 9 },
+      { "lat": -33.32837, "lon": -70.51961, "rumbo": 7 }
     ],
     "nivel": 2
   },
@@ -1804,9 +1823,9 @@
     "tipo": "calle",
     "comuna": "Lo Barnechea",
     "puntos": [
-      { "lat": -33.36149, "lon": -70.50465, "rumbo": 74 },
-      { "lat": -33.36564, "lon": -70.51612, "rumbo": 225 },
-      { "lat": -33.36386, "lon": -70.51316, "rumbo": 73 }
+      { "lat": -33.36204, "lon": -70.49384, "rumbo": 290, "pista": "cerca del río Mapocho" },
+      { "lat": -33.36406, "lon": -70.51378, "rumbo": 249, "pista": "muchas automotoras a los lados" },
+      { "lat": -33.36137, "lon": -70.50423, "rumbo": 254 }
     ],
     "nivel": 4
   },
@@ -1815,10 +1834,11 @@
     "tipo": "calle",
     "comuna": "Lo Barnechea",
     "puntos": [
-      { "lat": -33.35895, "lon": -70.54348, "rumbo": 212 },
-      { "lat": -33.35498, "lon": -70.53353, "rumbo": 79 },
-      { "lat": -33.35472, "lon": -70.52724, "rumbo": 64 },
-      { "lat": -33.35706, "lon": -70.53906, "rumbo": 49 }
+      { "lat": -33.35503, "lon": -70.53385, "rumbo": 259, "pista": "muchas automotoras a los lados" },
+      { "lat": -33.35866, "lon": -70.54323, "rumbo": 212, "pista": "muchas automotoras a los lados" },
+      { "lat": -33.35438, "lon": -70.52927, "rumbo": 269 },
+      { "lat": -33.35396, "lon": -70.52572, "rumbo": 55 },
+      { "lat": -33.36388, "lon": -70.54463, "rumbo": 186 }
     ],
     "nivel": 3
   },
@@ -1827,10 +1847,15 @@
     "tipo": "calle",
     "comuna": "Las Condes",
     "puntos": [
-      { "lat": -33.40123, "lon": -70.52434, "rumbo": 95 },
-      { "lat": -33.401, "lon": -70.51517, "rumbo": 263 },
-      { "lat": -33.40025, "lon": -70.5046, "rumbo": 99 },
-      { "lat": -33.40144, "lon": -70.51963, "rumbo": 84 }
+      {
+        "lat": -33.4001,
+        "lon": -70.50511,
+        "rumbo": 292,
+        "pista": "junto a Duoc UC – sede San Carlos de Apoquindo"
+      },
+      { "lat": -33.40179, "lon": -70.53281, "rumbo": 242 },
+      { "lat": -33.40516, "lon": -70.53894, "rumbo": 75 },
+      { "lat": -33.40136, "lon": -70.51865, "rumbo": 84 }
     ],
     "nivel": 3
   },
@@ -1839,12 +1864,12 @@
     "tipo": "calle",
     "comuna": "Las Condes",
     "puntos": [
-      { "lat": -33.41876, "lon": -70.53315, "rumbo": 339 },
-      { "lat": -33.39453, "lon": -70.5397, "rumbo": 12 },
-      { "lat": -33.40284, "lon": -70.5394, "rumbo": 158 },
-      { "lat": -33.38165, "lon": -70.52288, "rumbo": 233 },
-      { "lat": -33.4214, "lon": -70.53041, "rumbo": 314 },
-      { "lat": -33.41368, "lon": -70.5349, "rumbo": 342 }
+      { "lat": -33.38061, "lon": -70.52123, "rumbo": 233 },
+      { "lat": -33.39593, "lon": -70.53993, "rumbo": 181 },
+      { "lat": -33.40386, "lon": -70.53885, "rumbo": 158 },
+      { "lat": -33.38266, "lon": -70.52451, "rumbo": 233 },
+      { "lat": -33.38516, "lon": -70.52847, "rumbo": 53 },
+      { "lat": -33.41084, "lon": -70.536, "rumbo": 342 }
     ],
     "nivel": 3
   },
@@ -1853,9 +1878,9 @@
     "tipo": "calle",
     "comuna": "Las Condes",
     "puntos": [
-      { "lat": -33.41599, "lon": -70.55293, "rumbo": 9 },
-      { "lat": -33.42882, "lon": -70.55422, "rumbo": 2 },
-      { "lat": -33.40999, "lon": -70.55219, "rumbo": 189 }
+      { "lat": -33.43005, "lon": -70.55423, "rumbo": 173 },
+      { "lat": -33.41303, "lon": -70.55247, "rumbo": 9 },
+      { "lat": -33.41999, "lon": -70.55325, "rumbo": 0 }
     ],
     "nivel": 4
   },
@@ -1865,12 +1890,12 @@
     "comuna": "Las Condes",
     "puntos": [
       { "lat": -33.39796, "lon": -70.50979, "rumbo": 191 },
-      { "lat": -33.41198, "lon": -70.50608, "rumbo": 187 },
-      { "lat": -33.38916, "lon": -70.50435, "rumbo": 61 },
-      { "lat": -33.41528, "lon": -70.50717, "rumbo": 190 },
-      { "lat": -33.40902, "lon": -70.50661, "rumbo": 344 },
-      { "lat": -33.40554, "lon": -70.50795, "rumbo": 340 },
-      { "lat": -33.39331, "lon": -70.50796, "rumbo": 30 }
+      { "lat": -33.41293, "lon": -70.50619, "rumbo": 22 },
+      { "lat": -33.39033, "lon": -70.50577, "rumbo": 31 },
+      { "lat": -33.3878, "lon": -70.50124, "rumbo": 61 },
+      { "lat": -33.40725, "lon": -70.50736, "rumbo": 163 },
+      { "lat": -33.39486, "lon": -70.50891, "rumbo": 30 },
+      { "lat": -33.41579, "lon": -70.50708, "rumbo": 176 }
     ],
     "nivel": 3
   },
@@ -1879,15 +1904,20 @@
     "tipo": "calle",
     "comuna": "Ñuñoa",
     "puntos": [
-      { "lat": -33.45219, "lon": -70.60507, "rumbo": 353 },
-      { "lat": -33.48806, "lon": -70.60622, "rumbo": 183 },
-      { "lat": -33.42371, "lon": -70.61233, "rumbo": 339 },
-      { "lat": -33.48153, "lon": -70.606, "rumbo": 182 },
-      { "lat": -33.45703, "lon": -70.60541, "rumbo": 187 },
-      { "lat": -33.47048, "lon": -70.60656, "rumbo": 177 },
-      { "lat": -33.43593, "lon": -70.60807, "rumbo": 346 },
-      { "lat": -33.4741, "lon": -70.60638, "rumbo": 357 },
-      { "lat": -33.4414, "lon": -70.6068, "rumbo": 352 }
+      {
+        "lat": -33.46914,
+        "lon": -70.60665,
+        "rumbo": 358,
+        "pista": "cerca del Velódromo Sergio Tormen Méndez"
+      },
+      { "lat": -33.43687, "lon": -70.60779, "rumbo": 347, "pista": "junto a Universidad Finis Terrae" },
+      { "lat": -33.45161, "lon": -70.60516, "rumbo": 173 },
+      { "lat": -33.4426, "lon": -70.60657, "rumbo": 352 },
+      { "lat": -33.42497, "lon": -70.6118, "rumbo": 342 },
+      { "lat": -33.47996, "lon": -70.60595, "rumbo": 2 },
+      { "lat": -33.45464, "lon": -70.60498, "rumbo": 189 },
+      { "lat": -33.46379, "lon": -70.6065, "rumbo": 7 },
+      { "lat": -33.47599, "lon": -70.6062, "rumbo": 357 }
     ],
     "nivel": 2
   },
@@ -1896,10 +1926,10 @@
     "tipo": "calle",
     "comuna": "Providencia",
     "puntos": [
-      { "lat": -33.43659, "lon": -70.60095, "rumbo": 168 },
-      { "lat": -33.43035, "lon": -70.6026, "rumbo": 167 },
-      { "lat": -33.44288, "lon": -70.59941, "rumbo": 173 },
-      { "lat": -33.42276, "lon": -70.60482, "rumbo": 161 }
+      { "lat": -33.4278, "lon": -70.60337, "rumbo": 167 },
+      { "lat": -33.4398, "lon": -70.60004, "rumbo": 347 },
+      { "lat": -33.4427, "lon": -70.59943, "rumbo": 173 },
+      { "lat": -33.42186, "lon": -70.60505, "rumbo": 341 }
     ],
     "nivel": 3
   },
@@ -1908,9 +1938,9 @@
     "tipo": "calle",
     "comuna": "Providencia",
     "puntos": [
-      { "lat": -33.44977, "lon": -70.61018, "rumbo": 165 },
-      { "lat": -33.42975, "lon": -70.61687, "rumbo": 345 },
-      { "lat": -33.44131, "lon": -70.61296, "rumbo": 164 }
+      { "lat": -33.4363, "lon": -70.61465, "rumbo": 165, "pista": "junto a Universidad de las Américas" },
+      { "lat": -33.4504, "lon": -70.61, "rumbo": 345 },
+      { "lat": -33.42869, "lon": -70.61724, "rumbo": 345 }
     ],
     "nivel": 4
   },
@@ -1919,9 +1949,9 @@
     "tipo": "calle",
     "comuna": "Providencia",
     "puntos": [
-      { "lat": -33.42757, "lon": -70.62234, "rumbo": 111 },
-      { "lat": -33.43708, "lon": -70.61605, "rumbo": 349 },
-      { "lat": -33.43234, "lon": -70.61801, "rumbo": 151 }
+      { "lat": -33.43782, "lon": -70.61586, "rumbo": 169, "pista": "junto a una feria o mercado" },
+      { "lat": -33.43509, "lon": -70.61651, "rumbo": 349 },
+      { "lat": -33.45038, "lon": -70.61311, "rumbo": 350 }
     ],
     "nivel": 4
   },
@@ -1930,9 +1960,9 @@
     "tipo": "calle",
     "comuna": "Providencia",
     "puntos": [
-      { "lat": -33.43282, "lon": -70.61605, "rumbo": 248 },
-      { "lat": -33.43036, "lon": -70.60438, "rumbo": 255 },
-      { "lat": -33.42857, "lon": -70.59617, "rumbo": 75 }
+      { "lat": -33.43288, "lon": -70.61624, "rumbo": 248 },
+      { "lat": -33.42904, "lon": -70.59832, "rumbo": 255 },
+      { "lat": -33.43211, "lon": -70.61239, "rumbo": 77 }
     ],
     "nivel": 4
   },
@@ -1941,10 +1971,10 @@
     "tipo": "calle",
     "comuna": "Providencia",
     "puntos": [
-      { "lat": -33.43115, "lon": -70.58858, "rumbo": 73 },
-      { "lat": -33.43358, "lon": -70.5976, "rumbo": 253 },
-      { "lat": -33.43252, "lon": -70.59312, "rumbo": 73 },
-      { "lat": -33.43443, "lon": -70.60126, "rumbo": 253 }
+      { "lat": -33.43081, "lon": -70.58585, "rumbo": 231, "pista": "cerca del canal San Carlos" },
+      { "lat": -33.43639, "lon": -70.60873, "rumbo": 256, "pista": "junto a Universidad Finis Terrae" },
+      { "lat": -33.4319, "lon": -70.59072, "rumbo": 253 },
+      { "lat": -33.4378, "lon": -70.61372, "rumbo": 253 }
     ],
     "nivel": 4
   },
@@ -1953,10 +1983,10 @@
     "tipo": "calle",
     "comuna": "Ñuñoa",
     "puntos": [
-      { "lat": -33.44651, "lon": -70.59508, "rumbo": 124 },
-      { "lat": -33.45136, "lon": -70.58544, "rumbo": 300 },
-      { "lat": -33.44469, "lon": -70.59932, "rumbo": 263 },
-      { "lat": -33.45464, "lon": -70.58, "rumbo": 128 }
+      { "lat": -33.44727, "lon": -70.59369, "rumbo": 124 },
+      { "lat": -33.45018, "lon": -70.58801, "rumbo": 120 },
+      { "lat": -33.44435, "lon": -70.59873, "rumbo": 84 },
+      { "lat": -33.4455, "lon": -70.60674, "rumbo": 83 }
     ],
     "nivel": 3
   },
@@ -1965,16 +1995,16 @@
     "tipo": "calle",
     "comuna": "Peñalolén",
     "puntos": [
-      { "lat": -33.42637, "lon": -70.59034, "rumbo": 134 },
-      { "lat": -33.42117, "lon": -70.59709, "rumbo": 311 },
-      { "lat": -33.42426, "lon": -70.59303, "rumbo": 133 },
-      { "lat": -33.49392, "lon": -70.55867, "rumbo": 3 },
-      { "lat": -33.48001, "lon": -70.55722, "rumbo": 184 },
-      { "lat": -33.47141, "lon": -70.5531, "rumbo": 34 },
-      { "lat": -33.50524, "lon": -70.56034, "rumbo": 169 },
-      { "lat": -33.53943, "lon": -70.55275, "rumbo": 154 },
-      { "lat": -33.56604, "lon": -70.5518, "rumbo": 169 },
-      { "lat": -33.55194, "lon": -70.55346, "rumbo": 351 }
+      { "lat": -33.47253, "lon": -70.55403, "rumbo": 19, "pista": "cerca del canal San Carlos" },
+      { "lat": -33.55978, "lon": -70.55253, "rumbo": 175, "pista": "junto a «Feria Libre»" },
+      { "lat": -33.43489, "lon": -70.57979, "rumbo": 121 },
+      { "lat": -33.42037, "lon": -70.59819, "rumbo": 131 },
+      { "lat": -33.4598, "lon": -70.55296, "rumbo": 149 },
+      { "lat": -33.49428, "lon": -70.55866, "rumbo": 183 },
+      { "lat": -33.47688, "lon": -70.55603, "rumbo": 26 },
+      { "lat": -33.46908, "lon": -70.55127, "rumbo": 213 },
+      { "lat": -33.48714, "lon": -70.55788, "rumbo": 186 },
+      { "lat": -33.54076, "lon": -70.55263, "rumbo": 169 }
     ],
     "nivel": 3
   },
@@ -1983,11 +2013,11 @@
     "tipo": "calle",
     "comuna": "Peñalolén",
     "puntos": [
-      { "lat": -33.46702, "lon": -70.52589, "rumbo": 109 },
-      { "lat": -33.4617, "lon": -70.5647, "rumbo": 111 },
-      { "lat": -33.46254, "lon": -70.55714, "rumbo": 270 },
-      { "lat": -33.46289, "lon": -70.54976, "rumbo": 101 },
-      { "lat": -33.46289, "lon": -70.54182, "rumbo": 267 }
+      { "lat": -33.46554, "lon": -70.53125, "rumbo": 285, "pista": "cerca del canal Las Perdices" },
+      { "lat": -33.46702, "lon": -70.52589, "rumbo": 289 },
+      { "lat": -33.46342, "lon": -70.54645, "rumbo": 282 },
+      { "lat": -33.46253, "lon": -70.55849, "rumbo": 270 },
+      { "lat": -33.46316, "lon": -70.54283, "rumbo": 64 }
     ],
     "nivel": 3
   },
@@ -1996,20 +2026,20 @@
     "tipo": "calle",
     "comuna": "La Florida",
     "puntos": [
-      { "lat": -33.4702, "lon": -70.62632, "rumbo": 27 },
-      { "lat": -33.4573, "lon": -70.62922, "rumbo": 167 },
-      { "lat": -33.51062, "lon": -70.61128, "rumbo": 320 },
-      { "lat": -33.53221, "lon": -70.59459, "rumbo": 341 },
-      { "lat": -33.55492, "lon": -70.5865, "rumbo": 352 },
-      { "lat": -33.44726, "lon": -70.63243, "rumbo": 346 },
-      { "lat": -33.51725, "lon": -70.60521, "rumbo": 320 },
-      { "lat": -33.49953, "lon": -70.6155, "rumbo": 351 },
-      { "lat": -33.53626, "lon": -70.59276, "rumbo": 339 },
-      { "lat": -33.46307, "lon": -70.62753, "rumbo": 166 },
-      { "lat": -33.46712, "lon": -70.62663, "rumbo": 346 },
-      { "lat": -33.5127, "lon": -70.60646, "rumbo": 321 },
-      { "lat": -33.48101, "lon": -70.62129, "rumbo": 348 },
-      { "lat": -33.48403, "lon": -70.62068, "rumbo": 167 }
+      { "lat": -33.4851, "lon": -70.62042, "rumbo": 347, "pista": "cerca del Zanjón de la Aguada" },
+      { "lat": -33.51234, "lon": -70.60682, "rumbo": 136, "pista": "junto a Mall Florida Center" },
+      { "lat": -33.49981, "lon": -70.6159, "rumbo": 170, "pista": "junto a Duoc UC – sede San Joaquín" },
+      { "lat": -33.56697, "lon": -70.58448, "rumbo": 171 },
+      { "lat": -33.49436, "lon": -70.61698, "rumbo": 169 },
+      { "lat": -33.49101, "lon": -70.61777, "rumbo": 170 },
+      { "lat": -33.53161, "lon": -70.59482, "rumbo": 341 },
+      { "lat": -33.51576, "lon": -70.60284, "rumbo": 315 },
+      { "lat": -33.4614, "lon": -70.62825, "rumbo": 167 },
+      { "lat": -33.52152, "lon": -70.60059, "rumbo": 312 },
+      { "lat": -33.5617, "lon": -70.58532, "rumbo": 351 },
+      { "lat": -33.53922, "lon": -70.5914, "rumbo": 339 },
+      { "lat": -33.45258, "lon": -70.63062, "rumbo": 348 },
+      { "lat": -33.53482, "lon": -70.59305, "rumbo": 159 }
     ],
     "nivel": 1
   },
@@ -2018,12 +2048,10 @@
     "tipo": "calle",
     "comuna": "Macul",
     "puntos": [
-      { "lat": -33.48401, "lon": -70.59936, "rumbo": 3 },
-      { "lat": -33.47517, "lon": -70.5988, "rumbo": 3 },
-      { "lat": -33.50664, "lon": -70.59093, "rumbo": 330 },
-      { "lat": -33.48016, "lon": -70.59906, "rumbo": 182 },
-      { "lat": -33.49163, "lon": -70.59975, "rumbo": 357 },
-      { "lat": -33.50339, "lon": -70.59331, "rumbo": 329 }
+      { "lat": -33.47605, "lon": -70.59895, "rumbo": 183 },
+      { "lat": -33.48174, "lon": -70.59926, "rumbo": 182 },
+      { "lat": -33.50521, "lon": -70.5919, "rumbo": 148 },
+      { "lat": -33.49172, "lon": -70.59976, "rumbo": 357 }
     ],
     "nivel": 2
   },
@@ -2032,20 +2060,20 @@
     "tipo": "calle",
     "comuna": "La Florida",
     "puntos": [
-      { "lat": -33.51207, "lon": -70.55464, "rumbo": 273 },
-      { "lat": -33.50431, "lon": -70.65132, "rumbo": 105 },
-      { "lat": -33.507, "lon": -70.63422, "rumbo": 269 },
-      { "lat": -33.49048, "lon": -70.68116, "rumbo": 313 },
-      { "lat": -33.508, "lon": -70.61771, "rumbo": 93 },
-      { "lat": -33.48645, "lon": -70.68663, "rumbo": 131 },
-      { "lat": -33.5037, "lon": -70.6545, "rumbo": 106 },
-      { "lat": -33.50775, "lon": -70.62439, "rumbo": 94 },
-      { "lat": -33.51134, "lon": -70.57189, "rumbo": 98 },
-      { "lat": -33.50684, "lon": -70.64025, "rumbo": 104 },
-      { "lat": -33.50117, "lon": -70.66338, "rumbo": 108 },
-      { "lat": -33.4928, "lon": -70.67856, "rumbo": 310 },
-      { "lat": -33.48431, "lon": -70.69267, "rumbo": 113 },
-      { "lat": -33.51063, "lon": -70.57642, "rumbo": 94 }
+      { "lat": -33.51158, "lon": -70.55998, "rumbo": 283, "pista": "cerca del canal San Carlos" },
+      { "lat": -33.51031, "lon": -70.5883, "rumbo": 226, "pista": "cerca del Zanjón de la Aguada" },
+      { "lat": -33.51215, "lon": -70.55293, "rumbo": 93 },
+      { "lat": -33.5071, "lon": -70.63232, "rumbo": 90 },
+      { "lat": -33.51013, "lon": -70.58458, "rumbo": 94 },
+      { "lat": -33.48443, "lon": -70.6886, "rumbo": 307 },
+      { "lat": -33.50858, "lon": -70.60586, "rumbo": 95 },
+      { "lat": -33.48688, "lon": -70.68564, "rumbo": 313 },
+      { "lat": -33.50897, "lon": -70.60073, "rumbo": 95 },
+      { "lat": -33.50768, "lon": -70.62541, "rumbo": 94 },
+      { "lat": -33.5098, "lon": -70.59232, "rumbo": 94 },
+      { "lat": -33.50523, "lon": -70.64787, "rumbo": 285 },
+      { "lat": -33.50231, "lon": -70.65887, "rumbo": 288 },
+      { "lat": -33.48412, "lon": -70.69323, "rumbo": 113 }
     ],
     "nivel": 2
   },
@@ -2054,17 +2082,22 @@
     "tipo": "calle",
     "comuna": "Peñalolén",
     "puntos": [
-      { "lat": -33.48999, "lon": -70.57867, "rumbo": 293 },
-      { "lat": -33.49844, "lon": -70.56451, "rumbo": 278 },
-      { "lat": -33.50104, "lon": -70.53592, "rumbo": 110 },
-      { "lat": -33.48583, "lon": -70.59337, "rumbo": 97 },
-      { "lat": -33.49269, "lon": -70.56985, "rumbo": 292 },
-      { "lat": -33.50077, "lon": -70.54749, "rumbo": 99 },
-      { "lat": -33.49971, "lon": -70.55435, "rumbo": 280 },
-      { "lat": -33.49741, "lon": -70.56919, "rumbo": 294 },
-      { "lat": -33.4853, "lon": -70.6129, "rumbo": 264 },
-      { "lat": -33.50026, "lon": -70.52564, "rumbo": 83 },
-      { "lat": -33.50235, "lon": -70.53154, "rumbo": 290 }
+      { "lat": -33.49894, "lon": -70.56045, "rumbo": 93, "pista": "cerca del canal San Carlos" },
+      { "lat": -33.48594, "lon": -70.61822, "rumbo": 105, "pista": "cerca del Zanjón de la Aguada" },
+      { "lat": -33.50136, "lon": -70.54357, "rumbo": 96, "pista": "cerca del canal Las Perdices" },
+      {
+        "lat": -33.48604,
+        "lon": -70.59145,
+        "rumbo": 97,
+        "pista": "junto a «Feria Parque Nuestra Señora del Carmen»"
+      },
+      { "lat": -33.4878, "lon": -70.58373, "rumbo": 293 },
+      { "lat": -33.49825, "lon": -70.56604, "rumbo": 98 },
+      { "lat": -33.50112, "lon": -70.53562, "rumbo": 290 },
+      { "lat": -33.48492, "lon": -70.60346, "rumbo": 265 },
+      { "lat": -33.49265, "lon": -70.56996, "rumbo": 292 },
+      { "lat": -33.48513, "lon": -70.61128, "rumbo": 87 },
+      { "lat": -33.48981, "lon": -70.57831, "rumbo": 113 }
     ],
     "nivel": 2
   },
@@ -2073,12 +2106,12 @@
     "tipo": "calle",
     "comuna": "Ñuñoa",
     "puntos": [
-      { "lat": -33.47348, "lon": -70.58431, "rumbo": 70 },
-      { "lat": -33.47051, "lon": -70.57874, "rumbo": 238 },
-      { "lat": -33.47367, "lon": -70.59211, "rumbo": 273 },
-      { "lat": -33.47436, "lon": -70.61156, "rumbo": 267 },
-      { "lat": -33.47345, "lon": -70.59584, "rumbo": 93 },
-      { "lat": -33.47479, "lon": -70.62001, "rumbo": 87 }
+      { "lat": -33.47181, "lon": -70.58074, "rumbo": 59 },
+      { "lat": -33.47009, "lon": -70.57793, "rumbo": 238 },
+      { "lat": -33.47364, "lon": -70.59617, "rumbo": 275 },
+      { "lat": -33.47403, "lon": -70.60525, "rumbo": 266 },
+      { "lat": -33.47483, "lon": -70.62059, "rumbo": 267 },
+      { "lat": -33.47451, "lon": -70.61436, "rumbo": 86 }
     ],
     "nivel": 3
   },
@@ -2087,20 +2120,20 @@
     "tipo": "calle",
     "comuna": "La Pintana",
     "puntos": [
-      { "lat": -33.62557, "lon": -70.6284, "rumbo": 8 },
-      { "lat": -33.5241, "lon": -70.63605, "rumbo": 175 },
-      { "lat": -33.60464, "lon": -70.62717, "rumbo": 357 },
-      { "lat": -33.48877, "lon": -70.64086, "rumbo": 354 },
-      { "lat": -33.51453, "lon": -70.63724, "rumbo": 175 },
-      { "lat": -33.57376, "lon": -70.62992, "rumbo": 176 },
-      { "lat": -33.60087, "lon": -70.62728, "rumbo": 178 },
-      { "lat": -33.50472, "lon": -70.63867, "rumbo": 175 },
-      { "lat": -33.5946, "lon": -70.62755, "rumbo": 356 },
-      { "lat": -33.6322, "lon": -70.62955, "rumbo": 191 },
-      { "lat": -33.4827, "lon": -70.64165, "rumbo": 354 },
-      { "lat": -33.56964, "lon": -70.63, "rumbo": 177 },
-      { "lat": -33.56673, "lon": -70.6302, "rumbo": 358 },
-      { "lat": -33.53328, "lon": -70.63476, "rumbo": 354 }
+      { "lat": -33.47767, "lon": -70.64236, "rumbo": 152, "pista": "cerca del Zanjón de la Aguada" },
+      { "lat": -33.53674, "lon": -70.63449, "rumbo": 358, "pista": "cerca del Estadio San Gregorio" },
+      { "lat": -33.44266, "lon": -70.64585, "rumbo": 34, "pista": "junto a Biblioteca Nacional" },
+      { "lat": -33.46132, "lon": -70.6429, "rumbo": 174 },
+      { "lat": -33.52482, "lon": -70.63597, "rumbo": 355 },
+      { "lat": -33.46991, "lon": -70.64226, "rumbo": 177 },
+      { "lat": -33.4573, "lon": -70.64337, "rumbo": 353 },
+      { "lat": -33.51366, "lon": -70.63735, "rumbo": 355 },
+      { "lat": -33.56145, "lon": -70.63068, "rumbo": 178 },
+      { "lat": -33.60704, "lon": -70.62674, "rumbo": 177 },
+      { "lat": -33.50334, "lon": -70.63913, "rumbo": 175 },
+      { "lat": -33.59933, "lon": -70.62708, "rumbo": 176 },
+      { "lat": -33.48499, "lon": -70.64104, "rumbo": 174 },
+      { "lat": -33.58477, "lon": -70.62851, "rumbo": 174 }
     ],
     "nivel": 1
   },
@@ -2109,20 +2142,20 @@
     "tipo": "calle",
     "comuna": "San Miguel",
     "puntos": [
-      { "lat": -33.55674, "lon": -70.67712, "rumbo": 34 },
-      { "lat": -33.56343, "lon": -70.68239, "rumbo": 214 },
-      { "lat": -33.51355, "lon": -70.65788, "rumbo": 13 },
-      { "lat": -33.52941, "lon": -70.66229, "rumbo": 193 },
-      { "lat": -33.54874, "lon": -70.67083, "rumbo": 213 },
-      { "lat": -33.58092, "lon": -70.69559, "rumbo": 31 },
-      { "lat": -33.57515, "lon": -70.69134, "rumbo": 32 },
-      { "lat": -33.52553, "lon": -70.66124, "rumbo": 13 },
-      { "lat": -33.48948, "lon": -70.65097, "rumbo": 13 },
-      { "lat": -33.54123, "lon": -70.66519, "rumbo": 13 },
-      { "lat": -33.56015, "lon": -70.67963, "rumbo": 214 },
-      { "lat": -33.56629, "lon": -70.68471, "rumbo": 214 },
-      { "lat": -33.51078, "lon": -70.65705, "rumbo": 194 },
-      { "lat": -33.55267, "lon": -70.67389, "rumbo": 33 }
+      { "lat": -33.47766, "lon": -70.64803, "rumbo": 181, "pista": "cerca del Zanjón de la Aguada" },
+      { "lat": -33.52, "lon": -70.65968, "rumbo": 14, "pista": "muchas automotoras a los lados" },
+      { "lat": -33.55832, "lon": -70.67833, "rumbo": 34 },
+      { "lat": -33.5367, "lon": -70.66402, "rumbo": 190 },
+      { "lat": -33.48559, "lon": -70.65005, "rumbo": 193 },
+      { "lat": -33.50117, "lon": -70.65433, "rumbo": 14 },
+      { "lat": -33.57983, "lon": -70.69479, "rumbo": 211 },
+      { "lat": -33.51192, "lon": -70.65723, "rumbo": 13 },
+      { "lat": -33.57193, "lon": -70.68898, "rumbo": 211 },
+      { "lat": -33.49169, "lon": -70.65154, "rumbo": 191 },
+      { "lat": -33.58449, "lon": -70.69822, "rumbo": 47 },
+      { "lat": -33.56267, "lon": -70.68179, "rumbo": 34 },
+      { "lat": -33.56872, "lon": -70.68667, "rumbo": 212 },
+      { "lat": -33.49604, "lon": -70.65289, "rumbo": 193 }
     ],
     "nivel": 1
   },
@@ -2131,11 +2164,11 @@
     "tipo": "calle",
     "comuna": "Santiago",
     "puntos": [
-      { "lat": -33.46008, "lon": -70.6525, "rumbo": 262 },
-      { "lat": -33.45791, "lon": -70.64189, "rumbo": 256 },
-      { "lat": -33.45525, "lon": -70.62821, "rumbo": 88 },
-      { "lat": -33.45672, "lon": -70.63543, "rumbo": 256 },
-      { "lat": -33.45937, "lon": -70.64869, "rumbo": 255 }
+      { "lat": -33.4605, "lon": -70.65663, "rumbo": 262, "pista": "junto a Parque O'Higgins" },
+      { "lat": -33.45976, "lon": -70.65002, "rumbo": 82 },
+      { "lat": -33.45766, "lon": -70.64071, "rumbo": 256 },
+      { "lat": -33.4556, "lon": -70.63069, "rumbo": 256 },
+      { "lat": -33.45843, "lon": -70.64437, "rumbo": 76 }
     ],
     "nivel": 2
   },
@@ -2144,9 +2177,9 @@
     "tipo": "calle",
     "comuna": "Providencia",
     "puntos": [
-      { "lat": -33.45218, "lon": -70.62891, "rumbo": 167 },
-      { "lat": -33.44747, "lon": -70.63023, "rumbo": 346 },
-      { "lat": -33.44073, "lon": -70.63144, "rumbo": 168 }
+      { "lat": -33.44342, "lon": -70.63083, "rumbo": 350, "pista": "junto a «Feria Parque Bustamante»" },
+      { "lat": -33.43694, "lon": -70.63329, "rumbo": 160, "pista": "junto a Plaza Italia" },
+      { "lat": -33.45229, "lon": -70.62916, "rumbo": 168 }
     ],
     "nivel": 4
   },
@@ -2155,16 +2188,16 @@
     "tipo": "calle",
     "comuna": "Recoleta",
     "puntos": [
-      { "lat": -33.38324, "lon": -70.64069, "rumbo": 18 },
-      { "lat": -33.37293, "lon": -70.63626, "rumbo": 19 },
-      { "lat": -33.41631, "lon": -70.64373, "rumbo": 0 },
-      { "lat": -33.36401, "lon": -70.63263, "rumbo": 20 },
-      { "lat": -33.35929, "lon": -70.63059, "rumbo": 17 },
-      { "lat": -33.39683, "lon": -70.64277, "rumbo": 2 },
-      { "lat": -33.40989, "lon": -70.64338, "rumbo": 182 },
-      { "lat": -33.39122, "lon": -70.64251, "rumbo": 3 },
-      { "lat": -33.37748, "lon": -70.63819, "rumbo": 200 },
-      { "lat": -33.40083, "lon": -70.64287, "rumbo": 177 }
+      { "lat": -33.42274, "lon": -70.64496, "rumbo": 193, "pista": "junto a Cerro Blanco" },
+      { "lat": -33.43037, "lon": -70.64737, "rumbo": 194 },
+      { "lat": -33.37357, "lon": -70.63653, "rumbo": 19 },
+      { "lat": -33.41532, "lon": -70.64368, "rumbo": 2 },
+      { "lat": -33.36481, "lon": -70.63299, "rumbo": 19 },
+      { "lat": -33.35904, "lon": -70.63044, "rumbo": 217 },
+      { "lat": -33.36851, "lon": -70.63454, "rumbo": 19 },
+      { "lat": -33.41109, "lon": -70.64343, "rumbo": 182 },
+      { "lat": -33.37957, "lon": -70.6391, "rumbo": 18 },
+      { "lat": -33.38859, "lon": -70.6423, "rumbo": 182 }
     ],
     "nivel": 1
   },
@@ -2173,18 +2206,17 @@
     "tipo": "calle",
     "comuna": "Conchalí",
     "puntos": [
-      { "lat": -33.42376, "lon": -70.65514, "rumbo": 345 },
-      { "lat": -33.37962, "lon": -70.68338, "rumbo": 348 },
-      { "lat": -33.36641, "lon": -70.68915, "rumbo": 188 },
-      { "lat": -33.39165, "lon": -70.67458, "rumbo": 152 },
-      { "lat": -33.40484, "lon": -70.66256, "rumbo": 323 },
-      { "lat": -33.37463, "lon": -70.6857, "rumbo": 331 },
-      { "lat": -33.39769, "lon": -70.66956, "rumbo": 131 },
-      { "lat": -33.42929, "lon": -70.6536, "rumbo": 347 },
-      { "lat": -33.41836, "lon": -70.65636, "rumbo": 164 },
-      { "lat": -33.41195, "lon": -70.65889, "rumbo": 339 },
-      { "lat": -33.38705, "lon": -70.67817, "rumbo": 326 },
-      { "lat": -33.38342, "lon": -70.68146, "rumbo": 144 }
+      { "lat": -33.42163, "lon": -70.65551, "rumbo": 172 },
+      { "lat": -33.37915, "lon": -70.68362, "rumbo": 347 },
+      { "lat": -33.36422, "lon": -70.68935, "rumbo": 352 },
+      { "lat": -33.39522, "lon": -70.6723, "rumbo": 332 },
+      { "lat": -33.39833, "lon": -70.66925, "rumbo": 314 },
+      { "lat": -33.37122, "lon": -70.68778, "rumbo": 155 },
+      { "lat": -33.40926, "lon": -70.65992, "rumbo": 160 },
+      { "lat": -33.4271, "lon": -70.65424, "rumbo": 167 },
+      { "lat": -33.418, "lon": -70.65624, "rumbo": 349 },
+      { "lat": -33.39137, "lon": -70.67473, "rumbo": 152 },
+      { "lat": -33.38379, "lon": -70.68099, "rumbo": 324 }
     ],
     "nivel": 1
   },
@@ -2193,9 +2225,9 @@
     "tipo": "calle",
     "comuna": "Santiago",
     "puntos": [
-      { "lat": -33.44286, "lon": -70.67965, "rumbo": 356 },
-      { "lat": -33.43906, "lon": -70.68006, "rumbo": 175 },
-      { "lat": -33.44768, "lon": -70.67924, "rumbo": 176 }
+      { "lat": -33.44749, "lon": -70.67926, "rumbo": 356, "pista": "junto a una feria o mercado" },
+      { "lat": -33.43981, "lon": -70.68, "rumbo": 175, "pista": "junto a Museo de la Memoria" },
+      { "lat": -33.42991, "lon": -70.68073, "rumbo": 178 }
     ],
     "nivel": 2
   },
@@ -2204,13 +2236,13 @@
     "tipo": "calle",
     "comuna": "Quinta Normal",
     "puntos": [
-      { "lat": -33.4292, "lon": -70.70036, "rumbo": 283 },
-      { "lat": -33.43209, "lon": -70.6619, "rumbo": 268 },
-      { "lat": -33.42302, "lon": -70.73744, "rumbo": 275 },
-      { "lat": -33.4261, "lon": -70.7164, "rumbo": 103 },
-      { "lat": -33.43231, "lon": -70.68988, "rumbo": 288 },
-      { "lat": -33.42719, "lon": -70.71082, "rumbo": 283 },
-      { "lat": -33.42828, "lon": -70.70524, "rumbo": 282 }
+      { "lat": -33.43237, "lon": -70.6599, "rumbo": 225 },
+      { "lat": -33.42385, "lon": -70.72483, "rumbo": 94 },
+      { "lat": -33.42342, "lon": -70.73294, "rumbo": 275 },
+      { "lat": -33.42614, "lon": -70.71619, "rumbo": 103 },
+      { "lat": -33.43284, "lon": -70.679, "rumbo": 263 },
+      { "lat": -33.43204, "lon": -70.66429, "rumbo": 90 },
+      { "lat": -33.43284, "lon": -70.68509, "rumbo": 93 }
     ],
     "nivel": 3
   },
@@ -2219,18 +2251,18 @@
     "tipo": "calle",
     "comuna": "Pudahuel",
     "puntos": [
-      { "lat": -33.44389, "lon": -70.78145, "rumbo": 92 },
-      { "lat": -33.44316, "lon": -70.71531, "rumbo": 81 },
-      { "lat": -33.43431, "lon": -70.65357, "rumbo": 88 },
-      { "lat": -33.44386, "lon": -70.75593, "rumbo": 101 },
-      { "lat": -33.43454, "lon": -70.66024, "rumbo": 89 },
-      { "lat": -33.43686, "lon": -70.68596, "rumbo": 256 },
-      { "lat": -33.43507, "lon": -70.67385, "rumbo": 85 },
-      { "lat": -33.4432, "lon": -70.77008, "rumbo": 78 },
-      { "lat": -33.44455, "lon": -70.73431, "rumbo": 269 },
-      { "lat": -33.44469, "lon": -70.74118, "rumbo": 271 },
-      { "lat": -33.44472, "lon": -70.74531, "rumbo": 91 },
-      { "lat": -33.44391, "lon": -70.72043, "rumbo": 81 }
+      { "lat": -33.4342, "lon": -70.65097, "rumbo": 85, "pista": "junto a «Mercado Central de Santiago»" },
+      { "lat": -33.44386, "lon": -70.78108, "rumbo": 274 },
+      { "lat": -33.44344, "lon": -70.71734, "rumbo": 261 },
+      { "lat": -33.44359, "lon": -70.77273, "rumbo": 78 },
+      { "lat": -33.44344, "lon": -70.75751, "rumbo": 291 },
+      { "lat": -33.44308, "lon": -70.78862, "rumbo": 103 },
+      { "lat": -33.43679, "lon": -70.68564, "rumbo": 256 },
+      { "lat": -33.43499, "lon": -70.67101, "rumbo": 88 },
+      { "lat": -33.44309, "lon": -70.76947, "rumbo": 258 },
+      { "lat": -33.43896, "lon": -70.69718, "rumbo": 82 },
+      { "lat": -33.44456, "lon": -70.73541, "rumbo": 269 },
+      { "lat": -33.44476, "lon": -70.74586, "rumbo": 271 }
     ],
     "nivel": 1
   },
@@ -2239,15 +2271,15 @@
     "tipo": "calle",
     "comuna": "Maipú",
     "puntos": [
-      { "lat": -33.49668, "lon": -70.75739, "rumbo": 3 },
-      { "lat": -33.52481, "lon": -70.75735, "rumbo": 358 },
-      { "lat": -33.47998, "lon": -70.74336, "rumbo": 35 },
-      { "lat": -33.50281, "lon": -70.7574, "rumbo": 180 },
-      { "lat": -33.51218, "lon": -70.75726, "rumbo": 359 },
-      { "lat": -33.48608, "lon": -70.74806, "rumbo": 48 },
-      { "lat": -33.51905, "lon": -70.7574, "rumbo": 0 },
-      { "lat": -33.47671, "lon": -70.74142, "rumbo": 211 },
-      { "lat": -33.48325, "lon": -70.74641, "rumbo": 28 }
+      { "lat": -33.49078, "lon": -70.75424, "rumbo": 41, "pista": "cerca del Zanjón de la Aguada" },
+      { "lat": -33.52638, "lon": -70.75725, "rumbo": 357 },
+      { "lat": -33.50184, "lon": -70.75737, "rumbo": 179 },
+      { "lat": -33.48503, "lon": -70.74692, "rumbo": 39 },
+      { "lat": -33.5065, "lon": -70.75737, "rumbo": 179 },
+      { "lat": -33.47571, "lon": -70.74, "rumbo": 212 },
+      { "lat": -33.48757, "lon": -70.75042, "rumbo": 227 },
+      { "lat": -33.48233, "lon": -70.74583, "rumbo": 30 },
+      { "lat": -33.51108, "lon": -70.7573, "rumbo": 359 }
     ],
     "nivel": 2
   },
@@ -2256,19 +2288,20 @@
     "tipo": "calle",
     "comuna": "Cerrillos",
     "puntos": [
-      { "lat": -33.54669, "lon": -70.70846, "rumbo": 5 },
-      { "lat": -33.55152, "lon": -70.70902, "rumbo": 4 },
-      { "lat": -33.53486, "lon": -70.7067, "rumbo": 193 },
-      { "lat": -33.5374, "lon": -70.70793, "rumbo": 189 },
-      { "lat": -33.47634, "lon": -70.68628, "rumbo": 152 },
-      { "lat": -33.49212, "lon": -70.69051, "rumbo": 198 },
-      { "lat": -33.44683, "lon": -70.69209, "rumbo": 184 },
-      { "lat": -33.48289, "lon": -70.68656, "rumbo": 18 },
-      { "lat": -33.50273, "lon": -70.69549, "rumbo": 202 },
-      { "lat": -33.51428, "lon": -70.70132, "rumbo": 202 },
-      { "lat": -33.51158, "lon": -70.69916, "rumbo": 202 },
-      { "lat": -33.40498, "lon": -70.69567, "rumbo": 339 },
-      { "lat": -33.41652, "lon": -70.69096, "rumbo": 138 }
+      { "lat": -33.41916, "lon": -70.69035, "rumbo": 180, "pista": "cerca del río Mapocho" },
+      { "lat": -33.47675, "lon": -70.68576, "rumbo": 337, "pista": "cerca del Zanjón de la Aguada" },
+      { "lat": -33.40498, "lon": -70.69546, "rumbo": 339, "pista": "cerca del Estadio Los Tilos" },
+      { "lat": -33.54152, "lon": -70.70842, "rumbo": 182 },
+      { "lat": -33.53188, "lon": -70.70647, "rumbo": 192 },
+      { "lat": -33.52106, "lon": -70.70436, "rumbo": 199 },
+      { "lat": -33.55035, "lon": -70.70889, "rumbo": 7 },
+      { "lat": -33.48593, "lon": -70.68792, "rumbo": 21 },
+      { "lat": -33.513, "lon": -70.69987, "rumbo": 22 },
+      { "lat": -33.50889, "lon": -70.69785, "rumbo": 22 },
+      { "lat": -33.50591, "lon": -70.6972, "rumbo": 202 },
+      { "lat": -33.50263, "lon": -70.6956, "rumbo": 22 },
+      { "lat": -33.39164, "lon": -70.70025, "rumbo": 202 },
+      { "lat": -33.41372, "lon": -70.69229, "rumbo": 352 }
     ],
     "nivel": 2
   },
@@ -2277,20 +2310,20 @@
     "tipo": "calle",
     "comuna": "San Bernardo",
     "puntos": [
-      { "lat": -33.47867, "lon": -70.65576, "rumbo": 19 },
-      { "lat": -33.47155, "lon": -70.65594, "rumbo": 336 },
-      { "lat": -33.46359, "lon": -70.65651, "rumbo": 177 },
-      { "lat": -33.42056, "lon": -70.67661, "rumbo": 128 },
-      { "lat": -33.54366, "lon": -70.69009, "rumbo": 234 },
-      { "lat": -33.563, "lon": -70.71088, "rumbo": 187 },
-      { "lat": -33.65268, "lon": -70.7138, "rumbo": 20 },
-      { "lat": -33.37783, "lon": -70.6949, "rumbo": 339 },
-      { "lat": -33.53761, "lon": -70.68471, "rumbo": 24 },
-      { "lat": -33.69654, "lon": -70.72313, "rumbo": 346 },
-      { "lat": -33.51373, "lon": -70.6724, "rumbo": 202 },
-      { "lat": -33.57077, "lon": -70.71229, "rumbo": 187 },
-      { "lat": -33.63082, "lon": -70.71356, "rumbo": 173 },
-      { "lat": -33.43406, "lon": -70.66071, "rumbo": 175 }
+      { "lat": -33.47715, "lon": -70.65502, "rumbo": 201, "pista": "cerca del Zanjón de la Aguada" },
+      { "lat": -33.51894, "lon": -70.67511, "rumbo": 202, "pista": "cerca del Estadio Clara Estrella" },
+      { "lat": -33.46089, "lon": -70.65703, "rumbo": 177, "pista": "junto a Parque O'Higgins" },
+      { "lat": -33.40403, "lon": -70.68143, "rumbo": 155 },
+      { "lat": -33.5296, "lon": -70.68041, "rumbo": 24 },
+      { "lat": -33.61214, "lon": -70.71608, "rumbo": 354 },
+      { "lat": -33.42423, "lon": -70.6727, "rumbo": 146 },
+      { "lat": -33.64571, "lon": -70.71153, "rumbo": 6 },
+      { "lat": -33.36605, "lon": -70.70023, "rumbo": 159 },
+      { "lat": -33.41074, "lon": -70.67958, "rumbo": 174 },
+      { "lat": -33.3733, "lon": -70.69697, "rumbo": 340 },
+      { "lat": -33.59365, "lon": -70.71523, "rumbo": 186 },
+      { "lat": -33.41848, "lon": -70.6783, "rumbo": 152 },
+      { "lat": -33.62634, "lon": -70.71411, "rumbo": 353 }
     ],
     "nivel": 2
   },
@@ -2299,17 +2332,19 @@
     "tipo": "calle",
     "comuna": "Maipú",
     "puntos": [
-      { "lat": -33.49319, "lon": -70.753, "rumbo": 69 },
-      { "lat": -33.52406, "lon": -70.79908, "rumbo": 359 },
-      { "lat": -33.55303, "lon": -70.81403, "rumbo": 62 },
-      { "lat": -33.53199, "lon": -70.80021, "rumbo": 17 },
-      { "lat": -33.47684, "lon": -70.67834, "rumbo": 90 },
-      { "lat": -33.49485, "lon": -70.77393, "rumbo": 255 },
-      { "lat": -33.47774, "lon": -70.68992, "rumbo": 253 },
-      { "lat": -33.48194, "lon": -70.70886, "rumbo": 75 },
-      { "lat": -33.48396, "lon": -70.7263, "rumbo": 87 },
-      { "lat": -33.47626, "lon": -70.66278, "rumbo": 272 },
-      { "lat": -33.48889, "lon": -70.74717, "rumbo": 45 }
+      { "lat": -33.4788, "lon": -70.69482, "rumbo": 256, "pista": "cerca del Zanjón de la Aguada" },
+      { "lat": -33.47699, "lon": -70.68578, "rumbo": 270 },
+      { "lat": -33.55081, "lon": -70.81043, "rumbo": 47 },
+      { "lat": -33.55268, "lon": -70.81327, "rumbo": 57 },
+      { "lat": -33.51395, "lon": -70.79918, "rumbo": 359 },
+      { "lat": -33.47674, "lon": -70.67228, "rumbo": 90 },
+      { "lat": -33.47684, "lon": -70.67848, "rumbo": 270 },
+      { "lat": -33.49435, "lon": -70.77163, "rumbo": 255 },
+      { "lat": -33.48342, "lon": -70.71751, "rumbo": 264 },
+      { "lat": -33.48441, "lon": -70.73691, "rumbo": 87 },
+      { "lat": -33.47641, "lon": -70.66104, "rumbo": 288 },
+      { "lat": -33.51093, "lon": -70.79926, "rumbo": 181 },
+      { "lat": -33.49367, "lon": -70.75491, "rumbo": 264 }
     ],
     "nivel": 2
   },
@@ -2318,11 +2353,15 @@
     "tipo": "calle",
     "comuna": "Pudahuel",
     "puntos": [
-      { "lat": -33.44417, "lon": -70.78759, "rumbo": 103 },
-      { "lat": -33.45319, "lon": -70.73995, "rumbo": 283 },
-      { "lat": -33.45496, "lon": -70.73095, "rumbo": 103 },
-      { "lat": -33.45132, "lon": -70.75056, "rumbo": 103 },
-      { "lat": -33.44112, "lon": -70.80328, "rumbo": 103 }
+      { "lat": -33.43762, "lon": -70.82125, "rumbo": 103, "pista": "cerca del río Mapocho" },
+      { "lat": -33.44239, "lon": -70.79672, "rumbo": 103 },
+      { "lat": -33.45164, "lon": -70.74825, "rumbo": 283 },
+      { "lat": -33.4483, "lon": -70.76552, "rumbo": 283 },
+      { "lat": -33.45366, "lon": -70.73834, "rumbo": 283 },
+      { "lat": -33.45792, "lon": -70.7157, "rumbo": 283 },
+      { "lat": -33.45002, "lon": -70.75719, "rumbo": 283 },
+      { "lat": -33.43832, "lon": -70.81727, "rumbo": 283 },
+      { "lat": -33.43986, "lon": -70.80982, "rumbo": 103 }
     ],
     "nivel": 2
   },
@@ -2331,17 +2370,19 @@
     "tipo": "calle",
     "comuna": "La Florida",
     "puntos": [
-      { "lat": -33.5208, "lon": -70.57993, "rumbo": 154 },
-      { "lat": -33.54121, "lon": -70.57124, "rumbo": 340 },
-      { "lat": -33.53391, "lon": -70.574, "rumbo": 340 },
-      { "lat": -33.55318, "lon": -70.56367, "rumbo": 320 },
-      { "lat": -33.54916, "lon": -70.56715, "rumbo": 146 },
-      { "lat": -33.52637, "lon": -70.57703, "rumbo": 160 },
-      { "lat": -33.51146, "lon": -70.58716, "rumbo": 329 },
-      { "lat": -33.53803, "lon": -70.5725, "rumbo": 342 },
-      { "lat": -33.54635, "lon": -70.56901, "rumbo": 338 },
-      { "lat": -33.52908, "lon": -70.5759, "rumbo": 341 },
-      { "lat": -33.51492, "lon": -70.5849, "rumbo": 329 }
+      { "lat": -33.51358, "lon": -70.58589, "rumbo": 149, "pista": "cerca del Zanjón de la Aguada" },
+      { "lat": -33.52718, "lon": -70.57659, "rumbo": 161 },
+      { "lat": -33.54226, "lon": -70.57038, "rumbo": 341 },
+      { "lat": -33.53013, "lon": -70.57573, "rumbo": 160 },
+      { "lat": -33.55811, "lon": -70.55962, "rumbo": 328 },
+      { "lat": -33.54805, "lon": -70.56805, "rumbo": 326 },
+      { "lat": -33.54552, "lon": -70.56924, "rumbo": 337 },
+      { "lat": -33.53849, "lon": -70.57213, "rumbo": 161 },
+      { "lat": -33.51706, "lon": -70.58323, "rumbo": 148 },
+      { "lat": -33.51109, "lon": -70.58745, "rumbo": 329 },
+      { "lat": -33.56048, "lon": -70.55766, "rumbo": 140 },
+      { "lat": -33.52025, "lon": -70.57999, "rumbo": 326 },
+      { "lat": -33.52418, "lon": -70.57793, "rumbo": 340 }
     ],
     "nivel": 2
   },
@@ -2350,16 +2391,19 @@
     "tipo": "calle",
     "comuna": "Puente Alto",
     "puntos": [
-      { "lat": -33.60532, "lon": -70.5769, "rumbo": 351 },
-      { "lat": -33.59969, "lon": -70.57811, "rumbo": 171 },
-      { "lat": -33.57134, "lon": -70.58365, "rumbo": 171 },
-      { "lat": -33.59655, "lon": -70.57872, "rumbo": 171 },
-      { "lat": -33.62511, "lon": -70.57563, "rumbo": 195 },
-      { "lat": -33.58382, "lon": -70.58104, "rumbo": 350 },
-      { "lat": -33.58659, "lon": -70.58067, "rumbo": 170 },
-      { "lat": -33.59061, "lon": -70.57941, "rumbo": 351 },
-      { "lat": -33.57732, "lon": -70.58249, "rumbo": 351 },
-      { "lat": -33.61759, "lon": -70.57429, "rumbo": 171 }
+      { "lat": -33.62648, "lon": -70.57575, "rumbo": 338, "pista": "cerca del río Maipo" },
+      { "lat": -33.57656, "lon": -70.58213, "rumbo": 350, "pista": "junto a una feria o mercado" },
+      { "lat": -33.60102, "lon": -70.57733, "rumbo": 170, "pista": "junto a «Feria Artesanal»" },
+      { "lat": -33.6343, "lon": -70.57355, "rumbo": 159 },
+      { "lat": -33.5928, "lon": -70.57938, "rumbo": 171 },
+      { "lat": -33.60756, "lon": -70.57626, "rumbo": 350 },
+      { "lat": -33.59582, "lon": -70.57878, "rumbo": 351 },
+      { "lat": -33.58097, "lon": -70.58126, "rumbo": 171 },
+      { "lat": -33.62265, "lon": -70.57366, "rumbo": 173 },
+      { "lat": -33.58427, "lon": -70.58094, "rumbo": 350 },
+      { "lat": -33.59008, "lon": -70.57949, "rumbo": 171 },
+      { "lat": -33.6182, "lon": -70.57433, "rumbo": 351 },
+      { "lat": -33.57002, "lon": -70.58346, "rumbo": 170 }
     ],
     "nivel": 2
   },
@@ -2368,17 +2412,17 @@
     "tipo": "calle",
     "comuna": "Renca",
     "puntos": [
-      { "lat": -33.39602, "lon": -70.64647, "rumbo": 97 },
-      { "lat": -33.39769, "lon": -70.64061, "rumbo": 297 },
-      { "lat": -33.39769, "lon": -70.66884, "rumbo": 66 },
-      { "lat": -33.39555, "lon": -70.65286, "rumbo": 278 },
-      { "lat": -33.39628, "lon": -70.66141, "rumbo": 260 },
-      { "lat": -33.39909, "lon": -70.63485, "rumbo": 106 },
-      { "lat": -33.40792, "lon": -70.70518, "rumbo": 195 },
-      { "lat": -33.39994, "lon": -70.69668, "rumbo": 262 },
-      { "lat": -33.40106, "lon": -70.6919, "rumbo": 111 },
-      { "lat": -33.40474, "lon": -70.70347, "rumbo": 26 },
-      { "lat": -33.40267, "lon": -70.68304, "rumbo": 66 }
+      { "lat": -33.40827, "lon": -70.70531, "rumbo": 15, "pista": "cerca del río Mapocho" },
+      { "lat": -33.39611, "lon": -70.64583, "rumbo": 281 },
+      { "lat": -33.39705, "lon": -70.64224, "rumbo": 105 },
+      { "lat": -33.39535, "lon": -70.6527, "rumbo": 280 },
+      { "lat": -33.39909, "lon": -70.67133, "rumbo": 53 },
+      { "lat": -33.39646, "lon": -70.66123, "rumbo": 80 },
+      { "lat": -33.39831, "lon": -70.63836, "rumbo": 106 },
+      { "lat": -33.39965, "lon": -70.63167, "rumbo": 106 },
+      { "lat": -33.40294, "lon": -70.68412, "rumbo": 79 },
+      { "lat": -33.40206, "lon": -70.6887, "rumbo": 112 },
+      { "lat": -33.40315, "lon": -70.70252, "rumbo": 38 }
     ],
     "nivel": 3
   },
@@ -2387,10 +2431,10 @@
     "tipo": "calle",
     "comuna": "Huechuraba",
     "puntos": [
-      { "lat": -33.38359, "lon": -70.62126, "rumbo": 15 },
-      { "lat": -33.40448, "lon": -70.63237, "rumbo": 31 },
-      { "lat": -33.41132, "lon": -70.63699, "rumbo": 29 },
-      { "lat": -33.39387, "lon": -70.62566, "rumbo": 238 }
+      { "lat": -33.38297, "lon": -70.62105, "rumbo": 195 },
+      { "lat": -33.40291, "lon": -70.63122, "rumbo": 212 },
+      { "lat": -33.39086, "lon": -70.62371, "rumbo": 196 },
+      { "lat": -33.38729, "lon": -70.62261, "rumbo": 195 }
     ],
     "nivel": 3
   },
@@ -2399,10 +2443,9 @@
     "tipo": "calle",
     "comuna": "Estación Central",
     "puntos": [
-      { "lat": -33.46407, "lon": -70.705, "rumbo": 177 },
-      { "lat": -33.47156, "lon": -70.70446, "rumbo": 174 },
-      { "lat": -33.47449, "lon": -70.70342, "rumbo": 346 },
-      { "lat": -33.45932, "lon": -70.70532, "rumbo": 178 }
+      { "lat": -33.45846, "lon": -70.70557, "rumbo": 356 },
+      { "lat": -33.47313, "lon": -70.70381, "rumbo": 166 },
+      { "lat": -33.47918, "lon": -70.70188, "rumbo": 310 }
     ],
     "nivel": 2
   },
@@ -2411,15 +2454,14 @@
     "tipo": "calle",
     "comuna": "Pedro Aguirre Cerda",
     "puntos": [
-      { "lat": -33.47944, "lon": -70.64959, "rumbo": 99 },
-      { "lat": -33.47883, "lon": -70.66286, "rumbo": 93 },
-      { "lat": -33.47843, "lon": -70.67513, "rumbo": 91 },
-      { "lat": -33.48214, "lon": -70.63746, "rumbo": 109 },
-      { "lat": -33.48616, "lon": -70.62345, "rumbo": 289 },
-      { "lat": -33.47878, "lon": -70.66811, "rumbo": 89 },
-      { "lat": -33.48473, "lon": -70.62837, "rumbo": 289 },
-      { "lat": -33.47821, "lon": -70.68807, "rumbo": 91 },
-      { "lat": -33.47866, "lon": -70.65605, "rumbo": 88 }
+      { "lat": -33.48427, "lon": -70.63009, "rumbo": 289 },
+      { "lat": -33.47879, "lon": -70.66046, "rumbo": 273 },
+      { "lat": -33.47914, "lon": -70.6522, "rumbo": 99 },
+      { "lat": -33.48115, "lon": -70.64089, "rumbo": 289 },
+      { "lat": -33.48262, "lon": -70.6358, "rumbo": 109 },
+      { "lat": -33.47811, "lon": -70.68435, "rumbo": 273 },
+      { "lat": -33.48536, "lon": -70.62633, "rumbo": 109 },
+      { "lat": -33.47865, "lon": -70.66884, "rumbo": 270 }
     ],
     "nivel": 3
   },
@@ -2428,9 +2470,9 @@
     "tipo": "calle",
     "comuna": "Santiago",
     "puntos": [
-      { "lat": -33.43059, "lon": -70.66309, "rumbo": 85 },
-      { "lat": -33.43191, "lon": -70.65736, "rumbo": 106 },
-      { "lat": -33.42745, "lon": -70.67443, "rumbo": 112 }
+      { "lat": -33.42816, "lon": -70.67232, "rumbo": 112, "pista": "junto a una feria o mercado" },
+      { "lat": -33.43059, "lon": -70.66309, "rumbo": 265 },
+      { "lat": -33.43134, "lon": -70.65929, "rumbo": 112 }
     ],
     "nivel": 4
   },
@@ -2439,9 +2481,9 @@
     "tipo": "calle",
     "comuna": "Providencia",
     "puntos": [
-      { "lat": -33.43844, "lon": -70.60357, "rumbo": 163 },
-      { "lat": -33.43429, "lon": -70.60511, "rumbo": 162 },
-      { "lat": -33.44513, "lon": -70.60291, "rumbo": 353 }
+      { "lat": -33.43922, "lon": -70.60328, "rumbo": 163 },
+      { "lat": -33.44359, "lon": -70.6031, "rumbo": 174 },
+      { "lat": -33.44786, "lon": -70.60254, "rumbo": 173 }
     ],
     "nivel": 4
   },
@@ -2450,12 +2492,12 @@
     "tipo": "calle",
     "comuna": "Ñuñoa",
     "puntos": [
-      { "lat": -33.44998, "lon": -70.60275, "rumbo": 80 },
-      { "lat": -33.4457, "lon": -70.55806, "rumbo": 258 },
-      { "lat": -33.44807, "lon": -70.57325, "rumbo": 88 },
-      { "lat": -33.44411, "lon": -70.54678, "rumbo": 273 },
-      { "lat": -33.44843, "lon": -70.58416, "rumbo": 87 },
-      { "lat": -33.4442, "lon": -70.55093, "rumbo": 258 }
+      { "lat": -33.44692, "lon": -70.56361, "rumbo": 246, "pista": "cerca del canal San Carlos" },
+      { "lat": -33.44851, "lon": -70.58869, "rumbo": 89 },
+      { "lat": -33.44912, "lon": -70.59688, "rumbo": 259 },
+      { "lat": -33.44808, "lon": -70.57442, "rumbo": 88 },
+      { "lat": -33.44749, "lon": -70.56696, "rumbo": 82 },
+      { "lat": -33.44845, "lon": -70.58449, "rumbo": 267 }
     ],
     "nivel": 3
   },
@@ -2464,13 +2506,14 @@
     "tipo": "calle",
     "comuna": "Macul",
     "puntos": [
-      { "lat": -33.48791, "lon": -70.61219, "rumbo": 355 },
-      { "lat": -33.48274, "lon": -70.61323, "rumbo": 176 },
-      { "lat": -33.47803, "lon": -70.61316, "rumbo": 357 },
-      { "lat": -33.47142, "lon": -70.61411, "rumbo": 175 },
-      { "lat": -33.49118, "lon": -70.61184, "rumbo": 351 },
-      { "lat": -33.50669, "lon": -70.60855, "rumbo": 225 },
-      { "lat": -33.49929, "lon": -70.60535, "rumbo": 186 }
+      { "lat": -33.49711, "lon": -70.60511, "rumbo": 5, "pista": "cerca del Zanjón de la Aguada" },
+      { "lat": -33.50556, "lon": -70.60749, "rumbo": 215, "pista": "cerca del Estadio Monumental" },
+      { "lat": -33.49152, "lon": -70.61176, "rumbo": 339 },
+      { "lat": -33.47586, "lon": -70.6137, "rumbo": 176 },
+      { "lat": -33.46967, "lon": -70.61377, "rumbo": 177 },
+      { "lat": -33.48474, "lon": -70.61308, "rumbo": 177 },
+      { "lat": -33.46366, "lon": -70.61513, "rumbo": 357 },
+      { "lat": -33.50823, "lon": -70.61057, "rumbo": 191 }
     ],
     "nivel": 3
   },
@@ -2479,9 +2522,9 @@
     "tipo": "calle",
     "comuna": "Lo Barnechea",
     "puntos": [
-      { "lat": -33.35163, "lon": -70.51094, "rumbo": 259 },
-      { "lat": -33.35293, "lon": -70.52012, "rumbo": 79 },
-      { "lat": -33.35106, "lon": -70.50642, "rumbo": 98 }
+      { "lat": -33.35744, "lon": -70.52453, "rumbo": 343 },
+      { "lat": -33.35355, "lon": -70.52261, "rumbo": 64 },
+      { "lat": -33.3511, "lon": -70.50779, "rumbo": 80 }
     ],
     "nivel": 4
   },
@@ -2490,11 +2533,11 @@
     "tipo": "calle",
     "comuna": "Las Condes",
     "puntos": [
-      { "lat": -33.40232, "lon": -70.56987, "rumbo": 240 },
-      { "lat": -33.40683, "lon": -70.58105, "rumbo": 229 },
-      { "lat": -33.39841, "lon": -70.56542, "rumbo": 73 },
-      { "lat": -33.39585, "lon": -70.55614, "rumbo": 73 },
-      { "lat": -33.4119, "lon": -70.60122, "rumbo": 284 }
+      { "lat": -33.40148, "lon": -70.56784, "rumbo": 53 },
+      { "lat": -33.40895, "lon": -70.58394, "rumbo": 49 },
+      { "lat": -33.40289, "lon": -70.57091, "rumbo": 63 },
+      { "lat": -33.40543, "lon": -70.57771, "rumbo": 80 },
+      { "lat": -33.41197, "lon": -70.6009, "rumbo": 104 }
     ],
     "nivel": 3
   },
@@ -2503,9 +2546,8 @@
     "tipo": "calle",
     "comuna": "Las Condes",
     "puntos": [
-      { "lat": -33.42069, "lon": -70.55019, "rumbo": 319 },
-      { "lat": -33.41487, "lon": -70.55711, "rumbo": 311 },
-      { "lat": -33.41084, "lon": -70.56261, "rumbo": 131 }
+      { "lat": -33.42728, "lon": -70.54328, "rumbo": 137 },
+      { "lat": -33.40888, "lon": -70.56568, "rumbo": 295 }
     ],
     "nivel": 4
   },
@@ -2514,10 +2556,9 @@
     "tipo": "calle",
     "comuna": "Las Condes",
     "puntos": [
-      { "lat": -33.40469, "lon": -70.53218, "rumbo": 218 },
-      { "lat": -33.40279, "lon": -70.51652, "rumbo": 257 },
-      { "lat": -33.40291, "lon": -70.52763, "rumbo": 92 },
-      { "lat": -33.40331, "lon": -70.52149, "rumbo": 275 }
+      { "lat": -33.40193, "lon": -70.51068, "rumbo": 59 },
+      { "lat": -33.40319, "lon": -70.51823, "rumbo": 257 },
+      { "lat": -33.40301, "lon": -70.52604, "rumbo": 95 }
     ],
     "nivel": 4
   },
@@ -2526,9 +2567,9 @@
     "tipo": "calle",
     "comuna": "Las Condes",
     "puntos": [
-      { "lat": -33.41443, "lon": -70.59516, "rumbo": 260 },
-      { "lat": -33.41425, "lon": -70.59856, "rumbo": 278 },
-      { "lat": -33.41397, "lon": -70.60213, "rumbo": 268 }
+      { "lat": -33.4143, "lon": -70.59436, "rumbo": 260, "pista": "junto a Sanhattan" },
+      { "lat": -33.41358, "lon": -70.60395, "rumbo": 294, "pista": "junto a Edificio Titanium" },
+      { "lat": -33.41413, "lon": -70.59994, "rumbo": 278 }
     ],
     "nivel": 4
   },
@@ -2537,9 +2578,10 @@
     "tipo": "calle",
     "comuna": "Providencia",
     "puntos": [
-      { "lat": -33.44458, "lon": -70.60115, "rumbo": 172 },
-      { "lat": -33.44935, "lon": -70.60049, "rumbo": 353 },
-      { "lat": -33.4262, "lon": -70.60593, "rumbo": 345 }
+      { "lat": -33.43775, "lon": -70.60224, "rumbo": 172, "pista": "muchas automotoras a los lados" },
+      { "lat": -33.44769, "lon": -70.6007, "rumbo": 353 },
+      { "lat": -33.45101, "lon": -70.60039, "rumbo": 176 },
+      { "lat": -33.41974, "lon": -70.6088, "rumbo": 329 }
     ],
     "nivel": 4
   },
@@ -2547,7 +2589,10 @@
     "nombre": "Los Conquistadores",
     "tipo": "calle",
     "comuna": "Providencia",
-    "puntos": [{ "lat": -33.41634, "lon": -70.61233, "rumbo": 223 }],
+    "puntos": [
+      { "lat": -33.4161, "lon": -70.61205, "rumbo": 223, "pista": "cerca del canal El Carmen" },
+      { "lat": -33.41995, "lon": -70.61638, "rumbo": 224 }
+    ],
     "nivel": 4
   },
   {
@@ -2555,9 +2600,9 @@
     "tipo": "calle",
     "comuna": "Ñuñoa",
     "puntos": [
-      { "lat": -33.44003, "lon": -70.62453, "rumbo": 346 },
-      { "lat": -33.45719, "lon": -70.62079, "rumbo": 184 },
-      { "lat": -33.43641, "lon": -70.6256, "rumbo": 346 }
+      { "lat": -33.45113, "lon": -70.62132, "rumbo": 166 },
+      { "lat": -33.45784, "lon": -70.62083, "rumbo": 4 },
+      { "lat": -33.438, "lon": -70.62515, "rumbo": 346 }
     ],
     "nivel": 4
   },
@@ -2566,9 +2611,9 @@
     "tipo": "calle",
     "comuna": "Santiago",
     "puntos": [
-      { "lat": -33.47259, "lon": -70.66333, "rumbo": 178 },
-      { "lat": -33.45918, "lon": -70.66391, "rumbo": 179 },
-      { "lat": -33.48326, "lon": -70.66313, "rumbo": 198 }
+      { "lat": -33.47202, "lon": -70.66338, "rumbo": 178, "pista": "cerca del Estadio Militar" },
+      { "lat": -33.45864, "lon": -70.6639, "rumbo": 6, "pista": "junto a U. de Chile – Beauchef (FCFM)" },
+      { "lat": -33.46603, "lon": -70.66358, "rumbo": 358 }
     ],
     "nivel": 4
   },
@@ -2577,9 +2622,9 @@
     "tipo": "calle",
     "comuna": "Santiago",
     "puntos": [
-      { "lat": -33.45301, "lon": -70.67489, "rumbo": 169 },
-      { "lat": -33.4625, "lon": -70.67264, "rumbo": 169 },
-      { "lat": -33.45036, "lon": -70.67552, "rumbo": 349 }
+      { "lat": -33.47582, "lon": -70.67131, "rumbo": 179, "pista": "cerca del Zanjón de la Aguada" },
+      { "lat": -33.46305, "lon": -70.67254, "rumbo": 349, "pista": "junto a una feria o mercado" },
+      { "lat": -33.46835, "lon": -70.67196, "rumbo": 0, "pista": "junto a una feria o mercado" }
     ],
     "nivel": 4
   },
@@ -2588,10 +2633,9 @@
     "tipo": "calle",
     "comuna": "Santiago",
     "puntos": [
-      { "lat": -33.45839, "lon": -70.67163, "rumbo": 258 },
-      { "lat": -33.45693, "lon": -70.66208, "rumbo": 265 },
-      { "lat": -33.45772, "lon": -70.66794, "rumbo": 78 },
-      { "lat": -33.45851, "lon": -70.67548, "rumbo": 265 }
+      { "lat": -33.45816, "lon": -70.67042, "rumbo": 78 },
+      { "lat": -33.45688, "lon": -70.66143, "rumbo": 265 },
+      { "lat": -33.45735, "lon": -70.6659, "rumbo": 258 }
     ],
     "nivel": 4
   },
@@ -2600,11 +2644,11 @@
     "tipo": "calle",
     "comuna": "Vitacura",
     "puntos": [
-      { "lat": -33.38286, "lon": -70.53915, "rumbo": 236 },
-      { "lat": -33.38944, "lon": -70.55764, "rumbo": 64 },
-      { "lat": -33.38622, "lon": -70.54989, "rumbo": 64 },
-      { "lat": -33.39098, "lon": -70.56106, "rumbo": 247 },
-      { "lat": -33.37416, "lon": -70.52602, "rumbo": 243 }
+      { "lat": -33.38291, "lon": -70.53925, "rumbo": 236 },
+      { "lat": -33.37794, "lon": -70.53126, "rumbo": 46 },
+      { "lat": -33.39989, "lon": -70.58254, "rumbo": 54 },
+      { "lat": -33.39674, "lon": -70.57647, "rumbo": 241 },
+      { "lat": -33.3926, "lon": -70.56642, "rumbo": 71 }
     ],
     "nivel": 3
   },
@@ -2613,9 +2657,9 @@
     "tipo": "calle",
     "comuna": "Ñuñoa",
     "puntos": [
-      { "lat": -33.44213, "lon": -70.59283, "rumbo": 212 },
-      { "lat": -33.44588, "lon": -70.59603, "rumbo": 32 },
-      { "lat": -33.45185, "lon": -70.59831, "rumbo": 187 }
+      { "lat": -33.44644, "lon": -70.59642, "rumbo": 32 },
+      { "lat": -33.45377, "lon": -70.59858, "rumbo": 4 },
+      { "lat": -33.44034, "lon": -70.59149, "rumbo": 211 }
     ],
     "nivel": 4
   },
@@ -2624,10 +2668,10 @@
     "tipo": "calle",
     "comuna": "Ñuñoa",
     "puntos": [
-      { "lat": -33.45471, "lon": -70.61354, "rumbo": 276 },
-      { "lat": -33.45677, "lon": -70.5949, "rumbo": 273 },
-      { "lat": -33.45858, "lon": -70.58268, "rumbo": 282 },
-      { "lat": -33.45638, "lon": -70.59938, "rumbo": 102 }
+      { "lat": -33.45721, "lon": -70.58787, "rumbo": 101 },
+      { "lat": -33.45668, "lon": -70.5969, "rumbo": 273 },
+      { "lat": -33.4557, "lon": -70.60463, "rumbo": 97 },
+      { "lat": -33.45433, "lon": -70.61966, "rumbo": 102 }
     ],
     "nivel": 4
   },
@@ -2636,12 +2680,12 @@
     "tipo": "calle",
     "comuna": "La Reina",
     "puntos": [
-      { "lat": -33.44288, "lon": -70.53809, "rumbo": 98 },
-      { "lat": -33.44619, "lon": -70.57424, "rumbo": 262 },
-      { "lat": -33.44202, "lon": -70.54586, "rumbo": 97 },
-      { "lat": -33.44212, "lon": -70.54207, "rumbo": 6 },
-      { "lat": -33.44669, "lon": -70.58504, "rumbo": 281 },
-      { "lat": -33.44518, "lon": -70.58896, "rumbo": 302 }
+      { "lat": -33.44456, "lon": -70.56582, "rumbo": 233, "pista": "cerca del canal San Carlos" },
+      { "lat": -33.44437, "lon": -70.59046, "rumbo": 122 },
+      { "lat": -33.44288, "lon": -70.55497, "rumbo": 249 },
+      { "lat": -33.44653, "lon": -70.58036, "rumbo": 87 },
+      { "lat": -33.44605, "lon": -70.57308, "rumbo": 82 },
+      { "lat": -33.44638, "lon": -70.57689, "rumbo": 265 }
     ],
     "nivel": 3
   },
@@ -2650,13 +2694,12 @@
     "tipo": "calle",
     "comuna": "La Florida",
     "puntos": [
-      { "lat": -33.54704, "lon": -70.59397, "rumbo": 271 },
-      { "lat": -33.54755, "lon": -70.57126, "rumbo": 91 },
-      { "lat": -33.54741, "lon": -70.57742, "rumbo": 272 },
-      { "lat": -33.54684, "lon": -70.5999, "rumbo": 92 },
-      { "lat": -33.54754, "lon": -70.568, "rumbo": 281 },
-      { "lat": -33.54683, "lon": -70.60354, "rumbo": 271 },
-      { "lat": -33.54725, "lon": -70.58446, "rumbo": 272 }
+      { "lat": -33.54767, "lon": -70.56418, "rumbo": 92 },
+      { "lat": -33.54715, "lon": -70.58518, "rumbo": 92 },
+      { "lat": -33.54727, "lon": -70.57985, "rumbo": 91 },
+      { "lat": -33.54671, "lon": -70.60787, "rumbo": 272 },
+      { "lat": -33.54702, "lon": -70.59501, "rumbo": 272 },
+      { "lat": -33.54748, "lon": -70.57018, "rumbo": 91 }
     ],
     "nivel": 3
   },
@@ -2665,13 +2708,13 @@
     "tipo": "calle",
     "comuna": "La Florida",
     "puntos": [
-      { "lat": -33.55289, "lon": -70.57246, "rumbo": 87 },
-      { "lat": -33.55308, "lon": -70.58068, "rumbo": 88 },
-      { "lat": -33.55372, "lon": -70.59717, "rumbo": 267 },
-      { "lat": -33.55294, "lon": -70.57694, "rumbo": 93 },
-      { "lat": -33.55218, "lon": -70.5572, "rumbo": 83 },
-      { "lat": -33.55266, "lon": -70.56827, "rumbo": 266 },
-      { "lat": -33.55457, "lon": -70.61507, "rumbo": 75 }
+      { "lat": -33.55193, "lon": -70.55398, "rumbo": 70, "pista": "cerca del canal San Carlos" },
+      { "lat": -33.55349, "lon": -70.59024, "rumbo": 270 },
+      { "lat": -33.55451, "lon": -70.61434, "rumbo": 75 },
+      { "lat": -33.55373, "lon": -70.5975, "rumbo": 87 },
+      { "lat": -33.55268, "lon": -70.5618, "rumbo": 263 },
+      { "lat": -33.55402, "lon": -70.60917, "rumbo": 269 },
+      { "lat": -33.55334, "lon": -70.58599, "rumbo": 88 }
     ],
     "nivel": 3
   },
@@ -2680,9 +2723,9 @@
     "tipo": "calle",
     "comuna": "Santiago",
     "puntos": [
-      { "lat": -33.45448, "lon": -70.65623, "rumbo": 268 },
-      { "lat": -33.45422, "lon": -70.65053, "rumbo": 79 },
-      { "lat": -33.45222, "lon": -70.63835, "rumbo": 76 }
+      { "lat": -33.45261, "lon": -70.64026, "rumbo": 257 },
+      { "lat": -33.45424, "lon": -70.65064, "rumbo": 259 },
+      { "lat": -33.45189, "lon": -70.63648, "rumbo": 80 }
     ],
     "nivel": 4
   },
@@ -2691,9 +2734,9 @@
     "tipo": "calle",
     "comuna": "Providencia",
     "puntos": [
-      { "lat": -33.43321, "lon": -70.59769, "rumbo": 165 },
-      { "lat": -33.42938, "lon": -70.59891, "rumbo": 165 },
-      { "lat": -33.4249, "lon": -70.60033, "rumbo": 165 }
+      { "lat": -33.43652, "lon": -70.59666, "rumbo": 164 },
+      { "lat": -33.42984, "lon": -70.59876, "rumbo": 345 },
+      { "lat": -33.41796, "lon": -70.60399, "rumbo": 291 }
     ],
     "nivel": 4
   },
@@ -2702,9 +2745,10 @@
     "tipo": "calle",
     "comuna": "Providencia",
     "puntos": [
-      { "lat": -33.44389, "lon": -70.59745, "rumbo": 354 },
-      { "lat": -33.42957, "lon": -70.60077, "rumbo": 347 },
-      { "lat": -33.41981, "lon": -70.604, "rumbo": 159 }
+      { "lat": -33.41756, "lon": -70.60497, "rumbo": 352, "pista": "cerca del canal San Carlos" },
+      { "lat": -33.44187, "lon": -70.5977, "rumbo": 174 },
+      { "lat": -33.45458, "lon": -70.59632, "rumbo": 4 },
+      { "lat": -33.43292, "lon": -70.59982, "rumbo": 167 }
     ],
     "nivel": 4
   },
@@ -2713,20 +2757,20 @@
     "tipo": "calle",
     "comuna": "Colina",
     "puntos": [
-      { "lat": -33.35689, "lon": -70.69192, "rumbo": 164 },
-      { "lat": -33.34567, "lon": -70.69425, "rumbo": 176 },
-      { "lat": -33.29292, "lon": -70.70199, "rumbo": 353 },
-      { "lat": -33.2699, "lon": -70.70012, "rumbo": 15 },
-      { "lat": -33.25437, "lon": -70.69804, "rumbo": 180 },
-      { "lat": -33.26661, "lon": -70.69972, "rumbo": 187 },
-      { "lat": -33.35411, "lon": -70.69232, "rumbo": 169 },
-      { "lat": -33.3037, "lon": -70.69967, "rumbo": 171 },
-      { "lat": -33.36384, "lon": -70.6899, "rumbo": 175 },
-      { "lat": -33.33572, "lon": -70.69298, "rumbo": 344 },
-      { "lat": -33.3185, "lon": -70.70681, "rumbo": 3 },
-      { "lat": -33.32768, "lon": -70.70097, "rumbo": 312 },
-      { "lat": -33.29748, "lon": -70.70098, "rumbo": 349 },
-      { "lat": -33.28521, "lon": -70.70154, "rumbo": 172 }
+      { "lat": -33.3471, "lon": -70.69398, "rumbo": 176 },
+      { "lat": -33.34366, "lon": -70.69446, "rumbo": 1 },
+      { "lat": -33.3515, "lon": -70.69342, "rumbo": 340 },
+      { "lat": -33.26502, "lon": -70.69926, "rumbo": 187 },
+      { "lat": -33.25304, "lon": -70.69805, "rumbo": 180 },
+      { "lat": -33.25814, "lon": -70.69859, "rumbo": 192 },
+      { "lat": -33.36027, "lon": -70.69053, "rumbo": 344 },
+      { "lat": -33.32676, "lon": -70.70246, "rumbo": 313 },
+      { "lat": -33.29892, "lon": -70.70041, "rumbo": 349 },
+      { "lat": -33.3359, "lon": -70.69291, "rumbo": 344 },
+      { "lat": -33.31326, "lon": -70.70412, "rumbo": 208 },
+      { "lat": -33.32101, "lon": -70.70626, "rumbo": 343 },
+      { "lat": -33.30638, "lon": -70.69944, "rumbo": 197 },
+      { "lat": -33.28084, "lon": -70.70277, "rumbo": 356 }
     ],
     "nivel": 3
   },
@@ -2735,20 +2779,19 @@
     "tipo": "calle",
     "comuna": "Puente Alto",
     "puntos": [
-      { "lat": -33.68905, "lon": -70.68869, "rumbo": 223 },
-      { "lat": -33.69379, "lon": -70.69382, "rumbo": 215 },
-      { "lat": -33.63628, "lon": -70.65398, "rumbo": 69 },
-      { "lat": -33.6687, "lon": -70.67461, "rumbo": 209 },
-      { "lat": -33.64954, "lon": -70.66039, "rumbo": 205 },
-      { "lat": -33.68393, "lon": -70.68349, "rumbo": 34 },
-      { "lat": -33.68684, "lon": -70.68647, "rumbo": 219 },
-      { "lat": -33.63231, "lon": -70.60888, "rumbo": 80 },
-      { "lat": -33.63264, "lon": -70.61283, "rumbo": 260 },
-      { "lat": -33.63129, "lon": -70.60396, "rumbo": 256 },
-      { "lat": -33.59285, "lon": -70.60779, "rumbo": 351 },
-      { "lat": -33.61714, "lon": -70.59949, "rumbo": 163 },
-      { "lat": -33.56777, "lon": -70.61319, "rumbo": 173 },
-      { "lat": -33.58599, "lon": -70.61001, "rumbo": 345 }
+      { "lat": -33.6547, "lon": -70.66203, "rumbo": 182 },
+      { "lat": -33.69656, "lon": -70.69597, "rumbo": 28 },
+      { "lat": -33.63438, "lon": -70.63632, "rumbo": 269 },
+      { "lat": -33.65958, "lon": -70.66369, "rumbo": 35 },
+      { "lat": -33.67915, "lon": -70.68019, "rumbo": 30 },
+      { "lat": -33.67111, "lon": -70.67555, "rumbo": 21 },
+      { "lat": -33.66254, "lon": -70.66746, "rumbo": 237 },
+      { "lat": -33.63318, "lon": -70.61663, "rumbo": 260 },
+      { "lat": -33.62568, "lon": -70.59806, "rumbo": 3 },
+      { "lat": -33.60007, "lon": -70.60613, "rumbo": 341 },
+      { "lat": -33.56915, "lon": -70.61279, "rumbo": 353 },
+      { "lat": -33.58292, "lon": -70.6109, "rumbo": 353 },
+      { "lat": -33.57952, "lon": -70.61122, "rumbo": 353 }
     ],
     "nivel": 3
   },
@@ -2757,20 +2800,20 @@
     "tipo": "calle",
     "comuna": "Colina",
     "puntos": [
-      { "lat": -33.36023, "lon": -70.70313, "rumbo": 159 },
-      { "lat": -33.29981, "lon": -70.73026, "rumbo": 160 },
-      { "lat": -33.35532, "lon": -70.70505, "rumbo": 339 },
-      { "lat": -33.31953, "lon": -70.72137, "rumbo": 340 },
-      { "lat": -33.33242, "lon": -70.71529, "rumbo": 160 },
-      { "lat": -33.36375, "lon": -70.70152, "rumbo": 159 },
-      { "lat": -33.31291, "lon": -70.72406, "rumbo": 159 },
-      { "lat": -33.26219, "lon": -70.74683, "rumbo": 160 },
-      { "lat": -33.26582, "lon": -70.7452, "rumbo": 339 },
-      { "lat": -33.2735, "lon": -70.74177, "rumbo": 160 },
-      { "lat": -33.29251, "lon": -70.73321, "rumbo": 159 },
-      { "lat": -33.31544, "lon": -70.72292, "rumbo": 339 },
-      { "lat": -33.32565, "lon": -70.71858, "rumbo": 339 },
-      { "lat": -33.28068, "lon": -70.73851, "rumbo": 339 }
+      { "lat": -33.3584, "lon": -70.70363, "rumbo": 159 },
+      { "lat": -33.32106, "lon": -70.72038, "rumbo": 339 },
+      { "lat": -33.35384, "lon": -70.70571, "rumbo": 159 },
+      { "lat": -33.34512, "lon": -70.70992, "rumbo": 159 },
+      { "lat": -33.33729, "lon": -70.71313, "rumbo": 339 },
+      { "lat": -33.30206, "lon": -70.72919, "rumbo": 159 },
+      { "lat": -33.31245, "lon": -70.72426, "rumbo": 159 },
+      { "lat": -33.25514, "lon": -70.75019, "rumbo": 160 },
+      { "lat": -33.26012, "lon": -70.74796, "rumbo": 160 },
+      { "lat": -33.27508, "lon": -70.74126, "rumbo": 159 },
+      { "lat": -33.29091, "lon": -70.73417, "rumbo": 340 },
+      { "lat": -33.28666, "lon": -70.73583, "rumbo": 339 },
+      { "lat": -33.31525, "lon": -70.72301, "rumbo": 339 },
+      { "lat": -33.33147, "lon": -70.716, "rumbo": 159 }
     ],
     "nivel": 3
   },
@@ -2779,11 +2822,11 @@
     "tipo": "calle",
     "comuna": "Las Condes",
     "puntos": [
-      { "lat": -33.39265, "lon": -70.49366, "rumbo": 85 },
-      { "lat": -33.37898, "lon": -70.51376, "rumbo": 333 },
-      { "lat": -33.38655, "lon": -70.50158, "rumbo": 341 },
-      { "lat": -33.38918, "lon": -70.50048, "rumbo": 152 },
-      { "lat": -33.37443, "lon": -70.5165, "rumbo": 334 }
+      { "lat": -33.3697, "lon": -70.51912, "rumbo": 326, "pista": "cerca del río Mapocho" },
+      { "lat": -33.39188, "lon": -70.49783, "rumbo": 294 },
+      { "lat": -33.37972, "lon": -70.5133, "rumbo": 333 },
+      { "lat": -33.382, "lon": -70.50902, "rumbo": 299 },
+      { "lat": -33.38949, "lon": -70.5003, "rumbo": 152 }
     ],
     "nivel": 3
   },
@@ -2792,10 +2835,10 @@
     "tipo": "calle",
     "comuna": "Santiago",
     "puntos": [
-      { "lat": -33.45292, "lon": -70.6551, "rumbo": 257 },
-      { "lat": -33.45214, "lon": -70.65146, "rumbo": 74 },
-      { "lat": -33.44784, "lon": -70.634, "rumbo": 253 },
-      { "lat": -33.44893, "lon": -70.63811, "rumbo": 73 }
+      { "lat": -33.45045, "lon": -70.64414, "rumbo": 260, "pista": "muchas automotoras a los lados" },
+      { "lat": -33.45216, "lon": -70.65157, "rumbo": 254, "pista": "junto a Parque Almagro" },
+      { "lat": -33.45247, "lon": -70.65965, "rumbo": 123, "pista": "junto a Universidad Central" },
+      { "lat": -33.45292, "lon": -70.6551, "rumbo": 77 }
     ],
     "nivel": 4
   },
@@ -2804,9 +2847,9 @@
     "tipo": "calle",
     "comuna": "Santiago",
     "puntos": [
-      { "lat": -33.47028, "lon": -70.65295, "rumbo": 262 },
-      { "lat": -33.46886, "lon": -70.63981, "rumbo": 263 },
-      { "lat": -33.46806, "lon": -70.63255, "rumbo": 82 }
+      { "lat": -33.47027, "lon": -70.65285, "rumbo": 82 },
+      { "lat": -33.46939, "lon": -70.64488, "rumbo": 83 },
+      { "lat": -33.46789, "lon": -70.63106, "rumbo": 262 }
     ],
     "nivel": 4
   },
@@ -2815,9 +2858,9 @@
     "tipo": "calle",
     "comuna": "Santiago",
     "puntos": [
-      { "lat": -33.4726, "lon": -70.63772, "rumbo": 265 },
-      { "lat": -33.47291, "lon": -70.64183, "rumbo": 85 },
-      { "lat": -33.47198, "lon": -70.63102, "rumbo": 257 }
+      { "lat": -33.47254, "lon": -70.63932, "rumbo": 85, "pista": "muchas automotoras a los lados" },
+      { "lat": -33.47285, "lon": -70.64524, "rumbo": 266, "pista": "junto a «Mercado Matadero Franklin»" },
+      { "lat": -33.47359, "lon": -70.65382, "rumbo": 266 }
     ],
     "nivel": 4
   },
@@ -2826,9 +2869,9 @@
     "tipo": "calle",
     "comuna": "Santiago",
     "puntos": [
-      { "lat": -33.44308, "lon": -70.66221, "rumbo": 83 },
-      { "lat": -33.44403, "lon": -70.66919, "rumbo": 78 },
-      { "lat": -33.44204, "lon": -70.65179, "rumbo": 84 }
+      { "lat": -33.44216, "lon": -70.65407, "rumbo": 263, "pista": "junto a Palacio de La Moneda" },
+      { "lat": -33.44517, "lon": -70.67944, "rumbo": 86, "pista": "junto a Matucana 100" },
+      { "lat": -33.44309, "lon": -70.66232, "rumbo": 263, "pista": "junto a INACAP – sede Almirante Barroso" }
     ],
     "nivel": 4
   },
@@ -2837,12 +2880,12 @@
     "tipo": "calle",
     "comuna": "San Joaquín",
     "puntos": [
-      { "lat": -33.48998, "lon": -70.66114, "rumbo": 291 },
-      { "lat": -33.49358, "lon": -70.64668, "rumbo": 107 },
-      { "lat": -33.48567, "lon": -70.67224, "rumbo": 301 },
-      { "lat": -33.48736, "lon": -70.66892, "rumbo": 291 },
-      { "lat": -33.49541, "lon": -70.63784, "rumbo": 274 },
-      { "lat": -33.49565, "lon": -70.63438, "rumbo": 93 }
+      { "lat": -33.48679, "lon": -70.6703, "rumbo": 135 },
+      { "lat": -33.4882, "lon": -70.66663, "rumbo": 292 },
+      { "lat": -33.49509, "lon": -70.64049, "rumbo": 286 },
+      { "lat": -33.48952, "lon": -70.66261, "rumbo": 112 },
+      { "lat": -33.49579, "lon": -70.63253, "rumbo": 96 },
+      { "lat": -33.49639, "lon": -70.62287, "rumbo": 92 }
     ],
     "nivel": 2
   },
@@ -2851,9 +2894,9 @@
     "tipo": "calle",
     "comuna": "Estación Central",
     "puntos": [
-      { "lat": -33.45328, "lon": -70.69866, "rumbo": 248 },
-      { "lat": -33.45472, "lon": -70.70269, "rumbo": 63 },
-      { "lat": -33.45566, "lon": -70.70596, "rumbo": 173 }
+      { "lat": -33.45412, "lon": -70.70107, "rumbo": 68 },
+      { "lat": -33.45679, "lon": -70.70724, "rumbo": 62 },
+      { "lat": -33.45299, "lon": -70.69783, "rumbo": 72 }
     ],
     "nivel": 4
   },
@@ -2862,12 +2905,11 @@
     "tipo": "calle",
     "comuna": "Estación Central",
     "puntos": [
-      { "lat": -33.4651, "lon": -70.70684, "rumbo": 67 },
-      { "lat": -33.46143, "lon": -70.69795, "rumbo": 242 },
-      { "lat": -33.46725, "lon": -70.71065, "rumbo": 58 },
-      { "lat": -33.47241, "lon": -70.72094, "rumbo": 232 },
-      { "lat": -33.45544, "lon": -70.6839, "rumbo": 246 },
-      { "lat": -33.46864, "lon": -70.7137, "rumbo": 241 }
+      { "lat": -33.46622, "lon": -70.70876, "rumbo": 238, "pista": "cerca del Estadio Las Rejas" },
+      { "lat": -33.46248, "lon": -70.70001, "rumbo": 238 },
+      { "lat": -33.45707, "lon": -70.68711, "rumbo": 61 },
+      { "lat": -33.47028, "lon": -70.71714, "rumbo": 235 },
+      { "lat": -33.46854, "lon": -70.71404, "rumbo": 241 }
     ],
     "nivel": 2
   },
@@ -2876,8 +2918,9 @@
     "tipo": "calle",
     "comuna": "Santiago",
     "puntos": [
-      { "lat": -33.44417, "lon": -70.68442, "rumbo": 87 },
-      { "lat": -33.44436, "lon": -70.68899, "rumbo": 87 }
+      { "lat": -33.44426, "lon": -70.68681, "rumbo": 87, "pista": "cerca del Estadio Marista" },
+      { "lat": -33.44437, "lon": -70.69083, "rumbo": 270 },
+      { "lat": -33.44391, "lon": -70.68061, "rumbo": 266 }
     ],
     "nivel": 4
   },
@@ -2886,13 +2929,12 @@
     "tipo": "calle",
     "comuna": "San Joaquín",
     "puntos": [
-      { "lat": -33.52381, "lon": -70.62275, "rumbo": 174 },
-      { "lat": -33.4813, "lon": -70.63028, "rumbo": 333 },
-      { "lat": -33.50608, "lon": -70.62654, "rumbo": 350 },
-      { "lat": -33.48732, "lon": -70.62948, "rumbo": 357 },
-      { "lat": -33.51015, "lon": -70.62528, "rumbo": 349 },
-      { "lat": -33.49906, "lon": -70.62801, "rumbo": 170 },
-      { "lat": -33.51753, "lon": -70.62371, "rumbo": 353 }
+      { "lat": -33.48108, "lon": -70.63042, "rumbo": 150, "pista": "cerca del Zanjón de la Aguada" },
+      { "lat": -33.52027, "lon": -70.62355, "rumbo": 173 },
+      { "lat": -33.48983, "lon": -70.6296, "rumbo": 356 },
+      { "lat": -33.50653, "lon": -70.62649, "rumbo": 170 },
+      { "lat": -33.49561, "lon": -70.62842, "rumbo": 349 },
+      { "lat": -33.50946, "lon": -70.62543, "rumbo": 349 }
     ],
     "nivel": 3
   },
@@ -2901,9 +2943,9 @@
     "tipo": "calle",
     "comuna": "San Joaquín",
     "puntos": [
-      { "lat": -33.50066, "lon": -70.64078, "rumbo": 288 },
-      { "lat": -33.50024, "lon": -70.62338, "rumbo": 294 },
-      { "lat": -33.50028, "lon": -70.62784, "rumbo": 79 }
+      { "lat": -33.49992, "lon": -70.64365, "rumbo": 108 },
+      { "lat": -33.50017, "lon": -70.62441, "rumbo": 267 },
+      { "lat": -33.50036, "lon": -70.62809, "rumbo": 89 }
     ],
     "nivel": 4
   },
@@ -2912,9 +2954,9 @@
     "tipo": "calle",
     "comuna": "Vitacura",
     "puntos": [
-      { "lat": -33.39396, "lon": -70.56197, "rumbo": 339 },
-      { "lat": -33.38933, "lon": -70.56394, "rumbo": 341 },
-      { "lat": -33.40034, "lon": -70.55993, "rumbo": 354 }
+      { "lat": -33.39765, "lon": -70.5603, "rumbo": 172 },
+      { "lat": -33.38813, "lon": -70.56443, "rumbo": 341 },
+      { "lat": -33.39302, "lon": -70.56239, "rumbo": 160 }
     ],
     "nivel": 4
   },
@@ -2923,8 +2965,8 @@
     "tipo": "calle",
     "comuna": "Las Condes",
     "puntos": [
-      { "lat": -33.40245, "lon": -70.56242, "rumbo": 62 },
-      { "lat": -33.40712, "lon": -70.57408, "rumbo": 242 }
+      { "lat": -33.40355, "lon": -70.56488, "rumbo": 242 },
+      { "lat": -33.40618, "lon": -70.57164, "rumbo": 67 }
     ],
     "nivel": 4
   },
@@ -2933,9 +2975,9 @@
     "tipo": "calle",
     "comuna": "Vitacura",
     "puntos": [
-      { "lat": -33.38419, "lon": -70.55325, "rumbo": 343 },
-      { "lat": -33.39778, "lon": -70.55459, "rumbo": 190 },
-      { "lat": -33.37855, "lon": -70.55548, "rumbo": 200 }
+      { "lat": -33.3996, "lon": -70.55498, "rumbo": 190 },
+      { "lat": -33.38714, "lon": -70.55295, "rumbo": 175 },
+      { "lat": -33.3927, "lon": -70.5535, "rumbo": 190 }
     ],
     "nivel": 4
   },
@@ -2944,9 +2986,9 @@
     "tipo": "calle",
     "comuna": "Las Condes",
     "puntos": [
-      { "lat": -33.423, "lon": -70.58582, "rumbo": 255 },
-      { "lat": -33.41769, "lon": -70.57502, "rumbo": 69 },
-      { "lat": -33.41664, "lon": -70.57155, "rumbo": 70 }
+      { "lat": -33.42461, "lon": -70.59258, "rumbo": 75, "pista": "cerca del canal San Carlos" },
+      { "lat": -33.41855, "lon": -70.57706, "rumbo": 46 },
+      { "lat": -33.4222, "lon": -70.58216, "rumbo": 75 }
     ],
     "nivel": 4
   },
@@ -2955,9 +2997,9 @@
     "tipo": "calle",
     "comuna": "Providencia",
     "puntos": [
-      { "lat": -33.4318, "lon": -70.62416, "rumbo": 321 },
-      { "lat": -33.45219, "lon": -70.61789, "rumbo": 353 },
-      { "lat": -33.44137, "lon": -70.62074, "rumbo": 344 }
+      { "lat": -33.43284, "lon": -70.62355, "rumbo": 343 },
+      { "lat": -33.46094, "lon": -70.6189, "rumbo": 187 },
+      { "lat": -33.45637, "lon": -70.61819, "rumbo": 8 }
     ],
     "nivel": 4
   },
@@ -2966,15 +3008,15 @@
     "tipo": "calle",
     "comuna": "Huechuraba",
     "puntos": [
-      { "lat": -33.35152, "lon": -70.67043, "rumbo": 180 },
-      { "lat": -33.35556, "lon": -70.67063, "rumbo": 0 },
-      { "lat": -33.37197, "lon": -70.67113, "rumbo": 353 },
-      { "lat": -33.38714, "lon": -70.67124, "rumbo": 348 },
-      { "lat": -33.3637, "lon": -70.67058, "rumbo": 0 },
-      { "lat": -33.38374, "lon": -70.67232, "rumbo": 349 },
-      { "lat": -33.35955, "lon": -70.67062, "rumbo": 180 },
-      { "lat": -33.36655, "lon": -70.67056, "rumbo": 181 },
-      { "lat": -33.37986, "lon": -70.67299, "rumbo": 171 }
+      { "lat": -33.34898, "lon": -70.67044, "rumbo": 180 },
+      { "lat": -33.36967, "lon": -70.67096, "rumbo": 359 },
+      { "lat": -33.34027, "lon": -70.66815, "rumbo": 17 },
+      { "lat": -33.36191, "lon": -70.67058, "rumbo": 0 },
+      { "lat": -33.37749, "lon": -70.67186, "rumbo": 8 },
+      { "lat": -33.3806, "lon": -70.67306, "rumbo": 349 },
+      { "lat": -33.38371, "lon": -70.6721, "rumbo": 169 },
+      { "lat": -33.34452, "lon": -70.66962, "rumbo": 192 },
+      { "lat": -33.35211, "lon": -70.67048, "rumbo": 17 }
     ],
     "nivel": 3
   },
@@ -2983,13 +3025,13 @@
     "tipo": "calle",
     "comuna": "Peñalolén",
     "puntos": [
-      { "lat": -33.49018, "lon": -70.54541, "rumbo": 291 },
-      { "lat": -33.49741, "lon": -70.52253, "rumbo": 110 },
-      { "lat": -33.48859, "lon": -70.55051, "rumbo": 291 },
-      { "lat": -33.48347, "lon": -70.56709, "rumbo": 110 },
-      { "lat": -33.49851, "lon": -70.51903, "rumbo": 111 },
-      { "lat": -33.48084, "lon": -70.57575, "rumbo": 289 },
-      { "lat": -33.49223, "lon": -70.5389, "rumbo": 290 }
+      { "lat": -33.48629, "lon": -70.55782, "rumbo": 288, "pista": "cerca del canal San Carlos" },
+      { "lat": -33.49175, "lon": -70.54042, "rumbo": 290, "pista": "cerca del canal Las Perdices" },
+      { "lat": -33.49018, "lon": -70.54541, "rumbo": 111 },
+      { "lat": -33.49592, "lon": -70.52746, "rumbo": 290 },
+      { "lat": -33.48752, "lon": -70.55403, "rumbo": 291 },
+      { "lat": -33.48467, "lon": -70.56399, "rumbo": 110 },
+      { "lat": -33.49315, "lon": -70.53637, "rumbo": 291 }
     ],
     "nivel": 3
   },
@@ -2998,9 +3040,9 @@
     "tipo": "calle",
     "comuna": "Ñuñoa",
     "puntos": [
-      { "lat": -33.44798, "lon": -70.59911, "rumbo": 83 },
-      { "lat": -33.44904, "lon": -70.61403, "rumbo": 80 },
-      { "lat": -33.44885, "lon": -70.60678, "rumbo": 82 }
+      { "lat": -33.44826, "lon": -70.60192, "rumbo": 83 },
+      { "lat": -33.44865, "lon": -70.61153, "rumbo": 80 },
+      { "lat": -33.44787, "lon": -70.59812, "rumbo": 260 }
     ],
     "nivel": 4
   },
@@ -3008,7 +3050,7 @@
     "nombre": "Pío Nono",
     "tipo": "calle",
     "comuna": "Providencia",
-    "puntos": [{ "lat": -33.43308, "lon": -70.63583, "rumbo": 351 }],
+    "puntos": [{ "lat": -33.43289, "lon": -70.63586, "rumbo": 171 }],
     "nivel": 1
   },
   {
@@ -3016,13 +3058,13 @@
     "tipo": "calle",
     "comuna": "Quinta Normal",
     "puntos": [
-      { "lat": -33.42767, "lon": -70.67841, "rumbo": 110 },
-      { "lat": -33.41763, "lon": -70.7089, "rumbo": 308 },
-      { "lat": -33.4198, "lon": -70.70515, "rumbo": 297 },
-      { "lat": -33.42198, "lon": -70.69703, "rumbo": 113 },
-      { "lat": -33.41235, "lon": -70.7217, "rumbo": 122 },
-      { "lat": -33.4142, "lon": -70.71778, "rumbo": 127 },
-      { "lat": -33.41629, "lon": -70.71282, "rumbo": 102 }
+      { "lat": -33.41213, "lon": -70.72207, "rumbo": 318, "pista": "cerca del río Mapocho" },
+      { "lat": -33.42391, "lon": -70.6886, "rumbo": 293 },
+      { "lat": -33.42122, "lon": -70.69958, "rumbo": 105 },
+      { "lat": -33.41971, "lon": -70.70535, "rumbo": 297 },
+      { "lat": -33.42296, "lon": -70.69386, "rumbo": 100 },
+      { "lat": -33.4259, "lon": -70.68352, "rumbo": 298 },
+      { "lat": -33.41547, "lon": -70.7151, "rumbo": 295 }
     ],
     "nivel": 2
   },
@@ -3031,12 +3073,12 @@
     "tipo": "calle",
     "comuna": "Lo Prado",
     "puntos": [
-      { "lat": -33.46104, "lon": -70.72019, "rumbo": 153 },
-      { "lat": -33.41874, "lon": -70.71727, "rumbo": 191 },
-      { "lat": -33.44791, "lon": -70.72261, "rumbo": 357 },
-      { "lat": -33.44527, "lon": -70.72342, "rumbo": 357 },
-      { "lat": -33.42887, "lon": -70.71983, "rumbo": 12 },
-      { "lat": -33.42594, "lon": -70.71903, "rumbo": 12 }
+      { "lat": -33.45487, "lon": -70.72196, "rumbo": 169 },
+      { "lat": -33.41931, "lon": -70.71739, "rumbo": 191 },
+      { "lat": -33.4507, "lon": -70.72246, "rumbo": 177 },
+      { "lat": -33.44642, "lon": -70.7233, "rumbo": 177 },
+      { "lat": -33.42335, "lon": -70.71836, "rumbo": 193 },
+      { "lat": -33.44134, "lon": -70.72309, "rumbo": 186 }
     ],
     "nivel": 3
   },
@@ -3045,9 +3087,9 @@
     "tipo": "calle",
     "comuna": "Santiago",
     "puntos": [
-      { "lat": -33.45062, "lon": -70.6589, "rumbo": 167 },
-      { "lat": -33.44072, "lon": -70.65943, "rumbo": 14 },
-      { "lat": -33.43669, "lon": -70.65983, "rumbo": 353 }
+      { "lat": -33.45134, "lon": -70.6587, "rumbo": 347 },
+      { "lat": -33.43896, "lon": -70.65946, "rumbo": 174 },
+      { "lat": -33.43507, "lon": -70.66069, "rumbo": 354 }
     ],
     "nivel": 3
   },
@@ -3056,9 +3098,9 @@
     "tipo": "calle",
     "comuna": "Santiago",
     "puntos": [
-      { "lat": -33.43396, "lon": -70.66908, "rumbo": 175 },
-      { "lat": -33.43689, "lon": -70.66871, "rumbo": 176 },
-      { "lat": -33.44338, "lon": -70.66786, "rumbo": 356 }
+      { "lat": -33.43291, "lon": -70.66917, "rumbo": 175 },
+      { "lat": -33.4372, "lon": -70.66868, "rumbo": 356 },
+      { "lat": -33.43005, "lon": -70.66941, "rumbo": 356 }
     ],
     "nivel": 4
   },
@@ -3067,8 +3109,9 @@
     "tipo": "calle",
     "comuna": "Estación Central",
     "puntos": [
-      { "lat": -33.46986, "lon": -70.67952, "rumbo": 209 },
-      { "lat": -33.45774, "lon": -70.67827, "rumbo": 183 }
+      { "lat": -33.45205, "lon": -70.6779, "rumbo": 183, "pista": "junto a Mall Paseo Arauco Estación" },
+      { "lat": -33.45495, "lon": -70.67812, "rumbo": 3 },
+      { "lat": -33.46751, "lon": -70.67906, "rumbo": 183 }
     ],
     "nivel": 4
   },
@@ -3077,17 +3120,15 @@
     "tipo": "calle",
     "comuna": "Cerrillos",
     "puntos": [
-      { "lat": -33.47315, "lon": -70.68438, "rumbo": 48 },
-      { "lat": -33.49473, "lon": -70.70574, "rumbo": 141 },
-      { "lat": -33.4858, "lon": -70.69774, "rumbo": 219 },
-      { "lat": -33.47844, "lon": -70.69134, "rumbo": 217 },
-      { "lat": -33.503, "lon": -70.71121, "rumbo": 204 },
-      { "lat": -33.49861, "lon": -70.70839, "rumbo": 212 },
-      { "lat": -33.48849, "lon": -70.70061, "rumbo": 215 },
-      { "lat": -33.48251, "lon": -70.69483, "rumbo": 216 },
-      { "lat": -33.47096, "lon": -70.68141, "rumbo": 48 },
-      { "lat": -33.4754, "lon": -70.68751, "rumbo": 48 },
-      { "lat": -33.50845, "lon": -70.7183, "rumbo": 287 }
+      { "lat": -33.47746, "lon": -70.69016, "rumbo": 220, "pista": "cerca del Zanjón de la Aguada" },
+      { "lat": -33.47158, "lon": -70.68238, "rumbo": 49 },
+      { "lat": -33.49231, "lon": -70.70339, "rumbo": 34 },
+      { "lat": -33.48598, "lon": -70.69792, "rumbo": 219 },
+      { "lat": -33.47423, "lon": -70.68596, "rumbo": 49 },
+      { "lat": -33.50231, "lon": -70.71084, "rumbo": 24 },
+      { "lat": -33.49815, "lon": -70.70802, "rumbo": 212 },
+      { "lat": -33.48282, "lon": -70.69497, "rumbo": 27 },
+      { "lat": -33.49516, "lon": -70.70546, "rumbo": 31 }
     ],
     "nivel": 3
   },
@@ -3096,18 +3137,19 @@
     "tipo": "calle",
     "comuna": "Maipú",
     "puntos": [
-      { "lat": -33.52562, "lon": -70.75396, "rumbo": 57 },
-      { "lat": -33.555, "lon": -70.79709, "rumbo": 230 },
-      { "lat": -33.53971, "lon": -70.77487, "rumbo": 230 },
-      { "lat": -33.54798, "lon": -70.78709, "rumbo": 51 },
-      { "lat": -33.54175, "lon": -70.77781, "rumbo": 50 },
-      { "lat": -33.54521, "lon": -70.78285, "rumbo": 231 },
-      { "lat": -33.52268, "lon": -70.74793, "rumbo": 57 },
-      { "lat": -33.5065, "lon": -70.71514, "rumbo": 51 },
-      { "lat": -33.51452, "lon": -70.73244, "rumbo": 58 },
-      { "lat": -33.5083, "lon": -70.71824, "rumbo": 66 },
-      { "lat": -33.50953, "lon": -70.72197, "rumbo": 245 },
-      { "lat": -33.51099, "lon": -70.72509, "rumbo": 239 }
+      { "lat": -33.53064, "lon": -70.76178, "rumbo": 231 },
+      { "lat": -33.53313, "lon": -70.76511, "rumbo": 231 },
+      { "lat": -33.52811, "lon": -70.7578, "rumbo": 55 },
+      { "lat": -33.54804, "lon": -70.78717, "rumbo": 51 },
+      { "lat": -33.55357, "lon": -70.79523, "rumbo": 51 },
+      { "lat": -33.53799, "lon": -70.77263, "rumbo": 231 },
+      { "lat": -33.54373, "lon": -70.78087, "rumbo": 230 },
+      { "lat": -33.52213, "lon": -70.74693, "rumbo": 57 },
+      { "lat": -33.5258, "lon": -70.75368, "rumbo": 57 },
+      { "lat": -33.507, "lon": -70.71588, "rumbo": 51 },
+      { "lat": -33.51576, "lon": -70.7349, "rumbo": 58 },
+      { "lat": -33.50856, "lon": -70.71892, "rumbo": 246 },
+      { "lat": -33.51764, "lon": -70.73886, "rumbo": 58 }
     ],
     "nivel": 2
   },
@@ -3116,8 +3158,8 @@
     "tipo": "calle",
     "comuna": "Santiago",
     "puntos": [
-      { "lat": -33.44299, "lon": -70.65049, "rumbo": 174 },
-      { "lat": -33.43888, "lon": -70.65106, "rumbo": 174 }
+      { "lat": -33.44058, "lon": -70.65081, "rumbo": 354, "pista": "junto a Paseo Ahumada" },
+      { "lat": -33.44345, "lon": -70.65038, "rumbo": 165 }
     ],
     "nivel": 1
   },
@@ -3125,7 +3167,7 @@
     "nombre": "Nueva York",
     "tipo": "calle",
     "comuna": "Santiago",
-    "puntos": [{ "lat": -33.44221, "lon": -70.65077, "rumbo": 31 }],
+    "puntos": [{ "lat": -33.44237, "lon": -70.65087, "rumbo": 31 }],
     "nivel": 4
   },
   {
@@ -3133,14 +3175,13 @@
     "tipo": "calle",
     "comuna": "La Pintana",
     "puntos": [
-      { "lat": -33.59027, "lon": -70.66485, "rumbo": 194 },
-      { "lat": -33.55602, "lon": -70.65518, "rumbo": 193 },
-      { "lat": -33.57097, "lon": -70.65917, "rumbo": 13 },
-      { "lat": -33.54926, "lon": -70.65296, "rumbo": 13 },
-      { "lat": -33.55931, "lon": -70.65615, "rumbo": 11 },
-      { "lat": -33.55213, "lon": -70.65378, "rumbo": 193 },
-      { "lat": -33.58088, "lon": -70.66201, "rumbo": 13 },
-      { "lat": -33.56216, "lon": -70.65684, "rumbo": 191 }
+      { "lat": -33.58626, "lon": -70.66352, "rumbo": 15 },
+      { "lat": -33.57246, "lon": -70.65966, "rumbo": 15 },
+      { "lat": -33.56364, "lon": -70.65712, "rumbo": 13 },
+      { "lat": -33.54962, "lon": -70.65306, "rumbo": 193 },
+      { "lat": -33.54616, "lon": -70.6521, "rumbo": 193 },
+      { "lat": -33.58283, "lon": -70.66254, "rumbo": 192 },
+      { "lat": -33.57927, "lon": -70.66157, "rumbo": 193 }
     ],
     "nivel": 3
   },
@@ -3149,10 +3190,11 @@
     "tipo": "calle",
     "comuna": "Lo Prado",
     "puntos": [
-      { "lat": -33.43632, "lon": -70.73264, "rumbo": 267 },
-      { "lat": -33.43652, "lon": -70.7493, "rumbo": 88 },
-      { "lat": -33.43644, "lon": -70.74298, "rumbo": 270 },
-      { "lat": -33.43465, "lon": -70.76123, "rumbo": 284 }
+      { "lat": -33.43623, "lon": -70.75501, "rumbo": 278 },
+      { "lat": -33.43661, "lon": -70.75132, "rumbo": 88 },
+      { "lat": -33.43641, "lon": -70.74493, "rumbo": 91 },
+      { "lat": -33.43637, "lon": -70.73589, "rumbo": 91 },
+      { "lat": -33.43437, "lon": -70.76255, "rumbo": 104 }
     ],
     "nivel": 3
   },
@@ -3161,13 +3203,14 @@
     "tipo": "calle",
     "comuna": "Cerro Navia",
     "puntos": [
-      { "lat": -33.42981, "lon": -70.73815, "rumbo": 80 },
-      { "lat": -33.43259, "lon": -70.71306, "rumbo": 282 },
-      { "lat": -33.42994, "lon": -70.72279, "rumbo": 285 },
-      { "lat": -33.42753, "lon": -70.76011, "rumbo": 77 },
-      { "lat": -33.42909, "lon": -70.75081, "rumbo": 300 },
-      { "lat": -33.42573, "lon": -70.77165, "rumbo": 274 },
-      { "lat": -33.43165, "lon": -70.71664, "rumbo": 288 }
+      { "lat": -33.42233, "lon": -70.77743, "rumbo": 340 },
+      { "lat": -33.43241, "lon": -70.71379, "rumbo": 282 },
+      { "lat": -33.42583, "lon": -70.76821, "rumbo": 266 },
+      { "lat": -33.42749, "lon": -70.75979, "rumbo": 266 },
+      { "lat": -33.43216, "lon": -70.70247, "rumbo": 85 },
+      { "lat": -33.42483, "lon": -70.77484, "rumbo": 292 },
+      { "lat": -33.43007, "lon": -70.74634, "rumbo": 270 },
+      { "lat": -33.43168, "lon": -70.69517, "rumbo": 89 }
     ],
     "nivel": 3
   },
@@ -3176,9 +3219,14 @@
     "tipo": "calle",
     "comuna": "Santiago",
     "puntos": [
-      { "lat": -33.45651, "lon": -70.6771, "rumbo": 257 },
-      { "lat": -33.45443, "lon": -70.66665, "rumbo": 76 },
-      { "lat": -33.45359, "lon": -70.66246, "rumbo": 76 }
+      { "lat": -33.4535, "lon": -70.66203, "rumbo": 76, "pista": "junto a una feria o mercado" },
+      {
+        "lat": -33.45499,
+        "lon": -70.66954,
+        "rumbo": 77,
+        "pista": "junto a Corte de Apelaciones de San Miguel"
+      },
+      { "lat": -33.45609, "lon": -70.67495, "rumbo": 257 }
     ],
     "nivel": 4
   },
@@ -3187,9 +3235,9 @@
     "tipo": "calle",
     "comuna": "Santiago",
     "puntos": [
-      { "lat": -33.44176, "lon": -70.63887, "rumbo": 142 },
-      { "lat": -33.46183, "lon": -70.63186, "rumbo": 347 },
-      { "lat": -33.46558, "lon": -70.63085, "rumbo": 168 }
+      { "lat": -33.45222, "lon": -70.63433, "rumbo": 168 },
+      { "lat": -33.45894, "lon": -70.63263, "rumbo": 347 },
+      { "lat": -33.4467, "lon": -70.63572, "rumbo": 163 }
     ],
     "nivel": 4
   },
@@ -3197,18 +3245,14 @@
     "nombre": "Paseo Estado",
     "tipo": "calle",
     "comuna": "Santiago",
-    "puntos": [{ "lat": -33.43867, "lon": -70.64968, "rumbo": 173 }],
+    "puntos": [{ "lat": -33.43857, "lon": -70.64969, "rumbo": 353 }],
     "nivel": 4
   },
   {
     "nombre": "Bandera",
     "tipo": "calle",
     "comuna": "Santiago",
-    "puntos": [
-      { "lat": -33.44048, "lon": -70.65222, "rumbo": 173 },
-      { "lat": -33.43334, "lon": -70.65318, "rumbo": 175 },
-      { "lat": -33.43689, "lon": -70.65275, "rumbo": 354 }
-    ],
+    "puntos": [{ "lat": -33.43817, "lon": -70.65253, "rumbo": 353, "pista": "junto a Ex Congreso Nacional" }],
     "nivel": 4
   },
   {
@@ -3216,9 +3260,9 @@
     "tipo": "calle",
     "comuna": "Santiago",
     "puntos": [
-      { "lat": -33.43869, "lon": -70.6532, "rumbo": 263 },
-      { "lat": -33.44146, "lon": -70.67886, "rumbo": 262 },
-      { "lat": -33.43915, "lon": -70.65778, "rumbo": 83 }
+      { "lat": -33.4387, "lon": -70.6533, "rumbo": 83, "pista": "junto a Ex Congreso Nacional" },
+      { "lat": -33.43972, "lon": -70.66336, "rumbo": 262 },
+      { "lat": -33.44131, "lon": -70.67749, "rumbo": 82 }
     ],
     "nivel": 4
   },
@@ -3227,9 +3271,9 @@
     "tipo": "calle",
     "comuna": "Santiago",
     "puntos": [
-      { "lat": -33.43928, "lon": -70.65536, "rumbo": 352 },
-      { "lat": -33.44292, "lon": -70.65449, "rumbo": 172 },
-      { "lat": -33.43343, "lon": -70.65597, "rumbo": 358 }
+      { "lat": -33.44283, "lon": -70.65451, "rumbo": 352, "pista": "junto a Palacio de La Moneda" },
+      { "lat": -33.43233, "lon": -70.65555, "rumbo": 256, "pista": "junto a Estación Mapocho" },
+      { "lat": -33.43521, "lon": -70.65584, "rumbo": 174 }
     ],
     "nivel": 4
   },
@@ -3238,8 +3282,9 @@
     "tipo": "calle",
     "comuna": "Santiago",
     "puntos": [
-      { "lat": -33.43803, "lon": -70.65397, "rumbo": 353 },
-      { "lat": -33.44412, "lon": -70.65302, "rumbo": 173 }
+      { "lat": -33.44274, "lon": -70.65323, "rumbo": 352, "pista": "junto a Palacio de La Moneda" },
+      { "lat": -33.43258, "lon": -70.65474, "rumbo": 173, "pista": "junto a Estación Mapocho" },
+      { "lat": -33.4392, "lon": -70.6538, "rumbo": 353 }
     ],
     "nivel": 4
   },
@@ -3248,8 +3293,8 @@
     "tipo": "calle",
     "comuna": "Santiago",
     "puntos": [
-      { "lat": -33.43746, "lon": -70.64231, "rumbo": 254 },
-      { "lat": -33.43691, "lon": -70.63834, "rumbo": 270 }
+      { "lat": -33.43736, "lon": -70.64201, "rumbo": 254 },
+      { "lat": -33.43692, "lon": -70.63731, "rumbo": 90 }
     ],
     "nivel": 4
   },
@@ -3258,10 +3303,10 @@
     "tipo": "calle",
     "comuna": "Santiago",
     "puntos": [
-      { "lat": -33.44015, "lon": -70.67804, "rumbo": 83 },
-      { "lat": -33.43968, "lon": -70.67358, "rumbo": 263 },
-      { "lat": -33.44409, "lon": -70.71539, "rumbo": 261 },
-      { "lat": -33.44398, "lon": -70.70143, "rumbo": 91 }
+      { "lat": -33.43726, "lon": -70.65129, "rumbo": 82, "pista": "junto a Plaza de Armas" },
+      { "lat": -33.44026, "lon": -70.67931, "rumbo": 263, "pista": "junto a Museo de la Memoria" },
+      { "lat": -33.43803, "lon": -70.65738, "rumbo": 83, "pista": "junto a Fiscalía Nacional" },
+      { "lat": -33.43882, "lon": -70.66519, "rumbo": 263 }
     ],
     "nivel": 3
   },
@@ -3270,8 +3315,9 @@
     "tipo": "calle",
     "comuna": "Santiago",
     "puntos": [
-      { "lat": -33.44169, "lon": -70.66512, "rumbo": 2 },
-      { "lat": -33.44468, "lon": -70.66483, "rumbo": 173 }
+      { "lat": -33.4342, "lon": -70.66495, "rumbo": 177 },
+      { "lat": -33.44317, "lon": -70.66499, "rumbo": 356 },
+      { "lat": -33.44595, "lon": -70.66474, "rumbo": 355 }
     ],
     "nivel": 4
   },
@@ -3280,9 +3326,10 @@
     "tipo": "calle",
     "comuna": "Providencia",
     "puntos": [
-      { "lat": -33.43052, "lon": -70.59522, "rumbo": 163 },
-      { "lat": -33.42288, "lon": -70.59814, "rumbo": 341 },
-      { "lat": -33.43586, "lon": -70.59313, "rumbo": 358 }
+      { "lat": -33.42041, "lon": -70.59895, "rumbo": 164, "pista": "cerca del canal San Carlos" },
+      { "lat": -33.41376, "lon": -70.60319, "rumbo": 297, "pista": "junto a Edificio Titanium" },
+      { "lat": -33.4281, "lon": -70.59612, "rumbo": 163 },
+      { "lat": -33.43163, "lon": -70.5949, "rumbo": 162 }
     ],
     "nivel": 4
   },
@@ -3291,13 +3338,13 @@
     "tipo": "calle",
     "comuna": "La Florida",
     "puntos": [
-      { "lat": -33.53552, "lon": -70.60098, "rumbo": 91 },
-      { "lat": -33.53501, "lon": -70.55278, "rumbo": 267 },
-      { "lat": -33.53574, "lon": -70.59326, "rumbo": 265 },
-      { "lat": -33.53553, "lon": -70.54619, "rumbo": 261 },
-      { "lat": -33.53597, "lon": -70.57635, "rumbo": 263 },
-      { "lat": -33.53593, "lon": -70.55894, "rumbo": 118 },
-      { "lat": -33.53555, "lon": -70.57167, "rumbo": 267 }
+      { "lat": -33.53562, "lon": -70.55365, "rumbo": 266, "pista": "cerca del canal San Carlos" },
+      { "lat": -33.53519, "lon": -70.54358, "rumbo": 51, "pista": "cerca del canal Las Perdices" },
+      { "lat": -33.53557, "lon": -70.60142, "rumbo": 271 },
+      { "lat": -33.53531, "lon": -70.56184, "rumbo": 88 },
+      { "lat": -33.53569, "lon": -70.58949, "rumbo": 273 },
+      { "lat": -33.53606, "lon": -70.57764, "rumbo": 83 },
+      { "lat": -33.53523, "lon": -70.54803, "rumbo": 274 }
     ],
     "nivel": 3
   },
@@ -3306,16 +3353,17 @@
     "tipo": "calle",
     "comuna": "Puente Alto",
     "puntos": [
-      { "lat": -33.58476, "lon": -70.62196, "rumbo": 261 },
-      { "lat": -33.58036, "lon": -70.58945, "rumbo": 261 },
-      { "lat": -33.58207, "lon": -70.6022, "rumbo": 81 },
-      { "lat": -33.58119, "lon": -70.59609, "rumbo": 81 },
-      { "lat": -33.58082, "lon": -70.59287, "rumbo": 261 },
-      { "lat": -33.57931, "lon": -70.58246, "rumbo": 261 },
-      { "lat": -33.58293, "lon": -70.60907, "rumbo": 266 },
-      { "lat": -33.58591, "lon": -70.63025, "rumbo": 261 },
-      { "lat": -33.57652, "lon": -70.56836, "rumbo": 263 },
-      { "lat": -33.57564, "lon": -70.56034, "rumbo": 83 }
+      { "lat": -33.58479, "lon": -70.62217, "rumbo": 81 },
+      { "lat": -33.58376, "lon": -70.61479, "rumbo": 81 },
+      { "lat": -33.58597, "lon": -70.63081, "rumbo": 98 },
+      { "lat": -33.58188, "lon": -70.60079, "rumbo": 261 },
+      { "lat": -33.58537, "lon": -70.62668, "rumbo": 81 },
+      { "lat": -33.57999, "lon": -70.58693, "rumbo": 81 },
+      { "lat": -33.58295, "lon": -70.60929, "rumbo": 266 },
+      { "lat": -33.57944, "lon": -70.58273, "rumbo": 80 },
+      { "lat": -33.57682, "lon": -70.57101, "rumbo": 84 },
+      { "lat": -33.57548, "lon": -70.55887, "rumbo": 262 },
+      { "lat": -33.58548, "lon": -70.64427, "rumbo": 277 }
     ],
     "nivel": 3
   },
@@ -3324,14 +3372,16 @@
     "tipo": "calle",
     "comuna": "San Joaquín",
     "puntos": [
-      { "lat": -33.51185, "lon": -70.6674, "rumbo": 290 },
-      { "lat": -33.51787, "lon": -70.6422, "rumbo": 103 },
-      { "lat": -33.51391, "lon": -70.6607, "rumbo": 110 },
-      { "lat": -33.50494, "lon": -70.68679, "rumbo": 112 },
-      { "lat": -33.51421, "lon": -70.61978, "rumbo": 73 },
-      { "lat": -33.51871, "lon": -70.63603, "rumbo": 83 },
-      { "lat": -33.5163, "lon": -70.6242, "rumbo": 59 },
-      { "lat": -33.51304, "lon": -70.61474, "rumbo": 269 }
+      { "lat": -33.51777, "lon": -70.62706, "rumbo": 256, "pista": "cerca del Estadio Sargento Aldea" },
+      { "lat": -33.51172, "lon": -70.66782, "rumbo": 110 },
+      { "lat": -33.51869, "lon": -70.63812, "rumbo": 283 },
+      { "lat": -33.51405, "lon": -70.66028, "rumbo": 290 },
+      { "lat": -33.51036, "lon": -70.672, "rumbo": 293 },
+      { "lat": -33.50416, "lon": -70.68905, "rumbo": 112 },
+      { "lat": -33.51345, "lon": -70.61673, "rumbo": 73 },
+      { "lat": -33.51806, "lon": -70.63041, "rumbo": 263 },
+      { "lat": -33.51855, "lon": -70.63427, "rumbo": 83 },
+      { "lat": -33.51499, "lon": -70.62133, "rumbo": 241 }
     ],
     "nivel": 3
   },
@@ -3340,10 +3390,15 @@
     "tipo": "calle",
     "comuna": "La Cisterna",
     "puntos": [
-      { "lat": -33.52614, "lon": -70.66248, "rumbo": 293 },
-      { "lat": -33.52866, "lon": -70.64756, "rumbo": 280 },
-      { "lat": -33.52986, "lon": -70.63985, "rumbo": 100 },
-      { "lat": -33.5231, "lon": -70.6709, "rumbo": 113 }
+      { "lat": -33.51908, "lon": -70.67846, "rumbo": 144, "pista": "cerca del Estadio Clara Estrella" },
+      {
+        "lat": -33.52231,
+        "lon": -70.67375,
+        "rumbo": 293,
+        "pista": "cerca del Pista Atlética Estadio La Cisterna"
+      },
+      { "lat": -33.52591, "lon": -70.66311, "rumbo": 293 },
+      { "lat": -33.52745, "lon": -70.65531, "rumbo": 281 }
     ],
     "nivel": 4
   },
@@ -3352,15 +3407,15 @@
     "tipo": "calle",
     "comuna": "San Bernardo",
     "puntos": [
-      { "lat": -33.54332, "lon": -70.67398, "rumbo": 294 },
-      { "lat": -33.52523, "lon": -70.72291, "rumbo": 114 },
-      { "lat": -33.51982, "lon": -70.73741, "rumbo": 114 },
-      { "lat": -33.53841, "lon": -70.68742, "rumbo": 292 },
-      { "lat": -33.53099, "lon": -70.7075, "rumbo": 119 },
-      { "lat": -33.54091, "lon": -70.68046, "rumbo": 114 },
-      { "lat": -33.53633, "lon": -70.69309, "rumbo": 294 },
-      { "lat": -33.52832, "lon": -70.71456, "rumbo": 114 },
-      { "lat": -33.52166, "lon": -70.7328, "rumbo": 114 }
+      { "lat": -33.54472, "lon": -70.67008, "rumbo": 294 },
+      { "lat": -33.52542, "lon": -70.7224, "rumbo": 114 },
+      { "lat": -33.52237, "lon": -70.7309, "rumbo": 294 },
+      { "lat": -33.53926, "lon": -70.68515, "rumbo": 293 },
+      { "lat": -33.5381, "lon": -70.68845, "rumbo": 292 },
+      { "lat": -33.52097, "lon": -70.73444, "rumbo": 125 },
+      { "lat": -33.5352, "lon": -70.69613, "rumbo": 294 },
+      { "lat": -33.52915, "lon": -70.71234, "rumbo": 114 },
+      { "lat": -33.53057, "lon": -70.7084, "rumbo": 294 }
     ],
     "nivel": 3
   },
@@ -3369,16 +3424,17 @@
     "tipo": "calle",
     "comuna": "Puente Alto",
     "puntos": [
-      { "lat": -33.60715, "lon": -70.53646, "rumbo": 66 },
-      { "lat": -33.61182, "lon": -70.56728, "rumbo": 277 },
-      { "lat": -33.61344, "lon": -70.58517, "rumbo": 260 },
-      { "lat": -33.61243, "lon": -70.57211, "rumbo": 271 },
-      { "lat": -33.61006, "lon": -70.55816, "rumbo": 87 },
-      { "lat": -33.61062, "lon": -70.54778, "rumbo": 104 },
-      { "lat": -33.61667, "lon": -70.61131, "rumbo": 261 },
-      { "lat": -33.61095, "lon": -70.56176, "rumbo": 76 },
-      { "lat": -33.61138, "lon": -70.54407, "rumbo": 283 },
-      { "lat": -33.61745, "lon": -70.6179, "rumbo": 81 }
+      { "lat": -33.60666, "lon": -70.53514, "rumbo": 246 },
+      { "lat": -33.61183, "lon": -70.56717, "rumbo": 277 },
+      { "lat": -33.61568, "lon": -70.6015, "rumbo": 86 },
+      { "lat": -33.6144, "lon": -70.59004, "rumbo": 269 },
+      { "lat": -33.61261, "lon": -70.57871, "rumbo": 82 },
+      { "lat": -33.61026, "lon": -70.54957, "rumbo": 104 },
+      { "lat": -33.61847, "lon": -70.62559, "rumbo": 81 },
+      { "lat": -33.61695, "lon": -70.61387, "rumbo": 82 },
+      { "lat": -33.61014, "lon": -70.55554, "rumbo": 87 },
+      { "lat": -33.6162, "lon": -70.60764, "rumbo": 82 },
+      { "lat": -33.61243, "lon": -70.57305, "rumbo": 93 }
     ],
     "nivel": 3
   },
@@ -3387,9 +3443,9 @@
     "tipo": "calle",
     "comuna": "Pedro Aguirre Cerda",
     "puntos": [
-      { "lat": -33.49947, "lon": -70.69321, "rumbo": 22 },
-      { "lat": -33.48201, "lon": -70.68586, "rumbo": 18 },
-      { "lat": -33.49181, "lon": -70.68968, "rumbo": 198 }
+      { "lat": -33.49788, "lon": -70.69242, "rumbo": 22 },
+      { "lat": -33.4828, "lon": -70.68622, "rumbo": 198 },
+      { "lat": -33.49245, "lon": -70.68993, "rumbo": 18 }
     ],
     "nivel": 4
   },
@@ -3398,14 +3454,14 @@
     "tipo": "calle",
     "comuna": "Maipú",
     "puntos": [
-      { "lat": -33.50411, "lon": -70.81037, "rumbo": 312 },
-      { "lat": -33.50051, "lon": -70.8161, "rumbo": 95 },
-      { "lat": -33.50885, "lon": -70.76967, "rumbo": 278 },
-      { "lat": -33.50935, "lon": -70.77478, "rumbo": 264 },
-      { "lat": -33.50968, "lon": -70.76521, "rumbo": 102 },
-      { "lat": -33.50535, "lon": -70.78995, "rumbo": 84 },
-      { "lat": -33.50874, "lon": -70.8032, "rumbo": 266 },
-      { "lat": -33.50777, "lon": -70.7821, "rumbo": 293 }
+      { "lat": -33.50442, "lon": -70.80996, "rumbo": 132 },
+      { "lat": -33.50135, "lon": -70.81399, "rumbo": 312 },
+      { "lat": -33.50614, "lon": -70.79378, "rumbo": 72 },
+      { "lat": -33.50924, "lon": -70.7739, "rumbo": 84 },
+      { "lat": -33.50954, "lon": -70.76577, "rumbo": 102 },
+      { "lat": -33.50555, "lon": -70.78818, "rumbo": 283 },
+      { "lat": -33.5085, "lon": -70.80225, "rumbo": 252 },
+      { "lat": -33.50651, "lon": -70.78491, "rumbo": 112 }
     ],
     "nivel": 3
   },
@@ -3414,14 +3470,13 @@
     "tipo": "calle",
     "comuna": "Pudahuel",
     "puntos": [
-      { "lat": -33.45312, "lon": -70.73893, "rumbo": 351 },
-      { "lat": -33.46562, "lon": -70.73744, "rumbo": 355 },
-      { "lat": -33.43593, "lon": -70.74085, "rumbo": 181 },
-      { "lat": -33.44606, "lon": -70.74021, "rumbo": 314 },
-      { "lat": -33.46888, "lon": -70.73732, "rumbo": 357 },
-      { "lat": -33.46094, "lon": -70.73803, "rumbo": 175 },
-      { "lat": -33.45721, "lon": -70.73835, "rumbo": 354 },
-      { "lat": -33.44152, "lon": -70.7406, "rumbo": 356 }
+      { "lat": -33.44842, "lon": -70.7394, "rumbo": 176, "pista": "cerca del Estadio Modelo de Pudahuel" },
+      { "lat": -33.45347, "lon": -70.73884, "rumbo": 346 },
+      { "lat": -33.44396, "lon": -70.7406, "rumbo": 181 },
+      { "lat": -33.43292, "lon": -70.74089, "rumbo": 181 },
+      { "lat": -33.43753, "lon": -70.74089, "rumbo": 177 },
+      { "lat": -33.47088, "lon": -70.73725, "rumbo": 177 },
+      { "lat": -33.46433, "lon": -70.73775, "rumbo": 175 }
     ],
     "nivel": 2
   },
@@ -3430,14 +3485,14 @@
     "tipo": "calle",
     "comuna": "Cerrillos",
     "puntos": [
-      { "lat": -33.48064, "lon": -70.72387, "rumbo": 209 },
-      { "lat": -33.47378, "lon": -70.72222, "rumbo": 198 },
-      { "lat": -33.4907, "lon": -70.72275, "rumbo": 339 },
-      { "lat": -33.49818, "lon": -70.7171, "rumbo": 303 },
-      { "lat": -33.50096, "lon": -70.70987, "rumbo": 292 },
-      { "lat": -33.5019, "lon": -70.6975, "rumbo": 74 },
-      { "lat": -33.48778, "lon": -70.72396, "rumbo": 344 },
-      { "lat": -33.50427, "lon": -70.7034, "rumbo": 119 }
+      { "lat": -33.48218, "lon": -70.72445, "rumbo": 5, "pista": "cerca del Zanjón de la Aguada" },
+      { "lat": -33.47721, "lon": -70.72306, "rumbo": 9 },
+      { "lat": -33.49919, "lon": -70.71521, "rumbo": 122 },
+      { "lat": -33.48738, "lon": -70.72409, "rumbo": 346 },
+      { "lat": -33.50339, "lon": -70.69888, "rumbo": 39 },
+      { "lat": -33.50461, "lon": -70.70272, "rumbo": 297 },
+      { "lat": -33.49151, "lon": -70.72236, "rumbo": 169 },
+      { "lat": -33.50206, "lon": -70.69521, "rumbo": 112 }
     ],
     "nivel": 3
   },
@@ -3446,9 +3501,9 @@
     "tipo": "calle",
     "comuna": "Cerro Navia",
     "puntos": [
-      { "lat": -33.42082, "lon": -70.74752, "rumbo": 1 },
-      { "lat": -33.41059, "lon": -70.74634, "rumbo": 12 },
-      { "lat": -33.41363, "lon": -70.74709, "rumbo": 187 }
+      { "lat": -33.41191, "lon": -70.74665, "rumbo": 12, "pista": "cerca del río Mapocho" },
+      { "lat": -33.42072, "lon": -70.74752, "rumbo": 181 },
+      { "lat": -33.42453, "lon": -70.74806, "rumbo": 196 }
     ],
     "nivel": 4
   },
@@ -3457,20 +3512,20 @@
     "tipo": "calle",
     "comuna": "Maipú",
     "puntos": [
-      { "lat": -33.54537, "lon": -70.74458, "rumbo": 217 },
-      { "lat": -33.65224, "lon": -70.82677, "rumbo": 37 },
-      { "lat": -33.65622, "lon": -70.83035, "rumbo": 217 },
-      { "lat": -33.57687, "lon": -70.77176, "rumbo": 36 },
-      { "lat": -33.5228, "lon": -70.72553, "rumbo": 35 },
-      { "lat": -33.62938, "lon": -70.80463, "rumbo": 39 },
-      { "lat": -33.56119, "lon": -70.7588, "rumbo": 217 },
-      { "lat": -33.59188, "lon": -70.78169, "rumbo": 22 },
-      { "lat": -33.61218, "lon": -70.79324, "rumbo": 24 },
-      { "lat": -33.58923, "lon": -70.78018, "rumbo": 29 },
-      { "lat": -33.53968, "lon": -70.73973, "rumbo": 216 },
-      { "lat": -33.51908, "lon": -70.72225, "rumbo": 210 },
-      { "lat": -33.51599, "lon": -70.71993, "rumbo": 213 },
-      { "lat": -33.50799, "lon": -70.71393, "rumbo": 211 }
+      { "lat": -33.51659, "lon": -70.72029, "rumbo": 213, "pista": "muchas automotoras a los lados" },
+      { "lat": -33.5464, "lon": -70.7455, "rumbo": 217 },
+      { "lat": -33.52607, "lon": -70.72824, "rumbo": 214 },
+      { "lat": -33.65651, "lon": -70.83062, "rumbo": 217 },
+      { "lat": -33.56898, "lon": -70.76526, "rumbo": 31 },
+      { "lat": -33.53023, "lon": -70.73159, "rumbo": 213 },
+      { "lat": -33.63623, "lon": -70.8116, "rumbo": 220 },
+      { "lat": -33.56113, "lon": -70.7587, "rumbo": 217 },
+      { "lat": -33.59164, "lon": -70.78157, "rumbo": 202 },
+      { "lat": -33.61375, "lon": -70.79411, "rumbo": 204 },
+      { "lat": -33.58664, "lon": -70.77853, "rumbo": 209 },
+      { "lat": -33.55617, "lon": -70.75432, "rumbo": 205 },
+      { "lat": -33.50525, "lon": -70.71203, "rumbo": 189 },
+      { "lat": -33.51916, "lon": -70.72231, "rumbo": 30 }
     ],
     "nivel": 3
   },
@@ -3479,9 +3534,8 @@
     "tipo": "calle",
     "comuna": "Las Condes",
     "puntos": [
-      { "lat": -33.43015, "lon": -70.58428, "rumbo": 253 },
-      { "lat": -33.42827, "lon": -70.57972, "rumbo": 223 },
-      { "lat": -33.42527, "lon": -70.56429, "rumbo": 83 }
+      { "lat": -33.42447, "lon": -70.55862, "rumbo": 80 },
+      { "lat": -33.42514, "lon": -70.56298, "rumbo": 260 }
     ],
     "nivel": 4
   },
@@ -3490,9 +3544,8 @@
     "tipo": "calle",
     "comuna": "Vitacura",
     "puntos": [
-      { "lat": -33.39097, "lon": -70.58704, "rumbo": 28 },
-      { "lat": -33.40075, "lon": -70.59315, "rumbo": 7 },
-      { "lat": -33.39571, "lon": -70.59187, "rumbo": 217 }
+      { "lat": -33.3918, "lon": -70.58756, "rumbo": 208 },
+      { "lat": -33.38665, "lon": -70.5841, "rumbo": 2 }
     ],
     "nivel": 4
   },
@@ -3501,9 +3554,9 @@
     "tipo": "calle",
     "comuna": "Vitacura",
     "puntos": [
-      { "lat": -33.3977, "lon": -70.57671, "rumbo": 161 },
-      { "lat": -33.39415, "lon": -70.57875, "rumbo": 319 },
-      { "lat": -33.39139, "lon": -70.58428, "rumbo": 117 }
+      { "lat": -33.39622, "lon": -70.57734, "rumbo": 339 },
+      { "lat": -33.39104, "lon": -70.58512, "rumbo": 299 },
+      { "lat": -33.38952, "lon": -70.58795, "rumbo": 129 }
     ],
     "nivel": 4
   },
@@ -3512,9 +3565,9 @@
     "tipo": "calle",
     "comuna": "Las Condes",
     "puntos": [
-      { "lat": -33.42113, "lon": -70.54743, "rumbo": 266 },
-      { "lat": -33.42086, "lon": -70.54083, "rumbo": 268 },
-      { "lat": -33.42085, "lon": -70.56369, "rumbo": 91 }
+      { "lat": -33.42079, "lon": -70.56761, "rumbo": 91 },
+      { "lat": -33.42086, "lon": -70.54083, "rumbo": 88 },
+      { "lat": -33.42169, "lon": -70.5569, "rumbo": 101 }
     ],
     "nivel": 4
   },
@@ -3523,8 +3576,8 @@
     "tipo": "calle",
     "comuna": "Las Condes",
     "puntos": [
-      { "lat": -33.41972, "lon": -70.58553, "rumbo": 257 },
-      { "lat": -33.42053, "lon": -70.59097, "rumbo": 76 }
+      { "lat": -33.42119, "lon": -70.59342, "rumbo": 90 },
+      { "lat": -33.41986, "lon": -70.58768, "rumbo": 256 }
     ],
     "nivel": 4
   },
@@ -3533,9 +3586,9 @@
     "tipo": "calle",
     "comuna": "Las Condes",
     "puntos": [
-      { "lat": -33.42504, "lon": -70.56, "rumbo": 278 },
-      { "lat": -33.424, "lon": -70.52765, "rumbo": 271 },
-      { "lat": -33.42413, "lon": -70.54194, "rumbo": 263 }
+      { "lat": -33.42506, "lon": -70.55965, "rumbo": 98 },
+      { "lat": -33.42387, "lon": -70.53263, "rumbo": 272 },
+      { "lat": -33.42401, "lon": -70.54077, "rumbo": 83 }
     ],
     "nivel": 4
   },
@@ -3544,9 +3597,9 @@
     "tipo": "calle",
     "comuna": "Estación Central",
     "puntos": [
-      { "lat": -33.46404, "lon": -70.72442, "rumbo": 59 },
-      { "lat": -33.46637, "lon": -70.72774, "rumbo": 237 },
-      { "lat": -33.45936, "lon": -70.71361, "rumbo": 242 }
+      { "lat": -33.46747, "lon": -70.72974, "rumbo": 57 },
+      { "lat": -33.46073, "lon": -70.71587, "rumbo": 62 },
+      { "lat": -33.46416, "lon": -70.72364, "rumbo": 238 }
     ],
     "nivel": 2
   },
@@ -3555,9 +3608,14 @@
     "tipo": "calle",
     "comuna": "Recoleta",
     "puntos": [
-      { "lat": -33.40623, "lon": -70.63379, "rumbo": 268 },
-      { "lat": -33.40417, "lon": -70.65115, "rumbo": 284 },
-      { "lat": -33.40597, "lon": -70.62405, "rumbo": 218 }
+      {
+        "lat": -33.4029,
+        "lon": -70.65912,
+        "rumbo": 85,
+        "pista": "cerca del Estadio Santa Laura-Universidad SEK"
+      },
+      { "lat": -33.40628, "lon": -70.63612, "rumbo": 88 },
+      { "lat": -33.40348, "lon": -70.65452, "rumbo": 284 }
     ],
     "nivel": 4
   },
@@ -3566,12 +3624,12 @@
     "tipo": "calle",
     "comuna": "Recoleta",
     "puntos": [
-      { "lat": -33.38714, "lon": -70.65288, "rumbo": 276 },
-      { "lat": -33.3867, "lon": -70.65903, "rumbo": 275 },
-      { "lat": -33.38644, "lon": -70.66279, "rumbo": 274 },
-      { "lat": -33.3966, "lon": -70.62692, "rumbo": 301 },
-      { "lat": -33.39131, "lon": -70.63917, "rumbo": 96 },
-      { "lat": -33.38957, "lon": -70.6886, "rumbo": 239 }
+      { "lat": -33.38676, "lon": -70.65679, "rumbo": 100, "pista": "cerca del Estadio Chacabuco" },
+      { "lat": -33.38834, "lon": -70.64787, "rumbo": 119 },
+      { "lat": -33.39043, "lon": -70.64347, "rumbo": 300 },
+      { "lat": -33.39939, "lon": -70.62144, "rumbo": 302 },
+      { "lat": -33.39295, "lon": -70.63398, "rumbo": 292 },
+      { "lat": -33.38968, "lon": -70.68891, "rumbo": 239 }
     ],
     "nivel": 3
   },
@@ -3580,11 +3638,11 @@
     "tipo": "calle",
     "comuna": "Independencia",
     "puntos": [
-      { "lat": -33.42847, "lon": -70.66059, "rumbo": 352 },
-      { "lat": -33.41981, "lon": -70.66328, "rumbo": 352 },
-      { "lat": -33.39414, "lon": -70.6762, "rumbo": 347 },
-      { "lat": -33.40005, "lon": -70.67204, "rumbo": 339 },
-      { "lat": -33.41548, "lon": -70.66431, "rumbo": 160 }
+      { "lat": -33.42943, "lon": -70.66056, "rumbo": 180, "pista": "cerca del río Mapocho" },
+      { "lat": -33.42628, "lon": -70.66127, "rumbo": 164 },
+      { "lat": -33.40268, "lon": -70.67062, "rumbo": 322 },
+      { "lat": -33.39613, "lon": -70.67497, "rumbo": 148 },
+      { "lat": -33.38688, "lon": -70.67891, "rumbo": 332 }
     ],
     "nivel": 3
   },
@@ -3593,20 +3651,20 @@
     "tipo": "calle",
     "comuna": "Colina",
     "puntos": [
-      { "lat": -33.4215, "lon": -70.67473, "rumbo": 133 },
-      { "lat": -33.32781, "lon": -70.71702, "rumbo": 160 },
-      { "lat": -33.36867, "lon": -70.69943, "rumbo": 159 },
-      { "lat": -33.38353, "lon": -70.69128, "rumbo": 160 },
-      { "lat": -33.33349, "lon": -70.71535, "rumbo": 340 },
-      { "lat": -33.36331, "lon": -70.70195, "rumbo": 160 },
-      { "lat": -33.39618, "lon": -70.68573, "rumbo": 333 },
-      { "lat": -33.26101, "lon": -70.74697, "rumbo": 340 },
-      { "lat": -33.29695, "lon": -70.73093, "rumbo": 160 },
-      { "lat": -33.32017, "lon": -70.72044, "rumbo": 339 },
-      { "lat": -33.37759, "lon": -70.69394, "rumbo": 160 },
-      { "lat": -33.31013, "lon": -70.72496, "rumbo": 159 },
-      { "lat": -33.29122, "lon": -70.73348, "rumbo": 339 },
-      { "lat": -33.40589, "lon": -70.68059, "rumbo": 347 }
+      { "lat": -33.42384, "lon": -70.67259, "rumbo": 146 },
+      { "lat": -33.32701, "lon": -70.71746, "rumbo": 340 },
+      { "lat": -33.26642, "lon": -70.74551, "rumbo": 337 },
+      { "lat": -33.38578, "lon": -70.6903, "rumbo": 340 },
+      { "lat": -33.34129, "lon": -70.71184, "rumbo": 159 },
+      { "lat": -33.35585, "lon": -70.70535, "rumbo": 339 },
+      { "lat": -33.3966, "lon": -70.6855, "rumbo": 153 },
+      { "lat": -33.2601, "lon": -70.74738, "rumbo": 159 },
+      { "lat": -33.29533, "lon": -70.73257, "rumbo": 340 },
+      { "lat": -33.31882, "lon": -70.72104, "rumbo": 159 },
+      { "lat": -33.41093, "lon": -70.67984, "rumbo": 173 },
+      { "lat": -33.30288, "lon": -70.72823, "rumbo": 339 },
+      { "lat": -33.28654, "lon": -70.73559, "rumbo": 160 },
+      { "lat": -33.40566, "lon": -70.68066, "rumbo": 167 }
     ],
     "nivel": 3
   },
@@ -3615,10 +3673,11 @@
     "tipo": "calle",
     "comuna": "Huechuraba",
     "puntos": [
-      { "lat": -33.37836, "lon": -70.61784, "rumbo": 27 },
-      { "lat": -33.37988, "lon": -70.60723, "rumbo": 106 },
-      { "lat": -33.38459, "lon": -70.60464, "rumbo": 305 },
-      { "lat": -33.37809, "lon": -70.6136, "rumbo": 3 }
+      { "lat": -33.37785, "lon": -70.61148, "rumbo": 256, "pista": "cerca del canal El Carmen" },
+      { "lat": -33.38076, "lon": -70.61977, "rumbo": 229 },
+      { "lat": -33.37988, "lon": -70.60734, "rumbo": 286 },
+      { "lat": -33.38376, "lon": -70.60487, "rumbo": 169 },
+      { "lat": -33.37745, "lon": -70.61711, "rumbo": 58 }
     ],
     "nivel": 3
   },
@@ -3626,11 +3685,7 @@
     "nombre": "Diagonal Paraguay",
     "tipo": "calle",
     "comuna": "Santiago",
-    "puntos": [
-      { "lat": -33.44262, "lon": -70.64271, "rumbo": 287 },
-      { "lat": -33.44321, "lon": -70.63935, "rumbo": 280 },
-      { "lat": -33.44215, "lon": -70.63486, "rumbo": 250 }
-    ],
+    "puntos": [{ "lat": -33.44321, "lon": -70.63935, "rumbo": 100 }],
     "nivel": 4
   },
   {
@@ -3638,9 +3693,9 @@
     "tipo": "calle",
     "comuna": "Providencia",
     "puntos": [
-      { "lat": -33.42163, "lon": -70.62215, "rumbo": 209 },
-      { "lat": -33.41568, "lon": -70.61201, "rumbo": 114 },
-      { "lat": -33.41544, "lon": -70.61682, "rumbo": 273 }
+      { "lat": -33.42308, "lon": -70.62286, "rumbo": 6 },
+      { "lat": -33.41586, "lon": -70.61791, "rumbo": 224 },
+      { "lat": -33.41574, "lon": -70.6122, "rumbo": 282 }
     ],
     "nivel": 4
   },
@@ -3649,12 +3704,13 @@
     "tipo": "calle",
     "comuna": "Las Condes",
     "puntos": [
-      { "lat": -33.38831, "lon": -70.51358, "rumbo": 32 },
-      { "lat": -33.41073, "lon": -70.51374, "rumbo": 174 },
-      { "lat": -33.40566, "lon": -70.51663, "rumbo": 166 },
-      { "lat": -33.4156, "lon": -70.51282, "rumbo": 151 },
-      { "lat": -33.41779, "lon": -70.51, "rumbo": 302 },
-      { "lat": -33.38425, "lon": -70.50708, "rumbo": 258 }
+      { "lat": -33.4007, "lon": -70.51736, "rumbo": 345 },
+      { "lat": -33.40867, "lon": -70.51435, "rumbo": 330 },
+      { "lat": -33.40539, "lon": -70.5167, "rumbo": 346 },
+      { "lat": -33.41647, "lon": -70.51193, "rumbo": 124 },
+      { "lat": -33.418, "lon": -70.50762, "rumbo": 48 },
+      { "lat": -33.38467, "lon": -70.50962, "rumbo": 58 },
+      { "lat": -33.41336, "lon": -70.51259, "rumbo": 192 }
     ],
     "nivel": 3
   },
@@ -3663,9 +3719,9 @@
     "tipo": "calle",
     "comuna": "Las Condes",
     "puntos": [
-      { "lat": -33.39528, "lon": -70.51108, "rumbo": 279 },
-      { "lat": -33.3947, "lon": -70.51435, "rumbo": 113 },
-      { "lat": -33.39598, "lon": -70.50676, "rumbo": 102 }
+      { "lat": -33.3948, "lon": -70.52362, "rumbo": 275 },
+      { "lat": -33.39519, "lon": -70.51069, "rumbo": 279 },
+      { "lat": -33.39641, "lon": -70.50406, "rumbo": 103 }
     ],
     "nivel": 4
   },
@@ -3674,11 +3730,11 @@
     "tipo": "calle",
     "comuna": "Peñalolén",
     "puntos": [
-      { "lat": -33.49249, "lon": -70.51834, "rumbo": 353 },
-      { "lat": -33.4673, "lon": -70.53033, "rumbo": 158 },
-      { "lat": -33.4804, "lon": -70.52407, "rumbo": 338 },
-      { "lat": -33.47634, "lon": -70.52595, "rumbo": 338 },
-      { "lat": -33.48829, "lon": -70.52006, "rumbo": 158 }
+      { "lat": -33.46533, "lon": -70.53123, "rumbo": 340, "pista": "cerca del canal Las Perdices" },
+      { "lat": -33.49231, "lon": -70.51836, "rumbo": 173 },
+      { "lat": -33.47167, "lon": -70.52807, "rumbo": 158 },
+      { "lat": -33.49541, "lon": -70.51899, "rumbo": 7 },
+      { "lat": -33.48445, "lon": -70.52207, "rumbo": 338 }
     ],
     "nivel": 3
   },
@@ -3687,18 +3743,18 @@
     "tipo": "calle",
     "comuna": "Cerrillos",
     "puntos": [
-      { "lat": -33.41915, "lon": -70.73125, "rumbo": 356 },
-      { "lat": -33.42376, "lon": -70.7299, "rumbo": 202 },
-      { "lat": -33.43598, "lon": -70.7309, "rumbo": 181 },
-      { "lat": -33.46813, "lon": -70.73145, "rumbo": 358 },
-      { "lat": -33.47258, "lon": -70.731, "rumbo": 180 },
-      { "lat": -33.45739, "lon": -70.73133, "rumbo": 180 },
-      { "lat": -33.46205, "lon": -70.73093, "rumbo": 1 },
-      { "lat": -33.47538, "lon": -70.73101, "rumbo": 181 },
-      { "lat": -33.48787, "lon": -70.73108, "rumbo": 2 },
-      { "lat": -33.49778, "lon": -70.73259, "rumbo": 200 },
-      { "lat": -33.5101, "lon": -70.73469, "rumbo": 169 },
-      { "lat": -33.50264, "lon": -70.73474, "rumbo": 20 }
+      { "lat": -33.44189, "lon": -70.73096, "rumbo": 0, "pista": "junto a «Feria Nº 1 Las Torres»" },
+      { "lat": -33.41946, "lon": -70.73124, "rumbo": 176 },
+      { "lat": -33.424, "lon": -70.73004, "rumbo": 22 },
+      { "lat": -33.46394, "lon": -70.73138, "rumbo": 180 },
+      { "lat": -33.42878, "lon": -70.7307, "rumbo": 4 },
+      { "lat": -33.47134, "lon": -70.73099, "rumbo": 180 },
+      { "lat": -33.45788, "lon": -70.73086, "rumbo": 181 },
+      { "lat": -33.46729, "lon": -70.73094, "rumbo": 180 },
+      { "lat": -33.43865, "lon": -70.73092, "rumbo": 180 },
+      { "lat": -33.49006, "lon": -70.73114, "rumbo": 1 },
+      { "lat": -33.5007, "lon": -70.73342, "rumbo": 21 },
+      { "lat": -33.49714, "lon": -70.7323, "rumbo": 201 }
     ],
     "nivel": 3
   },
@@ -3707,13 +3763,19 @@
     "tipo": "calle",
     "comuna": "Renca",
     "puntos": [
-      { "lat": -33.40685, "lon": -70.73425, "rumbo": 109 },
-      { "lat": -33.40554, "lon": -70.7457, "rumbo": 278 },
-      { "lat": -33.40705, "lon": -70.73912, "rumbo": 285 },
-      { "lat": -33.40654, "lon": -70.71723, "rumbo": 274 },
-      { "lat": -33.4028, "lon": -70.77863, "rumbo": 283 },
-      { "lat": -33.40467, "lon": -70.76862, "rumbo": 283 },
-      { "lat": -33.40601, "lon": -70.76218, "rumbo": 103 }
+      {
+        "lat": -33.40705,
+        "lon": -70.73912,
+        "rumbo": 285,
+        "pista": "cerca del Estadio Newen (ex Estadio Lo Velásquez)"
+      },
+      { "lat": -33.40721, "lon": -70.71375, "rumbo": 90 },
+      { "lat": -33.40657, "lon": -70.7352, "rumbo": 109 },
+      { "lat": -33.40632, "lon": -70.74246, "rumbo": 104 },
+      { "lat": -33.40688, "lon": -70.75525, "rumbo": 94 },
+      { "lat": -33.40345, "lon": -70.77536, "rumbo": 103 },
+      { "lat": -33.40414, "lon": -70.77108, "rumbo": 283 },
+      { "lat": -33.40594, "lon": -70.76251, "rumbo": 103 }
     ],
     "nivel": 2
   },
@@ -3722,11 +3784,12 @@
     "tipo": "calle",
     "comuna": "Renca",
     "puntos": [
-      { "lat": -33.40409, "lon": -70.74033, "rumbo": 109 },
-      { "lat": -33.40218, "lon": -70.74831, "rumbo": 308 },
-      { "lat": -33.39223, "lon": -70.7749, "rumbo": 294 },
-      { "lat": -33.39494, "lon": -70.76799, "rumbo": 115 },
-      { "lat": -33.39791, "lon": -70.75982, "rumbo": 114 }
+      { "lat": -33.40071, "lon": -70.75206, "rumbo": 294 },
+      { "lat": -33.40248, "lon": -70.74765, "rumbo": 303 },
+      { "lat": -33.39101, "lon": -70.77811, "rumbo": 114 },
+      { "lat": -33.39675, "lon": -70.76319, "rumbo": 115 },
+      { "lat": -33.39462, "lon": -70.76852, "rumbo": 114 },
+      { "lat": -33.39861, "lon": -70.75821, "rumbo": 114 }
     ],
     "nivel": 3
   },
@@ -3735,20 +3798,20 @@
     "tipo": "calle",
     "comuna": "San Bernardo",
     "puntos": [
-      { "lat": -33.69622, "lon": -70.67394, "rumbo": 345 },
-      { "lat": -33.71297, "lon": -70.6812, "rumbo": 6 },
-      { "lat": -33.64051, "lon": -70.67131, "rumbo": 141 },
-      { "lat": -33.55213, "lon": -70.66827, "rumbo": 193 },
-      { "lat": -33.58009, "lon": -70.67596, "rumbo": 14 },
-      { "lat": -33.5577, "lon": -70.6697, "rumbo": 13 },
-      { "lat": -33.61428, "lon": -70.68265, "rumbo": 169 },
-      { "lat": -33.60154, "lon": -70.68177, "rumbo": 12 },
-      { "lat": -33.58979, "lon": -70.6786, "rumbo": 12 },
-      { "lat": -33.62983, "lon": -70.67816, "rumbo": 337 },
-      { "lat": -33.65743, "lon": -70.65983, "rumbo": 203 },
-      { "lat": -33.68436, "lon": -70.6726, "rumbo": 196 },
-      { "lat": -33.68964, "lon": -70.67469, "rumbo": 194 },
-      { "lat": -33.57185, "lon": -70.67362, "rumbo": 13 }
+      { "lat": -33.65318, "lon": -70.6608, "rumbo": 141, "pista": "cerca del río Maipo" },
+      { "lat": -33.7004, "lon": -70.67438, "rumbo": 196 },
+      { "lat": -33.72099, "lon": -70.68265, "rumbo": 188 },
+      { "lat": -33.64527, "lon": -70.66672, "rumbo": 321 },
+      { "lat": -33.55131, "lon": -70.66805, "rumbo": 193 },
+      { "lat": -33.58542, "lon": -70.67744, "rumbo": 13 },
+      { "lat": -33.60179, "lon": -70.68173, "rumbo": 12 },
+      { "lat": -33.60835, "lon": -70.68341, "rumbo": 9 },
+      { "lat": -33.62682, "lon": -70.67951, "rumbo": 160 },
+      { "lat": -33.62227, "lon": -70.68104, "rumbo": 170 },
+      { "lat": -33.55588, "lon": -70.66932, "rumbo": 13 },
+      { "lat": -33.65597, "lon": -70.6591, "rumbo": 9 },
+      { "lat": -33.68081, "lon": -70.67116, "rumbo": 28 },
+      { "lat": -33.60568, "lon": -70.68282, "rumbo": 11 }
     ],
     "nivel": 2
   }

@@ -29,6 +29,8 @@ const PREFERENCIAS_POR_DEFECTO = {
   ownStreets: true,
   // Qué tan difícil es "¿Dónde estás?" en la práctica: facil, medio, dificil o extremo. La ronda oficial siempre es extremo.
   nivelStreetView: 'facil',
+  // En "¿Qué calle es?" de la práctica: marcar solo un punto de la calle en vez de todo su trazado.
+  puntoEnCalle: false,
   // La práctica siempre es fácil (bordes de las comunas y líneas del metro); las rondas oficiales, difíciles.
 }
 const LARGO_TODAS = 999

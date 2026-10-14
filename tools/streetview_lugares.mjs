@@ -120,6 +120,9 @@ const TIPOS_DE_CALLE_PUBLICA = new Set([
 ])
 const TAMANO_DE_CELDA = 0.002
 const celdas = new Map()
+// Cruces entre calles con nombre distinto: ahí cuelgan los letreros con el nombre de la calle, así que se evitan.
+const nombresPorVertice = new Map()
+const llaveDeVertice = (lat, lon) => lat.toFixed(5) + ',' + lon.toFixed(5)
 const llaveDeCelda = (lat, lon) => Math.floor(lat / TAMANO_DE_CELDA) + ':' + Math.floor(lon / TAMANO_DE_CELDA)
 for (const archivo of fs.readdirSync('tools/btiles')) {
   const datosOsm = JSON.parse(fs.readFileSync('tools/btiles/' + archivo, 'utf8'))
@@ -128,6 +131,13 @@ for (const archivo of fs.readdirSync('tools/btiles')) {
     if (via.type !== 'way' || !via.geometry || !TIPOS_DE_CALLE_PUBLICA.has(etiquetas?.highway)) continue
     if (['private', 'no'].includes(etiquetas.access) || etiquetas.service) continue
     const linea = via.geometry.map(p => [p.lat, p.lon])
+    const nombreDeLaVia = etiquetas.name ?? etiquetas.ref
+    if (nombreDeLaVia)
+      for (const [lat, lon] of linea) {
+        const llave = llaveDeVertice(lat, lon)
+        if (!nombresPorVertice.has(llave)) nombresPorVertice.set(llave, new Set())
+        nombresPorVertice.get(llave).add(nombreDeLaVia)
+      }
     const vistas = new Set()
     for (const [lat, lon] of linea) {
       const llave = llaveDeCelda(lat, lon)
@@ -149,6 +159,26 @@ function estaSobreUnaCalle(panorama) {
   return false
 }
 console.log('celdas con calles públicas:', celdas.size)
+
+const cruces = new Map()
+for (const [llave, nombres] of nombresPorVertice) {
+  if (nombres.size < 2) continue
+  const [lat, lon] = llave.split(',').map(Number)
+  const celda = llaveDeCelda(lat, lon)
+  if (!cruces.has(celda)) cruces.set(celda, [])
+  cruces.get(celda).push([lat, lon])
+}
+const DISTANCIA_A_UN_CRUCE_KM = 0.04
+function estaCercaDeUnCruce(panorama) {
+  const celdaLat = Math.floor(panorama.lat / TAMANO_DE_CELDA)
+  const celdaLon = Math.floor(panorama.lon / TAMANO_DE_CELDA)
+  for (let dLat = -1; dLat <= 1; dLat++)
+    for (let dLon = -1; dLon <= 1; dLon++)
+      for (const cruce of cruces.get(celdaLat + dLat + ':' + (celdaLon + dLon)) ?? [])
+        if (distanciaKm([panorama.lat, panorama.lon], cruce) <= DISTANCIA_A_UN_CRUCE_KM) return true
+  return false
+}
+console.log('cruces entre calles con nombre:', [...cruces.values()].reduce((suma, lista) => suma + lista.length, 0))
 
 // ----- Street View desde una página con la llave
 const detener = await iniciarServidor({ reconstruir: false })
@@ -218,6 +248,8 @@ async function panoramaUtil(lat, lon, radio, distanciaAUnTunelKm = DISTANCIA_A_U
 const redondear = x => +x.toFixed(5)
 const punto = (panorama, rumbo) => ({ lat: redondear(panorama.lat), lon: redondear(panorama.lon), rumbo: ((Math.round(rumbo) % 360) + 360) % 360 })
 
+const RECINTOS = JSON.parse(fs.readFileSync('src/datos/recintos.json', 'utf8'))
+const PISTAS = JSON.parse(fs.readFileSync('src/datos/pistasCalles.json', 'utf8'))
 const resultado = []
 // Modo parcial: solo las calles de SV_CALLES y/o los puntos extra, mezclados con lo que ya hay en el archivo.
 const SOLO_CALLES = process.env.SV_CALLES?.split('|')
@@ -308,7 +340,12 @@ async function panoramasEnAnillos(lugar, anillos, elegidos) {
       const panorama = await panoramaUtil(lat, lon, anillo === 0 ? 60 : RADIO_DE_BUSQUEDA_M)
       if (panorama) candidatos.push(panorama)
     }
-    candidatos.sort((a, b) => distanciaKm([a.lat, a.lon], [lugar.lat, lugar.lon]) - distanciaKm([b.lat, b.lon], [lugar.lat, lugar.lon]))
+    const cercaDeCruce = candidato => (estaCercaDeUnCruce(candidato) ? 1 : 0)
+    candidatos.sort(
+      (a, b) =>
+        cercaDeCruce(a) - cercaDeCruce(b) ||
+        distanciaKm([a.lat, a.lon], [lugar.lat, lugar.lon]) - distanciaKm([b.lat, b.lon], [lugar.lat, lugar.lon]),
+    )
     for (const candidato of candidatos)
       if (
         elegidos.length < PUNTOS_POR_LUGAR &&
@@ -323,12 +360,49 @@ const panoramasEnLasCallesCercaDe = async lugar => {
   const elegidos = await panoramasEnAnillos(lugar, ANILLOS_KM, [])
   return elegidos.length || !process.env.SV_LUGARES ? elegidos : panoramasEnAnillos(lugar, ANILLOS_LEJANOS_KM, elegidos)
 }
+// Un cerro grande: los puntos van dentro de su recinto y en el juego vale cualquier toque dentro de él.
+const PUNTOS_POR_RECINTO = 6
+const SEPARACION_EN_UN_RECINTO_KM = 0.25
+function estaEnElPoligono([lat, lon], poligono) {
+  let dentro = false
+  for (let i = 0, j = poligono.length - 1; i < poligono.length; j = i++) {
+    const [latI, lonI] = poligono[i]
+    const [latJ, lonJ] = poligono[j]
+    if (lonI > lon !== lonJ > lon && lat < ((latJ - latI) * (lon - lonI)) / (lonJ - lonI) + latI) dentro = !dentro
+  }
+  return dentro
+}
+async function panoramasDentroDe(poligono) {
+  const lats = poligono.map(p => p[0])
+  const lons = poligono.map(p => p[1])
+  const elegidos = []
+  for (let intento = 0; intento < 150 && elegidos.length < PUNTOS_POR_RECINTO; intento++) {
+    const lat = Math.min(...lats) + azar() * (Math.max(...lats) - Math.min(...lats))
+    const lon = Math.min(...lons) + azar() * (Math.max(...lons) - Math.min(...lons))
+    if (!estaEnElPoligono([lat, lon], poligono)) continue
+    const panorama = await panoramaUtil(lat, lon, 40)
+    if (!panorama || !estaEnElPoligono([panorama.lat, panorama.lon], poligono)) continue
+    if (estaCercaDeUnCruce(panorama) && intento < 100) continue
+    if (elegidos.some(otro => distanciaKm([otro.lat, otro.lon], [panorama.lat, panorama.lon]) < SEPARACION_EN_UN_RECINTO_KM)) continue
+    elegidos.push(panorama)
+  }
+  return elegidos
+}
+
 const sinCalleCerca = []
 for (const nombre of SOLO_LUGARES ?? (PARCIAL ? [] : IMPORTANTES)) {
   const lugar = datos.landmarks.find(l => l.name === nombre)
   if (!lugar) {
     console.log('  no existe en los datos:', nombre)
     continue
+  }
+  if (RECINTOS[lugar.name] && lugar.name.startsWith('Cerro')) {
+    const dentro = await panoramasDentroDe(RECINTOS[lugar.name])
+    if (dentro.length) {
+      const puntosDentro = dentro.map(panorama => punto(panorama, azar() * 360))
+      resultado.push({ nombre: 'Dentro de ' + lugar.name.replace(/\s*\(.*\)/, ''), tipo: 'lugar', referencia: lugar.name, comuna: lugar.comuna, puntos: puntosDentro })
+      continue
+    }
   }
   const panoramas = await panoramasEnLasCallesCercaDe(lugar)
   if (!panoramas.length) {
@@ -365,7 +439,8 @@ if (CON_EXTRAS)
 const KM_POR_PUNTO = 1.2
 const MINIMO_DE_PUNTOS_POR_CALLE = 3
 const MAXIMO_DE_PUNTOS_POR_CALLE = 14
-const REINTENTOS_POR_TRAMO = 3
+const REINTENTOS_POR_TRAMO = 6
+const INTENTOS_SIN_CRUCE = 4 // los primeros intentos exigen estar lejos de un cruce; los últimos aceptan cualquiera
 const SEPARACION_MINIMA_KM = 0.3
 const puntosParaCalle = calle =>
   Math.max(MINIMO_DE_PUNTOS_POR_CALLE, Math.min(MAXIMO_DE_PUNTOS_POR_CALLE, Math.round(calle.km / KM_POR_PUNTO)))
@@ -377,16 +452,31 @@ const callesIncompletas = []
 for (const calle of calles) {
   const puntos = []
   const cantidad = puntosParaCalle(calle)
+  const sirveSobreLaCalle = panorama => distanciaYRumboALinea([panorama.lat, panorama.lon], calle.lines).km <= MARGEN_SOBRE_LA_CALLE_KM
+  const muyCerca = panorama => puntos.some(otro => distanciaKm([otro.lat, otro.lon], [panorama.lat, panorama.lon]) < SEPARACION_MINIMA_KM)
+  const agregar = (panorama, extra = {}) => {
+    const sobreLaCalle = distanciaYRumboALinea([panorama.lat, panorama.lon], calle.lines)
+    puntos.push({ ...punto(panorama, sobreLaCalle.rumbo + (azar() < 0.5 ? 0 : 180)), ...extra })
+  }
+  // primero los tramos que ayudan a reconocer la calle (un río al lado, automotoras, una feria, un mall…)
+  for (const pista of PISTAS[calle.name] ?? []) {
+    for (let intento = 0; intento < REINTENTOS_POR_TRAMO; intento++) {
+      const corrimiento = () => (intento ? (azar() - 0.5) * 0.0006 : 0)
+      const panorama = await panoramaUtil(pista.lat + corrimiento(), pista.lon + corrimiento(), 30)
+      if (!panorama || !sirveSobreLaCalle(panorama) || muyCerca(panorama)) continue
+      if (estaCercaDeUnCruce(panorama) && intento < INTENTOS_SIN_CRUCE) continue
+      agregar(panorama, { pista: pista.pista })
+      break
+    }
+  }
   // un tramo por punto: dentro de cada uno se elige un lugar al azar, así quedan repartidos por toda la calle
-  for (let tramo = 0; tramo < cantidad; tramo++)
+  for (let tramo = 0; tramo < cantidad && puntos.length < cantidad; tramo++)
     for (let intento = 0; intento < REINTENTOS_POR_TRAMO; intento++) {
       const candidato = puntoEnLaCalle(calle, (tramo + azar()) / cantidad)
       const panorama = await panoramaUtil(candidato[0], candidato[1], 30)
-      if (!panorama) continue
-      const sobreLaCalle = distanciaYRumboALinea([panorama.lat, panorama.lon], calle.lines)
-      if (sobreLaCalle.km > MARGEN_SOBRE_LA_CALLE_KM) continue
-      if (puntos.some(otro => distanciaKm([otro.lat, otro.lon], [panorama.lat, panorama.lon]) < SEPARACION_MINIMA_KM)) continue
-      puntos.push(punto(panorama, sobreLaCalle.rumbo + (azar() < 0.5 ? 0 : 180)))
+      if (!panorama || !sirveSobreLaCalle(panorama) || muyCerca(panorama)) continue
+      if (estaCercaDeUnCruce(panorama) && intento < INTENTOS_SIN_CRUCE) continue
+      agregar(panorama)
       break
     }
   if (!puntos.length) {

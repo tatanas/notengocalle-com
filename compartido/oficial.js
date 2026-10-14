@@ -10,6 +10,7 @@ export const REGLAS_OFICIALES = {
   ownStreets: false,
   easy: false,
   nivelStreetView: 'extremo',
+  puntoEnCalle: false,
 }
 
 // Juegos con ranking.

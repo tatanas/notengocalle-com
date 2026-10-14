@@ -6,6 +6,7 @@ import {
   abrirPagina,
   jugarRondaDeAlternativas,
   dormir,
+  responderComoSea,
   texto,
 } from '../apoyo.js'
 
@@ -480,6 +481,28 @@ export async function categoriasRanking(navegador, { verificar }) {
     /de 20$/.test((await texto(pagina, '#panel .q-head')).split('\n')[0].trim()),
     'jugar desde el ranking usa el largo de la pestaña',
   )
+  verificar(!errores.length, `sin errores en la consola${errores.length ? ': ' + errores.join(' | ') : ''}`)
+  await pagina.close()
+}
+
+// "¿Qué calle es?" con un solo punto marcado (ajuste de la práctica): sin trazado completo, con un pin, y la ronda oficial no cambia.
+export async function puntoEnCalle(navegador, { verificar }) {
+  const { page: pagina, errors: errores } = await abrirPagina(navegador)
+  await pagina.$eval('#setPunto', casilla => casilla.click())
+  await pagina.click('[data-mode="st-name"]')
+  await pagina.waitForSelector('.q-head')
+  await dormir(500)
+  const prompt = () => pagina.$eval('.q-prompt', nodo => nodo.innerText)
+  verificar(/punto marcado/.test(await prompt()), `la pregunta habla de un punto: «${await prompt()}»`)
+  verificar(!!(await pagina.$('.pin.ans')), 'el punto está marcado en el mapa')
+  await responderComoSea(pagina)
+  await pagina.waitForSelector('#btnNext', { timeout: 3000 })
+  verificar(true, 'se puede responder y sale "Siguiente"')
+
+  await irAlInicio(pagina)
+  await pagina.click('[data-official="st-name"]')
+  await pagina.waitForSelector('#panel .q-head', { timeout: 8000 })
+  verificar(!/punto marcado/.test(await prompt()), 'la ronda oficial sigue marcando la calle entera')
   verificar(!errores.length, `sin errores en la consola${errores.length ? ': ' + errores.join(' | ') : ''}`)
   await pagina.close()
 }

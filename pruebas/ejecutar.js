@@ -11,6 +11,7 @@ import {
   ajusteCelular,
   callesPropias,
   categoriasRanking,
+  puntoEnCalle,
   confirmarSalida,
   cronometro,
   cuentaRegresiva,
@@ -40,6 +41,7 @@ const CONJUNTOS = {
   'facil-dificil': facilDificil,
   'reiniciar-ronda': reiniciarRonda,
   'categorias-ranking': categoriasRanking,
+  'punto-en-calle': puntoEnCalle,
   fotos,
   cuentas,
 }

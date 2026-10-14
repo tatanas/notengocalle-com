@@ -113,6 +113,10 @@ function fichasDeLineasDeMetro() {
     <span class="muted" style="font-size:12px;align-self:center">← líneas con las que jugar</span></div>`
 }
 
+// En la práctica de "¿Qué calle es?": marcar solo un punto de la calle, para no aprender solo su forma.
+const fichaDePuntoEnCalle = () =>
+  `<div style="margin-bottom:10px">${pastilla('Marcar solo un punto de la calle en «¿Qué calle es?» (práctica)', ajustes.puntoEnCalle, 'id="setPunto"')}</div>`
+
 // Los juegos paso a paso van primero dentro de su grupo.
 const pasosPrimero = (a, b) => (b.id.startsWith('rs-') ? 1 : 0) - (a.id.startsWith('rs-') ? 1 : 0)
 
@@ -156,6 +160,7 @@ function tarjetaDeGrupo(grupo) {
     ${selectorDeLargo(grupo.name, modos)}
     ${selectorDeNivel(grupo.name)}
     ${grupo.name === 'Metro' ? fichasDeLineasDeMetro() : ''}
+    ${grupo.name === 'Calles' ? fichaDePuntoEnCalle() : ''}
     <div class="modes">${modos.map(filaDeModo).join('')}</div>
   </div>`
 }
@@ -275,6 +280,14 @@ function conectarAjustes() {
   for (const selectorElegido of vistaDePantalla.querySelectorAll('[data-length-group]'))
     selectorElegido.onchange = () => {
       ajustes.lengths = { ...ajustes.lengths, [selectorElegido.dataset.lengthGroup]: +selectorElegido.value }
+      guardarAjustes()
+    }
+
+  const soloUnPunto = $('#setPunto')
+  if (soloUnPunto)
+    soloUnPunto.onchange = evento => {
+      ajustes.puntoEnCalle = evento.target.checked
+      evento.target.parentElement.classList.toggle('on', evento.target.checked)
       guardarAjustes()
     }
 

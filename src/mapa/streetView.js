@@ -6,7 +6,8 @@ import { encuadrarCiudad, mapa, repararMapaBase } from './mapa.js'
 // para que el resto del juego siga siendo instantáneo y sin depender de Google.
 const LLAVE = __LLAVE_DE_GOOGLE_MAPS__
 const RADIO_DE_BUSQUEDA_M = 60
-// No se puede caminar: solo mirar alrededor. Si algo logra moverlo más que esto, vuelve al punto de partida.
+// En las preguntas no se puede caminar: solo mirar alrededor. Si algo logra moverlo más que esto, vuelve al punto de
+// partida. Al terminar una pregunta de calles sí se puede recorrer la calle (modo caminable).
 const TOLERANCIA_DE_MOVIMIENTO_KM = 0.005
 
 export const streetViewDisponible = () => !!LLAVE
@@ -91,18 +92,21 @@ function crearElementos() {
   botones.id = 'botonesDePanorama'
   botones.hidden = true
   botones.innerHTML = `<button type="button" id="reportarTunel" title="Este punto está en un túnel: que no vuelva a salir">🚧 Reportar túnel</button>
+    <button type="button" id="cerrarRecorrido" hidden>✖ Cerrar Street View</button>
     <button type="button" id="alternarVista"></button>`
   app.appendChild(botones)
+  document.getElementById('cerrarRecorrido').onclick = ocultarPanorama
   document.getElementById('reportarTunel').onclick = () => alReportar()
   botonAlternar().onclick = alternarEntrePanoramaYMapa
 }
 
-// Deja al jugador mirando desde el panorama de Street View más cercano a (lat, lon), sin poder caminar.
+// Deja al jugador mirando desde el panorama de Street View más cercano a (lat, lon), sin poder caminar
+// (salvo con caminable: true, que deja recorrer la calle).
 // Devuelve el punto real del panorama (puede quedar a unos metros del pedido) o null si ahí no hay cobertura.
 // alReportarTunel se llama cuando el jugador avisa que ese punto está en un túnel.
 export async function mostrarPanorama(
   { lat, lon, rumbo = Math.random() * 360 },
-  { alReportarTunel = () => {} } = {},
+  { alReportarTunel = () => {}, caminable = false } = {},
 ) {
   const maps = await cargarGoogleMaps()
   const { StreetViewPanorama, StreetViewService } = await maps.importLibrary('streetView')
@@ -129,7 +133,10 @@ export async function mostrarPanorama(
   contenedor.hidden = false
   botones.hidden = false
   if (!panorama) crearPanorama(StreetViewPanorama)
-  inicioDeLaPregunta = inicio
+  panorama.setOptions({ clickToGo: caminable, linksControl: caminable, showRoadLabels: caminable })
+  document.getElementById('reportarTunel').hidden = caminable
+  document.getElementById('cerrarRecorrido').hidden = !caminable
+  inicioDeLaPregunta = caminable ? null : inicio
   panoDeInicio = lugar.pano
   panorama.setPano(lugar.pano)
   panorama.setPov({ heading: rumbo, pitch: 0 })
