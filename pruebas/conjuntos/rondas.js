@@ -165,7 +165,7 @@ export async function fotos(navegador, { verificar }) {
 // Salir de una ronda a medias pide confirmación; "seguir jugando" no pierde nada.
 export async function confirmarSalida(navegador, { verificar }) {
   const { page: pagina, errors: errores } = await abrirPagina(navegador)
-  await pagina.click('[data-mode="com-name"]')
+  await pagina.click('[data-mode="st-name"]')
   await pagina.waitForSelector('.opt:not([disabled])')
   await pagina.click('#btnHome')
   await pagina.waitForSelector('#confirmDialog[open]')
@@ -266,8 +266,8 @@ export async function disenoMenu(navegador, { verificar }) {
     etiquetas.map(etiqueta => etiqueta.innerText.trim()),
   )
   verificar(!categorias.includes('Metro'), 'y ya no es una categoría de los lugares emblemáticos')
-  // Street View solo aparece si hay llave de Google: se cuenta aparte (su práctica es el botón grande y la oficial el chico).
-  // En Metro la práctica no va al lado sino abajo, con las líneas elegidas.
+  // Street View solo aparece si hay llave de Google: se cuenta aparte (un botón oficial por nivel, sin práctica).
+  // Comunas no tiene práctica; en Metro la práctica no va al lado sino abajo, con las líneas elegidas.
   const grandes = await pagina.$$eval(
     '.mode-row .mode.ranked',
     botones => botones.filter(boton => !boton.dataset.official.startsWith('sv-')).length,
@@ -277,11 +277,12 @@ export async function disenoMenu(navegador, { verificar }) {
   )
   const sinStreetView = MODOS_OFICIALES.filter(id => !id.startsWith('sv-'))
   const cantidadEsperada = sinStreetView.length
-  const chicosEsperados = sinStreetView.filter(id => !id.startsWith('mt-')).length
+  const chicosEsperados = sinStreetView.filter(id => !id.startsWith('mt-') && !id.startsWith('com-')).length
   verificar(
     grandes === cantidadEsperada && chicos.length === chicosEsperados,
-    `cada juego tiene botón grande (oficial) y chico (práctica), salvo el metro: ${grandes} y ${chicos.length}`,
+    `cada juego tiene botón grande (oficial) y chico (práctica), salvo el metro y las comunas: ${grandes} y ${chicos.length}`,
   )
+  verificar(!(await existe(pagina, '[data-mode^="com-"]')), 'las comunas no tienen práctica')
   const practicaDelMetro = await pagina.$$eval(
     '.card .separador ~ .modes [data-mode^="mt-"]',
     botones => botones.length,
@@ -292,7 +293,7 @@ export async function disenoMenu(navegador, { verificar }) {
     'el botón chico es la pesa 🏋️ (práctica)',
   )
 
-  await pagina.click('[data-mode="com-name"]')
+  await pagina.click('[data-mode="lm-loc"]')
   await pagina.waitForSelector('.q-head', { timeout: 1500 })
   verificar(
     !/Ronda oficial/.test(await texto(pagina, '.q-head')),
@@ -313,7 +314,10 @@ export async function disenoMenu(navegador, { verificar }) {
   )
   await pagina.click('#btnProgreso')
   await pagina.waitForSelector('#resetStats', { timeout: 2000 })
-  verificar(/Mi progreso/.test(await texto(pagina, '#title')), 'Mi progreso abre su propia página')
+  verificar(
+    (await pagina.$eval('.pestana.activa', pestana => pestana.dataset.pantalla)) === 'progress',
+    'Mi progreso abre su propia página, con su pestaña marcada',
+  )
   verificar(!errores.length, `sin errores en la consola${errores.length ? ': ' + errores.join(' | ') : ''}`)
   await pagina.close()
 }
@@ -372,8 +376,8 @@ export async function facilDificil(navegador, { verificar }) {
   verificar((await lineasDeMetro(pagina)) > 0, 'la práctica dibuja las líneas del metro')
 
   await irAlInicio(pagina)
-  await pagina.click('[data-mode="com-name"]')
-  await pagina.waitForSelector('.q-head')
+  await pagina.click('[data-official="com-name"]')
+  await pagina.waitForSelector('#panel .q-head', { timeout: 8000 })
   verificar(
     (await botonesDelMapa(pagina)).length === 0,
     'en el juego de comunas no hay ningún botón sobre el mapa',
@@ -395,7 +399,7 @@ export async function facilDificil(navegador, { verificar }) {
 export async function reiniciarRonda(navegador, { verificar }) {
   const { page: pagina, errors: errores } = await abrirPagina(navegador)
   const reinicioVisible = () => pagina.$eval('#btnRestart', boton => !boton.hidden)
-  await pagina.click('[data-mode="com-name"]')
+  await pagina.click('[data-mode="lm-com"]')
   await pagina.waitForSelector('.q-head')
   verificar(!(await reinicioVisible()), 'en la práctica no hay botón de reiniciar')
 

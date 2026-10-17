@@ -4,9 +4,6 @@ import { $ } from '../nucleo/utilidades.js'
 export const panel = $('#panel')
 export const vistaDePantalla = $('#screen')
 export const indicador = $('#hud')
-export const titulo = $('#title')
-
-export const NOMBRE_DE_LA_APP = 'NoTengoCalle'
 
 export function mostrarPanel(html) {
   panel.innerHTML = html

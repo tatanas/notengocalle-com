@@ -1,5 +1,6 @@
 import * as autenticacion from './autenticacion.js'
 import { ErrorHttp, prohibido, invalido, noEncontrado, noDisponible } from './errores.js'
+import * as progreso from './progreso.js'
 import * as puntajes from './puntajes.js'
 import * as reportes from './reportes.js'
 import { claveFiltrada } from './claves.js'
@@ -15,6 +16,9 @@ const RUTAS = {
   'GET /api/tabla': puntajes.tablaDePosiciones,
   'GET /api/lideres': puntajes.lideres,
   'POST /api/reportes': reportes.reportarPunto,
+  'GET /api/progreso': progreso.leerProgreso,
+  'POST /api/progreso': progreso.guardarProgreso,
+  'POST /api/progreso/borrar': progreso.borrarProgreso,
 }
 
 const BYTES_MAXIMOS_DE_CUERPO = 10_000

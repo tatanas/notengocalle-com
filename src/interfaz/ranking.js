@@ -14,8 +14,9 @@ import { limpiarCapa } from '../mapa/mapa.js'
 import { tieneRondaOficial, iniciarPartida, detenerPartida } from '../juego/engine.js'
 import { MODOS, modoPorId } from '../juego/registry.js'
 import { abrirDialogoDeCuenta } from './cuenta.js'
-import { definirPantalla, navegar } from './navegacion.js'
-import { ocultarPanel, mostrarPantalla, titulo } from './panel.js'
+import { definirPantalla } from './navegacion.js'
+import { ocultarPanel, mostrarPantalla } from './panel.js'
+import { htmlDelPie } from './pie.js'
 
 const ETIQUETAS_DE_PERIODO = { todo: 'Histórico', semana: 'Últimos 7 días' }
 const TODOS_LOS_JUEGOS = ''
@@ -176,7 +177,6 @@ function conectarPestanas() {
 
 function dibujar() {
   mostrarPantalla(`<div class="wrap narrow">
-    <button class="btn sec small" id="rankBack">← Menú</button>
     <div class="hero"><h2>🏆 Ranking</h2>
       <p>Solo cuentan las rondas oficiales. Gana quien acierta más; si hay empate, quien pensó menos tiempo. Cada largo de ronda tiene su propio ranking.</p></div>
     <div class="card">
@@ -184,8 +184,8 @@ function dibujar() {
       <div id="rankTabs" style="margin-top:12px">${htmlDePestanasDeCategoria()}</div>
       <div id="rankBody" style="margin-top:12px"></div>
     </div>
+    ${htmlDelPie()}
   </div>`)
-  $('#rankBack').onclick = () => navegar('home')
   $('#rankMode').onchange = evento => elegirVista({ modo: evento.target.value })
   for (const pastilla of document.querySelectorAll('[data-period]'))
     pastilla.onclick = () => elegirVista({ periodo: pastilla.dataset.period })
@@ -200,7 +200,6 @@ function abrirRanking(idDeModo, categoria) {
   detenerPartida()
   limpiarCapa()
   ocultarPanel()
-  titulo.textContent = 'Ranking'
   vista.modo = idDeModo ?? TODOS_LOS_JUEGOS
   if (categoria !== undefined) vista.categoria = categoria
   if (vista.modo && !modosOficiales().some(modo => modo.id === vista.modo)) vista.modo = TODOS_LOS_JUEGOS

@@ -24,9 +24,9 @@ import {
   vigilarAjustesDeVista,
 } from '../mapa/mapa.js'
 import { confirmarAccion } from '../interfaz/confirmar.js'
-import { resguardarSalida, navegar } from '../interfaz/navegacion.js'
+import { marcarPestana, resguardarSalida, navegar } from '../interfaz/navegacion.js'
 import { mostrarResultadoOficial } from '../interfaz/resultadoOficial.js'
-import { ocultarPantalla, indicador, panel, mostrarPanel, titulo, aviso } from '../interfaz/panel.js'
+import { ocultarPantalla, indicador, panel, mostrarPanel, aviso } from '../interfaz/panel.js'
 
 /* Un modo define: id, group, name, desc (opcional: se muestra bajo el nombre en el menú), pool(), key(item) y ask(item, quiz).
    Opcionales: label(item), balance(item), setup(quiz), limpiar() (al salir), disponible() (si no, no aparece en el menú), all, keepLayer, noHint, aids, relief, chile, roomy, tall, study.
@@ -157,7 +157,7 @@ export function iniciarPartida(
     hinted: false,
   }
   ocultarPantalla()
-  titulo.textContent = modo.name
+  marcarPestana('home')
   fijarModoDeEtiquetas('plain')
   if (!oficial && !modo.noHint && !modo.study) controlDePista.addTo(mapa)
   controlDePista.reset()

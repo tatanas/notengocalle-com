@@ -39,9 +39,16 @@ export async function humo(navegador, { verificar }, { celular = false, solo = n
   } = await abrirPagina(navegador, { celular })
   await pagina.screenshot({ path: CAPTURAS + prefijo + 'home.png' })
 
-  const ofrecidos = [
+  const conPractica = [
     ...new Set(await pagina.$$eval('[data-mode]', botones => botones.map(boton => boton.dataset.mode))),
   ]
+  // Los juegos sin práctica (comunas) se juegan con su ronda oficial.
+  const soloOficiales = [
+    ...new Set(
+      await pagina.$$eval('[data-official]', botones => botones.map(boton => boton.dataset.official)),
+    ),
+  ].filter(id => !conPractica.includes(id))
+  const ofrecidos = [...conPractica, ...soloOficiales]
   verificar(ofrecidos.length >= 15, `el menú ofrece ${ofrecidos.length} juegos`)
   const modos = solo ? ofrecidos.filter(id => solo.some(prefijo => id.startsWith(prefijo))) : ofrecidos
 
@@ -51,8 +58,13 @@ export async function humo(navegador, { verificar }, { celular = false, solo = n
     if (id.startsWith('sv-')) continue
     durante(id)
     await irAlInicio(pagina)
-    await pagina.click(`[data-mode="${id}"]`)
-    await pagina.waitForSelector('.q-head, #screen:not(.hidden)', { timeout: 3000 }).catch(() => {})
+    const oficial = soloOficiales.includes(id)
+    await pagina.click(oficial ? `[data-official="${id}"]` : `[data-mode="${id}"]`)
+    await pagina
+      .waitForSelector(oficial ? '#panel .q-head' : '.q-head, #screen:not(.hidden)', {
+        timeout: oficial ? 8000 : 3000,
+      })
+      .catch(() => {})
     await dormir(200)
     if (!(await pagina.$eval('#screen', pantalla => pantalla.classList.contains('hidden')))) {
       console.log(`  · ${id}: sin elementos, se omite`)

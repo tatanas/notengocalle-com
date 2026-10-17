@@ -1,34 +1,63 @@
 import { mostrarAyudas } from '../mapa/ayudas.js'
 import { COLORES, iconoDiv, dibujarMetro } from '../mapa/dibujo.js'
 import { DATOS, LINEAS_DE_METRO, comunasDelNucleo, lugarPorId, vias } from '../datos/datos.js'
-import { responder, encabezadoDePregunta, partida } from './engine.js'
+import { responder, encabezadoDePregunta, partida, saltarPregunta } from './engine.js'
+import { ajustes } from '../nucleo/almacen.js'
+import { distanciaKm } from '../nucleo/geografia.js'
 import { escaparHtml, mezclar } from '../nucleo/utilidades.js'
 import { encuadrar, capa } from '../mapa/mapa.js'
 import { pildoraDeLinea } from '../dominio/metro.js'
-import { panel, mostrarPanel } from '../interfaz/panel.js'
+import { rutaEnAuto } from '../dominio/rutaEnAuto.js'
+import { aviso, panel, mostrarPanel } from '../interfaz/panel.js'
 import { registrarModo } from './registry.js'
 
-export const lugarSanJoaquin = DATOS.landmarks.find(l => /Campus San Joaquín/.test(l.name))
-export const CASA = {
-  id: 'home',
-  name: 'Punto fijo',
-  comuna: 'Santiago',
-  lat: -33.4372,
-  lon: -70.6506,
+// En la práctica en auto, el jugador puede fijar un punto propio (su casa, su trabajo) del que parten o al que llegan
+// todas las rutas: ajustes.puntoDeRuteo = { nombre, lat, lon, sentido: 'desde' | 'hacia' }. Se guarda solo en su navegador.
+const PUNTO_PROPIO = 'propio'
+const puntoPropio = () => {
+  const { nombre, lat, lon } = ajustes.puntoDeRuteo
+  return { id: PUNTO_PROPIO, name: nombre, lat, lon }
 }
-export const SJ = {
-  id: 'sj',
-  name: 'Campus San Joaquín UC',
-  comuna: 'Macul',
-  lat: lugarSanJoaquin ? lugarSanJoaquin.lat : -33.4988,
-  lon: lugarSanJoaquin ? lugarSanJoaquin.lon : -70.6107,
+const extremoDeRuta = id => (id === PUNTO_PROPIO ? puntoPropio() : lugarPorId[id])
+const lugarDeLaRuta = ruta => extremoDeRuta(ruta.from === PUNTO_PROPIO ? ruta.to : ruta.from)
+
+// Los destinos del punto propio: lugares emblemáticos ni tan cerca (la ruta sería trivial) ni tan lejos.
+const KM_MINIMOS_DESDE_EL_PUNTO = 3
+const KM_MAXIMOS_DESDE_EL_PUNTO = 30
+const esLugarDeLandmarks = lugar => /^l\d+$/.test(lugar.id)
+
+function rutasDelPuntoPropio() {
+  const punto = puntoPropio()
+  const desde = ajustes.puntoDeRuteo.sentido !== 'hacia'
+  return DATOS.landmarks
+    .filter(lugar => {
+      const km = distanciaKm([punto.lat, punto.lon], [lugar.lat, lugar.lon])
+      return esLugarDeLandmarks(lugar) && km >= KM_MINIMOS_DESDE_EL_PUNTO && km <= KM_MAXIMOS_DESDE_EL_PUNTO
+    })
+    .map(lugar => {
+      const [from, to] = desde ? [PUNTO_PROPIO, lugar.id] : [lugar.id, PUNTO_PROPIO]
+      return { k: `${from}>${to}`, from, to }
+    })
 }
-export const punto = id => (id === 'home' ? CASA : id === 'sj' ? SJ : lugarPorId[id])
-export const otroExtremo = r => {
-  const a = punto(r.from),
-    b = punto(r.to)
-  return a === CASA || a === SJ ? b : a
+
+// Las rutas del punto propio se piden a OSRM al llegar a la pregunta (y la siguiente se adelanta).
+async function rutaCalculada(ruta, q) {
+  if (ruta.steps) return ruta
+  mostrarPanel(encabezadoDePregunta(q) + '<p class="muted">Calculando la ruta…</p>')
+  let calculada
+  try {
+    calculada = await rutaEnAuto(extremoDeRuta(ruta.from), extremoDeRuta(ruta.to))
+  } catch {
+    aviso('No pude calcular la ruta: revisa tu conexión.')
+  }
+  if (partida !== q) return null
+  const siguiente = q.items[q.i + 1]
+  if (siguiente && !siguiente.steps)
+    rutaEnAuto(extremoDeRuta(siguiente.from), extremoDeRuta(siguiente.to)).catch(() => {})
+  if (!calculada) saltarPregunta()
+  return calculada
 }
+
 // Nombres de calles reales para completar alternativas cuando la ruta trae pocas.
 const callesDeRelleno = () => vias().map(calle => calle.name.replace(/\s*\(.*\)/, ''))
 /* cfg: {A, B, steps:[{label, x:[...], g, color}], sub, firstQ, nextQ, summary} */
@@ -141,28 +170,30 @@ export function preguntarPasos(q, cfg) {
   )
   dibujar()
 }
-export function registrarModoDePasosEnAuto(id, nombre, filtro) {
+export function registrarModoDePasosEnAuto(id, nombre) {
   registrarModo({
     id,
     group: 'Ruteo',
     aids: true,
     name: nombre,
-    balance: r => (otroExtremo(r) || {}).comuna,
-    pool: () => (DATOS.steps || []).filter(filtro),
-    key: r => r.k,
-    label: r => punto(r.from).name + ' → ' + punto(r.to).name,
-    ask(r, q) {
-      const A = punto(r.from),
-        B = punto(r.to)
+    balance: ruta => lugarDeLaRuta(ruta)?.comuna,
+    pool: () => (ajustes.puntoDeRuteo ? rutasDelPuntoPropio() : DATOS.steps || []),
+    key: ruta => ruta.k,
+    label: ruta => extremoDeRuta(ruta.from).name + ' → ' + extremoDeRuta(ruta.to).name,
+    async ask(ruta, q) {
+      const recorrido = await rutaCalculada(ruta, q)
+      if (!recorrido) return
+      const A = extremoDeRuta(ruta.from),
+        B = extremoDeRuta(ruta.to)
       preguntarPasos(q, {
         A,
         B,
-        steps: r.steps.map(s => ({ label: s.n, x: s.x, g: s.g })),
+        steps: recorrido.steps.map(paso => ({ label: paso.n, x: paso.x, g: paso.g })),
         filler: callesDeRelleno(),
-        sub: `En auto · ~${String(r.km).replace('.', ',')} km · ${r.steps.length} calles principales (las chicas se omiten)`,
+        sub: `En auto · ~${String(recorrido.km).replace('.', ',')} km · ${recorrido.steps.length} calles principales (las chicas se omiten)`,
         firstQ: '¿por qué calle partes?',
         nextQ: '¿a qué calle sigues?',
-        summary: `<p><b>${r.steps.map(s => escaparHtml(s.n)).join(' → ')}</b></p><p class="muted">~${String(r.km).replace('.', ',')} km, ~${r.min} min sin taco. Ruta calculada por OSRM; puede haber otras igual de buenas (y no considera TAG ni tacos).</p>`,
+        summary: `<p><b>${recorrido.steps.map(paso => escaparHtml(paso.n)).join(' → ')}</b></p><p class="muted">~${String(recorrido.km).replace('.', ',')} km, ~${recorrido.min} min sin taco. Ruta calculada por OSRM; puede haber otras igual de buenas (y no considera TAG ni tacos).</p>`,
       })
     },
   })
@@ -186,19 +217,19 @@ export const htmlDePasoDeTransporte = v => {
     .join('')
   return `${m[1] === 'Micro' ? '🚌' : m[1] === 'Metro' ? '🚇' : '🚆'} ${pildoras} hasta <b>${escaparHtml(m[3])}</b>`
 }
-export function registrarModoDePasosEnTransporte(id, nombre, filtro) {
+export function registrarModoDePasosEnTransporte(id, nombre) {
   registrarModo({
     id,
     group: 'Ruteo',
     aids: true,
     name: nombre,
-    balance: r => (otroExtremo(r) || {}).comuna,
-    pool: () => (DATOS.transit || []).filter(filtro),
+    balance: r => lugarPorId[r.from]?.comuna,
+    pool: () => DATOS.transit || [],
     key: r => r.k,
-    label: r => punto(r.from).name + ' → ' + punto(r.to).name,
+    label: r => lugarPorId[r.from].name + ' → ' + lugarPorId[r.to].name,
     ask(r, q) {
-      const A = punto(r.from),
-        B = punto(r.to)
+      const A = lugarPorId[r.from],
+        B = lugarPorId[r.to]
       preguntarPasos(q, {
         A,
         B,

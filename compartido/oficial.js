@@ -9,6 +9,7 @@ export const REGLAS_OFICIALES = {
   strict: false,
   ownStreets: false,
   easy: false,
+  puntoDeRuteo: null,
 }
 
 // Juegos con ranking.

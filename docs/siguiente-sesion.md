@@ -60,12 +60,25 @@ node servidor/admin.js reportes     túneles reportados por los jugadores
    (automáticas: agua, automotoras, feria, estadio, lugares emblemáticos cercanos). Falta lo que OSM no dice (bandejones, arbolado): cargarlo a mano en `PISTAS_MANUALES` (`tools/pistas_calles.mjs`).
 2. **Autopistas en Street View**: son muy amplias; el dueño dijo "dejémoslo" por ahora. Idea: ponerlas solo en puntos cercanos a un lugar relevante (Costanera Norte junto al Costanera Center, Vespucio junto a un mall…).
 3. **Salidas de Costanera Norte y Vespucio** como guía para decidir qué calles agregar: el dueño pidió solo la lista (no agregar); no hay una fuente oficial limpia (TAG, `tag.cl/mapa`, o los mapas de cada concesionaria).
-4. Sincronizar el progreso de práctica entre dispositivos; tabla general de ranking; historial de rondas (ver `CLAUDE.md`, "Ideas pendientes").
+4. Tabla general de ranking; historial de rondas; sincronizar también los récords personales (ver `CLAUDE.md`, "Ideas pendientes").
+5. **Ruteo por Street View** (idea del dueño, sin hacer): ver la propuesta al final de este archivo.
 5. Verificar en el primer despliegue real: camino con Neon real y el `rateLimit` por IP de `netlify/functions/api.js` (nunca se han visto funcionar).
 6. `tools/` está desordenado (~100 archivos); ordenar solo si se puede volver a correr cada script.
 
 ## Decisiones recientes del dueño (para no discutirlas de nuevo)
-- Street View: **sí se camina** durante la pregunta (hasta 500 m, sin nombres en el panorama ni en el mapa; el puntaje se mide desde el punto de partida; antes no se podía y al dueño le parecía demasiado difícil); ronda siempre de 10; sin "todas"; un botón de práctica por nivel con su 🏆 oficial al lado (ranking por nivel); el fácil es chico (~24) y céntrico; priorizar calles y lugares históricos sobre recintos.
+- Street View: **sí se camina** durante la pregunta (hasta 500 m, sin nombres en el panorama ni en el mapa; el puntaje se mide desde el punto de partida; antes no se podía y al dueño le parecía demasiado difícil); ronda siempre de 10; sin "todas"; un botón por nivel, **todos ronda oficial** (sin práctica: sin ayudas no tenía sentido; ídem Comunas); el fácil es chico (~24) y céntrico; priorizar calles y lugares históricos sobre recintos.
 - Street View en cerros grandes: vale cualquier toque dentro del cerro. Evitar letreros (cruces) en lo posible.
 - El punto de la pregunta debe cambiar entre partidas: nadie debe ganar memorizando una foto.
 - Calles agregadas: Agustinas y Monjitas (para ubicarse cerca de La Moneda), Rolando Petersen, Camino a Lonquén (se tomó éste porque no hay "Av. Lonquén"), Isabel La Católica, Candelaria Goyenechea, Luis Carrera, Alonso de Camargo, Presidente Errázuriz y Alexander Fleming (de vuelta).
+
+## Propuesta: ruteo por Street View (sin hacer)
+Idea del dueño: llegar de A a B mirando Street View en vez del mapa, con instrucciones como las de Google Maps en auto.
+- **Caminar libre de A a B no sirve**: cada clic avanza ~10 m (una ruta de 3 km son cientos de clics). Descartado.
+- **Lo que sí funciona: saltar de cruce en cruce.** Con las rutas en auto que ya existen (`DATOS.steps`, o las del punto propio de
+  `src/dominio/rutaEnAuto.js`), en cada cambio de calle se muestra Street View unos 40 m antes del cruce, mirando hacia donde se avanza
+  (rumbo del último tramo de la geometría). Arriba, la instrucción del tramo anterior ("Sigue por Av. Grecia 1,2 km") y la pregunta
+  "¿Qué haces en este cruce?" con 3–4 alternativas ("Dobla a la derecha en Av. Macul", "Sigue derecho por Av. Grecia"…). Si se equivoca,
+  se corrige al tiro y sigue desde el cruce correcto; al final, el mapa con la ruta completa.
+- Detalles: el lado del giro sale de comparar el rumbo antes y después del cruce; para las alternativas incorrectas, del rumbo de la calle
+  del juego más cercana al cruce. Reutilizar el único panorama (`src/mapa/streetView.js`). En autopistas y túneles no hay buena imagen:
+  esos pasos van solo con texto. Los letreros de los cruces se ven, pero aquí ayudan: es justamente aprender a ubicarse en la calle.

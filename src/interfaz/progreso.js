@@ -1,10 +1,13 @@
 import { mejores, reiniciarProgreso, estadisticas } from '../nucleo/progreso.js'
+import { borrarProgresoCompartido } from '../cuenta/progresoCompartido.js'
+import { usuario } from '../cuenta/sesion.js'
 import { $, escaparHtml, formatearTiempo } from '../nucleo/utilidades.js'
 import { limpiarCapa, fijarChile, fijarRelieve } from '../mapa/mapa.js'
 import { detenerPartida } from '../juego/engine.js'
 import { MODOS } from '../juego/registry.js'
 import { definirPantalla } from './navegacion.js'
-import { ocultarPanel, mostrarPantalla, titulo } from './panel.js'
+import { ocultarPanel, mostrarPantalla } from './panel.js'
+import { htmlDelPie } from './pie.js'
 
 function mejorRonda(idDeModo) {
   const llaves = Object.keys(mejores).filter(llave => llave.startsWith(idDeModo + ':'))
@@ -46,12 +49,13 @@ function abrirProgreso() {
   ocultarPanel()
   fijarRelieve(false)
   fijarChile(false)
-  titulo.textContent = 'Mi progreso'
   mostrarPantalla(`<div class="wrap pagina-angosta"><div class="card">${htmlDeProgreso()}
-    <div class="row" style="margin-top:10px"><button class="btn sec small" id="resetStats">Borrar progreso</button></div></div></div>`)
+    <p class="muted nota">${usuario ? 'Tu progreso de práctica se guarda en tu cuenta: es el mismo en todos tus dispositivos.' : 'Tu progreso se guarda solo en este navegador. Con una cuenta, es el mismo en todos tus dispositivos.'}</p>
+    <div class="row" style="margin-top:10px"><button class="btn sec small" id="resetStats">Borrar progreso</button></div></div>${htmlDelPie()}</div>`)
   $('#resetStats').onclick = () => {
     if (!confirm('¿Borrar todo tu progreso?')) return
     reiniciarProgreso()
+    borrarProgresoCompartido()
     abrirProgreso()
   }
 }

@@ -23,7 +23,10 @@ import { tieneRondaOficial, iniciarPartida, detenerPartida } from '../juego/engi
 import { MODOS, modoPorId } from '../juego/registry.js'
 import { mostrarMisCalles } from './misCalles.js'
 import { definirPantalla } from './navegacion.js'
-import { NOMBRE_DE_LA_APP, ocultarPanel, vistaDePantalla, mostrarPantalla, titulo } from './panel.js'
+import { ocultarPanel, vistaDePantalla, mostrarPantalla } from './panel.js'
+import { htmlDelPie } from './pie.js'
+import { conectarPuntoDeRuteo, htmlDelPuntoDeRuteo } from './puntoDeRuteo.js'
+import { alTraerProgreso } from '../cuenta/progresoCompartido.js'
 
 const GRUPOS = [
   {
@@ -75,8 +78,6 @@ const GRUPOS = [
   },
 ]
 
-const enlace = (href, texto) => `<a href="${href}" target="_blank" rel="noopener">${texto}</a>`
-
 const pastilla = (etiqueta, marcado, atributos, estilo = '') =>
   `<label class="chip ${marcado ? 'on' : ''}" style="${estilo}"><input type="checkbox" ${atributos} ${marcado ? 'checked' : ''}>${etiqueta}</label>`
 
@@ -117,30 +118,29 @@ const DESCRIPCION_DE_NIVEL = {
   extremo: 'Cualquier calle o lugar del juego',
 }
 
-// Street View: un botón de práctica por nivel y, al lado, la ronda oficial de ese nivel (cada nivel tiene su ranking).
+// Street View: una ronda oficial por nivel, y cada nivel tiene su ranking.
 function filasDeNivelesDeStreetView(modo) {
   return NIVELES_DE_STREET_VIEW.map(nivel => {
     const nombre = etiquetaDeCategoria(nivel)
     const dominado = conReglas({ nivelStreetView: nivel }, () => dominio(modo))
     return `<div class="mode-row">
-    <button class="mode" data-mode="${modo.id}" data-nivel="${nivel}" title="Práctica del nivel ${nombre}: ronda sin ranking">
+    <button class="mode ranked" data-official="${modo.id}" data-nivel="${nivel}" title="Ronda oficial del nivel ${nombre}: cuenta para su ranking">
       <span><b>${nombre}</b><br><small>${DESCRIPCION_DE_NIVEL[nivel]}</small></span><span class="mastery">${dominado}</span>
     </button>
-    <button class="oficial-chico" data-official="${modo.id}" data-nivel="${nivel}" title="Ronda oficial del nivel ${nombre}: cuenta para su ranking" aria-label="Ronda oficial de ${escaparHtml(modo.name)}, nivel ${nombre}">🏆</button>
   </div>`
   }).join('')
 }
 
 // El botón grande es la ronda oficial (cuenta para el ranking); el chico, una ronda de práctica.
-// Un juego sin ronda oficial deja su único botón como práctica. Excepciones: en Street View hay un botón de práctica por
-// nivel, con su oficial chica al lado; y en Metro la práctica va aparte, abajo, con las líneas elegidas.
+// Un juego sin ronda oficial deja su único botón como práctica. Excepciones: los juegos solo oficiales (Street View, con
+// un botón por nivel, y Comunas) no tienen práctica; y en Metro la práctica va aparte, abajo, con las líneas elegidas.
 function filaDeModo(modo) {
   if (modo.group === 'Street View' && tieneRondaOficial(modo)) return filasDeNivelesDeStreetView(modo)
   const etiqueta = etiquetaDeModo(modo, { todasLasLineas: modo.group === 'Metro' })
   if (!tieneRondaOficial(modo))
     return `<div class="mode-row"><button class="mode" data-mode="${modo.id}">${etiqueta}</button></div>`
   const botonOficial = `<button class="mode ranked" data-official="${modo.id}" title="Ronda oficial: cuenta para el ranking">${etiqueta}</button>`
-  if (modo.group === 'Metro') return `<div class="mode-row">${botonOficial}</div>`
+  if (modo.group === 'Metro' || modo.soloOficial) return `<div class="mode-row">${botonOficial}</div>`
   return `<div class="mode-row">
     ${botonOficial}
     <button class="practice" data-mode="${modo.id}" title="Práctica: ronda sin ranking, con ayudas" aria-label="Práctica de ${escaparHtml(modo.name)}">🏋️</button>
@@ -213,6 +213,7 @@ function ajustesDeLaTarjeta(grupo, modos) {
     selectorDeLargo(grupo.name, modos),
     grupo.name === 'Comunas' ? selectorDeAlcance() : '',
     grupo.name === 'Lugares emblemáticos' ? ajustesDeLugares() : '',
+    grupo.name === 'Ruteo' ? htmlDelPuntoDeRuteo() : '',
   ].filter(Boolean)
   return opciones.length
     ? `<hr class="separador"><div class="ajustes-de-tarjeta">${opciones.join('')}</div>`
@@ -232,14 +233,6 @@ function tarjetaDeGrupo(grupo) {
   </div>`
 }
 
-const htmlDeCreditos = () =>
-  `<p class="foot">Mapas y datos: © ${enlace('https://www.openstreetmap.org/copyright', 'OpenStreetMap')} (ODbL),
-    mapa base © ${enlace('https://openfreemap.org', 'OpenFreeMap')} / OpenMapTiles, rutas: ${enlace('https://project-osrm.org', 'OSRM')},
-    recorridos: Red (DTPM), relieve: AWS Terrain Tiles, fotos: autores indicados en cada foto vía
-    ${enlace('https://commons.wikimedia.org', 'Wikimedia Commons')} y ${enlace('https://panoramax.fr', 'Panoramax')}.
-    Datos generados el ${escaparHtml(DATOS.built)}. ${enlace('/privacidad.html', 'Privacidad')}.</p>
-  <p class="foot">Hecho a punta de Claude por ${enlace('https://github.com/tatanas', 'tatanas')}.</p>`
-
 const htmlDeInicio = () => `<div class="home-backdrop" aria-hidden="true"></div>
   <div class="wrap">
   <div class="hero inicio"><h2>¿Dónde queda eso? 🏔️</h2>
@@ -252,7 +245,7 @@ const htmlDeInicio = () => `<div class="home-backdrop" aria-hidden="true"></div>
       <p>Agrega calles que te importan a ti (la de tu casa, la de un amigo). Aparecen en los juegos de calles y se guardan solo en este navegador.</p>
       <div id="myst"></div></div>
   </div>
-  ${htmlDeCreditos()}
+  ${htmlDelPie()}
 </div>`
 
 const valoresMarcados = (contenedor, atributo) =>
@@ -299,27 +292,17 @@ function conectarAjustes() {
     }
 }
 
-// La práctica de Street View juega el nivel guardado en los ajustes (de ahí sale también su récord personal).
-function recordarNivelDeStreetView(boton) {
-  if (!boton.dataset.nivel) return
-  ajustes.nivelStreetView = boton.dataset.nivel
-  guardarAjustes()
-}
-
 function abrirInicio() {
   detenerPartida()
   limpiarCapa()
   ocultarPanel()
   fijarRelieve(false)
   fijarChile(false)
-  titulo.textContent = NOMBRE_DE_LA_APP
   mostrarPantalla(htmlDeInicio())
 
   for (const boton of vistaDePantalla.querySelectorAll('[data-mode]'))
-    boton.onclick = () => {
-      recordarNivelDeStreetView(boton)
-      iniciarPartida(modoPorId(boton.dataset.mode))
-    }
+    boton.onclick = () => iniciarPartida(modoPorId(boton.dataset.mode))
+  // Los botones de nivel de Street View traen el nivel, que es la categoría de su ranking.
   for (const boton of vistaDePantalla.querySelectorAll('[data-official]'))
     boton.onclick = () =>
       iniciarPartida(modoPorId(boton.dataset.official), {
@@ -328,6 +311,14 @@ function abrirInicio() {
       })
   mostrarMisCalles($('#myst'))
   conectarAjustes()
+  conectarPuntoDeRuteo(redibujarInicioSinSaltar)
 }
 
 definirPantalla('home', abrirInicio)
+
+// Cuando llega el progreso de la cuenta (jugado en otro dispositivo), el "% dominado" del menú se pone al día.
+const menuALaVista = () =>
+  !vistaDePantalla.classList.contains('hidden') && !!vistaDePantalla.querySelector('.home-backdrop')
+alTraerProgreso(() => {
+  if (menuALaVista()) redibujarInicioSinSaltar()
+})

@@ -113,19 +113,14 @@ function describe(leg,dest,RD){
 }
 // --- trabajos (mismos pares que las rutas en auto)
 const old=JSON.parse(fs.readFileSync('routes.json'));const byId=Object.fromEntries(lm.map(l=>[l.id,l]));
-const sj=lm.find(l=>/Campus San Joaquín/.test(l.name));
-const ORIG=[{id:'home',name:'Punto fijo',lat:-33.4372,lon:-70.6506},{id:'sj',name:'Campus San Joaquín UC',lat:sj.lat,lon:sj.lon}];
 const hubs=new Set(old.flatMap(r=>[r.from,r.to]));const jobs=[];
-for(const O of ORIG)for(const l of lm){if(dkm(O,l)<3)continue;jobs.push({o:O.id,a:O,b:l});if(hubs.has(l.id))jobs.push({o:O.id,a:l,b:O});}
-for(const r of old)jobs.push({o:null,a:byId[r.from],b:byId[r.to]});
+for(const r of old)jobs.push({a:byId[r.from],b:byId[r.to]});
 const cacheD={};const cacheR={};const out=[];let skip=0;
 for(const j of jobs){const D=cacheD[j.a.id]||(cacheD[j.a.id]=dijkstra(j.a));const R=pathTo(D,j.b);
   if(!R||R.legs.length<2||R.legs.length>4){skip++;continue;}
   const RD=cacheR[j.b.id]||(cacheR[j.b.id]=reverseDijkstra(j.b));
   const legs=R.legs.map(l=>describe(l,j.b,RD));if(legs.some(l=>l.x.length<2)){skip++;continue;}
-  out.push({k:j.a.id+'>'+j.b.id,o:j.o,from:j.a.id,to:j.b.id,min:Math.round(R.sec/60),walk:Math.round(R.walkEnd*1000),legs});}
+  out.push({k:j.a.id+'>'+j.b.id,from:j.a.id,to:j.b.id,min:Math.round(R.sec/60),walk:Math.round(R.walkEnd*1000),legs});}
 fs.writeFileSync('transit.json',JSON.stringify(out));
 console.log('itinerarios',out.length,'omitidos',skip,'bytes',fs.statSync('transit.json').size);
-for(const n of ['Escuela Militar','Palacio de La Moneda','Estadio Nacional','PUC – Campus San Joaquín','Mall Plaza Vespucio']){const r=out.find(r=>r.o==='home'&&r.from==='home'&&byId[r.to].name===n);if(r)console.log('Casa →',n,'('+r.min+' min):',r.legs.map(l=>l.label+' ['+l.min+"']").join(' ⇒ '),'\n    distractores 1:',r.legs[0].x.slice(0,3).join(' | '));}
-for(const n of ['Costanera Center / Gran Torre Santiago','Palacio de La Moneda','Portal La Dehesa']){const r=out.find(r=>r.from==='sj'&&byId[r.to].name===n);if(r)console.log('SJ →',n,'('+r.min+' min):',r.legs.map(l=>l.label).join(' ⇒ '));}
 })();

@@ -15,6 +15,7 @@
   --shadow: 0 6px 24px rgba(0, 0, 0, 0.12);
   --panel-w: 390px;
   --top-h: 52px;
+  --pestana-activa: #2a8f86;
 }
 * {
   box-sizing: border-box;
@@ -56,14 +57,72 @@ button {
   z-index: 1200;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
-#topbar h1 {
-  font-size: 17px;
-  margin: 0;
-  flex: 0 1 auto;
+/* Las secciones son pestañas, como las de un navegador: la activa, un poco más clara, con las curvas de Chrome abajo. */
+#pestanas {
+  align-self: stretch;
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+  min-width: 0;
+  padding-left: 2px;
+}
+.pestana {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  height: calc(100% - 8px);
+  min-width: 0;
+  padding: 0 14px;
+  border: 0;
+  border-radius: 10px 10px 0 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
   white-space: nowrap;
+  cursor: pointer;
+}
+.pestana:hover {
+  background: rgba(255, 255, 255, 0.12);
+}
+.pestana.activa {
+  background: var(--pestana-activa);
+}
+.pestana.activa::before,
+.pestana.activa::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  width: 10px;
+  height: 10px;
+  pointer-events: none;
+}
+.pestana.activa::before {
+  left: -10px;
+  background: radial-gradient(circle at 0 0, transparent 10px, var(--pestana-activa) 10.5px);
+}
+.pestana.activa::after {
+  right: -10px;
+  background: radial-gradient(circle at 100% 0, transparent 10px, var(--pestana-activa) 10.5px);
+}
+.pestana .icono {
+  font-size: 18px;
+  line-height: 1;
+}
+.pestana-inicio {
+  flex: 0 1 auto;
+}
+.pestana-inicio img {
+  flex: 0 0 auto;
+  border-radius: 5px;
+}
+.pestana .marca {
+  font-size: 16px;
+  font-weight: 650;
   overflow: hidden;
   text-overflow: ellipsis;
-  font-weight: 650;
 }
 #hud {
   margin-left: auto;
@@ -81,40 +140,19 @@ button {
   cursor: pointer;
   color: inherit;
 }
-/* Ranking, Explorar y Mi progreso, junto al nombre: con texto en escritorio y solo el emoji en el celular */
-#navSuperior {
-  display: flex;
-  gap: 2px;
-  margin-left: 6px;
-}
-.navbtn {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  background: transparent;
-  border: 0;
-  border-radius: 8px;
-  padding: 6px 10px;
-  color: inherit;
-  font: inherit;
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-  white-space: nowrap;
-}
-.navbtn:hover {
-  background: rgba(255, 255, 255, 0.15);
-}
-.navbtn .icono {
-  font-size: 18px;
-  line-height: 1;
-}
+/* En el celular, Ranking, Explorar y Mi progreso muestran solo el emoji. */
 @media (max-width: 760px) {
-  .navbtn .texto {
+  #pestanas {
+    padding-left: 0;
+  }
+  .pestana .texto {
     display: none;
   }
-  .navbtn {
-    padding: 6px;
+  .pestana {
+    padding: 0 8px;
+  }
+  .pestana .marca {
+    font-size: 15px;
   }
 }
 .pagina-angosta {
@@ -954,8 +992,7 @@ h3.tight {
 .mode.ranked:hover {
   border-color: var(--warn);
 }
-.practice,
-.oficial-chico {
+.practice {
   flex: 0 0 auto;
   width: 56px;
   border: 1px solid var(--line);
@@ -965,8 +1002,7 @@ h3.tight {
   font-size: 22px;
   color: var(--muted);
 }
-.practice:hover,
-.oficial-chico:hover {
+.practice:hover {
   border-color: var(--pri);
   color: var(--ink);
 }
@@ -1215,14 +1251,6 @@ table.board.clickable tr[data-open]:hover td {
   margin: 0 0 8px;
   font-size: 15px;
 }
-/* En Street View el botón chico es la ronda oficial */
-.oficial-chico {
-  border-color: #f2d58a;
-  background: #fffbeb;
-}
-.oficial-chico:hover {
-  border-color: var(--warn);
-}
 /* Lo configurable de cada tarjeta va al final, bajo una raya */
 .ajustes-de-tarjeta {
   display: flex;
@@ -1235,4 +1263,27 @@ table.board.clickable tr[data-open]:hover td {
 .ajustes-de-tarjeta .nota {
   font-size: 12px;
   margin: 0;
+}
+/* Ruteo: el punto fijo del jugador y la búsqueda para elegirlo */
+.punto-propio {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+.punto-propio select {
+  width: auto;
+  padding: 5px 8px;
+}
+#buscarPunto input {
+  flex: 1;
+  min-width: 0;
+}
+#resultadosDelPunto {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+#resultadosDelPunto:empty {
+  display: none;
 }

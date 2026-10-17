@@ -1819,17 +1819,6 @@
     "nivel": 2
   },
   {
-    "nombre": "Av. Raúl Labbé",
-    "tipo": "calle",
-    "comuna": "Lo Barnechea",
-    "puntos": [
-      { "lat": -33.36204, "lon": -70.49384, "rumbo": 290, "pista": "cerca del río Mapocho" },
-      { "lat": -33.36406, "lon": -70.51378, "rumbo": 249, "pista": "muchas automotoras a los lados" },
-      { "lat": -33.36137, "lon": -70.50423, "rumbo": 254 }
-    ],
-    "nivel": 4
-  },
-  {
     "nombre": "Av. José Alcalde Délano",
     "tipo": "calle",
     "comuna": "Lo Barnechea",
@@ -1856,20 +1845,6 @@
       { "lat": -33.40179, "lon": -70.53281, "rumbo": 242 },
       { "lat": -33.40516, "lon": -70.53894, "rumbo": 75 },
       { "lat": -33.40136, "lon": -70.51865, "rumbo": 84 }
-    ],
-    "nivel": 3
-  },
-  {
-    "nombre": "Av. Paul Harris",
-    "tipo": "calle",
-    "comuna": "Las Condes",
-    "puntos": [
-      { "lat": -33.38061, "lon": -70.52123, "rumbo": 233 },
-      { "lat": -33.39593, "lon": -70.53993, "rumbo": 181 },
-      { "lat": -33.40386, "lon": -70.53885, "rumbo": 158 },
-      { "lat": -33.38266, "lon": -70.52451, "rumbo": 233 },
-      { "lat": -33.38516, "lon": -70.52847, "rumbo": 53 },
-      { "lat": -33.41084, "lon": -70.536, "rumbo": 342 }
     ],
     "nivel": 3
   },
@@ -2500,17 +2475,6 @@
     "nivel": 3
   },
   {
-    "nombre": "Av. El Rodeo",
-    "tipo": "calle",
-    "comuna": "Lo Barnechea",
-    "puntos": [
-      { "lat": -33.35744, "lon": -70.52453, "rumbo": 343 },
-      { "lat": -33.35355, "lon": -70.52261, "rumbo": 64 },
-      { "lat": -33.3511, "lon": -70.50779, "rumbo": 80 }
-    ],
-    "nivel": 4
-  },
-  {
     "nombre": "Av. Presidente Riesco",
     "tipo": "calle",
     "comuna": "Las Condes",
@@ -2620,19 +2584,6 @@
       { "lat": -33.45735, "lon": -70.6659, "rumbo": 258 }
     ],
     "nivel": 4
-  },
-  {
-    "nombre": "Las Hualtatas",
-    "tipo": "calle",
-    "comuna": "Vitacura",
-    "puntos": [
-      { "lat": -33.38291, "lon": -70.53925, "rumbo": 236 },
-      { "lat": -33.37794, "lon": -70.53126, "rumbo": 46 },
-      { "lat": -33.39989, "lon": -70.58254, "rumbo": 54 },
-      { "lat": -33.39674, "lon": -70.57647, "rumbo": 241 },
-      { "lat": -33.3926, "lon": -70.56642, "rumbo": 71 }
-    ],
-    "nivel": 3
   },
   {
     "nombre": "Av. Chile España",
@@ -2953,28 +2904,6 @@
     "nivel": 4
   },
   {
-    "nombre": "Las Tranqueras",
-    "tipo": "calle",
-    "comuna": "Vitacura",
-    "puntos": [
-      { "lat": -33.3996, "lon": -70.55498, "rumbo": 190 },
-      { "lat": -33.38714, "lon": -70.55295, "rumbo": 175 },
-      { "lat": -33.3927, "lon": -70.5535, "rumbo": 190 }
-    ],
-    "nivel": 4
-  },
-  {
-    "nombre": "Martín de Zamora",
-    "tipo": "calle",
-    "comuna": "Las Condes",
-    "puntos": [
-      { "lat": -33.42461, "lon": -70.59258, "rumbo": 75, "pista": "cerca del canal San Carlos" },
-      { "lat": -33.41855, "lon": -70.57706, "rumbo": 46 },
-      { "lat": -33.4222, "lon": -70.58216, "rumbo": 75 }
-    ],
-    "nivel": 4
-  },
-  {
     "nombre": "Av. José Manuel Infante",
     "tipo": "calle",
     "comuna": "Providencia",
@@ -3016,17 +2945,6 @@
       { "lat": -33.49315, "lon": -70.53637, "rumbo": 291 }
     ],
     "nivel": 3
-  },
-  {
-    "nombre": "Av. Sucre",
-    "tipo": "calle",
-    "comuna": "Ñuñoa",
-    "puntos": [
-      { "lat": -33.44826, "lon": -70.60192, "rumbo": 83 },
-      { "lat": -33.44865, "lon": -70.61153, "rumbo": 80 },
-      { "lat": -33.44787, "lon": -70.59812, "rumbo": 260 }
-    ],
-    "nivel": 4
   },
   {
     "nombre": "Pío Nono",
@@ -3522,38 +3440,6 @@
     "nivel": 4
   },
   {
-    "nombre": "Candelaria Goyenechea",
-    "tipo": "calle",
-    "comuna": "Vitacura",
-    "puntos": [
-      { "lat": -33.3918, "lon": -70.58756, "rumbo": 208 },
-      { "lat": -33.38665, "lon": -70.5841, "rumbo": 2 }
-    ],
-    "nivel": 4
-  },
-  {
-    "nombre": "Luis Carrera",
-    "tipo": "calle",
-    "comuna": "Vitacura",
-    "puntos": [
-      { "lat": -33.39622, "lon": -70.57734, "rumbo": 339 },
-      { "lat": -33.39104, "lon": -70.58512, "rumbo": 299 },
-      { "lat": -33.38952, "lon": -70.58795, "rumbo": 129 }
-    ],
-    "nivel": 4
-  },
-  {
-    "nombre": "Alonso de Camargo",
-    "tipo": "calle",
-    "comuna": "Las Condes",
-    "puntos": [
-      { "lat": -33.42079, "lon": -70.56761, "rumbo": 91 },
-      { "lat": -33.42086, "lon": -70.54083, "rumbo": 88 },
-      { "lat": -33.42169, "lon": -70.5569, "rumbo": 101 }
-    ],
-    "nivel": 4
-  },
-  {
     "nombre": "Av. Presidente Errázuriz",
     "tipo": "calle",
     "comuna": "Las Condes",
@@ -3678,32 +3564,6 @@
       { "lat": -33.42308, "lon": -70.62286, "rumbo": 6 },
       { "lat": -33.41586, "lon": -70.61791, "rumbo": 224 },
       { "lat": -33.41574, "lon": -70.6122, "rumbo": 282 }
-    ],
-    "nivel": 4
-  },
-  {
-    "nombre": "Av. Francisco Bulnes Correa",
-    "tipo": "calle",
-    "comuna": "Las Condes",
-    "puntos": [
-      { "lat": -33.4007, "lon": -70.51736, "rumbo": 345 },
-      { "lat": -33.40867, "lon": -70.51435, "rumbo": 330 },
-      { "lat": -33.40539, "lon": -70.5167, "rumbo": 346 },
-      { "lat": -33.41647, "lon": -70.51193, "rumbo": 124 },
-      { "lat": -33.418, "lon": -70.50762, "rumbo": 48 },
-      { "lat": -33.38467, "lon": -70.50962, "rumbo": 58 },
-      { "lat": -33.41336, "lon": -70.51259, "rumbo": 192 }
-    ],
-    "nivel": 3
-  },
-  {
-    "nombre": "Camino Las Flores",
-    "tipo": "calle",
-    "comuna": "Las Condes",
-    "puntos": [
-      { "lat": -33.3948, "lon": -70.52362, "rumbo": 275 },
-      { "lat": -33.39519, "lon": -70.51069, "rumbo": 279 },
-      { "lat": -33.39641, "lon": -70.50406, "rumbo": 103 }
     ],
     "nivel": 4
   },

@@ -11,6 +11,7 @@ import { registrarModo } from '../registry.js'
 
 registrarModo({
   id: 'com-name',
+  soloOficial: true,
   all: true,
   noHint: true,
   aids: true,
@@ -48,6 +49,7 @@ registrarModo({
 
 registrarModo({
   id: 'com-all',
+  soloOficial: true,
   noHint: true,
   aids: true,
   group: 'Comunas',

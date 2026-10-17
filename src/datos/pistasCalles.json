@@ -126,10 +126,6 @@
     { "lat": -33.36161, "lon": -70.51544, "pista": "muchas automotoras a los lados", "tipo": "automotoras" },
     { "lat": -33.35477, "lon": -70.51779, "pista": "muchas automotoras a los lados", "tipo": "automotoras" }
   ],
-  "Av. Raúl Labbé": [
-    { "lat": -33.36204, "lon": -70.49386, "pista": "cerca del río Mapocho", "tipo": "agua" },
-    { "lat": -33.36404, "lon": -70.51375, "pista": "muchas automotoras a los lados", "tipo": "automotoras" }
-  ],
   "Av. José Alcalde Délano": [
     { "lat": -33.35514, "lon": -70.53418, "pista": "muchas automotoras a los lados", "tipo": "automotoras" },
     { "lat": -33.35867, "lon": -70.54318, "pista": "muchas automotoras a los lados", "tipo": "automotoras" }
@@ -326,9 +322,6 @@
   ],
   "Av. Las Industrias": [
     { "lat": -33.48096, "lon": -70.63054, "pista": "cerca del Zanjón de la Aguada", "tipo": "agua" }
-  ],
-  "Martín de Zamora": [
-    { "lat": -33.42454, "lon": -70.59264, "pista": "cerca del canal San Carlos", "tipo": "agua" }
   ],
   "Av. Los Presidentes": [
     { "lat": -33.48647, "lon": -70.55781, "pista": "cerca del canal San Carlos", "tipo": "agua" },

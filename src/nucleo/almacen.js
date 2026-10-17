@@ -27,8 +27,10 @@ const PREFERENCIAS_POR_DEFECTO = {
   lines: null,
   strict: false,
   ownStreets: true,
-  // Nivel de "¿Dónde estás?" (facil, medio, dificil o extremo): el último botón de práctica tocado en el menú.
+  // Nivel de "¿Dónde estás?" (facil, medio, dificil o extremo) para una ronda que no traiga el suyo (las del menú lo traen).
   nivelStreetView: 'facil',
+  // Punto propio de la práctica de ruteo en auto: { nombre, lat, lon, sentido: 'desde' | 'hacia' } o null.
+  puntoDeRuteo: null,
   // La práctica siempre es fácil (bordes de las comunas y líneas del metro); las rondas oficiales, difíciles.
 }
 const LARGO_TODAS = 999

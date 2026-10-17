@@ -5,7 +5,7 @@
 //       node geocode.js && node finalize_lm.js && node remap_routes.js
 const fs=require('fs');
 const old=JSON.parse(fs.readFileSync('landmarks.prev.json')),nw=JSON.parse(fs.readFileSync('landmarks.json'));
-const map={home:'home',sj:'sj'};const gone=[];
+const map={};const gone=[];
 for(const o of old){const m=nw.find(n=>Math.abs(n.lat-o.lat)<1e-5&&Math.abs(n.lon-o.lon)<1e-5);if(m)map[o.id]=m.id;else gone.push(o.name);}
 console.log('landmarks que ya no están:',gone.join(', ')||'(ninguno)');
 for(const f of ['steproutes.json','transit.json','routes.json']){const R=JSON.parse(fs.readFileSync(f));const out=[];

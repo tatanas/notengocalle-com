@@ -165,7 +165,7 @@ Hay dos formas de jugar el mismo modo:
 | Al empezar     | de inmediato                                                        | cuenta regresiva de 3 segundos                |
 
 En el menú, el **botón grande** de cada juego es la ronda oficial y el **chico** ("Práctica") es la ronda de
-práctica. La cuenta regresiva (`runCountdown`, `quiz/engine.js`) tapa el mapa antes de la primera pregunta; el
+práctica. Los juegos con `soloOficial: true` (Street View y Comunas) no tienen práctica. La cuenta regresiva (`runCountdown`, `quiz/engine.js`) tapa el mapa antes de la primera pregunta; el
 reloj de la ronda parte con la pregunta, no con la cuenta, y salir durante la cuenta no pide confirmación.
 Durante la cuenta el mapa se puede mover: si la persona lo acomodó, el encuadre general del comienzo (ciudad
 o Chile) no lo pisa (`watchViewAdjustments`, `src/map/map.js`). Las rondas oficiales tienen un botón de
@@ -196,7 +196,11 @@ Al terminar una ronda oficial (`ui/officialOutcome.js` → `account/scores.js`):
 | `user`               | nombre de la sesión (solo para pintar el botón al instante) |
 | `outbox`             | rondas oficiales pendientes de enviar                       |
 
-El progreso de práctica es local a cada navegador. Al servidor solo llegan las rondas oficiales.
+Sin cuenta, el progreso de práctica es local a cada navegador. Con cuenta, `stats` se comparte entre dispositivos
+(`src/cuenta/progresoCompartido.js` ↔ `servidor/progreso.js`, tabla `progreso`, una fila por pregunta): al entrar se
+trae y se junta con el local (de cada pregunta gana la respuesta más reciente) y cada respuesta se sube a los pocos
+segundos; lo pendiente se guarda en `progresoPendiente`. `best` sigue siendo local. Otras claves: `rutasPropias`
+(rutas en auto ya calculadas desde el punto fijo del jugador, `ajustes.puntoDeRuteo`).
 
 ### Service worker
 
@@ -218,6 +222,9 @@ web), así que el mismo código corre en Netlify y en el servidor local de desar
 | `POST /api/scores`                             | guarda una ronda oficial; responde puesto y mejor marca                                                       |
 | `GET /api/leaderboard?mode=&category=&period=` | los 50 mejores de un juego en esa categoría, más la fila del usuario y cuántos jugadores tiene cada categoría |
 | `GET /api/leaders?category=&period=`           | el líder de cada juego en esa categoría y el puesto del usuario en cada uno                                   |
+| `GET /api/progreso`                            | el progreso de práctica de la cuenta (`stats`)                                                                |
+| `POST /api/progreso`                           | sube entradas de `stats`; de cada pregunta queda la más reciente                                              |
+| `POST /api/progreso/borrar`                    | borra el progreso de práctica de la cuenta                                                                    |
 
 Los errores siempre salen como `{ "error": "código", "message": "texto para mostrar" }`.
 

@@ -21,14 +21,11 @@
 <body>
 <div id="app">
   <header id="topbar">
-    <button id="btnHome" class="iconbtn" title="Menú" aria-label="Menú">
-      <svg viewBox="0 0 24 24" width="22" height="22"><path d="M4 6h16M4 12h16M4 18h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-    </button>
-    <h1 id="title">NoTengoCalle</h1>
-    <nav id="navSuperior" aria-label="Secciones">
-      <button id="btnRanking" class="navbtn" title="Ranking" aria-label="Ranking"><span class="icono">🏆</span><span class="texto">Ranking</span></button>
-      <button id="btnExplorar" class="navbtn" title="Explorar el mapa" aria-label="Explorar el mapa"><span class="icono">🔎</span><span class="texto">Explorar</span></button>
-      <button id="btnProgreso" class="navbtn" title="Mi progreso" aria-label="Mi progreso"><span class="icono">📊</span><span class="texto">Mi progreso</span></button>
+    <nav id="pestanas" aria-label="Secciones">
+      <button id="btnHome" class="pestana pestana-inicio activa" data-pantalla="home" title="Juegos" aria-current="page"><img src="/icons/icon-192.png" alt="" width="20" height="20"><span class="marca">NoTengoCalle</span></button>
+      <button id="btnRanking" class="pestana" data-pantalla="ranking" title="Ranking" aria-label="Ranking"><span class="icono">🏆</span><span class="texto">Ranking</span></button>
+      <button id="btnExplorar" class="pestana" data-pantalla="explore" title="Explorar el mapa" aria-label="Explorar el mapa"><span class="icono">🔎</span><span class="texto">Explorar</span></button>
+      <button id="btnProgreso" class="pestana" data-pantalla="progress" title="Mi progreso" aria-label="Mi progreso"><span class="icono">📊</span><span class="texto">Mi progreso</span></button>
     </nav>
     <div id="hud"></div>
     <button id="btnRestart" class="iconbtn" title="Reiniciar la ronda" aria-label="Reiniciar la ronda" hidden>

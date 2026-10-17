@@ -43,7 +43,7 @@ import {
 } from '../mapa/mapa.js'
 import { detenerPartida } from '../juego/engine.js'
 import { definirPantalla } from './navegacion.js'
-import { ocultarPanel, ocultarPantalla, panel, mostrarPanel, titulo } from './panel.js'
+import { ocultarPanel, ocultarPantalla, panel, mostrarPanel } from './panel.js'
 import { htmlDeFoto } from './fotos.js'
 
 let yaEncuadrado = false
@@ -52,7 +52,6 @@ let controlDeReapertura = null
 function abrirExplorar() {
   detenerPartida()
   ocultarPantalla()
-  titulo.textContent = 'Explorar'
   limpiarCapa()
   fijarModoDeEtiquetas('labels')
   const st = Object.assign(
@@ -148,7 +147,7 @@ function abrirExplorar() {
       weight: 3.5,
       opacity: 0.8,
     }).bindPopup(
-      `<h4>🚌 Micro ${escaparHtml(m.name)}</h4><p>${escaparHtml(m.long)}</p><p class="muted">Pasa cada ~${m.min} min (día laboral, media mañana) · ${m.km} km${m.why === 'casa' ? ' · pasa cerca del punto fijo' : m.why === 'campus' ? ' · pasa por el Campus San Joaquín' : ''}</p>`,
+      `<h4>🚌 Micro ${escaparHtml(m.name)}</h4><p>${escaparHtml(m.long)}</p><p class="muted">Pasa cada ~${m.min} min (día laboral, media mañana) · ${m.km} km</p>`,
     )
     pl.on('mouseover', () => pl.setStyle({ weight: 7, opacity: 1 }))
     pl.on('mouseout', () => pl.setStyle({ weight: 3.5, opacity: 0.8 }))

@@ -3,8 +3,6 @@ const fs=require('fs');const turf=require('@turf/turf');
 const lm=JSON.parse(fs.readFileSync('landmarks.json'));
 const streets=JSON.parse(fs.readFileSync('streets.json'));
 const old=JSON.parse(fs.readFileSync('routes.json'));
-const ORIG=[{id:'home',name:'Punto fijo',lat:-33.4372,lon:-70.6506},
-  (()=>{const s=lm.find(l=>/Campus San Joaquín/.test(l.name));return {id:'sj',name:'Campus San Joaquín UC',lat:s.lat,lon:s.lon};})()];
 const km=(a,b)=>Math.hypot((a.lon-b.lon)*92.9,(a.lat-b.lat)*111.2);
 const canon=s=>{s=s.replace(/^Avenida /,'Av. ').replace(/ Lateral$/,'').replace(/^Caletera /,'').trim();
   if(/Vespucio/.test(s))return 'Américo Vespucio';
@@ -60,13 +58,12 @@ function build(R){
 (async()=>{
   const jobs=[];
   const hubs=new Set(old.flatMap(r=>[r.from,r.to]));
-  for(const O of ORIG){for(const l of lm){if(km(O,l)<3)continue;jobs.push({o:O.id,dir:'out',a:O,b:l,key:O.id+'>'+l.id});if(hubs.has(l.id))jobs.push({o:O.id,dir:'in',a:l,b:O,key:l.id+'>'+O.id});}}
   const byId=Object.fromEntries(lm.map(l=>[l.id,l]));
-  for(const r of old)jobs.push({o:null,a:byId[r.from],b:byId[r.to],key:r.from+'>'+r.to});
+  for(const r of old)jobs.push({a:byId[r.from],b:byId[r.to],key:r.from+'>'+r.to});
   console.log('jobs',jobs.length);
   const out=[];let skipped=0;
   for(const j of jobs){const R=await osrm(j.a,j.b);if(!R){skipped++;continue;}const steps=build(R);if(!steps){skipped++;continue;}
-    out.push({k:j.key,o:j.o,from:j.a.id.length>4?j.a.id:j.a.id,to:j.b.id,km:+(R.d/1000).toFixed(1),min:Math.round(R.t/60),steps});}
+    out.push({k:j.key,from:j.a.id.length>4?j.a.id:j.a.id,to:j.b.id,km:+(R.d/1000).toFixed(1),min:Math.round(R.t/60),steps});}
   fs.writeFileSync('osrmcache2.json',JSON.stringify(cache));
   // distractores: calles (de cualquier ruta) que pasan cerca del punto donde empieza cada paso
   const pts=[];for(const r of out)for(const s of r.steps)for(let i=0;i<s.g.length;i+=3)pts.push({n:s.n,p:s.g[i]});
@@ -78,5 +75,4 @@ function build(R){
       s.x=Object.entries(cand).sort((a,b)=>(a[1]-Math.min(0.4,(freq[a[0]]||0)*0.01))-(b[1]-Math.min(0.4,(freq[b[0]]||0)*0.01))).slice(0,6).map(e=>e[0]);}}
   fs.writeFileSync('steproutes.json',JSON.stringify(out));
   console.log('rutas',out.length,'omitidas',skipped,'bytes',fs.statSync('steproutes.json').size);
-  const h=out.find(r=>r.o==='home'&&/Escuela Militar/.test(byId[r.to]?.name||''));if(h)console.log('Casa -> Escuela Militar:',h.steps.map(s=>s.n+' ('+s.km+')').join(' → '));
 })();

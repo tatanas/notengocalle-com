@@ -69,6 +69,7 @@ function reportarTunel(lugar, punto, q) {
 
 registrarModo({
   id: 'sv-ubicar',
+  soloOficial: true,
   roomy: true,
   puntosPorPregunta: PUNTOS_MAXIMOS,
   noHint: true,

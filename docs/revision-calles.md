@@ -1,7 +1,15 @@
 # Revisión de las calles del juego (octubre 2026)
 
-Lista completa de las 174 calles jugables (calles y autopistas; los ríos, canales y trenes no entran) para decidir qué dejar en el
-juego para todos y qué dejar solo para uno (en "Mis calles"). **No se ha sacado nada**: las marcas son sugerencias para revisar una a una.
+Lista completa de las 162 calles jugables (calles y autopistas; los ríos, canales y trenes no entran), por sector y tamaño.
+
+## Decisiones (17 de octubre de 2026)
+
+- **Sacadas** (chicas o medianas y del oriente alto, más Sucre): El Rodeo, Raúl Labbé, Las Hualtatas, Martín de Zamora, Candelaria Goyenechea,
+  Luis Carrera, Alonso de Camargo, Francisco Bulnes Correa, Camino Las Flores, Paul Harris, Las Tranqueras y Sucre.
+- **Se quedan**: San Carlos de Apoquindo, Escrivá de Balaguer (Costanera Sur), Av. La Dehesa e Isabel La Católica (grande: 100 %).
+- **No se agrega** "Juan Pablo II": en OpenStreetMap es una plaza de Lo Barnechea, sobre la Av. Paseo Pie Andino (secundaria, 17,8 km,
+  solo de Lo Barnechea); sirve para "Mis calles" de quien viva por ahí, no para el juego de todos.
+- Agregadas en la misma tanda: Agustinas y Monjitas (centro, cerca de La Moneda).
 
 ## Criterio
 
@@ -13,30 +21,13 @@ juego para todos y qué dejar solo para uno (en "Mis calles"). **No se ha sacado
 
 ## Lo que salta a la vista
 
-- El oriente alto (Las Condes, Vitacura y Lo Barnechea) tiene **39 calles**, y el poniente (Maipú, Pudahuel, Cerro Navia,
+- El oriente alto (Las Condes, Vitacura y Lo Barnechea) tiene **28 calles**, y el poniente (Maipú, Pudahuel, Cerro Navia,
   Lo Prado, Quinta Normal, Estación Central, Cerrillos y Renca), con unas tres veces más habitantes, tiene **23**.
   Casi todas las calles chicas (menos de 30 % grande) del juego están en el oriente.
 - San Francisco (Pudahuel) y José Joaquín Pérez **no son de nicho según este criterio**: son 97 % y 100 % grandes. Pesan en el poniente lo mismo
   que Tomás Moro o Camino El Alba en Las Condes.
 
-## 🟠 Candidatas a sacar del juego para todos (chicas o medianas, y del oriente alto)
-
-- Av. El Rodeo: calle de barrio de La Dehesa
-- Av. Raúl Labbé: tramo corto de Lo Barnechea; el camino a la nieve ya está como Camino a Farellones
-- Las Hualtatas: residencial de Vitacura alto
-- Candelaria Goyenechea: residencial (la agregaste hace poco)
-- Luis Carrera: residencial (la agregaste hace poco)
-- Alonso de Camargo: residencial (la agregaste hace poco)
-- Martín de Zamora: residencial de Las Condes
-- Av. Francisco Bulnes Correa: Las Condes alto, conocida por los colegios del sector
-- Camino Las Flores: Las Condes alto
-- Av. Paul Harris: Las Condes alto
-- Las Tranqueras: calle de barrio entre Vitacura y Las Condes
-- Av. La Dehesa: el eje del barrio La Dehesa; importante allá, poco conocida fuera
-- Av. San Carlos de Apoquindo: terciaria; la conoce quien va a la UANDES o al estadio de la UC
-- Av. Monseñor Escrivá de Balaguer: larga y junto al río, pero mediana (42 %) y poco conocida fuera del sector
-
-Isidora Goyenechea también es chica (35 %), pero es conocida en toda la ciudad (El Golf, Sanhattan): se sugiere dejarla.
+Isidora Goyenechea es chica (35 %), pero es conocida en toda la ciudad (El Golf, Sanhattan): se queda.
 
 ## 🟡 Grandes, pero muy del sector (se quedan según el criterio; revisar si se quiere ser más estricto)
 
@@ -56,7 +47,6 @@ Más conocidas porque mucha gente trabaja o estudia por ahí, pero en el mapa so
 - Luis Thayer Ojeda
 - Av. Holanda
 - Av. José Manuel Infante
-- Av. Sucre
 - Av. El Cerro
 - Av. Chile España
 
@@ -78,7 +68,7 @@ Calles primarias o secundarias largas de OSM que no están en el juego (sin las 
 
 ## Lista completa por sector
 
-🟠 candidata a sacar · 🟡 grande pero local · ⚪ zona gris
+🟡 grande pero local · ⚪ zona gris
 
 ### Ejes que cruzan varios sectores: 7
 
@@ -125,7 +115,7 @@ Calles primarias o secundarias largas de OSM que no están en el juego (sin las 
 | Paseo Estado                     | 0,6 |      0 % | Santiago                                  |
 | Nueva York                       | 0,2 |      0 % | Santiago                                  |
 
-### Oriente (Providencia, Ñuñoa, La Reina, Peñalolén): 37
+### Oriente (Providencia, Ñuñoa, La Reina, Peñalolén): 36
 
 | Calle                      |   km | % grande | Comunas                                      |
 | -------------------------- | ---: | -------: | -------------------------------------------- |
@@ -165,9 +155,8 @@ Calles primarias o secundarias largas de OSM que no están en el juego (sin las 
 | ⚪ Av. Ricardo Lyon        |  3,7 |      0 % | Providencia, Ñuñoa                           |
 | ⚪ Av. José Manuel Infante |  3,4 |      0 % | Providencia, Ñuñoa                           |
 | ⚪ Luis Thayer Ojeda       |    3 |      0 % | Providencia                                  |
-| ⚪ Av. Sucre               |  2,6 |      0 % | Ñuñoa                                        |
 
-### Oriente alto (Las Condes, Vitacura, Lo Barnechea): 39
+### Oriente alto (Las Condes, Vitacura, Lo Barnechea): 28
 
 | Calle                                     |   km | % grande | Comunas                            |
 | ----------------------------------------- | ---: | -------: | ---------------------------------- |
@@ -195,21 +184,10 @@ Calles primarias o secundarias largas de OSM que no están en el juego (sin las 
 | 🟡 Av. Alexander Fleming                  |  3,3 |     68 % | Las Condes                         |
 | Av. Santa María                           |  9,4 |     67 % | Vitacura                           |
 | 🟡 Av. Luis Pasteur                       |  4,9 |     65 % | Vitacura                           |
-| 🟠 Las Tranqueras                         |    3 |     57 % | Vitacura, Las Condes               |
 | 🟠 Av. La Dehesa                          | 11,1 |     50 % | Lo Barnechea                       |
 | 🟠 Av. Monseñor Escrivá de Balaguer       | 13,9 |     42 % | Vitacura, Lo Barnechea             |
 | Isidora Goyenechea                        |  1,3 |     35 % | Las Condes                         |
-| 🟠 Av. Raúl Labbé                         |  3,3 |     28 % | Lo Barnechea                       |
-| 🟠 Av. El Rodeo                           |    4 |     22 % | Lo Barnechea                       |
-| 🟠 Av. Francisco Bulnes Correa            |  8,6 |      0 % | Las Condes                         |
 | 🟠 Av. San Carlos de Apoquindo            |  8,5 |      0 % | Las Condes                         |
-| 🟠 Av. Paul Harris                        |    7 |      0 % | Las Condes                         |
-| 🟠 Las Hualtatas                          |  6,5 |      0 % | Vitacura                           |
-| 🟠 Martín de Zamora                       |  3,7 |      0 % | Las Condes                         |
-| 🟠 Camino Las Flores                      |  3,7 |      0 % | Las Condes                         |
-| 🟠 Alonso de Camargo                      |  3,1 |      0 % | Las Condes                         |
-| 🟠 Luis Carrera                           |  2,6 |      0 % | Vitacura                           |
-| 🟠 Candelaria Goyenechea                  |  2,4 |      0 % | Vitacura                           |
 
 ### Norte: 13
 

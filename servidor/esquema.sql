@@ -114,3 +114,15 @@ create table if not exists intentos_fallidos (
 );
 
 create index if not exists intentos_fallidos_por_nombre on intentos_fallidos (llave_de_nombre, en);
+
+-- Progreso de práctica de cada jugador ("% dominado", puntos débiles), para que sea el mismo en todos sus dispositivos.
+-- Una fila por pregunta (llave = "<modo>:<ítem>"); al juntar dos dispositivos gana la respuesta más reciente (ultima, en ms).
+create table if not exists progreso (
+  usuario_id integer not null references usuarios (id) on delete cascade,
+  llave      text not null,
+  respuestas integer not null,
+  aciertos   integer not null,
+  racha      integer not null,
+  ultima     bigint not null,
+  primary key (usuario_id, llave)
+);

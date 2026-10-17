@@ -6,6 +6,9 @@ export const estadisticas = almacen.get('stats', {})
 // bests["<modo>:<preguntas>"] = { ok, ms, d }
 export const mejores = almacen.get('best', {})
 
+const oyentesDeRespuestas = new Set()
+export const alRegistrarRespuesta = oyente => oyentesDeRespuestas.add(oyente)
+
 export function registrar(llave, ok) {
   const entrada = estadisticas[llave] || (estadisticas[llave] = { n: 0, ok: 0, streak: 0 })
   entrada.n++
@@ -17,6 +20,17 @@ export function registrar(llave, ok) {
   }
   entrada.last = Date.now()
   almacen.set('stats', estadisticas)
+  for (const oyente of oyentesDeRespuestas) oyente(llave)
+}
+
+// Junta el progreso de otro dispositivo (traído del servidor) con el de este: de cada pregunta queda la versión con la
+// respuesta más reciente. Devuelve las llaves en que este dispositivo tiene algo más nuevo que lo traído.
+export function fusionarEstadisticas(traidas) {
+  const ultimaDe = entrada => entrada?.last ?? 0
+  for (const [llave, traida] of Object.entries(traidas))
+    if (!estadisticas[llave] || traida.last > ultimaDe(estadisticas[llave])) estadisticas[llave] = traida
+  almacen.set('stats', estadisticas)
+  return Object.keys(estadisticas).filter(llave => ultimaDe(estadisticas[llave]) > ultimaDe(traidas[llave]))
 }
 
 export function guardarMejor(llave, mejor) {

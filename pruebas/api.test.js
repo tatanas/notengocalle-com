@@ -434,3 +434,35 @@ test('al actualizar la base no se pierde ninguna marca: las anteriores quedan en
     [['Ana', 33, 34]],
   )
 })
+
+test('el progreso de práctica se comparte entre dispositivos y gana lo más reciente', async () => {
+  assert.equal((await cliente()('GET', '/progreso')).estado, 401)
+  const { llamar: celular } = await registrado('Seba')
+  const computador = cliente()
+  await computador('POST', '/entrar', { nombre: 'Seba', clave: 'secreto1' })
+  const entrada = (n, ok, last) => ({ n, ok, streak: ok ? 1 : 0, last })
+
+  await celular('POST', '/progreso', { estadisticas: { 'lm-loc:Plaza de Armas': entrada(3, 2, 1000) } })
+  assert.deepEqual((await computador('GET', '/progreso')).datos.estadisticas, {
+    'lm-loc:Plaza de Armas': entrada(3, 2, 1000),
+  })
+  await computador('POST', '/progreso', {
+    estadisticas: { 'lm-loc:Plaza de Armas': entrada(1, 0, 500), 'st-name:Moneda': entrada(1, 1, 600) },
+  })
+  await computador('POST', '/progreso', { estadisticas: { 'st-name:Moneda': entrada(2, 1, 900) } })
+  assert.deepEqual((await celular('GET', '/progreso')).datos.estadisticas, {
+    'lm-loc:Plaza de Armas': entrada(3, 2, 1000),
+    'st-name:Moneda': entrada(2, 1, 900),
+  })
+
+  const { llamar: otro } = await registrado('Otra')
+  assert.deepEqual((await otro('GET', '/progreso')).datos.estadisticas, {})
+  for (const malo of [{ x: entrada(1, 2, 5) }, { x: null }, { x: { n: 1, ok: 1, streak: 1, last: -3 } }])
+    assert.equal(
+      (await celular('POST', '/progreso', { estadisticas: malo })).datos.error,
+      'progreso_invalido',
+    )
+
+  await celular('POST', '/progreso/borrar')
+  assert.deepEqual((await computador('GET', '/progreso')).datos.estadisticas, {})
+})
