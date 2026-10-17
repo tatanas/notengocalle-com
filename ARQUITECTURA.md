@@ -384,7 +384,7 @@ l1…` se corren; esto reasigna las rutas) → `node merge_st.js` → `npm run b
   corre `node extensions.js` y luego `npm run build`.
 - **Otros**: `metro.js`, `cerros.js`, `chile.js`/`chile2.js`, `extras.js` (rotondas, calles por línea de
   metro), `relations.js` (cruces y paralelas), `steproutes.js` (OSRM), `transit.js` (GTFS → itinerarios),
-  `micros.js`, `border.js` (fronteras entre comunas; la sección se retiró, el cálculo sigue disponible).
+  `micros.js`.
 - **Descargas crudas**: consultas Overpass en `q*.txt`. GTFS: el enlace vigente está en
   https://www.dtpm.cl/index.php/noticias/gtfs-vigente
 
