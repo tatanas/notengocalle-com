@@ -72,11 +72,17 @@ node servidor/admin.js reportes     túneles reportados por los jugadores
 - Calles agregadas: Agustinas y Monjitas (para ubicarse cerca de La Moneda), Rolando Petersen, Camino a Lonquén (se tomó éste porque no hay "Av. Lonquén"), Isabel La Católica, Candelaria Goyenechea, Luis Carrera, Alonso de Camargo, Presidente Errázuriz y Alexander Fleming (de vuelta).
 
 ## Ruteo con Street View (`rs-sv-car`, hecho en oct. 2026)
-- Sin mapa: se salta de cruce en cruce de la ruta en auto (las de todos o las del punto fijo). En cada cruce, Street View 50 m antes mirando hacia
-  donde se avanza y alternativas tipo navegador ("Dobla a la derecha en Av. Grecia", "Sigue derecho por…", "Toma Américo Vespucio por la
-  izquierda"). El lado del giro sale del rumbo antes y después del cruce (`src/dominio/maniobras.js`); las incorrectas son el giro al otro lado,
-  seguir derecho por la calle actual y calles cercanas con el lado calculado desde el cruce. Si se equivoca se corrige al tiro; al llegar se ve
-  el mapa con la ruta y las instrucciones. 5 rutas por ronda, sin ranking (se puede agregar a `MODOS_OFICIALES`).
+- Se salta de decisión en decisión de la ruta en auto (las de todos o las del punto fijo). Cada paso de una ruta trae `fin` (donde de verdad
+  se deja esa calle: ahí va la cámara, 50 m antes) y `c` (las calles chicas con nombre por las que se pasa hasta la siguiente principal).
+  Sin calles chicas: "Vas hacia el oriente por X. ¿Qué haces en el cruce que viene?". Con calles chicas: "Ibas por X y doblaste a la izquierda
+  por Y. Ahora llegas a Z: ¿qué haces?", con la cámara al final de Y.
+- Maniobras (`src/dominio/maniobras.js`): "Sigue derecho" solo si la calle cambia de nombre sin doblar (menos de 20°); 20°–60° es
+  "Mantente a la derecha hacia…"; más es "Dobla"; a una autopista, "Toma X por la derecha". El giro se mide contra los primeros 150 m de la
+  calle siguiente (no contra la rampa: en un trébol se curva hacia atrás). Las incorrectas: el giro al otro lado, "Sigue por la actual sin
+  doblar" (no si lo correcto es seguir derecho: sería lo mismo) y calles cercanas con su lado calculado (nunca las que quedan atrás).
+- "🗺️ Abrir mapa" muestra A, B, lo ya recorrido y una flecha en el punto actual que gira con la vista del panorama.
+- Las rutas son de **Valhalla** (`compartido/rutaEnAuto.js`, lo comparten el navegador y `tools/steproutes.js`; caché en `tools/valhallacache.json`).
+  El aeropuerto se movió a los terminales (antes estaba en la zona de carga y las rutas daban la vuelta por Lo Boza).
 - Pendiente de probar jugando: autopistas y túneles (sin imagen se pregunta igual, con un aviso).
 
 ## Conexiones (retirado por mientras)

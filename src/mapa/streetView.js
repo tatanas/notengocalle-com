@@ -37,6 +37,9 @@ function cargarGoogleMaps() {
 let contenedor = null
 let botones = null
 let alReportar = () => {}
+// Quien muestra el panorama puede encuadrar el mapa a su manera al abrirlo, y enterarse de hacia dónde se mira.
+let alVerElMapa = null
+let alGirarLaVista = null
 let mapaEncuadrado = false
 
 // Un solo panorama para todas las preguntas: cada StreetViewPanorama nuevo abre otro contexto WebGL y, en los
@@ -98,6 +101,7 @@ function crearPanorama(StreetViewPanorama) {
     motionTrackingControl: false,
     panControl: false,
   })
+  panorama.addListener('pov_changed', () => alGirarLaVista?.(panorama.getPov().heading))
   panorama.addListener('position_changed', () => {
     const posicion = panorama.getPosition()
     if (!posicion) return
@@ -127,7 +131,8 @@ function alternarEntrePanoramaYMapa() {
   if (!verMapa) return
   repararMapaBase()
   mapa.invalidateSize()
-  if (!mapaEncuadrado) encuadrarCiudad()
+  if (alVerElMapa) alVerElMapa()
+  else if (!mapaEncuadrado) encuadrarCiudad()
   mapaEncuadrado = true
 }
 
@@ -158,7 +163,12 @@ function crearElementos() {
 // alReportarTunel se llama cuando el jugador avisa que ese punto está en un túnel.
 export async function mostrarPanorama(
   { lat, lon, rumbo = Math.random() * 360 },
-  { alReportarTunel = null, recorrerCalle = false } = {},
+  {
+    alReportarTunel = null,
+    recorrerCalle = false,
+    alVerElMapa: encuadrarAlVerElMapa = null,
+    alGirarLaVista: alGirar = null,
+  } = {},
 ) {
   const maps = await cargarGoogleMaps()
   const { StreetViewPanorama, StreetViewService } = await maps.importLibrary('streetView')
@@ -180,6 +190,8 @@ export async function mostrarPanorama(
   mapaEncuadrado = false
   quitarMarcadorDePosicion()
   alReportar = alReportarTunel ?? (() => {})
+  alVerElMapa = encuadrarAlVerElMapa
+  alGirarLaVista = alGirar
   document.body.classList.remove('ver-mapa')
   document.body.classList.add('con-panorama')
   botonAlternar().textContent = '🗺️ Abrir mapa'
@@ -224,4 +236,6 @@ export function ocultarPanorama() {
   inicioDeLaPregunta = null
   document.body.classList.remove('con-panorama', 'ver-mapa', 'recorriendo')
   alReportar = () => {}
+  alVerElMapa = null
+  alGirarLaVista = null
 }

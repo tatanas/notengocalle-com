@@ -82,7 +82,7 @@ const F={
 "Planetario USACH":{ll:[-33.45032,-70.68141]},
 "Hospital Clínico UC (Marcoleta)":{ll:[-33.44205,-70.64040]},
 "Hospital Clínico U. de Chile (J.J. Aguirre)":{ll:[-33.42060,-70.65300]},
-"Aeropuerto Arturo Merino Benítez":{ll:[-33.38927,-70.79000]},
+"Aeropuerto Arturo Merino Benítez":{ll:[-33.39960,-70.79300]}, // entre los terminales (antes estaba en la zona de carga y las rutas daban la vuelta por Lo Boza)
 "PUC – Casa Central":{ll:[-33.44177,-70.64033]},
 "PUC – Campus San Joaquín":{ll:[-33.49877,-70.61068]},
 "PUC – Campus Oriente":{ll:[-33.44570,-70.59328]},

@@ -29,14 +29,33 @@ export function puntoDesdeElInicio(linea, km) {
 
 export const puntoAntesDelFinal = (linea, km) => puntoDesdeElInicio([...linea].reverse(), km)
 
-const GRADOS_DE_SEGUIR_DERECHO = 30
-const GRADOS_DE_VUELTA_EN_U = 150
+// "Sigue derecho" es solo cuando la calle cambia de nombre sin doblar; un desvío suave es "mantente a la derecha".
+export const GRADOS_DE_SEGUIR_DERECHO = 20
+const GRADOS_DE_DESVIO_SUAVE = 60
+export const GRADOS_DE_VUELTA_EN_U = 150
+
+export const ladoDelGiro = grados => (grados > 0 ? 'derecha' : 'izquierda')
 
 // La instrucción como la diría un navegador: "Dobla a la derecha en Av. Grecia", "Sigue derecho por Av. Apoquindo"…
 export function textoDeManiobra(grados, calle, { autopista = false } = {}) {
   const cuanto = Math.abs(grados)
   if (cuanto < GRADOS_DE_SEGUIR_DERECHO) return `Sigue derecho por ${calle}`
-  const lado = grados > 0 ? 'derecha' : 'izquierda'
+  const lado = ladoDelGiro(grados)
   if (cuanto > GRADOS_DE_VUELTA_EN_U) return `Da la vuelta y sigue por ${calle}`
-  return autopista ? `Toma ${calle} por la ${lado}` : `Dobla a la ${lado} en ${calle}`
+  if (autopista) return `Toma ${calle} por la ${lado}`
+  if (cuanto < GRADOS_DE_DESVIO_SUAVE) return `Mantente a la ${lado} hacia ${calle}`
+  return `Dobla a la ${lado} en ${calle}`
 }
+
+const PUNTOS_CARDINALES = [
+  'norte',
+  'nororiente',
+  'oriente',
+  'suroriente',
+  'sur',
+  'surponiente',
+  'poniente',
+  'norponiente',
+]
+// "norte", "suroriente"… para un rumbo en grados.
+export const puntoCardinal = grados => PUNTOS_CARDINALES[Math.round(grados / 45) % PUNTOS_CARDINALES.length]

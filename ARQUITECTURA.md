@@ -332,7 +332,7 @@ separarlas, Netlify permite dar a cada contexto de despliegue un valor distinto 
 | Qué                                              | De dónde                                                             |
 | ------------------------------------------------ | -------------------------------------------------------------------- |
 | Comunas, calles, metro, lugares, barrios, cerros | OpenStreetMap (ODbL), vía Overpass y Nominatim                       |
-| Rutas en auto                                    | OSRM (router.project-osrm.org)                                       |
+| Rutas en auto                                    | Valhalla (valhalla1.openstreetmap.de, FOSSGIS)                       |
 | Rutas en micro y metro, recorridos               | GTFS de Red (DTPM)                                                   |
 | Regiones, ciudades y parques nacionales          | OpenStreetMap; población de las ciudades                             |
 | Fotos                                            | Wikimedia Commons y Panoramax, siempre con autor y licencia visibles |
@@ -383,7 +383,7 @@ l1…` se corren; esto reasigna las rutas) → `node merge_st.js` → `npm run b
   400 m de la línea ya dibujada. Para prolongar otra calle, se agrega a la lista `ROADS` de ese archivo y se
   corre `node extensions.js` y luego `npm run build`.
 - **Otros**: `metro.js`, `cerros.js`, `chile.js`/`chile2.js`, `extras.js` (rotondas, calles por línea de
-  metro), `cruces.js` (cruces según OpenStreetMap: calles que comparten un nodo, o cuyo extremo queda a menos de 20 m de la otra; los que pasan uno sobre otro, aparte → `cruces.json`), `relations.js` (comunas de cada calle, paralelas, cruces y pares dudosos que el juego no debe preguntar), `steproutes.js` (OSRM), `transit.js` (GTFS → itinerarios),
+  metro), `cruces.js` (cruces según OpenStreetMap: calles que comparten un nodo, o cuyo extremo queda a menos de 20 m de la otra; los que pasan uno sobre otro, aparte → `cruces.json`), `relations.js` (comunas de cada calle, paralelas, cruces y pares dudosos que el juego no debe preguntar), `steproutes.js` (Valhalla, con `compartido/rutaEnAuto.js`), `transit.js` (GTFS → itinerarios),
   `micros.js`.
 - **Descargas crudas**: consultas Overpass en `q*.txt`. GTFS: el enlace vigente está en
   https://www.dtpm.cl/index.php/noticias/gtfs-vigente

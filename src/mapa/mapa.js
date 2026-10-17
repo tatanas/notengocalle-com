@@ -162,9 +162,15 @@ if (mapaVectorial) {
 // ----- encuadres: dejan libre la parte del mapa que tapa el panel
 // Con Street View a la vista en el escritorio, el panorama ocupa la mitad izquierda. En el celular se alterna entre
 // panorama y mapa, así que el mapa usa su relleno de siempre.
+// Con "ver mapa" el panorama sigue ahí pero escondido: no tapa nada.
 const panoramaTapaElMapa = () => {
   const panorama = document.getElementById('panorama')
-  return !!panorama && !panorama.hidden && innerWidth > ANCHO_CELULAR
+  return (
+    !!panorama &&
+    !panorama.hidden &&
+    !document.body.classList.contains('ver-mapa') &&
+    innerWidth > ANCHO_CELULAR
+  )
 }
 
 function relleno() {
@@ -174,8 +180,11 @@ function relleno() {
       paddingBottomRight: [20, 20],
     }
   if (panel.classList.contains('hidden')) return { padding: [20, 20] }
-  return innerWidth <= ANCHO_CELULAR
-    ? { paddingTopLeft: [20, 20], paddingBottomRight: [20, panel.offsetHeight + 16] }
+  if (innerWidth <= ANCHO_CELULAR)
+    return { paddingTopLeft: [20, 20], paddingBottomRight: [20, panel.offsetHeight + 16] }
+  // Con Street View el panel va a la izquierda; si no, a la derecha.
+  return document.body.classList.contains('con-panorama')
+    ? { paddingTopLeft: [panel.offsetWidth + 30, 20], paddingBottomRight: [20, 20] }
     : { paddingTopLeft: [50, 20], paddingBottomRight: [panel.offsetWidth + 30, 20] }
 }
 

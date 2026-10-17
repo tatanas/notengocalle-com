@@ -43,7 +43,7 @@ function rutasDelPuntoPropio() {
 // Las rutas en auto de la práctica: las de todos o, si el jugador fijó un punto, las de su punto.
 export const rutasEnAuto = () => (ajustes.puntoDeRuteo ? rutasDelPuntoPropio() : DATOS.steps || [])
 
-// Las rutas del punto propio se piden a OSRM al llegar a la pregunta (y la siguiente se adelanta).
+// Las rutas del punto propio se piden a Valhalla al llegar a la pregunta (y la siguiente se adelanta).
 export async function rutaCalculada(ruta, q) {
   if (ruta.steps) return ruta
   mostrarPanel(encabezadoDePregunta(q) + '<p class="muted">Calculando la ruta…</p>')
@@ -198,7 +198,7 @@ export function registrarModoDePasosEnAuto(id, nombre) {
         sub: `En auto · ~${String(recorrido.km).replace('.', ',')} km · ${recorrido.steps.length} calles principales (las chicas se omiten)`,
         firstQ: '¿por qué calle partes?',
         nextQ: '¿a qué calle sigues?',
-        summary: `<p><b>${recorrido.steps.map(paso => escaparHtml(paso.n)).join(' → ')}</b></p><p class="muted">~${String(recorrido.km).replace('.', ',')} km, ~${recorrido.min} min sin taco. Ruta calculada por OSRM; puede haber otras igual de buenas (y no considera TAG ni tacos).</p>`,
+        summary: `<p><b>${recorrido.steps.map(paso => escaparHtml(paso.n)).join(' → ')}</b></p><p class="muted">~${String(recorrido.km).replace('.', ',')} km, ~${recorrido.min} min sin taco. Ruta calculada por Valhalla; puede haber otras igual de buenas (y no considera TAG ni tacos).</p>`,
       })
     },
   })

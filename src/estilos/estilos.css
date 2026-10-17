@@ -264,8 +264,17 @@ body.ruteo-sv #panorama {
   right: 0;
   width: auto;
 }
+/* Se puede abrir el mapa para ver dónde se está (también en el escritorio, donde el panorama ocupa todo). */
 body.ruteo-sv #alternarVista {
-  display: none !important;
+  display: inline-block;
+}
+body.ruteo-sv.ver-mapa #panorama {
+  visibility: hidden;
+  pointer-events: none;
+}
+.flecha-de-rumbo {
+  background: none;
+  border: 0;
 }
 /* (con :not(.ver-mapa) para ganarle a la regla del celular que esconde el panel sobre el panorama) */
 body.ruteo-sv.con-panorama:not(.ver-mapa) #panel {
