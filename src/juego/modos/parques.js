@@ -11,6 +11,7 @@ import { mostrarPanel } from '../../interfaz/panel.js'
 
 registrarModo({
   id: 'pn-reg',
+  soloOficial: true,
   group: 'Parques nacionales',
   name: '¿En qué región está el parque?',
   desc: 'Toca la región del parque nacional.',
@@ -47,6 +48,7 @@ registrarModo({
 })
 registrarModo({
   id: 'pn-photo',
+  soloOficial: true,
   group: 'Parques nacionales',
   name: 'Reconoce el parque por la foto',
   desc: 'Te muestro una foto de un parque nacional; eliges cuál es.',

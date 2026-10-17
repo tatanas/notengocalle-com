@@ -357,7 +357,7 @@ curadas sí se versionan (`streets.json`, `landmarks.json`, `zones.json`, `chile
 Regenerar el archivo final (minutos): `npm run build` dentro de `tools/`
 (equivale a `node build_data.js ../public/data/data.js`).
 
-- **Agregar o quitar una calle**: editar `streetlist.js` → `node streets.js` → `node merge_st.js` →
+- **Agregar o quitar una calle**: editar `streetlist.js` → `node streets.js` → `node cruces.js` → `node merge_st.js` →
   `npm run build`.
   Cada entrada es `[nombre_mostrado, regex_OSM, pista, ancla[lon,lat]|null, {bt:1, kind, gap, trMin}]`:
   `bt:1` busca en `btiles/` (descarga completa de la RM); `kind` es `calle|autopista|agua|tren`; `gap` es la
@@ -383,7 +383,7 @@ l1…` se corren; esto reasigna las rutas) → `node merge_st.js` → `npm run b
   400 m de la línea ya dibujada. Para prolongar otra calle, se agrega a la lista `ROADS` de ese archivo y se
   corre `node extensions.js` y luego `npm run build`.
 - **Otros**: `metro.js`, `cerros.js`, `chile.js`/`chile2.js`, `extras.js` (rotondas, calles por línea de
-  metro), `relations.js` (cruces y paralelas), `steproutes.js` (OSRM), `transit.js` (GTFS → itinerarios),
+  metro), `cruces.js` (cruces según OpenStreetMap: calles que comparten un nodo, o cuyo extremo queda a menos de 20 m de la otra; los que pasan uno sobre otro, aparte → `cruces.json`), `relations.js` (comunas de cada calle, paralelas, cruces y pares dudosos que el juego no debe preguntar), `steproutes.js` (OSRM), `transit.js` (GTFS → itinerarios),
   `micros.js`.
 - **Descargas crudas**: consultas Overpass en `q*.txt`. GTFS: el enlace vigente está en
   https://www.dtpm.cl/index.php/noticias/gtfs-vigente

@@ -318,7 +318,6 @@ module.exports=[
 ["Barrio París-Londres","Barrios","Barrio París-Londres","Santiago","Dos calles adoquinadas de estilo europeo detrás de la Iglesia de San Francisco, en la Alameda."],
 ["Villa Portales","Barrios","Villa Portales, Estación Central","Estación Central","Conjunto de bloques modernistas junto a la USACH y la Quinta Normal."],
 ["Lo Cañas","Barrios","Lo Cañas, La Florida","La Florida","Sector precordillerano de La Florida, de parcelas y condominios."],
-["Los Trapenses","Barrios","Los Trapenses, Lo Barnechea","Lo Barnechea","Sector residencial del norte de Lo Barnechea, en torno al Camino Los Trapenses (colegios, Santiago College)."],
 ["San Damián","Barrios","San Damián, Las Condes","Las Condes","Barrio residencial del sector alto de Las Condes, entre Av. Las Condes y los cerros, en el límite con Vitacura y Lo Barnechea; cerca de la Clínica Las Condes y el Colegio Los Andes."],
 ["Quinchamalí","Barrios","Quinchamalí, Las Condes","Las Condes","Barrio residencial al final de Av. Las Condes, al pie de los cerros, justo antes de Plaza San Enrique y el límite con Lo Barnechea."],
 ["Parque Almagro","Cerros y parques","Parque Almagro, Santiago","Santiago","Parque alargado al sur de la Alameda, entre San Diego y Lord Cochrane: Iglesia de los Sacramentinos, U. Central (estación Parque Almagro, L3)."],

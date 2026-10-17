@@ -76,7 +76,7 @@ const micros=rd('micros.json')||[];
     for(let i=0;i<ours.length;i++)for(let j=i+1;j<ours.length;j++){const a=ours[i],b=ours[j];if(R.inter.some(x=>(x.a===a&&x.b===b)||(x.a===b&&x.b===a)))continue;
       const cf=feats.filter(f=>turf.booleanPointInPolygon([r.c[1],r.c[0]],f)).map(f=>f.properties.name);R.inter.push({a,b,pts:[r.c],comunas:cf,rot:r.name});add++;}}
   console.log('cruces totales',R.inter.length,'(por rotonda +'+add+')');}
-const data={comunas:{type:'FeatureCollection',features:feats},metro,streets,landmarks,cerros,photos,inter:R.inter,para:R.para,steps,transit,micros,zones,chile,metroAlong,rotondas,built:new Date().toISOString().slice(0,10)};
+const data={comunas:{type:'FeatureCollection',features:feats},metro,streets,landmarks,cerros,photos,inter:R.inter,para:R.para,dudosos:R.dudosos,steps,transit,micros,zones,chile,metroAlong,rotondas,built:new Date().toISOString().slice(0,10)};
 fs.writeFileSync(OUT,'// Datos generados desde OpenStreetMap (ODbL) y OSRM. No editar a mano: ver tools/\nwindow.DATA='+JSON.stringify(data)+';\n');
 console.log('wrote',OUT,fs.statSync(OUT).size,'bytes');
 console.log(feats.filter(f=>f.properties.group=='core').map(f=>f.properties.name+': '+f.properties.nb.join(',')).slice(0,6).join('\n'));

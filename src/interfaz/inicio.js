@@ -132,8 +132,8 @@ function filasDeNivelesDeStreetView(modo) {
 }
 
 // El botón grande es la ronda oficial (cuenta para el ranking); el chico, una ronda de práctica.
-// Un juego sin ronda oficial deja su único botón como práctica. Excepciones: los juegos solo oficiales (Street View, con
-// un botón por nivel, y Comunas) no tienen práctica; y en Metro la práctica va aparte, abajo, con las líneas elegidas.
+// Un juego sin ronda oficial deja su único botón como práctica. Excepciones: los juegos solo oficiales (soloOficial: Street
+// View, con un botón por nivel, Comunas, Chile y Parques) no tienen práctica; y en Metro la práctica va aparte, abajo.
 function filaDeModo(modo) {
   if (modo.group === 'Street View' && tieneRondaOficial(modo)) return filasDeNivelesDeStreetView(modo)
   const etiqueta = etiquetaDeModo(modo, { todasLasLineas: modo.group === 'Metro' })

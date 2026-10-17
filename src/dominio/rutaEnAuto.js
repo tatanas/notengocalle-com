@@ -35,7 +35,7 @@ export function nombreDeRuteo(nombreDeOsm) {
   return nombre.replace(/ (Norte|Sur|Oriente|Poniente)$/, sufijo => (/^Av\./.test(nombre) ? '' : sufijo))
 }
 
-const nombreDeRuteoDeCalle = calle =>
+export const nombreDeRuteoDeCalle = calle =>
   nombreDeRuteo(calle.name.replace(/\s*\(.*\)/, '').replace(/^Av\. /, 'Avenida '))
 
 let callesDelJuego = null
@@ -45,6 +45,17 @@ const esCallePrincipal = nombre => (callesDelJuego ??= new Set(vias().map(nombre
 const METROS_DE_TRAMO_LARGO = 500
 const METROS_DE_TRAMO_PRINCIPAL = 250
 const PASOS_MINIMOS = 2
+
+// Los caminos sin nombre del comienzo y del final (estacionamientos, accesos de un recinto) no son parte de la ruta: se
+// parte donde se sale a una calle y se llega donde se la deja.
+const esCaminoInterno = paso => !paso.name && !paso.ref && !paso.rotary_name
+function sinCaminosInternos(pasosDeOsrm) {
+  let inicio = 0
+  let fin = pasosDeOsrm.length
+  while (inicio < fin && esCaminoInterno(pasosDeOsrm[inicio])) inicio++
+  while (fin > inicio && esCaminoInterno(pasosDeOsrm[fin - 1])) fin--
+  return pasosDeOsrm.slice(inicio, fin)
+}
 
 function tramosConNombre(pasosDeOsrm) {
   const tramos = []
@@ -115,7 +126,7 @@ async function pedirRuta(desde, hasta) {
   if (!respuesta.ok) throw new Error(`OSRM respondió ${respuesta.status}`)
   const [ruta] = (await respuesta.json()).routes ?? []
   if (!ruta) return null
-  const pasos = pasosPrincipales(tramosConNombre(ruta.legs[0].steps))
+  const pasos = pasosPrincipales(tramosConNombre(sinCaminosInternos(ruta.legs[0].steps)))
   if (!pasos) return null
   const nombresDeLaRuta = new Set(pasos.map(paso => paso.nombre))
   return {

@@ -10,6 +10,7 @@ import { mostrarPanel, aviso } from '../../interfaz/panel.js'
 
 registrarModo({
   id: 'ch-find',
+  soloOficial: true,
   all: true,
   group: 'Chile',
   name: 'Ubica la región',
@@ -42,6 +43,7 @@ registrarModo({
 })
 registrarModo({
   id: 'ch-city',
+  soloOficial: true,
   group: 'Chile',
   name: 'Ubica la ciudad',
   desc: 'Toca dónde está la ciudad en el mapa de Chile (margen 60 km).',
@@ -83,6 +85,7 @@ registrarModo({
 })
 registrarModo({
   id: 'ch-cityreg',
+  soloOficial: true,
   group: 'Chile',
   name: '¿En qué región está la ciudad?',
   desc: 'Toca la región donde queda la ciudad.',
@@ -112,6 +115,7 @@ registrarModo({
 })
 registrarModo({
   id: 'ch-all',
+  soloOficial: true,
   group: 'Chile',
   name: 'Completa el mapa (regiones)',
   desc: 'Las 16 regiones, una por una, hasta pintar el mapa entero.',

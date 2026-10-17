@@ -61,7 +61,7 @@ node servidor/admin.js reportes     túneles reportados por los jugadores
 2. **Autopistas en Street View**: son muy amplias; el dueño dijo "dejémoslo" por ahora. Idea: ponerlas solo en puntos cercanos a un lugar relevante (Costanera Norte junto al Costanera Center, Vespucio junto a un mall…).
 3. **Salidas de Costanera Norte y Vespucio** como guía para decidir qué calles agregar: el dueño pidió solo la lista (no agregar); no hay una fuente oficial limpia (TAG, `tag.cl/mapa`, o los mapas de cada concesionaria).
 4. Tabla general de ranking; historial de rondas; sincronizar también los récords personales (ver `CLAUDE.md`, "Ideas pendientes").
-5. **Ruteo por Street View** (idea del dueño, sin hacer): ver la propuesta al final de este archivo.
+5. **Volver a poner Conexiones** con los datos de cruces nuevos (ver "Conexiones" al final). Ranking para el ruteo con Street View, si gusta.
 5. Verificar en el primer despliegue real: camino con Neon real y el `rateLimit` por IP de `netlify/functions/api.js` (nunca se han visto funcionar).
 6. `tools/` está desordenado (~100 archivos); ordenar solo si se puede volver a correr cada script.
 
@@ -71,14 +71,18 @@ node servidor/admin.js reportes     túneles reportados por los jugadores
 - El punto de la pregunta debe cambiar entre partidas: nadie debe ganar memorizando una foto.
 - Calles agregadas: Agustinas y Monjitas (para ubicarse cerca de La Moneda), Rolando Petersen, Camino a Lonquén (se tomó éste porque no hay "Av. Lonquén"), Isabel La Católica, Candelaria Goyenechea, Luis Carrera, Alonso de Camargo, Presidente Errázuriz y Alexander Fleming (de vuelta).
 
-## Propuesta: ruteo por Street View (sin hacer)
-Idea del dueño: llegar de A a B mirando Street View en vez del mapa, con instrucciones como las de Google Maps en auto.
-- **Caminar libre de A a B no sirve**: cada clic avanza ~10 m (una ruta de 3 km son cientos de clics). Descartado.
-- **Lo que sí funciona: saltar de cruce en cruce.** Con las rutas en auto que ya existen (`DATOS.steps`, o las del punto propio de
-  `src/dominio/rutaEnAuto.js`), en cada cambio de calle se muestra Street View unos 40 m antes del cruce, mirando hacia donde se avanza
-  (rumbo del último tramo de la geometría). Arriba, la instrucción del tramo anterior ("Sigue por Av. Grecia 1,2 km") y la pregunta
-  "¿Qué haces en este cruce?" con 3–4 alternativas ("Dobla a la derecha en Av. Macul", "Sigue derecho por Av. Grecia"…). Si se equivoca,
-  se corrige al tiro y sigue desde el cruce correcto; al final, el mapa con la ruta completa.
-- Detalles: el lado del giro sale de comparar el rumbo antes y después del cruce; para las alternativas incorrectas, del rumbo de la calle
-  del juego más cercana al cruce. Reutilizar el único panorama (`src/mapa/streetView.js`). En autopistas y túneles no hay buena imagen:
-  esos pasos van solo con texto. Los letreros de los cruces se ven, pero aquí ayudan: es justamente aprender a ubicarse en la calle.
+## Ruteo con Street View (`rs-sv-car`, hecho en oct. 2026)
+- Sin mapa: se salta de cruce en cruce de la ruta en auto (las de todos o las del punto fijo). En cada cruce, Street View 50 m antes mirando hacia
+  donde se avanza y alternativas tipo navegador ("Dobla a la derecha en Av. Grecia", "Sigue derecho por…", "Toma Américo Vespucio por la
+  izquierda"). El lado del giro sale del rumbo antes y después del cruce (`src/dominio/maniobras.js`); las incorrectas son el giro al otro lado,
+  seguir derecho por la calle actual y calles cercanas con el lado calculado desde el cruce. Si se equivoca se corrige al tiro; al llegar se ve
+  el mapa con la ruta y las instrucciones. 5 rutas por ronda, sin ranking (se puede agregar a `MODOS_OFICIALES`).
+- Pendiente de probar jugando: autopistas y túneles (sin imagen se pregunta igual, con un aviso).
+
+## Conexiones (retirado por mientras)
+- Se sacó del menú y del ranking porque las preguntas de cruces y de "¿pasa por esta comuna?" tenían errores. Para volver: `import './conexiones.js'`
+  en `src/juego/modos/index.js` y `'cx'` en `MODOS_OFICIALES`.
+- Ya está hecha la base del arreglo: los cruces salen de OpenStreetMap (`tools/cruces.js`, nodos compartidos) y `relations.js` deja en los datos
+  `cl` (metros de cada calle dentro de cada comuna, sin margen), `cc` (comunas que la calle roza a 60 m) y `dudosos` (pares que pasan uno sobre
+  otro o se acercan a menos de 80 m sin cruzarse). Falta usarlos en `conexiones.js`: "pasa por" solo con al menos 800 m (o la mitad de una calle
+  corta) dentro de la comuna; "no pasa" solo si ni la roza (`cc`); y nunca ofrecer un par `dudoso` como respuesta ni como distractor.

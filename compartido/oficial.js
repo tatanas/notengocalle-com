@@ -31,7 +31,6 @@ export const MODOS_OFICIALES = [
   'ch-all',
   'pn-reg',
   'pn-photo',
-  'cx',
   'sv-ubicar',
 ]
 
@@ -45,10 +44,10 @@ export const TODAS_LAS_PREGUNTAS = 'todas'
 export const CATEGORIAS_DE_RONDA = ['20', TODAS_LAS_PREGUNTAS]
 
 // Las rondas son de 20 preguntas, salvo en los juegos que se juegan más largo y por eso van de a menos.
-const LARGO_NORMAL = { 'sv-ubicar': 10 }
+const LARGO_NORMAL = { 'sv-ubicar': 10, 'rs-sv-car': 5 }
 export const largoNormalDe = modo => LARGO_NORMAL[modo] ?? 20
 // Hay juegos con demasiadas preguntas para recorrerlas todas: su ronda siempre es del largo normal.
-const SIN_RONDA_DE_TODAS = new Set(['sv-ubicar', 'rs-any-car', 'rs-any-tp'])
+const SIN_RONDA_DE_TODAS = new Set(['sv-ubicar', 'rs-any-car', 'rs-any-tp', 'rs-sv-car'])
 export const tieneRondaDeTodas = modo => !SIN_RONDA_DE_TODAS.has(modo)
 
 // Algunos juegos no se separan por largo sino por un ajuste del jugador, y cada valor tiene su propio ranking:

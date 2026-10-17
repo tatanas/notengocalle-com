@@ -1,3 +1,28 @@
+/* Tipografía gobCL (Kit Digital del Gobierno de Chile), en prueba. Las de sistema quedan de respaldo. */
+@font-face {
+  font-family: 'gobCL';
+  src: url('/fuentes/gobcl/gobCL-Light.otf') format('opentype');
+  font-weight: 300;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'gobCL';
+  src: url('/fuentes/gobcl/gobCL-Regular.otf') format('opentype');
+  font-weight: 400;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'gobCL';
+  src: url('/fuentes/gobcl/gobCL-Bold.otf') format('opentype');
+  font-weight: 700;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'gobCL';
+  src: url('/fuentes/gobcl/gobCL-Heavy.otf') format('opentype');
+  font-weight: 900;
+  font-display: swap;
+}
 :root {
   --bg: #f5f7f6;
   --card: #ffffff;
@@ -27,7 +52,8 @@ body {
   background: var(--bg);
   color: var(--ink);
   font:
-    15px/1.4 system-ui,
+    15px/1.4 'gobCL',
+    system-ui,
     -apple-system,
     'Segoe UI',
     Roboto,
@@ -232,6 +258,18 @@ body.con-panorama .leaflet-top.leaflet-left {
 }
 #alternarVista {
   display: none;
+}
+/* Ruteo con Street View: el panorama ocupa todo (no hay mapa hasta llegar) y la pregunta va encima. */
+body.ruteo-sv #panorama {
+  right: 0;
+  width: auto;
+}
+body.ruteo-sv #alternarVista {
+  display: none !important;
+}
+/* (con :not(.ver-mapa) para ganarle a la regla del celular que esconde el panel sobre el panorama) */
+body.ruteo-sv.con-panorama:not(.ver-mapa) #panel {
+  display: block;
 }
 /* Recorriendo una calle (escritorio): el panel se achica a la derecha, con solo el nombre de la calle y "Siguiente". */
 .recorrido-titulo {

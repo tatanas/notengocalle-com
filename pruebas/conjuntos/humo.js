@@ -55,7 +55,7 @@ export async function humo(navegador, { verificar }, { celular = false, solo = n
   const sinResponder = []
   for (const id of modos) {
     // Street View carga el script de Google y gasta cuota: se prueba a mano.
-    if (id.startsWith('sv-')) continue
+    if (/(^|-)sv(-|$)/.test(id)) continue
     durante(id)
     await irAlInicio(pagina)
     const oficial = soloOficiales.includes(id)

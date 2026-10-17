@@ -18,8 +18,8 @@ const puntoPropio = () => {
   const { nombre, lat, lon } = ajustes.puntoDeRuteo
   return { id: PUNTO_PROPIO, name: nombre, lat, lon }
 }
-const extremoDeRuta = id => (id === PUNTO_PROPIO ? puntoPropio() : lugarPorId[id])
-const lugarDeLaRuta = ruta => extremoDeRuta(ruta.from === PUNTO_PROPIO ? ruta.to : ruta.from)
+export const extremoDeRuta = id => (id === PUNTO_PROPIO ? puntoPropio() : lugarPorId[id])
+export const lugarDeLaRuta = ruta => extremoDeRuta(ruta.from === PUNTO_PROPIO ? ruta.to : ruta.from)
 
 // Los destinos del punto propio: lugares emblemáticos ni tan cerca (la ruta sería trivial) ni tan lejos.
 const KM_MINIMOS_DESDE_EL_PUNTO = 3
@@ -40,8 +40,11 @@ function rutasDelPuntoPropio() {
     })
 }
 
+// Las rutas en auto de la práctica: las de todos o, si el jugador fijó un punto, las de su punto.
+export const rutasEnAuto = () => (ajustes.puntoDeRuteo ? rutasDelPuntoPropio() : DATOS.steps || [])
+
 // Las rutas del punto propio se piden a OSRM al llegar a la pregunta (y la siguiente se adelanta).
-async function rutaCalculada(ruta, q) {
+export async function rutaCalculada(ruta, q) {
   if (ruta.steps) return ruta
   mostrarPanel(encabezadoDePregunta(q) + '<p class="muted">Calculando la ruta…</p>')
   let calculada
@@ -60,15 +63,22 @@ async function rutaCalculada(ruta, q) {
 
 // Nombres de calles reales para completar alternativas cuando la ruta trae pocas.
 const callesDeRelleno = () => vias().map(calle => calle.name.replace(/\s*\(.*\)/, ''))
-/* cfg: {A, B, steps:[{label, x:[...], g, color}], sub, firstQ, nextQ, summary} */
+/* cfg: {A, B, steps:[{label, x:[...], g, color}], sub, firstQ, nextQ, summary, porLaCalle} */
+// Con porLaCalle, A y B se marcan donde la ruta sale a la calle y donde la deja (no en medio de un recinto).
 export function preguntarPasos(q, cfg) {
   const { A, B, steps: pasos } = cfg
   let i = 0,
     errores = 0
   const listo = []
   mostrarAyudas({ borders: comunasDelNucleo(), metro: false })
-  L.marker([A.lat, A.lon], { icon: iconoDiv('pin a', 'A', 28), pane: 'points' }).addTo(capa)
-  L.marker([B.lat, B.lon], { icon: iconoDiv('pin b', 'B', 28), pane: 'points' }).addTo(capa)
+  const salida = cfg.porLaCalle ? pasos[0].g[0] : [A.lat, A.lon]
+  const llegada = cfg.porLaCalle ? pasos.at(-1).g.at(-1) : [B.lat, B.lon]
+  L.marker(salida, { icon: iconoDiv('pin a', 'A', 28), pane: 'points' })
+    .addTo(capa)
+    .bindTooltip(escaparHtml(A.name), { direction: 'top', offset: [0, -14] })
+  L.marker(llegada, { icon: iconoDiv('pin b', 'B', 28), pane: 'points' })
+    .addTo(capa)
+    .bindTooltip(escaparHtml(B.name), { direction: 'top', offset: [0, -14] })
   if (cfg.pre) cfg.pre()
   let aqui = null
   const dibujar = () => {
@@ -81,7 +91,7 @@ export function preguntarPasos(q, cfg) {
     )
     if (aqui) capa.removeLayer(aqui)
     aqui = L.marker(st.g[0], { icon: iconoDiv('pulse', '', 22), pane: 'points' }).addTo(capa)
-    if (i > 0) encuadrar(L.latLngBounds([st.g[0], [B.lat, B.lon]]).pad(0.3), 14)
+    if (i > 0) encuadrar(L.latLngBounds([st.g[0], llegada]).pad(0.3), 14)
     let xs = mezclar(st.x || []).slice(0, 3)
     if (xs.length < 3 && cfg.filler)
       for (const f of mezclar(cfg.filler)) {
@@ -143,8 +153,8 @@ export function preguntarPasos(q, cfg) {
               if (aqui) capa.removeLayer(aqui)
               encuadrar(
                 L.latLngBounds(pasos.flatMap(s => s.g))
-                  .extend([A.lat, A.lon])
-                  .extend([B.lat, B.lon])
+                  .extend(salida)
+                  .extend(llegada)
                   .pad(0.1),
                 15,
               )
@@ -161,13 +171,7 @@ export function preguntarPasos(q, cfg) {
     })
     panel.appendChild(caja)
   }
-  encuadrar(
-    L.latLngBounds([
-      [A.lat, A.lon],
-      [B.lat, B.lon],
-    ]).pad(0.2),
-    14,
-  )
+  encuadrar(L.latLngBounds([salida, llegada]).pad(0.2), 14)
   dibujar()
 }
 export function registrarModoDePasosEnAuto(id, nombre) {
@@ -177,7 +181,7 @@ export function registrarModoDePasosEnAuto(id, nombre) {
     aids: true,
     name: nombre,
     balance: ruta => lugarDeLaRuta(ruta)?.comuna,
-    pool: () => (ajustes.puntoDeRuteo ? rutasDelPuntoPropio() : DATOS.steps || []),
+    pool: rutasEnAuto,
     key: ruta => ruta.k,
     label: ruta => extremoDeRuta(ruta.from).name + ' → ' + extremoDeRuta(ruta.to).name,
     async ask(ruta, q) {
@@ -190,6 +194,7 @@ export function registrarModoDePasosEnAuto(id, nombre) {
         B,
         steps: recorrido.steps.map(paso => ({ label: paso.n, x: paso.x, g: paso.g })),
         filler: callesDeRelleno(),
+        porLaCalle: true,
         sub: `En auto · ~${String(recorrido.km).replace('.', ',')} km · ${recorrido.steps.length} calles principales (las chicas se omiten)`,
         firstQ: '¿por qué calle partes?',
         nextQ: '¿a qué calle sigues?',

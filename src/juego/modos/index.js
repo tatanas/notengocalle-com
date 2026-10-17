@@ -5,6 +5,7 @@ import './metro.js'
 import './calles.js'
 import './streetView.js'
 import './rutas.js'
+import './rutasStreetView.js'
 import './chile.js'
 import './parques.js'
-import './conexiones.js'
+// Conexiones está retirado por mientras (sus preguntas de cruces y de comunas tenían errores): ver docs/siguiente-sesion.md.

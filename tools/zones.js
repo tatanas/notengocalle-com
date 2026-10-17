@@ -63,7 +63,6 @@ Z.push(
  {name:"San Carlos de Apoquindo (sector)",desc:"Sector alto de Las Condes al pie de la cordillera: U. de los Andes, UDD, estadio de la UC (Claro Arena), colegios y condominios.",streets:["Av. Francisco Bulnes Correa","Camino San Francisco de Asís","Av. La Plaza","General Blanche"],near:[-33.395,-70.508],approx:true,
   c:[["^Avenida Francisco Bulnes Correa$","^General Blanche$"],[-33.38390,-70.50610],["^Camino San Francisco de Asís$","^Avenida La Plaza$"],[-33.3990,-70.4985],[-33.4105,-70.5005],[-33.4105,-70.5090]]},
  {name:"La Dehesa (sector)",desc:"El gran sector residencial de Lo Barnechea en torno a Av. La Dehesa y El Rodeo: malls, colegios y clubes.",axis:["^Avenida La Dehesa$","^Avenida El Rodeo$"],r:0.8,streets:["Av. La Dehesa","Av. El Rodeo"]},
- {name:"Los Trapenses",desc:"Sector residencial del norte de Lo Barnechea a lo largo del Camino Los Trapenses: colegios, Santiago College, condominios.",axis:["^Avenida Camino Los Trapenses$"],r:0.6,streets:["Av. Camino Los Trapenses"]},
  {name:"Lynch (La Reina)",desc:"Sector residencial de La Reina en torno a las avenidas Lynch Norte y Lynch Sur.",axis:["^Avenida Lynch (Norte|Sur)$"],r:0.35,streets:["Av. Lynch Norte","Av. Lynch Sur"]},
  {name:"El Arrayán",at:1.1},{name:"Quinchamalí",at:0.45},{name:"Santa María de Manquehue",at:0.8},{name:"Lo Curro",at:0.9},{name:"Jardín del Este",at:0.5},
  {name:"Bajos de Mena",at:1.0},{name:"La Bandera",at:0.6},{name:"La Legua",at:0.5},{name:"La Victoria",at:0.45},{name:"La Pincoya",at:0.7},{name:"Lo Hermida",at:0.8},
@@ -75,7 +74,7 @@ for(const z of Z){let poly=[];let ok=true;
   if(z.axis||z.at){let pg0;
     if(z.axis){const ws=z.axis.flatMap(r=>waysOf(r));if(!ws.length){console.log('ERR eje',z.name);continue;}pg0=turf.buffer(turf.multiLineString(ws.map(w=>w.map(p=>[p[1],p[0]]))),z.r);}
     else{const l=LM.find(x=>x.name===z.name);if(!l){console.log('ERR sin landmark',z.name);continue;}z.desc=l.desc;z.streets=[];pg0=turf.circle([l.lon,l.lat],z.at,{steps:20});}
-    if(z.axis&&/Dehesa|Trapenses/.test(z.name)){const lb=comunas.find(f=>f.properties.name==='Lo Barnechea');const it=turf.intersect(turf.featureCollection([pg0,lb]));if(it)pg0=it;}
+    if(z.axis&&/Dehesa/.test(z.name)){const lb=comunas.find(f=>f.properties.name==='Lo Barnechea');const it=turf.intersect(turf.featureCollection([pg0,lb]));if(it)pg0=it;}
     let g=pg0.geometry;if(g.type==='MultiPolygon')g={type:'Polygon',coordinates:g.coordinates.sort((a,b)=>b[0].length-a[0].length)[0]};
     const sm=turf.simplify(turf.polygon([g.coordinates[0]]),{tolerance:0.0006});poly=sm.geometry.coordinates[0].slice(0,-1).map(c=>[c[1],c[0]]);z.approx=true;z.c=[];}
   for(const c of (z.axis||z.at?[]:z.c)){if(typeof c[0]==='number'){poly.push(c);continue;}const r=corner(c[0],c[1],z.near);if(r.err){console.log('ERR',z.name,':',r.err);ok=false;}else poly.push(r.p);}

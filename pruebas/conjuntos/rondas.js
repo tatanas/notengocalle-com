@@ -141,8 +141,8 @@ export async function rondasOficiales(navegador, { verificar }) {
 // Las fotos se insertan como HTML: el carrusel y el zoom dependen de un listener global.
 export async function fotos(navegador, { verificar }) {
   const { page: pagina, errors: errores } = await abrirPagina(navegador)
-  await pagina.click('[data-mode="pn-photo"]')
-  await pagina.waitForSelector('.ph img')
+  await pagina.click('[data-official="pn-photo"]')
+  await pagina.waitForSelector('.ph img', { timeout: 8000 })
   for (let pregunta = 0; pregunta < 20 && !(await existe(pagina, '.phnav.next')); pregunta++) {
     await pagina.click('.opt:not([disabled])')
     await clicEnSiguiente(pagina)
@@ -267,7 +267,7 @@ export async function disenoMenu(navegador, { verificar }) {
   )
   verificar(!categorias.includes('Metro'), 'y ya no es una categoría de los lugares emblemáticos')
   // Street View solo aparece si hay llave de Google: se cuenta aparte (un botón oficial por nivel, sin práctica).
-  // Comunas no tiene práctica; en Metro la práctica no va al lado sino abajo, con las líneas elegidas.
+  // Comunas, Chile y Parques nacionales no tienen práctica; en Metro la práctica no va al lado sino abajo, con las líneas elegidas.
   const grandes = await pagina.$$eval(
     '.mode-row .mode.ranked',
     botones => botones.filter(boton => !boton.dataset.official.startsWith('sv-')).length,
@@ -277,12 +277,17 @@ export async function disenoMenu(navegador, { verificar }) {
   )
   const sinStreetView = MODOS_OFICIALES.filter(id => !id.startsWith('sv-'))
   const cantidadEsperada = sinStreetView.length
-  const chicosEsperados = sinStreetView.filter(id => !id.startsWith('mt-') && !id.startsWith('com-')).length
+  const chicosEsperados = sinStreetView.filter(
+    id => !['mt-', 'com-', 'ch-', 'pn-'].some(prefijo => id.startsWith(prefijo)),
+  ).length
   verificar(
     grandes === cantidadEsperada && chicos.length === chicosEsperados,
-    `cada juego tiene botón grande (oficial) y chico (práctica), salvo el metro y las comunas: ${grandes} y ${chicos.length}`,
+    `cada juego tiene botón grande (oficial) y chico (práctica), salvo metro, comunas, Chile y parques: ${grandes} y ${chicos.length}`,
   )
-  verificar(!(await existe(pagina, '[data-mode^="com-"]')), 'las comunas no tienen práctica')
+  verificar(
+    !(await existe(pagina, '[data-mode^="com-"], [data-mode^="ch-"], [data-mode^="pn-"]')),
+    'comunas, Chile y parques nacionales no tienen práctica',
+  )
   const practicaDelMetro = await pagina.$$eval(
     '.card .separador ~ .modes [data-mode^="mt-"]',
     botones => botones.length,

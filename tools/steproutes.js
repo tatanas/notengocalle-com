@@ -37,9 +37,15 @@ async function osrm(a,b){
     }catch(e){await sleep(3000);}}
   return null;
 }
+// Caminos internos de un recinto (estacionamientos, accesos sin nombre o con nombre de calle de servicio): la ruta empieza
+// donde se sale a una calle pública y termina donde se la deja, para que se entienda por dónde se parte y se llega.
+const CLASES_INTERNAS=/^(service|footway|path|track|pedestrian|steps|cycleway)$/;
+const clasesPorNombre={};for(const k of Object.keys(require('./nameidx.json'))){const [n,c]=k.split(' | ');(clasesPorNombre[n]=clasesPorNombre[n]||new Set()).add(c);}
+const esInterno=s=>(!s.n&&!s.ref)||(!!s.n&&!!clasesPorNombre[s.n]&&[...clasesPorNombre[s.n]].every(c=>CLASES_INTERNAS.test(c)));
+function sinCaminosInternos(pasos){let a=0,b=pasos.length;while(a<b&&esInterno(pasos[a]))a++;while(b>a&&esInterno(pasos[b-1]))b--;return pasos.slice(a,b);}
 function build(R){
   // 1) nombrar y unir tramos consecutivos de la misma calle
-  const raw=[];for(const s of R.s){const n=s.n?canon(s.n):(s.ref?canon('Ruta '+s.ref.split(';')[0]):'');
+  const raw=[];for(const s of sinCaminosInternos(R.s)){const n=s.n?canon(s.n):(s.ref?canon('Ruta '+s.ref.split(';')[0]):'');
     const last=raw[raw.length-1];
     if(last&&(n===last.n||!n)){last.d+=s.d;last.g.push(...s.g);}else if(n)raw.push({n,d:s.d,g:s.g.slice()});
     else if(!last)raw.push({n:'',d:s.d,g:s.g.slice()});}

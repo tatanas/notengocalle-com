@@ -158,7 +158,7 @@ function crearElementos() {
 // alReportarTunel se llama cuando el jugador avisa que ese punto está en un túnel.
 export async function mostrarPanorama(
   { lat, lon, rumbo = Math.random() * 360 },
-  { alReportarTunel = () => {}, recorrerCalle = false } = {},
+  { alReportarTunel = null, recorrerCalle = false } = {},
 ) {
   const maps = await cargarGoogleMaps()
   const { StreetViewPanorama, StreetViewService } = await maps.importLibrary('streetView')
@@ -179,7 +179,7 @@ export async function mostrarPanorama(
 
   mapaEncuadrado = false
   quitarMarcadorDePosicion()
-  alReportar = alReportarTunel
+  alReportar = alReportarTunel ?? (() => {})
   document.body.classList.remove('ver-mapa')
   document.body.classList.add('con-panorama')
   botonAlternar().textContent = '🗺️ Abrir mapa'
@@ -187,7 +187,7 @@ export async function mostrarPanorama(
   botones.hidden = false
   if (!panorama) crearPanorama(StreetViewPanorama)
   panorama.setOptions({ showRoadLabels: recorrerCalle })
-  document.getElementById('reportarTunel').hidden = recorrerCalle
+  document.getElementById('reportarTunel').hidden = !alReportarTunel
   document.getElementById('volverAlInicio').hidden = recorrerCalle
   document.getElementById('cerrarRecorrido').hidden = !recorrerCalle
   inicioDeLaPregunta = recorrerCalle ? null : inicio
