@@ -237,7 +237,7 @@ const htmlDeCreditos = () =>
     mapa base © ${enlace('https://openfreemap.org', 'OpenFreeMap')} / OpenMapTiles, rutas: ${enlace('https://project-osrm.org', 'OSRM')},
     recorridos: Red (DTPM), relieve: AWS Terrain Tiles, fotos: autores indicados en cada foto vía
     ${enlace('https://commons.wikimedia.org', 'Wikimedia Commons')} y ${enlace('https://panoramax.fr', 'Panoramax')}.
-    Datos generados el ${escaparHtml(DATOS.built)}.</p>`
+    Datos generados el ${escaparHtml(DATOS.built)}. ${enlace('/privacidad.html', 'Privacidad')}.</p>`
 
 const htmlDeInicio = () => `<div class="home-backdrop" aria-hidden="true"></div>
   <div class="wrap">

@@ -19,7 +19,8 @@ const ESCRITORIO = { width: 1366, height: 820 }
 const CELULAR = { width: 390, height: 844, deviceScaleFactor: 2, isMobile: true, hasTouch: true }
 
 // Servicios externos (teselas, fotos) que pueden fallar sin que sea un error del juego.
-const EXTERNOS = /terrarium|openfreemap|openstreetmap|wikimedia|panoramax/
+const EXTERNOS =
+  /terrarium|openfreemap|openstreetmap|wikimedia|panoramax|googlesyndication|doubleclick|adtrafficquality|googleads/
 
 export const dormir = ms => new Promise(resolver => setTimeout(resolver, ms))
 
