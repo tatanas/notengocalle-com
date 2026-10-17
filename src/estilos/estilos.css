@@ -630,6 +630,9 @@ table.stats th {
 .foot a {
   color: var(--muted);
 }
+.foot + .foot {
+  margin-top: 6px;
+}
 
 /* map labels */
 .lbl {
