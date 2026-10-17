@@ -1,5 +1,10 @@
 import { estadisticas } from '../nucleo/progreso.js'
-import { largoNormalDe, tieneRondaDeTodas } from '../../compartido/oficial.js'
+import {
+  NIVELES_DE_STREET_VIEW,
+  etiquetaDeCategoria,
+  largoNormalDe,
+  tieneRondaDeTodas,
+} from '../../compartido/oficial.js'
 import { aplicarReglasDeRonda, largoPara, guardarAjustes, ajustes } from '../nucleo/almacen.js'
 import { $, escaparHtml } from '../nucleo/utilidades.js'
 import {
@@ -88,9 +93,9 @@ function dominio(modo) {
 
 const TODAS_LAS_LINEAS = { lines: null }
 
-// Los juegos de metro de la parte de arriba de su tarjeta usan siempre todas las líneas, y su "% dominado" también.
-function conTodasLasLineas(calcular) {
-  aplicarReglasDeRonda(TODAS_LAS_LINEAS)
+// El "% dominado" de un juego con otras reglas que las del jugador (todas las líneas del metro, un nivel de Street View).
+function conReglas(reglas, calcular) {
+  aplicarReglasDeRonda(reglas)
   try {
     return calcular()
   } finally {
@@ -100,23 +105,40 @@ function conTodasLasLineas(calcular) {
 
 function etiquetaDeModo(modo, { todasLasLineas = false, conDescripcion = true } = {}) {
   const descripcion = conDescripcion && modo.desc ? `<br><small>${escaparHtml(modo.desc)}</small>` : ''
-  const dominado = todasLasLineas ? conTodasLasLineas(() => dominio(modo)) : dominio(modo)
+  const dominado = todasLasLineas ? conReglas(TODAS_LAS_LINEAS, () => dominio(modo)) : dominio(modo)
   return `<span><b>${escaparHtml(modo.name)}</b>${descripcion}</span>
       <span class="mastery">${dominado}</span>`
 }
 
+const DESCRIPCION_DE_NIVEL = {
+  facil: 'Lo que todos conocen, sobre todo del centro',
+  medio: 'Los grandes ejes, autopistas y lugares más conocidos',
+  dificil: 'Además, las avenidas largas y otros lugares conocidos',
+  extremo: 'Cualquier calle o lugar del juego',
+}
+
+// Street View: un botón de práctica por nivel y, al lado, la ronda oficial de ese nivel (cada nivel tiene su ranking).
+function filasDeNivelesDeStreetView(modo) {
+  return NIVELES_DE_STREET_VIEW.map(nivel => {
+    const nombre = etiquetaDeCategoria(nivel)
+    const dominado = conReglas({ nivelStreetView: nivel }, () => dominio(modo))
+    return `<div class="mode-row">
+    <button class="mode" data-mode="${modo.id}" data-nivel="${nivel}" title="Práctica del nivel ${nombre}: ronda sin ranking">
+      <span><b>${nombre}</b><br><small>${DESCRIPCION_DE_NIVEL[nivel]}</small></span><span class="mastery">${dominado}</span>
+    </button>
+    <button class="oficial-chico" data-official="${modo.id}" data-nivel="${nivel}" title="Ronda oficial del nivel ${nombre}: cuenta para su ranking" aria-label="Ronda oficial de ${escaparHtml(modo.name)}, nivel ${nombre}">🏆</button>
+  </div>`
+  }).join('')
+}
+
 // El botón grande es la ronda oficial (cuenta para el ranking); el chico, una ronda de práctica.
-// Un juego sin ronda oficial deja su único botón como práctica. Excepciones: en Street View la práctica es la grande y la
-// oficial la chica (usa el nivel elegido); y en Metro la práctica va aparte, abajo, con las líneas elegidas.
+// Un juego sin ronda oficial deja su único botón como práctica. Excepciones: en Street View hay un botón de práctica por
+// nivel, con su oficial chica al lado; y en Metro la práctica va aparte, abajo, con las líneas elegidas.
 function filaDeModo(modo) {
+  if (modo.group === 'Street View' && tieneRondaOficial(modo)) return filasDeNivelesDeStreetView(modo)
   const etiqueta = etiquetaDeModo(modo, { todasLasLineas: modo.group === 'Metro' })
   if (!tieneRondaOficial(modo))
     return `<div class="mode-row"><button class="mode" data-mode="${modo.id}">${etiqueta}</button></div>`
-  if (modo.group === 'Street View')
-    return `<div class="mode-row">
-    <button class="mode" data-mode="${modo.id}" title="Práctica: ronda sin ranking">${etiqueta}</button>
-    <button class="oficial-chico" data-official="${modo.id}" title="Ronda oficial: cuenta para el ranking, en el nivel elegido" aria-label="Ronda oficial de ${escaparHtml(modo.name)}">🏆</button>
-  </div>`
   const botonOficial = `<button class="mode ranked" data-official="${modo.id}" title="Ronda oficial: cuenta para el ranking">${etiqueta}</button>`
   if (modo.group === 'Metro') return `<div class="mode-row">${botonOficial}</div>`
   return `<div class="mode-row">
@@ -163,13 +185,6 @@ const pasosPrimero = (a, b) => (b.id.startsWith('rs-') ? 1 : 0) - (a.id.startsWi
 
 const OPCIONES_DE_LARGO = [20, 999]
 
-const NIVELES_DE_STREET_VIEW = [
-  ['facil', 'Fácil'],
-  ['medio', 'Medio'],
-  ['dificil', 'Difícil'],
-  ['extremo', 'Extremo'],
-]
-
 // Cuántas preguntas por ronda, en la tarjeta del juego. Los juegos que siempre recorren todo su conjunto
 // (las comunas: son pocas) no lo ofrecen.
 function selectorDeLargo(grupo, modos) {
@@ -179,16 +194,6 @@ function selectorDeLargo(grupo, modos) {
       `<option value="${eleccion}" ${eleccion === largoPara(grupo) ? 'selected' : ''}>${eleccion === 999 ? 'Todas' : largoNormalDe(modos[0].id)}</option>`,
   )
   return `<label class="length-row">Preguntas por ronda <select data-length-group="${escaparHtml(grupo)}">${opciones.join('')}</select></label>`
-}
-
-// Qué tan completas son las preguntas de Street View en la práctica; la ronda oficial siempre usa todas.
-function selectorDeNivel(grupo) {
-  if (grupo !== 'Street View') return ''
-  const opciones = NIVELES_DE_STREET_VIEW.map(
-    ([valor, etiqueta]) =>
-      `<option value="${valor}" ${valor === ajustes.nivelStreetView ? 'selected' : ''}>${etiqueta}</option>`,
-  )
-  return `<label class="length-row">Nivel <select id="nivelStreetView">${opciones.join('')}</select></label>`
 }
 
 // Lugares emblemáticos: qué categorías preguntar y qué tan estricto es el margen (solo en la práctica).
@@ -206,7 +211,6 @@ function ajustesDeLugares() {
 function ajustesDeLaTarjeta(grupo, modos) {
   const opciones = [
     selectorDeLargo(grupo.name, modos),
-    selectorDeNivel(grupo.name),
     grupo.name === 'Comunas' ? selectorDeAlcance() : '',
     grupo.name === 'Lugares emblemáticos' ? ajustesDeLugares() : '',
   ].filter(Boolean)
@@ -284,13 +288,6 @@ function conectarAjustes() {
       guardarAjustes()
     }
 
-  const nivelStreetView = $('#nivelStreetView')
-  if (nivelStreetView)
-    nivelStreetView.onchange = () => {
-      ajustes.nivelStreetView = nivelStreetView.value
-      guardarAjustes()
-    }
-
   const categorias = $('#setCats')
   for (const entrada of categorias?.querySelectorAll('input') ?? [])
     entrada.onchange = () => {
@@ -299,6 +296,13 @@ function conectarAjustes() {
       ajustes.cats = elegidos.length === CATEGORIAS.length ? null : elegidos
       guardarAjustes()
     }
+}
+
+// La práctica de Street View juega el nivel guardado en los ajustes (de ahí sale también su récord personal).
+function recordarNivelDeStreetView(boton) {
+  if (!boton.dataset.nivel) return
+  ajustes.nivelStreetView = boton.dataset.nivel
+  guardarAjustes()
 }
 
 function abrirInicio() {
@@ -311,9 +315,16 @@ function abrirInicio() {
   mostrarPantalla(htmlDeInicio())
 
   for (const boton of vistaDePantalla.querySelectorAll('[data-mode]'))
-    boton.onclick = () => iniciarPartida(modoPorId(boton.dataset.mode))
+    boton.onclick = () => {
+      recordarNivelDeStreetView(boton)
+      iniciarPartida(modoPorId(boton.dataset.mode))
+    }
   for (const boton of vistaDePantalla.querySelectorAll('[data-official]'))
-    boton.onclick = () => iniciarPartida(modoPorId(boton.dataset.official), { ranked: true })
+    boton.onclick = () =>
+      iniciarPartida(modoPorId(boton.dataset.official), {
+        ranked: true,
+        category: boton.dataset.nivel ?? null,
+      })
   mostrarMisCalles($('#myst'))
   conectarAjustes()
 }

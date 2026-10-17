@@ -6,9 +6,11 @@ import { encuadrarCiudad, mapa, repararMapaBase } from './mapa.js'
 // para que el resto del juego siga siendo instantáneo y sin depender de Google.
 const LLAVE = __LLAVE_DE_GOOGLE_MAPS__
 const RADIO_DE_BUSQUEDA_M = 60
-// En las preguntas no se puede caminar: solo mirar alrededor. Si algo logra moverlo más que esto, vuelve al punto de
-// partida. Al terminar una pregunta de calles sí se puede recorrer la calle (modo caminable).
-const TOLERANCIA_DE_MOVIMIENTO_KM = 0.005
+// En las preguntas se puede caminar para ubicarse, pero sin nombres de calles y sin alejarse más que esto del punto de
+// partida (el puntaje se mide desde ahí). Al terminar una pregunta de calles se recorre la calle sin límite y con nombres.
+export const DISTANCIA_MAXIMA_DE_CAMINATA_KM = 0.5
+// Para dibujar lo caminado basta un punto cada tantos metros.
+const PASO_MINIMO_DEL_CAMINO_KM = 0.005
 
 export const streetViewDisponible = () => !!LLAVE
 
@@ -42,6 +44,22 @@ let mapaEncuadrado = false
 let panorama = null
 let inicioDeLaPregunta = null
 let panoDeInicio = null
+let ultimoPanoPermitido = null
+let caminoDeLaPregunta = []
+
+// Lo que caminó el jugador en la pregunta actual, desde el punto de partida: [[lat, lon], …].
+export const caminoRecorrido = () => [...caminoDeLaPregunta]
+
+function anotarEnElCamino(lugar) {
+  const ultimo = caminoDeLaPregunta.at(-1)
+  if (!ultimo || distanciaKm(ultimo, lugar) >= PASO_MINIMO_DEL_CAMINO_KM) caminoDeLaPregunta.push(lugar)
+}
+
+function volverAlPanorama(pano) {
+  const direccion = panorama.getPov()
+  panorama.setPano(pano)
+  panorama.setPov(direccion)
+}
 
 // Al recorrer una calle, un punto azul en el mapa sigue al jugador.
 let marcadorDePosicion = null
@@ -70,8 +88,8 @@ function seguirEnElMapa(posicion) {
 
 function crearPanorama(StreetViewPanorama) {
   panorama = new StreetViewPanorama(contenedor, {
-    clickToGo: false,
-    linksControl: false,
+    clickToGo: true,
+    linksControl: true,
     addressControl: false,
     showRoadLabels: false,
     fullscreenControl: false,
@@ -80,18 +98,23 @@ function crearPanorama(StreetViewPanorama) {
     motionTrackingControl: false,
     panControl: false,
   })
-  // Las flechas del teclado también caminan: si algo lo mueve, vuelve.
   panorama.addListener('position_changed', () => {
     const posicion = panorama.getPosition()
-    if (posicion && !inicioDeLaPregunta && document.body.classList.contains('recorriendo'))
-      seguirEnElMapa(posicion)
-    if (!posicion || !inicioDeLaPregunta) return
-    if (distanciaKm([posicion.lat(), posicion.lng()], inicioDeLaPregunta) <= TOLERANCIA_DE_MOVIMIENTO_KM)
+    if (!posicion) return
+    if (!inicioDeLaPregunta) {
+      if (document.body.classList.contains('recorriendo')) seguirEnElMapa(posicion)
       return
-    const direccion = panorama.getPov()
-    panorama.setPano(panoDeInicio)
-    panorama.setPov(direccion)
-    aviso('Aquí solo puedes mirar alrededor, no caminar.')
+    }
+    const lugar = [posicion.lat(), posicion.lng()]
+    if (distanciaKm(lugar, inicioDeLaPregunta) > DISTANCIA_MAXIMA_DE_CAMINATA_KM) {
+      volverAlPanorama(ultimoPanoPermitido)
+      aviso(
+        `Hasta aquí: puedes alejarte hasta ${DISTANCIA_MAXIMA_DE_CAMINATA_KM * 1000} m del punto de partida.`,
+      )
+      return
+    }
+    ultimoPanoPermitido = panorama.getPano()
+    anotarEnElCamino(lugar)
   })
 }
 
@@ -119,21 +142,23 @@ function crearElementos() {
   botones.id = 'botonesDePanorama'
   botones.hidden = true
   botones.innerHTML = `<button type="button" id="reportarTunel" title="Este punto está en un túnel: que no vuelva a salir">🚧 Reportar túnel</button>
+    <button type="button" id="volverAlInicio" title="Volver al punto de partida">↩ Al inicio</button>
     <button type="button" id="cerrarRecorrido" hidden>✖ Cerrar Street View</button>
     <button type="button" id="alternarVista"></button>`
   app.appendChild(botones)
   document.getElementById('cerrarRecorrido').onclick = ocultarPanorama
   document.getElementById('reportarTunel').onclick = () => alReportar()
+  document.getElementById('volverAlInicio').onclick = () => volverAlPanorama(panoDeInicio)
   botonAlternar().onclick = alternarEntrePanoramaYMapa
 }
 
-// Deja al jugador mirando desde el panorama de Street View más cercano a (lat, lon), sin poder caminar
-// (salvo con caminable: true, que deja recorrer la calle).
+// Deja al jugador en el panorama de Street View más cercano a (lat, lon). En una pregunta puede caminar un poco, sin
+// nombres de calles; con recorrerCalle: true camina sin límite y con nombres.
 // Devuelve el punto real del panorama (puede quedar a unos metros del pedido) o null si ahí no hay cobertura.
 // alReportarTunel se llama cuando el jugador avisa que ese punto está en un túnel.
 export async function mostrarPanorama(
   { lat, lon, rumbo = Math.random() * 360 },
-  { alReportarTunel = () => {}, caminable = false } = {},
+  { alReportarTunel = () => {}, recorrerCalle = false } = {},
 ) {
   const maps = await cargarGoogleMaps()
   const { StreetViewPanorama, StreetViewService } = await maps.importLibrary('streetView')
@@ -161,11 +186,14 @@ export async function mostrarPanorama(
   contenedor.hidden = false
   botones.hidden = false
   if (!panorama) crearPanorama(StreetViewPanorama)
-  panorama.setOptions({ clickToGo: caminable, linksControl: caminable, showRoadLabels: caminable })
-  document.getElementById('reportarTunel').hidden = caminable
-  document.getElementById('cerrarRecorrido').hidden = !caminable
-  inicioDeLaPregunta = caminable ? null : inicio
+  panorama.setOptions({ showRoadLabels: recorrerCalle })
+  document.getElementById('reportarTunel').hidden = recorrerCalle
+  document.getElementById('volverAlInicio').hidden = recorrerCalle
+  document.getElementById('cerrarRecorrido').hidden = !recorrerCalle
+  inicioDeLaPregunta = recorrerCalle ? null : inicio
+  caminoDeLaPregunta = recorrerCalle ? [] : [inicio]
   panoDeInicio = lugar.pano
+  ultimoPanoPermitido = lugar.pano
   panorama.setPano(lugar.pano)
   panorama.setPov({ heading: rumbo, pitch: 0 })
   panorama.setVisible(true)

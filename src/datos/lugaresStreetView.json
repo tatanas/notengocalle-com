@@ -3796,5 +3796,26 @@
       { "lat": -33.60568, "lon": -70.68282, "rumbo": 11 }
     ],
     "nivel": 2
+  },
+  {
+    "nombre": "Agustinas",
+    "tipo": "calle",
+    "comuna": "Santiago",
+    "puntos": [
+      { "lat": -33.44381, "lon": -70.67794, "rumbo": 262 },
+      { "lat": -33.44159, "lon": -70.65978, "rumbo": 263 },
+      { "lat": -33.44301, "lon": -70.67083, "rumbo": 80 }
+    ],
+    "nivel": 4
+  },
+  {
+    "nombre": "Monjitas",
+    "tipo": "calle",
+    "comuna": "Santiago",
+    "puntos": [
+      { "lat": -33.43686, "lon": -70.64674, "rumbo": 83 },
+      { "lat": -33.43667, "lon": -70.64171, "rumbo": 279 }
+    ],
+    "nivel": 4
   }
 ]

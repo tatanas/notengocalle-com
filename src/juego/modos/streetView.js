@@ -9,7 +9,13 @@ import { PUNTOS_MAXIMOS, esAciertoDeStreetView, puntajeDeStreetView } from '../.
 import { describirUbicacion } from '../../dominio/ubicacion.js'
 import { COLORES, dibujarCalle, iconoDiv } from '../../mapa/dibujo.js'
 import { capa, encuadrar, encuadrarCiudad, mapa, repararMapaBase } from '../../mapa/mapa.js'
-import { mostrarPanorama, ocultarPanorama, streetViewDisponible } from '../../mapa/streetView.js'
+import {
+  DISTANCIA_MAXIMA_DE_CAMINATA_KM,
+  caminoRecorrido,
+  mostrarPanorama,
+  ocultarPanorama,
+  streetViewDisponible,
+} from '../../mapa/streetView.js'
 import { aviso, mostrarPanel } from '../../interfaz/panel.js'
 import { encabezadoDePregunta, partida, responder, saltarPregunta } from '../engine.js'
 import { registrarModo } from '../registry.js'
@@ -28,7 +34,8 @@ const callesBajoElPunto = punto =>
     .slice(0, MAXIMO_DE_CALLES_MOSTRADAS)
     .map(({ calle }) => calle)
 
-const textoDeLaPregunta = `<div class="q-prompt">Mira alrededor y <b>toca en el mapa</b> dónde estás parado.</div>`
+const textoDeLaPregunta = `<div class="q-prompt">Mira alrededor y <b>toca en el mapa</b> dónde partiste.</div>
+  <p class="muted tight">Puedes caminar hasta ${DISTANCIA_MAXIMA_DE_CAMINATA_KM * 1000} m para ubicarte; el puntaje se mide desde el punto de partida (↩ te devuelve ahí).</p>`
 
 // Los puntos que alguien reportó como túnel no vuelven a salir en este dispositivo.
 const llaveDelPunto = punto => `${punto.lat},${punto.lon}`
@@ -105,22 +112,30 @@ registrarModo({
       const puntos = puntajeDeStreetView(distancia)
       const calles = callesBajoElPunto(verdadero)
       const enLaCalle = calles.some(calle => distanciaALinea(adivinado, calle.lines) <= MARGEN_DE_CALLE_KM)
+      const camino = caminoRecorrido()
+      const seMovio = camino.length > 1
 
       ocultarPanorama()
       for (const calle of calles) dibujarCalle(calle, COLORES.ok, { labelText: calle.name })
       if (dentroDelRecinto)
         L.polygon(recinto, { pane: 'routes', color: '#16a34a', weight: 2, fillOpacity: 0.12 }).addTo(capa)
+      if (seMovio)
+        L.polyline(camino, { pane: 'routes', color: '#2563eb', weight: 3, opacity: 0.8 }).addTo(capa)
       L.marker(adivinado, { icon: iconoDiv('pin you'), pane: 'points' }).addTo(capa)
       L.marker(verdadero, { icon: iconoDiv('pin ' + (acierto ? 'good' : 'ans')), pane: 'points' })
         .addTo(capa)
-        .bindTooltip('Estabas aquí', { permanent: true, direction: 'top', offset: [0, -10] })
+        .bindTooltip(seMovio ? 'Partiste aquí' : 'Estabas aquí', {
+          permanent: true,
+          direction: 'top',
+          offset: [0, -10],
+        })
       L.polyline([adivinado, verdadero], {
         pane: 'routes',
         color: '#334155',
         dashArray: '5 6',
         weight: 2,
       }).addTo(capa)
-      encuadrar(L.latLngBounds([adivinado, verdadero]).pad(0.3), 18)
+      encuadrar(L.latLngBounds([adivinado, verdadero, ...camino]).pad(0.3), 18)
 
       const descripcion = describirUbicacion(verdadero, calles)
       const referencia = lugar.referencia ?? lugar.nombre

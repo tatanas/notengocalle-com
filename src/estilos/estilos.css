@@ -244,7 +244,13 @@ body.con-panorama .leaflet-top.leaflet-left {
   #alternarVista {
     display: inline-block;
   }
-  body.ver-mapa #reportarTunel {
+  #botonesDePanorama {
+    left: 12px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
+  body.ver-mapa #reportarTunel,
+  body.ver-mapa #volverAlInicio {
     display: none;
   }
 }

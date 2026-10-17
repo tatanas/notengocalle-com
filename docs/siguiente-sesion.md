@@ -34,7 +34,7 @@ node servidor/admin.js reportes     túneles reportados por los jugadores
 | Juego `st-punto` | `registrarNombreDeCalle` en `src/juego/modos/calles.js`; el punto: `puntoParaPreguntar` en `src/dominio/calles.js` |
 | Rankings por ajuste (nivel de Street View, alcance de comunas) | `ajusteDeCategoria` y `COMUNAS_POR_ALCANCE` en `compartido/oficial.js`; el motor lo aplica en `iniciarPartida` (`src/juego/engine.js`) |
 | Menú / barra superior / Mi progreso | `src/interfaz/inicio.js`, `index.html` (botones 🏆🔎📊), `src/interfaz/progreso.js` |
-| Visor de Street View | `src/mapa/streetView.js` (un solo panorama reutilizado; modo `caminable`) |
+| Visor de Street View | `src/mapa/streetView.js` (un solo panorama reutilizado; en las preguntas se camina hasta 500 m sin nombres; `recorrerCalle: true` camina libre y con nombres) |
 | Rondas oficiales / largos / categorías | `compartido/oficial.js` (lo comparten navegador y servidor) |
 | Puntajes y ranking del servidor | `servidor/puntajes.js`, `servidor/api.js` |
 | Pruebas de navegador | `pruebas/conjuntos/*.js`; qué suite corre por archivo cambiado: `pruebas/seleccion.js` |
@@ -48,7 +48,7 @@ node servidor/admin.js reportes     túneles reportados por los jugadores
 - El usuario hace los `git push`; Claude solo hace commit (con la línea `Co-Authored-By` que indique el entorno).
 
 ## Ideas y pendientes (por valor)
-1. **Más pistas para aprender cada calle** (idea del dueño): bandejón muy ancho, árboles al medio, ferias, automotoras, estadios, malls, ríos/canales. Hoy 107 de 172 calles tienen alguna
+1. **Más pistas para aprender cada calle** (idea del dueño): bandejón muy ancho, árboles al medio, ferias, automotoras, estadios, malls, ríos/canales. Hoy 107 de 174 calles tienen alguna
    (automáticas: agua, automotoras, feria, estadio, lugares emblemáticos cercanos). Falta lo que OSM no dice (bandejones, arbolado): cargarlo a mano en `PISTAS_MANUALES` (`tools/pistas_calles.mjs`).
 2. **Autopistas en Street View**: son muy amplias; el dueño dijo "dejémoslo" por ahora. Idea: ponerlas solo en puntos cercanos a un lugar relevante (Costanera Norte junto al Costanera Center, Vespucio junto a un mall…).
 3. **Salidas de Costanera Norte y Vespucio** como guía para decidir qué calles agregar: el dueño pidió solo la lista (no agregar); no hay una fuente oficial limpia (TAG, `tag.cl/mapa`, o los mapas de cada concesionaria).
@@ -57,7 +57,7 @@ node servidor/admin.js reportes     túneles reportados por los jugadores
 6. `tools/` está desordenado (~100 archivos); ordenar solo si se puede volver a correr cada script.
 
 ## Decisiones recientes del dueño (para no discutirlas de nuevo)
-- Street View: no caminar durante la pregunta; ronda siempre de 10; sin "todas"; la ronda oficial varía por nivel (botón grande = práctica, chico 🏆 = oficial); el fácil es chico (~24) y céntrico; priorizar calles y lugares históricos sobre recintos.
+- Street View: **sí se camina** durante la pregunta (hasta 500 m, sin nombres en el panorama ni en el mapa; el puntaje se mide desde el punto de partida; antes no se podía y al dueño le parecía demasiado difícil); ronda siempre de 10; sin "todas"; un botón de práctica por nivel con su 🏆 oficial al lado (ranking por nivel); el fácil es chico (~24) y céntrico; priorizar calles y lugares históricos sobre recintos.
 - Street View en cerros grandes: vale cualquier toque dentro del cerro. Evitar letreros (cruces) en lo posible.
 - El punto de la pregunta debe cambiar entre partidas: nadie debe ganar memorizando una foto.
-- Calles agregadas: Rolando Petersen, Camino a Lonquén (se tomó éste porque no hay "Av. Lonquén"), Isabel La Católica, Candelaria Goyenechea, Luis Carrera, Alonso de Camargo, Presidente Errázuriz y Alexander Fleming (de vuelta).
+- Calles agregadas: Agustinas y Monjitas (para ubicarse cerca de La Moneda), Rolando Petersen, Camino a Lonquén (se tomó éste porque no hay "Av. Lonquén"), Isabel La Católica, Candelaria Goyenechea, Luis Carrera, Alonso de Camargo, Presidente Errázuriz y Alexander Fleming (de vuelta).

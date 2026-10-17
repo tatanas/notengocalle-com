@@ -35,7 +35,7 @@ export function conectarRecorrerCalle(calle, inicio = null) {
     try {
       const partida = await mostrarPanorama(
         { lat, lon, rumbo: inicio ? undefined : alAzar?.rumbo },
-        { caminable: true },
+        { recorrerCalle: true },
       )
       if (!partida) return aviso('No hay Street View en esta calle.')
       ponerNombreEnElPanel(boton, calle)

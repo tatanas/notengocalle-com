@@ -6,6 +6,7 @@ import {
   tieneRondaDeTodas,
   TODAS_LAS_PREGUNTAS,
   categoriaDe,
+  etiquetaDeCategoria,
 } from '../../compartido/oficial.js'
 import { pesoAdaptativo, mejores, registrar, guardarMejor, muestraPonderada } from '../nucleo/progreso.js'
 import { ajustes, aplicarReglasDeRonda, largoPara } from '../nucleo/almacen.js'
@@ -237,8 +238,11 @@ export function siguientePregunta({ first: primero = false } = {}) {
 
 export function encabezadoDePregunta(q) {
   const progreso = ((q.i / q.items.length) * 100).toFixed(0)
+  const tipoDeRonda = q.ranked ? '🏆 Ronda oficial' : q.mode.group
+  // El nivel de Street View o el alcance de comunas: cada uno es un ranking distinto.
+  const ajuste = q.variante ? ` · ${etiquetaDeCategoria(q.variante)}` : ''
   return `<div class="progress"><i style="width:${progreso}%"></i></div>
-    <div class="q-head"><span>Pregunta ${q.i + 1} de ${q.items.length}</span><span>${q.ranked ? '🏆 Ronda oficial' : q.mode.group}</span></div>`
+    <div class="q-head"><span>Pregunta ${q.i + 1} de ${q.items.length}</span><span>${tipoDeRonda}${ajuste}</span></div>`
 }
 
 function tituloDelComentario(ok, parcial, conPista) {

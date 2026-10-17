@@ -27,7 +27,7 @@ const PREFERENCIAS_POR_DEFECTO = {
   lines: null,
   strict: false,
   ownStreets: true,
-  // Qué tan difícil es "¿Dónde estás?" en la práctica: facil, medio, dificil o extremo. La ronda oficial siempre es extremo.
+  // Nivel de "¿Dónde estás?" (facil, medio, dificil o extremo): el último botón de práctica tocado en el menú.
   nivelStreetView: 'facil',
   // La práctica siempre es fácil (bordes de las comunas y líneas del metro); las rondas oficiales, difíciles.
 }
