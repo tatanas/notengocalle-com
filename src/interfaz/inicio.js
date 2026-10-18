@@ -25,6 +25,7 @@ import { mostrarMisCalles } from './misCalles.js'
 import { definirPantalla } from './navegacion.js'
 import { ocultarPanel, vistaDePantalla, mostrarPantalla } from './panel.js'
 import { htmlDelPie } from './pie.js'
+import { htmlDeAnuncio } from './anuncios.js'
 import { conectarPuntoDeRuteo, htmlDelPuntoDeRuteo } from './puntoDeRuteo.js'
 import { alTraerProgreso } from '../cuenta/progresoCompartido.js'
 
@@ -237,6 +238,7 @@ const htmlDeInicio = () => `<div class="home-backdrop" aria-hidden="true"></div>
   <div class="wrap">
   <div class="hero inicio"><h2>¿Dónde queda eso? 🏔️</h2>
     <p>Practica comunas, lugares, calles, rutas y metro de Santiago.</p></div>
+  ${htmlDeAnuncio('menu')}
   <div class="grid">
     ${GRUPOS.map(tarjetaDeGrupo).join('')}
   </div>

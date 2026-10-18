@@ -1334,3 +1334,26 @@ table.board.clickable tr[data-open]:hover td {
 #resultadosDelPunto:empty {
   display: none;
 }
+
+/* Publicidad (src/interfaz/anuncios.js): chica y horizontal, separada de los botones para no tocarla sin querer. */
+.anuncio {
+  margin: 18px auto 10px;
+  text-align: center;
+}
+.anuncio-etiqueta {
+  display: block;
+  margin-bottom: 2px;
+  font-size: 11px;
+  color: var(--muted);
+}
+.anuncio-horizontal {
+  width: 320px;
+  height: 50px;
+}
+@media (min-width: 761px) {
+  .anuncio-menu .anuncio-horizontal,
+  .anuncio-paginas .anuncio-horizontal {
+    width: 728px;
+    height: 90px;
+  }
+}

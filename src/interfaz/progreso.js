@@ -8,6 +8,7 @@ import { MODOS } from '../juego/registry.js'
 import { definirPantalla } from './navegacion.js'
 import { ocultarPanel, mostrarPantalla } from './panel.js'
 import { htmlDelPie } from './pie.js'
+import { htmlDeAnuncio } from './anuncios.js'
 
 function mejorRonda(idDeModo) {
   const llaves = Object.keys(mejores).filter(llave => llave.startsWith(idDeModo + ':'))
@@ -51,7 +52,7 @@ function abrirProgreso() {
   fijarChile(false)
   mostrarPantalla(`<div class="wrap pagina-angosta"><div class="card">${htmlDeProgreso()}
     <p class="muted nota">${usuario ? 'Tu progreso de práctica se guarda en tu cuenta: es el mismo en todos tus dispositivos.' : 'Tu progreso se guarda solo en este navegador. Con una cuenta, es el mismo en todos tus dispositivos.'}</p>
-    <div class="row" style="margin-top:10px"><button class="btn sec small" id="resetStats">Borrar progreso</button></div></div>${htmlDelPie()}</div>`)
+    <div class="row" style="margin-top:10px"><button class="btn sec small" id="resetStats">Borrar progreso</button></div></div>${htmlDeAnuncio('paginas')}${htmlDelPie()}</div>`)
   $('#resetStats').onclick = () => {
     if (!confirm('¿Borrar todo tu progreso?')) return
     reiniciarProgreso()

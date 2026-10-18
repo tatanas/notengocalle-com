@@ -27,6 +27,7 @@ import { confirmarAccion } from '../interfaz/confirmar.js'
 import { marcarPestana, resguardarSalida, navegar } from '../interfaz/navegacion.js'
 import { mostrarResultadoOficial } from '../interfaz/resultadoOficial.js'
 import { ocultarPantalla, indicador, panel, mostrarPanel, aviso } from '../interfaz/panel.js'
+import { htmlDeAnuncio } from '../interfaz/anuncios.js'
 
 /* Un modo define: id, group, name, desc (opcional: se muestra bajo el nombre en el menú), pool(), key(item) y ask(item, quiz).
    Opcionales: label(item), balance(item), setup(quiz), limpiar() (al salir), disponible() (si no, no aparece en el menú), all, keepLayer, noHint, aids, relief, chile, roomy, tall, study.
@@ -333,7 +334,8 @@ function terminarPartida() {
       ${!oficial && tieneRondaOficial(modo) ? '<button class="btn sec" id="goOfficial">🏆 Ronda oficial</button>' : ''}
       <button class="btn sec" id="menu">Menú</button>
     </div>
-    <p class="muted" style="font-size:12px;margin-top:10px">${notaFinal}</p>`)
+    <p class="muted" style="font-size:12px;margin-top:10px">${notaFinal}</p>
+    ${htmlDeAnuncio('resultado')}`)
 
   $('#again').onclick = () => iniciarPartida(modo, { ranked: oficial, category: categoria, reglas })
   $('#menu').onclick = () => navegar('home')

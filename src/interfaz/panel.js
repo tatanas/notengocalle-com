@@ -1,4 +1,5 @@
 import { $ } from '../nucleo/utilidades.js'
+import { activarAnuncios } from './anuncios.js'
 
 // El panel flota sobre el mapa (preguntas, Explorar); la pantalla lo tapa entero (menú, ranking).
 export const panel = $('#panel')
@@ -7,6 +8,7 @@ export const indicador = $('#hud')
 
 export function mostrarPanel(html) {
   panel.innerHTML = html
+  activarAnuncios(panel)
   panel.classList.remove('hidden')
   panel.scrollTop = 0
 }
@@ -17,6 +19,7 @@ export function ocultarPanel() {
 
 export function mostrarPantalla(html) {
   vistaDePantalla.innerHTML = html
+  activarAnuncios(vistaDePantalla)
   vistaDePantalla.classList.remove('hidden')
   vistaDePantalla.scrollTop = 0
 }

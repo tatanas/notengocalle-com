@@ -17,6 +17,7 @@ import { abrirDialogoDeCuenta } from './cuenta.js'
 import { definirPantalla } from './navegacion.js'
 import { ocultarPanel, mostrarPantalla } from './panel.js'
 import { htmlDelPie } from './pie.js'
+import { htmlDeAnuncio } from './anuncios.js'
 
 const ETIQUETAS_DE_PERIODO = { todo: 'Histórico', semana: 'Últimos 7 días' }
 const TODOS_LOS_JUEGOS = ''
@@ -184,6 +185,7 @@ function dibujar() {
       <div id="rankTabs" style="margin-top:12px">${htmlDePestanasDeCategoria()}</div>
       <div id="rankBody" style="margin-top:12px"></div>
     </div>
+    ${htmlDeAnuncio('paginas')}
     ${htmlDelPie()}
   </div>`)
   $('#rankMode').onchange = evento => elegirVista({ modo: evento.target.value })
