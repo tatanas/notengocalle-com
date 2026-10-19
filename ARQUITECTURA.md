@@ -360,7 +360,7 @@ Regenerar el archivo final (minutos): `npm run build` dentro de `tools/`
 - **Agregar o quitar una calle**: editar `streetlist.js` → `node streets.js` → `node cruces.js` → `node merge_st.js` →
   `npm run build`.
   Cada entrada es `[nombre_mostrado, regex_OSM, pista, ancla[lon,lat]|null, {bt:1, kind, gap, trMin}]`:
-  `bt:1` busca en `btiles/` (descarga completa de la RM); `kind` es `calle|autopista|agua|tren`; `gap` es la
+  `bt:1` busca en `btiles/` (descarga completa de la RM); `kind` es `calle|autopista|agua|tren`; `box:[lonMín,latMín,lonMáx,latMáx]` limita a las vías dentro de esa caja (para dos calles con el mismo nombre en OSM); `gap` es la
   distancia en km para unir tramos separados; `trMin` el largo mínimo para mostrar "tramos con nombre".
   Para ver cómo figura una calle en OSM: `nameidx.json`, `ways_named.json`,
   `node cross.js "<nombre OSM>" lat|lon`.

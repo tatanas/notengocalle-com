@@ -267,7 +267,8 @@ export async function disenoMenu(navegador, { verificar }) {
   )
   verificar(!categorias.includes('Metro'), 'y ya no es una categoría de los lugares emblemáticos')
   // Street View solo aparece si hay llave de Google: se cuenta aparte (un botón oficial por nivel, sin práctica).
-  // Comunas, Chile y Parques nacionales no tienen práctica; en Metro la práctica no va al lado sino abajo, con las líneas elegidas.
+  // Comunas, Chile y Parques nacionales no tienen práctica; en Metro y Lugares emblemáticos la práctica no va al lado
+  // sino abajo, con las líneas o categorías elegidas.
   const grandes = await pagina.$$eval(
     '.mode-row .mode.ranked',
     botones => botones.filter(boton => !boton.dataset.official.startsWith('sv-')).length,
@@ -278,11 +279,11 @@ export async function disenoMenu(navegador, { verificar }) {
   const sinStreetView = MODOS_OFICIALES.filter(id => !id.startsWith('sv-'))
   const cantidadEsperada = sinStreetView.length
   const chicosEsperados = sinStreetView.filter(
-    id => !['mt-', 'com-', 'ch-', 'pn-'].some(prefijo => id.startsWith(prefijo)),
+    id => !['mt-', 'lm-', 'com-', 'ch-', 'pn-'].some(prefijo => id.startsWith(prefijo)),
   ).length
   verificar(
     grandes === cantidadEsperada && chicos.length === chicosEsperados,
-    `cada juego tiene botón grande (oficial) y chico (práctica), salvo metro, comunas, Chile y parques: ${grandes} y ${chicos.length}`,
+    `cada juego tiene botón grande (oficial) y chico (práctica), salvo metro, lugares, comunas, Chile y parques: ${grandes} y ${chicos.length}`,
   )
   verificar(
     !(await existe(pagina, '[data-mode^="com-"], [data-mode^="ch-"], [data-mode^="pn-"]')),
@@ -293,6 +294,14 @@ export async function disenoMenu(navegador, { verificar }) {
     botones => botones.length,
   )
   verificar(practicaDelMetro === 2, 'el metro tiene su subsección de práctica con los dos juegos')
+  const practicaDeLugares = await pagina.$$eval(
+    '.card .separador ~ .modes [data-mode^="lm-"]',
+    botones => botones.length,
+  )
+  verificar(
+    practicaDeLugares === 2,
+    'los lugares emblemáticos tienen su subsección de práctica con los dos juegos',
+  )
   verificar(
     chicos.every(etiqueta => etiqueta === '🏋️'),
     'el botón chico es la pesa 🏋️ (práctica)',

@@ -1,6 +1,6 @@
 # Revisión de las calles del juego (octubre 2026)
 
-Lista completa de las 162 calles jugables (calles y autopistas; los ríos, canales y trenes no entran), por sector y tamaño.
+Lista completa de las 162 calles jugables de ese momento (hoy son 164) (calles y autopistas; los ríos, canales y trenes no entran), por sector y tamaño.
 
 ## Decisiones (17 de octubre de 2026)
 
@@ -44,9 +44,9 @@ Más conocidas porque mucha gente trabaja o estudia por ahí, pero en el mapa so
 - Av. Ricardo Lyon
 - Av. Simón Bolívar
 - Av. Echeñique
-- Luis Thayer Ojeda
-- Av. Holanda
-- Av. José Manuel Infante
+- ~~Luis Thayer Ojeda~~ (sacada)
+- ~~Av. Holanda~~ (sacada)
+- ~~Av. José Manuel Infante~~ (sacada)
 - Av. El Cerro
 - Av. Chile España
 

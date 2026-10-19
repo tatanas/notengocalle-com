@@ -93,7 +93,12 @@ function dominio(modo) {
   return `${Math.round((dominados / elementos.length) * 100)}% dominado`
 }
 
-const TODAS_LAS_LINEAS = { lines: null }
+// Metro y Lugares emblemáticos llevan la práctica aparte, abajo, con las líneas o categorías que elija el jugador.
+// Arriba van las rondas oficiales, cuyo "% dominado" cuenta todas (sinFiltro).
+const PRACTICA_APARTE = {
+  Metro: { sinFiltro: { lines: null }, fichas: () => fichasDeLineasDeMetro() },
+  'Lugares emblemáticos': { sinFiltro: { cats: null }, fichas: () => fichasDeCategoriasDeLugares() },
+}
 
 // El "% dominado" de un juego con otras reglas que las del jugador (todas las líneas del metro, un nivel de Street View).
 function conReglas(reglas, calcular) {
@@ -105,9 +110,9 @@ function conReglas(reglas, calcular) {
   }
 }
 
-function etiquetaDeModo(modo, { todasLasLineas = false, conDescripcion = true } = {}) {
+function etiquetaDeModo(modo, { reglas = null, conDescripcion = true } = {}) {
   const descripcion = conDescripcion && modo.desc ? `<br><small>${escaparHtml(modo.desc)}</small>` : ''
-  const dominado = todasLasLineas ? conReglas(TODAS_LAS_LINEAS, () => dominio(modo)) : dominio(modo)
+  const dominado = reglas ? conReglas(reglas, () => dominio(modo)) : dominio(modo)
   return `<span><b>${escaparHtml(modo.name)}</b>${descripcion}</span>
       <span class="mastery">${dominado}</span>`
 }
@@ -134,28 +139,29 @@ function filasDeNivelesDeStreetView(modo) {
 
 // El botón grande es la ronda oficial (cuenta para el ranking); el chico, una ronda de práctica.
 // Un juego sin ronda oficial deja su único botón como práctica. Excepciones: los juegos solo oficiales (soloOficial: Street
-// View, con un botón por nivel, Comunas, Chile y Parques) no tienen práctica; y en Metro la práctica va aparte, abajo.
+// View, con un botón por nivel, Comunas, Chile y Parques) no tienen práctica; y en Metro y Lugares emblemáticos la
+// práctica va aparte, abajo.
 function filaDeModo(modo) {
   if (modo.group === 'Street View' && tieneRondaOficial(modo)) return filasDeNivelesDeStreetView(modo)
-  const etiqueta = etiquetaDeModo(modo, { todasLasLineas: modo.group === 'Metro' })
+  const practicaAparte = PRACTICA_APARTE[modo.group]
+  const etiqueta = etiquetaDeModo(modo, { reglas: practicaAparte?.sinFiltro })
   if (!tieneRondaOficial(modo))
     return `<div class="mode-row"><button class="mode" data-mode="${modo.id}">${etiqueta}</button></div>`
   const botonOficial = `<button class="mode ranked" data-official="${modo.id}" title="Ronda oficial: cuenta para el ranking">${etiqueta}</button>`
-  if (modo.group === 'Metro' || modo.soloOficial) return `<div class="mode-row">${botonOficial}</div>`
+  if (practicaAparte || modo.soloOficial) return `<div class="mode-row">${botonOficial}</div>`
   return `<div class="mode-row">
     ${botonOficial}
     <button class="practice" data-mode="${modo.id}" title="Práctica: ronda sin ranking, con ayudas" aria-label="Práctica de ${escaparHtml(modo.name)}">🏋️</button>
   </div>`
 }
 
-// Práctica del metro: las líneas que elija el jugador.
-const filaDePracticaDeMetro = modo =>
+const filaDePractica = modo =>
   `<div class="mode-row"><button class="mode" data-mode="${modo.id}">${etiquetaDeModo(modo, { conDescripcion: false })}</button></div>`
 
-function subseccionDePracticaDeMetro(modos) {
+function subseccionDePractica(grupo, modos) {
   return `<hr class="separador"><h4 class="subseccion">Práctica</h4>
-    ${fichasDeLineasDeMetro()}
-    <div class="modes">${modos.map(filaDePracticaDeMetro).join('')}</div>`
+    ${PRACTICA_APARTE[grupo].fichas()}
+    <div class="modes">${modos.map(filaDePractica).join('')}</div>`
 }
 
 // La periferia (Colina, Lampa, Padre Hurtado, Pirque, Buin…) cambia qué comunas hay en los juegos de comunas, y cada
@@ -197,15 +203,12 @@ function selectorDeLargo(grupo, modos) {
   return `<label class="length-row">Preguntas por ronda <select data-length-group="${escaparHtml(grupo)}">${opciones.join('')}</select></label>`
 }
 
-// Lugares emblemáticos: qué categorías preguntar y qué tan estricto es el margen (solo en la práctica).
-function ajustesDeLugares() {
-  const elegidos = ajustes.cats || CATEGORIAS
-  const fichasDeCategoria = CATEGORIAS.map(categoria =>
-    pastilla(escaparHtml(categoria), elegidos.includes(categoria), `data-cat="${escaparHtml(categoria)}"`),
+function fichasDeCategoriasDeLugares() {
+  const elegidas = ajustes.cats || CATEGORIAS
+  const fichas = CATEGORIAS.map(categoria =>
+    pastilla(escaparHtml(categoria), elegidas.includes(categoria), `data-cat="${escaparHtml(categoria)}"`),
   )
-  return `<label>Categorías de lugares emblemáticos</label>
-    <div class="chips" id="setCats">${fichasDeCategoria.join('')}</div>
-    <p class="muted nota">Las categorías valen solo para la práctica; las rondas oficiales preguntan todas.</p>`
+  return `<div class="chips" id="setCats" style="margin-bottom:10px">${fichas.join('')}</div>`
 }
 
 // Todo lo configurable de un grupo va al final de su tarjeta, bajo una raya.
@@ -213,7 +216,6 @@ function ajustesDeLaTarjeta(grupo, modos) {
   const opciones = [
     selectorDeLargo(grupo.name, modos),
     grupo.name === 'Comunas' ? selectorDeAlcance() : '',
-    grupo.name === 'Lugares emblemáticos' ? ajustesDeLugares() : '',
     grupo.name === 'Ruteo' ? htmlDelPuntoDeRuteo() : '',
   ].filter(Boolean)
   return opciones.length
@@ -229,7 +231,7 @@ function tarjetaDeGrupo(grupo) {
   return `<div class="card">
     <h3><span class="em">${grupo.emoji}</span>${grupo.name}</h3><p>${grupo.blurb}</p>
     <div class="modes">${modos.map(filaDeModo).join('')}</div>
-    ${grupo.name === 'Metro' ? subseccionDePracticaDeMetro(modos) : ''}
+    ${PRACTICA_APARTE[grupo.name] ? subseccionDePractica(grupo.name, modos) : ''}
     ${ajustesDeLaTarjeta(grupo, modos)}
   </div>`
 }
@@ -287,10 +289,10 @@ function conectarAjustes() {
   const categorias = $('#setCats')
   for (const entrada of categorias?.querySelectorAll('input') ?? [])
     entrada.onchange = () => {
-      entrada.parentElement.classList.toggle('on', entrada.checked)
-      const elegidos = valoresMarcados(categorias, 'cat')
-      ajustes.cats = elegidos.length === CATEGORIAS.length ? null : elegidos
+      const elegidas = valoresMarcados(categorias, 'cat')
+      ajustes.cats = elegidas.length === CATEGORIAS.length ? null : elegidas
       guardarAjustes()
+      redibujarInicioSinSaltar()
     }
 }
 

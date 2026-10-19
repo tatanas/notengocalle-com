@@ -75,12 +75,23 @@ async function categoriasJugadas(db, modo, desde) {
   return Object.fromEntries(filas.map(fila => [fila.categoria, fila.jugadores]))
 }
 
+async function usuariosRegistrados(db) {
+  const [{ registrados }] = await db.query('select count(*)::int as registrados from usuarios')
+  return registrados
+}
+
 export async function tablaDePosiciones({ db, url, usuario }) {
   const modo = url.searchParams.get('modo')
   if (!MODOS_OFICIALES.includes(modo)) throw invalido('modo_invalido', 'Ese juego no tiene ranking')
   const desde = inicioDelPeriodo(url)
   const datos = await tabla(db, modo, categoriaDe(url), desde, usuario?.id ?? null)
-  return { datos: { ...datos, jugadas: await categoriasJugadas(db, modo, desde) } }
+  return {
+    datos: {
+      ...datos,
+      jugadas: await categoriasJugadas(db, modo, desde),
+      registrados: await usuariosRegistrados(db),
+    },
+  }
 }
 
 // En el resumen de todos los juegos, "20 preguntas" incluye a Street View en su nivel más difícil (extremo) y "todas",
@@ -101,7 +112,7 @@ export async function lideres({ db, url, usuario }) {
     modos[fila.modo] ||= { lider: entrada(fila), jugadores: fila.jugadores, yo: null }
     if (fila.usuario_id === idDeUsuario) modos[fila.modo].yo = entrada(fila)
   }
-  return { datos: { modos } }
+  return { datos: { modos, registrados: await usuariosRegistrados(db) } }
 }
 
 async function exigirSinInundacion(db, idDeUsuario) {

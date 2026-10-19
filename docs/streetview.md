@@ -8,7 +8,7 @@ Todo lo de Street View en un solo lugar. Para el resto del proyecto: `ARQUITECTU
 - **Rondas siempre de 10 preguntas** (no hay "todas": `tieneRondaDeTodas` en `compartido/oficial.js`). Ranking por puntos (máximo 5 × 10), **una tabla por nivel** (las categorías de ranking de este juego son `facil|medio|dificil|extremo`, no el largo).
 - **4 niveles**, solo ronda oficial: no hay práctica (`ajustes.nivelStreetView`: `facil|medio|dificil|extremo`, campo `nivel` 1–4 de cada pregunta en el JSON,
   calculado por `node tools/niveles_streetview.mjs`; ahí están las listas editables). Fácil ≈ 25 preguntas (lo más conocido, sobre todo del centro,
-  sin autopistas), medio ≈ 68, difícil ≈ 158, extremo = todas (277). **Cada nivel tiene su botón** en la tarjeta, y todos son ronda oficial con su ranking ( el nivel viaja como `categoria` al servidor; antes la oficial era siempre extremo y esas marcas se migraron a `extremo` en `servidor/esquema.sql`).
+  sin autopistas), medio ≈ 68, difícil ≈ 163, extremo = todas (279). **Cada nivel tiene su botón** en la tarjeta, y todos son ronda oficial con su ranking ( el nivel viaja como `categoria` al servidor; antes la oficial era siempre extremo y esas marcas se migraron a `extremo` en `servidor/esquema.sql`).
 - Al responder se describe dónde estabas (`src/dominio/ubicacion.js`: calle, esquina, lugar cercano, barrio, metro, comuna) y se marcan las calles bajo el punto.
 - **Cerros grandes** (`src/datos/recintos.json`, polígonos): si el punto está dentro del polígono de su lugar (hoy Cerro San Cristóbal y Santa Lucía),
   vale cualquier toque dentro del cerro (distancia 0).

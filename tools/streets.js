@@ -17,7 +17,8 @@ for(const w of raw.elements){if(w.type!='way'||!w.geometry)continue;const nm=w.t
     if(isRail&&(t.service||t.usage==='industrial'))continue;
     const nm=isRail?'(rail) '+(t.operator||''):t.name;if(!nm)continue;
     if(t.highway&&/^(service|track|path|footway|cycleway)$/.test(t.highway))continue;
-    const i=regs.findIndex((r,k)=>{const o=L[k][4];if(!o||!o.bt||!r.test(nm))return false;const key=o.key||'highway';return key==='railway'?isRail:!!t[key];});
+    const enCaja=b=>!b||w.geometry.some(p=>p.lon>=b[0]&&p.lat>=b[1]&&p.lon<=b[2]&&p.lat<=b[3]);
+    const i=regs.findIndex((r,k)=>{const o=L[k][4];if(!o||!o.bt||!r.test(nm)||!enCaja(o.box))return false;const key=o.key||'highway';return key==='railway'?isRail:!!t[key];});
     if(i<0)continue;groups[i].push({nm,hw:t.highway||t.waterway||t.railway,coords:w.geometry.map(p=>[p.lon,p.lat])});}}}
 const out=[];
 const key=c=>c[0].toFixed(4)+','+c[1].toFixed(4);

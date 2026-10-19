@@ -23,3 +23,10 @@ export function formatearTiempo(ms) {
   const segundos = Math.round(ms / 1000)
   return Math.floor(segundos / 60) + ':' + String(segundos % 60).padStart(2, '0')
 }
+
+// Con milésimas (1:23,456) para el ranking, donde a igual número de aciertos gana el tiempo.
+export function formatearTiempoExacto(ms) {
+  const minutos = Math.floor(ms / 60000)
+  const resto = String(ms % 60000).padStart(5, '0')
+  return `${minutos}:${resto.slice(0, 2)},${resto.slice(2)}`
+}

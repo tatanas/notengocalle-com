@@ -185,6 +185,7 @@ test('el ranking ordena por aciertos y luego por tiempo, con la mejor ronda de c
     ],
   )
   assert.equal(tabla.jugadores, 3)
+  assert.equal(tabla.registrados, 3)
   assert.equal(tabla.yo.puesto, 3)
   assert.equal((await cliente()('GET', '/tabla?modo=ch-city')).datos.yo, null)
 })
@@ -203,6 +204,7 @@ test('cada juego tiene su propio ranking y el resumen muestra al líder de cada 
   assert.equal(modos['ch-city'].yo.puesto, 2)
   assert.equal(modos['st-name'].lider.nombre, 'Ana')
   assert.equal(modos['st-name'].yo.puesto, 1)
+  assert.equal((await ana.llamar('GET', '/lideres')).datos.registrados, 2)
   assert.equal((await cliente()('GET', '/lideres')).datos.modos['ch-city'].yo, null)
 })
 

@@ -3,8 +3,9 @@ const comunas=JSON.parse(fs.readFileSync('comunas_s.geojson'));
 const comunaOf=(lon,lat)=>{const p=turf.point([lon,lat]);for(const f of comunas.features)if(turf.booleanPointInPolygon(p,f))return f.properties.name;return null;};
 const geo=JSON.parse(fs.readFileSync('landmarks_geo.json'));
 const CAR=require('./careers.js');
-const DROP=['Colegio SEK','Colegio Manquehue','Confitería Torres','Casa Piedra','Disquería Funtracks','AudioMusica (Chile España)'];
+const DROP=['Colegio SEK','Colegio Manquehue','Casa Piedra','Disquería Funtracks','AudioMusica (Chile España)'];
 // Se descartan por su nombre original o por el que muestran (ver F).
+DROP.push("Colegio San Ignacio El Bosque","Colegio San Ignacio Alonso Ovalle","Santiago College","Castillo Forestal");
 DROP.push("Colegio Verbo Divino","Villa María Academy","Lycée Antoine de Saint-Exupéry","Nido de Águilas","The Grange School");
 DROP.push("PUC – Campus Lo Contador","U. de Chile – Facultad de Derecho","U. de Chile – FEN","U. de Chile – FAU (Arquitectura)","U. de Chile – Campus Sur (Agronomía)","UAI – sede Presidente Errázuriz","Universidad Gabriela Mistral","Universidad San Sebastián – Los Leones","UNAB – La Casona","UTFSM – Campus Vitacura","Duoc UC – sede Antonio Varas","Duoc UC – Plaza Oeste","Duoc UC – sede Puente Alto","Duoc UC – sede San Bernardo","INACAP Renca","INACAP Puente Alto","INACAP Ñuñoa","AIEP – sede Bellavista","AIEP – sede San Joaquín","AIEP – sede Maipú","AIEP – sede San Bernardo","Santo Tomás – sede Estación Central","Santo Tomás – sede Puente Alto","Universidad de las Américas (campus Maipú)","Universidad de las Américas (campus Santiago)","Universidad Mayor – campus Alameda","Universidad Mayor – campus Oriente","UTEM – Campus Macul","Universidad Central – Campus Santa Isabel","Universidad Autónoma – Providencia","Universidad Católica Silva Henríquez – Campus Lo Cañas","Universidad Bernardo O'Higgins","Universidad Academia de Humanismo Cristiano","Embajada de Estados Unidos","Plaza Las Lilas","Plaza San Enrique","Plaza Egaña","Plaza de Renca","Plaza de Quilicura","El Cruceral (Pirque)","Quinchamalí","Lo Ovalle (sector)","El Llano Subercaseaux","Villa Frei","Lo Cañas","Jardín del Este","Prince of Wales Country Club","Teatro Oriente","Teatro UC","Colegio Craighouse","Teleférico Bicentenario (estación Canal San Carlos)","Parque Brasil","Parque Juan XXIII","Parque André Jarlán","Parque Laguna Carén","Parque Inés de Suárez","Parque Mahuida","Parque Aguas de Ramón","Quebrada de Macul");
 const F={
@@ -93,6 +94,7 @@ const F={
 "Colegio Los Andes":{ll:[-33.37562,-70.52723],desc:"Colegio en el sector alto de Vitacura (San Damián)."},
 "Colegio Cordillera":{ll:[-33.39735,-70.51433],desc:"Colegio en el sector alto de Las Condes (Los Pumas)."},
 "Bar Nacional":{ll:[-33.43956,-70.65224]},
+"Confitería Torres":{ll:[-33.44612,-70.65803]},
 "Emporio La Rosa (Lastarria)":{ll:[-33.43695,-70.64070],desc:"Heladería conocida en calle Merced, barrio Lastarria."},
 "U. de Chile – Campus Andrés Bello (FEN)":{ll:[-33.44263,-70.63713],name:"U. de Chile – FEN",desc:"Economía y Negocios U. de Chile, en Diagonal Paraguay, cerca de la Alameda y Plaza Italia."},
 "U. de Chile – Campus Norte (Medicina)":{ll:[-33.42276,-70.65303]},

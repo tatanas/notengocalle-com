@@ -9,7 +9,7 @@ import {
 import { pedirTabla, pedirLideres } from '../cuenta/puntajes.js'
 import { cuentasDisponibles, usuario } from '../cuenta/sesion.js'
 import { ajustes, almacen } from '../nucleo/almacen.js'
-import { $, escaparHtml, formatearTiempo } from '../nucleo/utilidades.js'
+import { $, escaparHtml, formatearTiempoExacto } from '../nucleo/utilidades.js'
 import { limpiarCapa } from '../mapa/mapa.js'
 import { tieneRondaOficial, iniciarPartida, detenerPartida } from '../juego/engine.js'
 import { MODOS, modoPorId } from '../juego/registry.js'
@@ -44,7 +44,13 @@ const categoriasDe = idDeModo => {
 const modosOficiales = () => MODOS.filter(tieneRondaOficial)
 const gruposDe = modos => [...new Set(modos.map(modo => modo.group))]
 const puntaje = entrada => `${entrada.aciertos}/${entrada.total}`
-const fechaCorta = iso => new Date(iso).toLocaleDateString('es-CL', { day: 'numeric', month: 'short' })
+const fechaYHora = iso =>
+  new Date(iso).toLocaleString('es-CL', {
+    day: 'numeric',
+    month: 'short',
+    hour: '2-digit',
+    minute: '2-digit',
+  })
 const soyYo = entrada => !!usuario && entrada.nombre === usuario.nombre
 
 function htmlDeSelectorDeJuego() {
@@ -80,7 +86,7 @@ function htmlDePestanasDeCategoria() {
 }
 
 const filaDeTabla = entrada =>
-  `<tr class="${soyYo(entrada) ? 'me' : ''}"><td>${entrada.puesto}</td><td>${escaparHtml(entrada.nombre)}</td><td>${puntaje(entrada)}</td><td>${formatearTiempo(entrada.ms)}</td><td class="muted">${fechaCorta(entrada.en)}</td></tr>`
+  `<tr class="${soyYo(entrada) ? 'me' : ''}"><td>${entrada.puesto}</td><td>${escaparHtml(entrada.nombre)}</td><td>${puntaje(entrada)}</td><td>${formatearTiempoExacto(entrada.ms)}</td><td class="muted">${fechaYHora(entrada.en)}</td></tr>`
 
 function htmlDeTabla({ filas, jugadores, yo }) {
   if (!filas.length)
@@ -98,13 +104,18 @@ function htmlDeLideres({ modos }) {
   const filas = modosOficiales().map(modo => {
     const entrada = modos[modo.id]
     const lider = entrada
-      ? `<td>${escaparHtml(entrada.lider.nombre)}</td><td>${puntaje(entrada.lider)} · ${formatearTiempo(entrada.lider.ms)}</td>`
+      ? `<td>${escaparHtml(entrada.lider.nombre)}</td><td>${puntaje(entrada.lider)} · ${formatearTiempoExacto(entrada.lider.ms)}</td>`
       : '<td class="muted" colspan="2">sin marcas todavía</td>'
     const mia = entrada?.yo ? `${entrada.yo.puesto}.º de ${entrada.jugadores}` : '—'
     return `<tr data-open="${modo.id}"><td><b>${escaparHtml(modo.name)}</b><br><small class="muted">${escaparHtml(modo.group)}</small></td>${lider}<td>${mia}</td></tr>`
   })
   return `<table class="stats board clickable"><tr><th>Juego</th><th>Líder</th><th>Marca</th><th>Tu puesto</th></tr>${filas.join('')}</table>`
 }
+
+const htmlDeRegistrados = registrados =>
+  registrados
+    ? `<p class="muted" style="font-size:12.5px">${registrados} ${registrados === 1 ? 'usuario registrado' : 'usuarios registrados'} en NoTengoCalle.</p>`
+    : ''
 
 function htmlDePie() {
   const jugar = vista.modo
@@ -124,14 +135,18 @@ async function cargarTabla() {
   const solicitado = { ...vista }
   cuerpo.innerHTML = '<p class="muted">Cargando…</p>'
   let html
+  let registrados = null
   try {
     if (vista.modo) {
       const tabla = await pedirTabla(vista.modo, vista.categoria, vista.periodo)
       jugadoresPorCategoria = tabla.jugadas
+      registrados = tabla.registrados
       html = htmlDeTabla(tabla)
     } else {
       jugadoresPorCategoria = {}
-      html = htmlDeLideres(await pedirLideres(vista.categoria, vista.periodo))
+      const resumen = await pedirLideres(vista.categoria, vista.periodo)
+      registrados = resumen.registrados
+      html = htmlDeLideres(resumen)
     }
   } catch (error) {
     html = `<p class="muted">No se pudo cargar el ranking: ${escaparHtml(error.message)}.</p>`
@@ -142,7 +157,7 @@ async function cargarTabla() {
     solicitado.categoria === vista.categoria &&
     solicitado.periodo === vista.periodo
   if (!sigueVigente) return
-  cuerpo.innerHTML = html + htmlDePie()
+  cuerpo.innerHTML = html + htmlDePie() + htmlDeRegistrados(registrados)
   $('#rankTabs').innerHTML = htmlDePestanasDeCategoria()
   conectarPestanas()
 

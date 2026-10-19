@@ -286,9 +286,6 @@
   "Av. San José de la Estrella": [
     { "lat": -33.55194, "lon": -70.55409, "pista": "cerca del canal San Carlos", "tipo": "agua" }
   ],
-  "Av. Holanda": [
-    { "lat": -33.41778, "lon": -70.60497, "pista": "cerca del canal San Carlos", "tipo": "agua" }
-  ],
   "Camino a Farellones (G-21)": [
     { "lat": -33.37005, "lon": -70.45983, "pista": "cerca del río Mapocho", "tipo": "agua" }
   ],
