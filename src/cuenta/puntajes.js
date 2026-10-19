@@ -1,5 +1,5 @@
 import { almacen } from '../nucleo/almacen.js'
-import { SIN_CONEXION, api } from './api.js'
+import { DEMASIADAS_SOLICITUDES, SIN_CONEXION, api } from './api.js'
 import { cuentasDisponibles, alCambiarLaSesion, sesionExpirada, usuario } from './sesion.js'
 
 // Rondas oficiales que aún no llegan al servidor: jugadas sin cuenta o sin conexión.
@@ -15,7 +15,7 @@ function encolar(resultado) {
 
 const NO_AUTORIZADO = 401
 
-// Devuelve { estado } con 'guardado' (más puesto, jugadores, mejoro, mejor), 'invitado', 'sin_conexion', 'no_disponible' o 'rechazado'.
+// Devuelve { estado } con 'guardado' (más puesto, jugadores, mejoro, mejor), 'invitado', 'sin_conexion', 'limite' (429 de Netlify), 'no_disponible' o 'rechazado'.
 export async function enviarRondaOficial(resultado) {
   if (!cuentasDisponibles) return { estado: 'no_disponible' }
   if (!usuario) {
@@ -28,6 +28,10 @@ export async function enviarRondaOficial(resultado) {
     if (error.codigo === SIN_CONEXION) {
       encolar(resultado)
       return { estado: 'sin_conexion' }
+    }
+    if (error.codigo === DEMASIADAS_SOLICITUDES) {
+      encolar(resultado)
+      return { estado: 'limite' }
     }
     if (error.estado === NO_AUTORIZADO) {
       encolar(resultado)
@@ -56,7 +60,8 @@ async function enviarPendientes() {
     try {
       entregados.set(resultado, await api('POST', '/puntajes', resultado))
     } catch (error) {
-      if (error.codigo === SIN_CONEXION || error.estado === NO_AUTORIZADO) break
+      const reintentarDespues = [SIN_CONEXION, DEMASIADAS_SOLICITUDES].includes(error.codigo)
+      if (reintentarDespues || error.estado === NO_AUTORIZADO) break
     }
     bandejaDeSalida.shift()
     guardarBandejaDeSalida()

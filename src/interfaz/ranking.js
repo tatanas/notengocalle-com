@@ -119,7 +119,7 @@ const htmlDeRegistrados = registrados =>
 
 function htmlDePie() {
   const jugar = vista.modo
-    ? `<button class="btn" id="rankPlay">🏆 Jugar la ronda oficial (${textoDeCategoria(vista.modo, vista.categoria)})</button>`
+    ? `<button class="btn" id="rankPlay">🏆 Jugar (${textoDeCategoria(vista.modo, vista.categoria)})</button>`
     : ''
   const iniciarSesionEnRanking = usuario
     ? ''
@@ -194,7 +194,7 @@ function conectarPestanas() {
 function dibujar() {
   mostrarPantalla(`<div class="wrap narrow">
     <div class="hero"><h2>🏆 Ranking</h2>
-      <p>Solo cuentan las rondas oficiales. Gana quien acierta más; si hay empate, quien pensó menos tiempo. Cada largo de ronda tiene su propio ranking.</p></div>
+      <p>Las rondas de práctica no cuentan. Gana quien acierta más; si hay empate, quien pensó menos tiempo. Cada largo de ronda tiene su propio ranking.</p></div>
     <div class="card">
       <div class="row">${htmlDeSelectorDeJuego()}<div class="chips">${htmlDeFichasDePeriodo()}</div></div>
       <div id="rankTabs" style="margin-top:12px">${htmlDePestanasDeCategoria()}</div>

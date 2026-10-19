@@ -63,7 +63,7 @@ node servidor/admin.js reportes     túneles reportados por los jugadores
 3. **Salidas de Costanera Norte y Vespucio** como guía para decidir qué calles agregar: el dueño pidió solo la lista (no agregar); no hay una fuente oficial limpia (TAG, `tag.cl/mapa`, o los mapas de cada concesionaria).
 4. Tabla general de ranking; historial de rondas; sincronizar también los récords personales (ver `CLAUDE.md`, "Ideas pendientes").
 5. **Volver a poner Conexiones** con los datos de cruces nuevos (ver "Conexiones" al final). Ranking para el ruteo con Street View, si gusta.
-5. Verificar en el primer despliegue real: camino con Neon real y el `rateLimit` por IP de `netlify/functions/api.js` (nunca se han visto funcionar).
+5. Verificar en el primer despliegue real: camino con Neon real y el `rateLimit` por IP de `netlify/functions/api.js` (nunca se han visto funcionar). **Hacerlo antes de sacar "Continuar con Google" del modo Testing** en Google Cloud (el dueño pidió que se lo recuerden).
 6. `tools/` está desordenado (~100 archivos); ordenar solo si se puede volver a correr cada script.
 
 ## Decisiones recientes del dueño (para no discutirlas de nuevo)

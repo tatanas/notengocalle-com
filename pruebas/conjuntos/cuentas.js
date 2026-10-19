@@ -36,7 +36,7 @@ async function jugarRondaOficial(pagina) {
 const desenlace = pagina =>
   pagina.waitForFunction(() => !/Guardando/.test(document.getElementById('officialOutcome').innerText))
 const errorDelDialogo = pagina =>
-  pagina.waitForFunction(() => document.querySelector('#accountDialog .error')?.innerText)
+  pagina.waitForFunction(() => document.querySelector('#accountDialog form .error')?.innerText)
 
 // El recorrido completo de una cuenta: jugar sin ella, crearla, aparecer en el ranking, salir y entrar.
 export async function cuentas(navegador, { verificar }) {
@@ -78,6 +78,8 @@ export async function cuentas(navegador, { verificar }) {
     /de 1 en el ranking/.test(await texto(pagina, '#officialOutcome')),
     'con sesión, la ronda oficial se guarda sola',
   )
+  verificar(await existe(pagina, '#panel #share'), 'al terminar la ronda se ofrece compartir')
+  await pagina.screenshot({ path: CAPTURAS + 'resultado_compartir.png' })
 
   // Un segundo jugador, en otro navegador.
   const segundo = await abrirPagina(navegador)
@@ -86,7 +88,7 @@ export async function cuentas(navegador, { verificar }) {
   await llenar(segundo.page, { nombre: 'ana', clave: CLAVE_DE_PRUEBA })
   await errorDelDialogo(segundo.page)
   verificar(
-    /ya está en uso/.test(await texto(segundo.page, '#accountDialog .error')),
+    /ya está en uso/.test(await texto(segundo.page, '#accountDialog form .error')),
     'no se puede registrar un nombre ya tomado',
   )
   await llenar(segundo.page, { nombre: 'Beto', clave: CLAVE_DE_PRUEBA })
@@ -117,7 +119,7 @@ export async function cuentas(navegador, { verificar }) {
   await llenar(pagina, { nombre: 'Ana', clave: 'no-es-la-clave' })
   await errorDelDialogo(pagina)
   verificar(
-    /incorrectos/.test(await texto(pagina, '#accountDialog .error')),
+    /incorrectos/.test(await texto(pagina, '#accountDialog form .error')),
     'una clave incorrecta se rechaza con un mensaje claro',
   )
   await pagina.screenshot({ path: CAPTURAS + 'account_login.png' })

@@ -59,6 +59,17 @@ create table if not exists usuarios (
   creado_en       timestamptz not null default now()
 );
 
+-- "Continuar con Google": de Google solo se guarda su identificador fijo (sub). Esas cuentas pueden no tener clave.
+alter table usuarios add column if not exists google_sub text;
+
+create unique index if not exists usuarios_por_google on usuarios (google_sub);
+
+alter table usuarios alter column clave_cifrada drop not null;
+
+-- Los códigos de recuperación se quitaron (oct. 2026), pero las bases creadas antes conservaban la columna
+-- obligatoria y ninguna cuenta nueva se podía crear.
+alter table usuarios drop column if exists recovery_hash;
+
 create table if not exists sesiones (
   ficha_cifrada text primary key,
   usuario_id    integer not null references usuarios (id) on delete cascade,

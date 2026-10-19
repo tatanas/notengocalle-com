@@ -40,7 +40,7 @@ const htmlDelBuscador = () => `<form class="row" id="buscarPunto">
 
 export const htmlDelPuntoDeRuteo = () => `<label>Tu punto fijo (práctica en auto)</label>
   <div id="puntoDeRuteo">${ajustes.puntoDeRuteo ? htmlDelPuntoElegido(ajustes.puntoDeRuteo) : htmlDelBuscador()}</div>
-  <p class="muted nota">Las rutas de la práctica en auto parten de tu punto o llegan a él. Se guarda solo en este navegador; la ronda oficial usa siempre las rutas de todos.</p>`
+  <p class="muted nota">Las rutas de la práctica en auto parten de tu punto o llegan a él. Se guarda solo en este navegador; fuera de la práctica se usan siempre las rutas de todos.</p>`
 
 function fijarPunto(punto, alCambiar) {
   ajustes.puntoDeRuteo = punto

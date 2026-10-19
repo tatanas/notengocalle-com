@@ -127,8 +127,7 @@ export async function rondasOficiales(navegador, { verificar }) {
     const total = +(encabezado.match(/de (\d+)/) || [])[1]
     // Las comunas se piden según el alcance elegido (aquí, toda la RM: 52).
     const esperado = { 'com-name': 52, 'com-all': 52, 'ch-all': 16, 'ch-find': 16 }[id] ?? 20
-    if (total !== esperado || !/Ronda oficial/.test(encabezado))
-      incorrectas.push(`${id} (${total || 'no partió'})`)
+    if (total !== esperado || /Práctica/.test(encabezado)) incorrectas.push(`${id} (${total || 'no partió'})`)
   }
   verificar(
     !incorrectas.length,
@@ -310,13 +309,16 @@ export async function disenoMenu(navegador, { verificar }) {
   await pagina.click('[data-mode="lm-loc"]')
   await pagina.waitForSelector('.q-head', { timeout: 1500 })
   verificar(
-    !/Ronda oficial/.test(await texto(pagina, '.q-head')),
+    /Práctica/.test(await texto(pagina, '.q-head')),
     'el botón chico abre una ronda de práctica, sin cuenta regresiva',
   )
   await irAlInicio(pagina)
   await pagina.click('[data-official="com-name"]')
   await pagina.waitForSelector('.q-head', { timeout: 8000 })
-  verificar(/Ronda oficial/.test(await texto(pagina, '.q-head')), 'el botón grande abre la ronda oficial')
+  verificar(
+    !/Práctica/.test(await texto(pagina, '.q-head')),
+    'el botón grande abre la ronda que cuenta para el ranking',
+  )
   verificar(
     !(await pagina.$eval('#countdown', caja => !caja.hidden)),
     'la cuenta regresiva se cierra al empezar',

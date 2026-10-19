@@ -28,6 +28,7 @@ import { marcarPestana, resguardarSalida, navegar } from '../interfaz/navegacion
 import { mostrarResultadoOficial } from '../interfaz/resultadoOficial.js'
 import { ocultarPantalla, indicador, panel, mostrarPanel, aviso } from '../interfaz/panel.js'
 import { htmlDeAnuncio } from '../interfaz/anuncios.js'
+import { htmlDelBotonCompartir, conectarBotonCompartir } from '../interfaz/compartir.js'
 
 /* Un modo define: id, group, name, desc (opcional: se muestra bajo el nombre en el menú), pool(), key(item) y ask(item, quiz).
    Opcionales: label(item), balance(item), setup(quiz), limpiar() (al salir), disponible() (si no, no aparece en el menú), all, keepLayer, noHint, aids, relief, chile, roomy, tall, study.
@@ -53,7 +54,7 @@ function correrCuentaRegresiva(nombreDeModo, alTerminar) {
   const caja = $('#countdown')
   let restantes = SEGUNDOS_DE_CUENTA_REGRESIVA
   const dibujar = () => {
-    caja.innerHTML = `<p class="countdown-label">🏆 Ronda oficial · ${escaparHtml(nombreDeModo)}</p>
+    caja.innerHTML = `<p class="countdown-label">🏆 ${escaparHtml(nombreDeModo)}</p>
       <p class="countdown-number">${restantes}</p>
       <p class="countdown-hint">¡Prepárate! Puedes mover el mapa para acomodarlo.</p>`
   }
@@ -173,7 +174,7 @@ export function iniciarPartida(
   limpiarCapa()
   limpiarAyudas()
   mostrarPanel(`<div class="progress"><i style="width:0%"></i></div>
-    <div class="q-sub" style="margin:0 0 6px">🏆 Ronda oficial</div><div class="q-prompt">Prepárate…</div>`)
+    <div class="q-sub" style="margin:0 0 6px">🏆 ${escaparHtml(modo.name)}</div><div class="q-prompt">Prepárate…</div>`)
   vigilarAjustesDeVista(true)
   prepararRonda()
   correrCuentaRegresiva(modo.name, () => {
@@ -239,7 +240,7 @@ export function siguientePregunta({ first: primero = false } = {}) {
 
 export function encabezadoDePregunta(q) {
   const progreso = ((q.i / q.items.length) * 100).toFixed(0)
-  const tipoDeRonda = q.ranked ? '🏆 Ronda oficial' : q.mode.group
+  const tipoDeRonda = q.ranked ? `🏆 ${q.mode.group}` : `🏋️ Práctica · ${q.mode.group}`
   // El nivel de Street View o el alcance de comunas: cada uno es un ranking distinto.
   const ajuste = q.variante ? ` · ${etiquetaDeCategoria(q.variante)}` : ''
   return `<div class="progress"><i style="width:${progreso}%"></i></div>
@@ -280,7 +281,7 @@ export function responder(ok, htmlDelComentario, { points: puntos = null, partia
 const GRUPOS_SIN_CALLE = ['Comunas', 'Metro', 'Calles', 'Street View']
 
 function veredicto(porcentaje, grupo) {
-  if (porcentaje >= 90) return '¡Te la sabes! 🏆'
+  if (porcentaje >= 90) return '¡Teni calle! 🏆'
   if (porcentaje >= 70) return 'Muy bien 👏'
   if (porcentaje >= 40) return 'Vas mejorando 💪'
   return GRUPOS_SIN_CALLE.includes(grupo) ? 'no teni calle :(' : 'A seguir practicando 🗺️'
@@ -320,7 +321,7 @@ function terminarPartida() {
   const porcentaje = Math.round((ok / maximo) * 100)
   const segundosPorPregunta = (ms / total / 1000).toFixed(1).replace('.', ',')
   const notaFinal = oficial
-    ? 'Las rondas oficiales usan las mismas reglas para todos: Gran Santiago, todas las categorías, sin tus calles propias y sin ayudas.'
+    ? 'Estas rondas usan las mismas reglas para todos: Gran Santiago, todas las categorías, sin tus calles propias y sin ayudas.'
     : 'Las preguntas que fallas aparecen más seguido en las próximas rondas.'
   mostrarPanel(`<h3 class="tight">${veredicto(porcentaje, modo.group)}</h3>
     <p class="result-score">${ok} / ${maximo} <span class="muted">(${porcentaje}%)</span></p>
@@ -331,7 +332,8 @@ function terminarPartida() {
     ${fallos.length ? `<p class="muted" style="margin-bottom:4px">Para repasar:</p><p style="margin-top:0">${fallos.map(escaparHtml).join(' · ')}</p>` : ''}
     <div class="row" style="margin-top:12px">
       <button class="btn" id="again">Otra ronda</button>
-      ${!oficial && tieneRondaOficial(modo) ? '<button class="btn sec" id="goOfficial">🏆 Ronda oficial</button>' : ''}
+      ${oficial ? htmlDelBotonCompartir() : ''}
+      ${!oficial && tieneRondaOficial(modo) ? '<button class="btn sec" id="goOfficial">🏆 Jugar con ranking</button>' : ''}
       <button class="btn sec" id="menu">Menú</button>
     </div>
     <p class="muted" style="font-size:12px;margin-top:10px">${notaFinal}</p>
@@ -340,11 +342,23 @@ function terminarPartida() {
   $('#again').onclick = () => iniciarPartida(modo, { ranked: oficial, category: categoria, reglas })
   $('#menu').onclick = () => navegar('home')
   if ($('#goOfficial')) $('#goOfficial').onclick = () => iniciarPartida(modo, { ranked: true })
-  if (oficial)
-    mostrarResultadoOficial(
-      { modo: modo.id, categoria, aciertos: ok, total: maximo, ms },
-      $('#officialOutcome'),
-    )
+  if (!oficial) return
+  let enElRanking = {}
+  conectarBotonCompartir($('#share'), () => ({
+    idDeModo: modo.id,
+    nombreDelJuego: modo.name,
+    aciertos: ok,
+    maximo,
+    ms,
+    nivel: modo.id === 'sv-ubicar' && variante ? etiquetaDeCategoria(variante) : null,
+    nuevoRecord: esMejor && !!anterior,
+    ...enElRanking,
+  }))
+  mostrarResultadoOficial(
+    { modo: modo.id, categoria, aciertos: ok, total: maximo, ms },
+    $('#officialOutcome'),
+    ({ puesto, jugadores }) => (enElRanking = { puesto, jugadores }),
+  )
 }
 
 // Reiniciar una ronda oficial a medias: otras preguntas, mismo juego y mismo largo, otra vez con cuenta regresiva.
@@ -370,7 +384,7 @@ resguardarSalida(() =>
     ? confirmarAccion({
         title: '¿Salir de la ronda?',
         message: partida.ranked
-          ? 'Es una ronda oficial: si sales ahora no cuenta para el ranking.'
+          ? 'Si sales ahora, esta ronda no cuenta para el ranking.'
           : 'Perderás el avance de esta ronda.',
         confirmLabel: 'Salir',
         cancelLabel: 'Seguir jugando',

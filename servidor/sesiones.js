@@ -39,7 +39,7 @@ export async function usuarioDeSesion(db, solicitud) {
   const ficha = fichaDeSesion(solicitud)
   if (!ficha) return null
   const [usuario] = await db.query(
-    `select usuarios.id, usuarios.nombre from sesiones join usuarios on usuarios.id = sesiones.usuario_id
+    `select usuarios.id, usuarios.nombre, usuarios.google_sub from sesiones join usuarios on usuarios.id = sesiones.usuario_id
      where sesiones.ficha_cifrada = $1 and sesiones.expira_en > now()`,
     [huella(ficha)],
   )

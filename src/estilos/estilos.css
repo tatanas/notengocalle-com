@@ -1141,6 +1141,21 @@ dialog .error {
   color: var(--muted);
   padding: 6px;
 }
+.boton-de-google {
+  display: flex;
+  justify-content: center;
+  min-height: 44px;
+  margin-top: 4px;
+}
+#share {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.o-bien {
+  text-align: center;
+  margin: 2px 0 6px;
+}
 .linklike {
   border: 0;
   background: none;

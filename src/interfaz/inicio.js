@@ -130,7 +130,7 @@ function filasDeNivelesDeStreetView(modo) {
     const nombre = etiquetaDeCategoria(nivel)
     const dominado = conReglas({ nivelStreetView: nivel }, () => dominio(modo))
     return `<div class="mode-row">
-    <button class="mode ranked" data-official="${modo.id}" data-nivel="${nivel}" title="Ronda oficial del nivel ${nombre}: cuenta para su ranking">
+    <button class="mode ranked" data-official="${modo.id}" data-nivel="${nivel}" title="Nivel ${nombre}: cuenta para su ranking">
       <span><b>${nombre}</b><br><small>${DESCRIPCION_DE_NIVEL[nivel]}</small></span><span class="mastery">${dominado}</span>
     </button>
   </div>`
@@ -147,7 +147,7 @@ function filaDeModo(modo) {
   const etiqueta = etiquetaDeModo(modo, { reglas: practicaAparte?.sinFiltro })
   if (!tieneRondaOficial(modo))
     return `<div class="mode-row"><button class="mode" data-mode="${modo.id}">${etiqueta}</button></div>`
-  const botonOficial = `<button class="mode ranked" data-official="${modo.id}" title="Ronda oficial: cuenta para el ranking">${etiqueta}</button>`
+  const botonOficial = `<button class="mode ranked" data-official="${modo.id}" title="Cuenta para el ranking">${etiqueta}</button>`
   if (practicaAparte || modo.soloOficial) return `<div class="mode-row">${botonOficial}</div>`
   return `<div class="mode-row">
     ${botonOficial}

@@ -41,6 +41,18 @@ export async function entrar(nombre, clave) {
   fijarUsuario((await api('POST', '/entrar', { nombre, clave })).usuario)
 }
 
+// Devuelve true si es la primera vez con esa cuenta de Google y falta elegir el nombre de usuario.
+export async function entrarConGoogle(credencial, nombre) {
+  const respuesta = await api('POST', '/google', { credencial, nombre })
+  if (respuesta.necesitaNombre) return true
+  fijarUsuario(respuesta.usuario)
+  return false
+}
+
+export async function vincularGoogle(credencial) {
+  fijarUsuario((await api('POST', '/google/vincular', { credencial })).usuario)
+}
+
 export async function salir() {
   await api('POST', '/salir').catch(() => {})
   fijarUsuario(null)

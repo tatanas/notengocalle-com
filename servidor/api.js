@@ -5,13 +5,16 @@ import * as puntajes from './puntajes.js'
 import * as reportes from './reportes.js'
 import { claveFiltrada } from './claves.js'
 import { usuarioDeSesion } from './sesiones.js'
+import { llavesPublicasDeGoogle } from './google.js'
 
-// Cada ruta recibe { db, solicitud, url, cuerpo, usuario, estaFiltrada } y devuelve { datos, estado?, galleta? }.
+// Cada ruta recibe { db, solicitud, url, cuerpo, usuario, estaFiltrada, llavesDeGoogle } y devuelve { datos, estado?, galleta? }.
 const RUTAS = {
   'POST /api/registrarse': autenticacion.registrarse,
   'POST /api/entrar': autenticacion.entrar,
   'POST /api/salir': autenticacion.salir,
   'GET /api/yo': autenticacion.yo,
+  'POST /api/google': autenticacion.entrarConGoogle,
+  'POST /api/google/vincular': autenticacion.vincularGoogle,
   'POST /api/puntajes': puntajes.enviarPuntaje,
   'GET /api/tabla': puntajes.tablaDePosiciones,
   'GET /api/lideres': puntajes.lideres,
@@ -49,7 +52,7 @@ async function leerCuerpo(solicitud) {
 }
 
 // El mismo manejador sirve en Netlify Functions y en el servidor local: recibe un Request y devuelve un Response.
-export function crearApi(db, { estaFiltrada = claveFiltrada } = {}) {
+export function crearApi(db, { estaFiltrada = claveFiltrada, llavesDeGoogle = llavesPublicasDeGoogle } = {}) {
   return async function manejar(solicitud) {
     const url = new URL(solicitud.url)
     try {
@@ -64,7 +67,7 @@ export function crearApi(db, { estaFiltrada = claveFiltrada } = {}) {
         estado = 200,
         datos,
         galleta,
-      } = await ruta({ db, solicitud, url, cuerpo, usuario, estaFiltrada })
+      } = await ruta({ db, solicitud, url, cuerpo, usuario, estaFiltrada, llavesDeGoogle })
       return json(estado, datos, galleta)
     } catch (error) {
       if (error instanceof ErrorHttp)

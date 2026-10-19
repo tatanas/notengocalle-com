@@ -4,6 +4,7 @@ import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
 import { test } from 'node:test'
 import { llaveDeUsuario, PATRON_DE_USUARIO } from '../compartido/cuentas.js'
+import { textoParaCompartir, tiempoEnPalabras } from '../src/dominio/compartir.js'
 import {
   COMUNAS_POR_ALCANCE,
   categoriaDe,
@@ -314,4 +315,44 @@ test('las comunas por alcance coinciden con los datos del juego', () => {
   assert.equal(contar('core'), COMUNAS_POR_ALCANCE.core)
   assert.equal(contar('core', 'peri'), COMUNAS_POR_ALCANCE.peri)
   assert.equal(contar('core', 'peri', 'rural'), COMUNAS_POR_ALCANCE.all)
+})
+
+test('el tiempo para compartir se escribe en palabras', () => {
+  assert.equal(tiempoEnPalabras(28_400), '28 segundos')
+  assert.equal(tiempoEnPalabras(1_000), '1 segundo')
+  assert.equal(tiempoEnPalabras(60_000), '1 minuto')
+  assert.equal(tiempoEnPalabras(72_499), '1 minuto y 12 segundos')
+  assert.equal(tiempoEnPalabras(185_000), '3 minutos y 5 segundos')
+})
+
+test('el texto para compartir parte por el récord y termina con el sitio', () => {
+  const ronda = {
+    idDeModo: 'com-all',
+    nombreDelJuego: 'Completa el mapa',
+    aciertos: 30,
+    maximo: 34,
+    ms: 28_000,
+  }
+  assert.equal(
+    textoParaCompartir(ronda),
+    'Le achunté a 30 de 34 comunas de Santiago en 28 segundos. ¿Teni calle? notengocalle.com',
+  )
+  assert.equal(
+    textoParaCompartir({ ...ronda, nuevoRecord: true, puesto: 3, jugadores: 41 }),
+    '¡Saqué nuevo récord en "Completa el mapa"! Le achunté a 30 de 34 comunas de Santiago en 28 segundos, y voy 3.º de 41 en el ranking 🏆. ¿Teni calle? notengocalle.com',
+  )
+  assert.match(
+    textoParaCompartir({
+      ...ronda,
+      idDeModo: 'sv-ubicar',
+      nombreDelJuego: '¿Dónde estás?',
+      maximo: 50,
+      nivel: 'Difícil',
+    }),
+    /^Saqué 30 de 50 puntos .*\(nivel Difícil\) en 28 segundos\./,
+  )
+  assert.match(
+    textoParaCompartir({ ...ronda, idDeModo: 'rs-any-car', nombreDelJuego: 'En auto' }),
+    /"En auto"/,
+  )
 })

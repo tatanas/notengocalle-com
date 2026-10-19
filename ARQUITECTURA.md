@@ -230,7 +230,16 @@ Los errores siempre salen como `{ "error": "código", "message": "texto para mos
 
 ### Cuentas
 
-Nombre de usuario y clave, sin correo. Decisiones:
+Nombre de usuario y clave, sin correo, o "Continuar con Google". Decisiones:
+
+- **Google** (`servidor/google.js`, `src/cuenta/google.js`): el navegador carga Google Identity Services recién al
+  abrir el diálogo de cuenta y recibe un ID token; `POST /api/google` lo verifica con las llaves públicas de Google
+  (WebCrypto, sin dependencias; firma RS256, `aud` = `ID_DE_CLIENTE_DE_GOOGLE` de `compartido/configuracion.js`,
+  `iss` de Google, no vencido) y guarda **solo `sub`** (columna `usuarios.google_sub`); nombre, correo y foto se
+  descartan. La primera vez responde `necesitaNombre` y el navegador reenvía el token con el nombre elegido (no se
+  usa el de Google). Esas cuentas no tienen clave (`clave_cifrada` nula). Una cuenta con clave se vincula con
+  `POST /api/google/vincular`, solo con la sesión iniciada; nunca se juntan cuentas por el nombre. En Google Cloud
+  la app está en modo Testing: solo entran los usuarios de prueba hasta publicarla.
 
 - **Claves** con scrypt (`servidor/claves.js`); nunca se guardan en claro. El costo (hoy 64 MB por intento)
   va dentro de cada hash: al subirlo, las claves antiguas se recalculan solas la próxima vez que la persona

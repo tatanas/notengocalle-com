@@ -1,62 +1,145 @@
 <!doctype html>
 <html lang="es">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Privacidad · NoTengoCalle</title>
-<meta name="theme-color" content="#0f766e">
-<link rel="icon" href="/icons/icon-192.png">
-<style>
-  :root { color-scheme: light dark; --acento: #0f766e; --texto: #1f2933; --fondo: #f6f7f5; --tenue: #52606d; }
-  @media (prefers-color-scheme: dark) {
-    :root { --acento: #5eead4; --texto: #e5e7eb; --fondo: #111827; --tenue: #9ca3af; }
-  }
-  body { margin: 0; background: var(--fondo); color: var(--texto); font: 16px/1.6 system-ui, -apple-system, 'Segoe UI', sans-serif; }
-  main { max-width: 680px; margin: 0 auto; padding: 24px 16px 48px; }
-  h1 { font-size: 1.6rem; margin: 8px 0 4px; }
-  h2 { font-size: 1.15rem; margin: 28px 0 6px; }
-  a { color: var(--acento); }
-  .tenue { color: var(--tenue); font-size: 0.9rem; }
-</style>
-</head>
-<body>
-<main>
-  <p><a href="/">← Volver al juego</a></p>
-  <h1>Privacidad</h1>
-  <p class="tenue">Última actualización: 17 de octubre de 2026.</p>
-  <p>NoTengoCalle es un juego para aprender la geografía de Santiago. Aquí se explica qué datos guarda y qué servicios de otras empresas usa.</p>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Privacidad · NoTengoCalle</title>
+    <meta name="theme-color" content="#0f766e" />
+    <link rel="icon" href="/icons/icon-192.png" />
+    <style>
+      :root {
+        color-scheme: light dark;
+        --acento: #0f766e;
+        --texto: #1f2933;
+        --fondo: #f6f7f5;
+        --tenue: #52606d;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --acento: #5eead4;
+          --texto: #e5e7eb;
+          --fondo: #111827;
+          --tenue: #9ca3af;
+        }
+      }
+      body {
+        margin: 0;
+        background: var(--fondo);
+        color: var(--texto);
+        font:
+          16px/1.6 system-ui,
+          -apple-system,
+          'Segoe UI',
+          sans-serif;
+      }
+      main {
+        max-width: 680px;
+        margin: 0 auto;
+        padding: 24px 16px 48px;
+      }
+      h1 {
+        font-size: 1.6rem;
+        margin: 8px 0 4px;
+      }
+      h2 {
+        font-size: 1.15rem;
+        margin: 28px 0 6px;
+      }
+      a {
+        color: var(--acento);
+      }
+      .tenue {
+        color: var(--tenue);
+        font-size: 0.9rem;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <p><a href="/">← Volver al juego</a></p>
+      <h1>Privacidad</h1>
+      <p class="tenue">Última actualización: 19 de octubre de 2026.</p>
+      <p>
+        NoTengoCalle es un juego para aprender la geografía de Santiago. Aquí se explica qué datos guarda y
+        qué servicios de otras empresas usa.
+      </p>
 
-  <h2>Lo que queda en tu navegador</h2>
-  <p>Tus ajustes, tus récords personales, "Mis calles" y tu punto fijo del ruteo se guardan solo en tu navegador y no se envían a ningún
-    servidor. Sin cuenta, tu progreso de práctica también queda solo ahí. Para borrarlos, borra los datos de este sitio en tu navegador.</p>
+      <h2>Lo que queda en tu navegador</h2>
+      <p>
+        Tus ajustes, tus récords personales, "Mis calles" y tu punto fijo del ruteo se guardan solo en tu
+        navegador y no se envían a ningún servidor. Sin cuenta, tu progreso de práctica también queda solo
+        ahí. Para borrarlos, borra los datos de este sitio en tu navegador.
+      </p>
 
-  <h2>Cuentas y ranking</h2>
-  <p>Puedes jugar sin cuenta. Si creas una para aparecer en el ranking, se guarda tu nombre de usuario, tu clave cifrada (nunca la clave
-    misma), tu sesión, los puntajes de tus rondas oficiales y tu progreso de práctica (qué preguntas acertaste o fallaste), para
-    que sea el mismo en todos tus dispositivos; "Borrar progreso", en Mi progreso, lo borra también de tu cuenta. No se pide correo ni ningún otro dato. Tu nombre de usuario y tus puntajes se
-    ven en el ranking público. Para frenar a quien intente adivinar claves, se anota la hora de los intentos fallidos de entrar a una cuenta.</p>
-  <p>Si reportas un punto de Street View como túnel, se guarda solo el lugar y sus coordenadas, sin ningún dato tuyo.</p>
+      <h2>Cuentas y ranking</h2>
+      <p>
+        Puedes jugar sin cuenta. Si creas una para aparecer en el ranking, se guarda tu nombre de usuario, tu
+        clave cifrada (nunca la clave misma), tu sesión, los puntajes de tus rondas (no las de práctica) y tu
+        progreso de práctica (qué preguntas acertaste o fallaste), para que sea el mismo en todos tus
+        dispositivos; "Borrar progreso", en Mi progreso, lo borra también de tu cuenta. No se pide correo ni
+        ningún otro dato. Tu nombre de usuario y tus puntajes se ven en el ranking público. Para frenar a
+        quien intente adivinar claves, se anota la hora de los intentos fallidos de entrar a una cuenta.
+      </p>
+      <h2>Entrar con Google</h2>
+      <p>
+        Si eliges "Continuar con Google", Google nos envía un comprobante firmado de que entraste con tu
+        cuenta. Ese comprobante incluye tu nombre, tu correo y tu foto de perfil, pero
+        <b>solo guardamos un identificador de tu cuenta de Google</b> (un número que no dice quién eres) para
+        reconocerte la próxima vez. Tu nombre, tu correo y tu foto se descartan: no se guardan ni se muestran.
+        En el ranking aparece el nombre de usuario que eliges tú. El botón de Google se carga solo cuando
+        abres la ventana para entrar (<a href="https://policies.google.com/privacy" rel="noopener"
+          >política de privacidad de Google</a
+        >).
+      </p>
+      <p>
+        Si reportas un punto de Street View como túnel, se guarda solo el lugar y sus coordenadas, sin ningún
+        dato tuyo.
+      </p>
 
-  <h2>Publicidad</h2>
-  <p>Este sitio muestra anuncios de Google AdSense. Google y otros proveedores usan cookies para mostrar anuncios según tus visitas
-    anteriores a este sitio y a otros sitios de Internet. Con las cookies de publicidad, Google y sus socios pueden mostrarte anuncios
-    basados en tus visitas a este y otros sitios.</p>
-  <p>Puedes desactivar los anuncios personalizados en la <a href="https://adssettings.google.com" rel="noopener">configuración de anuncios de Google</a>,
-    y los de otros proveedores en <a href="https://www.aboutads.info/choices/" rel="noopener">aboutads.info</a>. Más detalles en
-    <a href="https://policies.google.com/technologies/partner-sites" rel="noopener">cómo usa Google la información de los sitios que usan sus servicios</a>.</p>
+      <h2>Publicidad</h2>
+      <p>
+        Este sitio muestra anuncios de Google AdSense. Google y otros proveedores usan cookies para mostrar
+        anuncios según tus visitas anteriores a este sitio y a otros sitios de Internet. Con las cookies de
+        publicidad, Google y sus socios pueden mostrarte anuncios basados en tus visitas a este y otros
+        sitios.
+      </p>
+      <p>
+        Puedes desactivar los anuncios personalizados en la
+        <a href="https://adssettings.google.com" rel="noopener">configuración de anuncios de Google</a>, y los
+        de otros proveedores en <a href="https://www.aboutads.info/choices/" rel="noopener">aboutads.info</a>.
+        Más detalles en
+        <a href="https://policies.google.com/technologies/partner-sites" rel="noopener"
+          >cómo usa Google la información de los sitios que usan sus servicios</a
+        >.
+      </p>
 
-  <h2>Otros servicios</h2>
-  <ul>
-    <li><b>Google Street View</b>: solo cuando juegas "¿Dónde estás?", el ruteo con Street View o recorres una calle, tu navegador pide las imágenes a Google
-      (<a href="https://policies.google.com/privacy" rel="noopener">política de privacidad de Google</a>).</li>
-    <li><b>Mapa, relieve y fotos</b>: tu navegador pide el mapa a OpenFreeMap, el relieve a AWS Terrain Tiles y las fotos a Wikimedia
-      Commons y Panoramax.</li>
-    <li><b>Búsqueda de "Mis calles" y del punto fijo del ruteo</b>: lo que escribes se envía a Nominatim (OpenStreetMap) para encontrarlo.</li>
-    <li><b>Ruteo desde tu punto fijo</b>: las coordenadas de tu punto y del destino se envían a Valhalla (valhalla1.openstreetmap.de, de FOSSGIS) para calcular
-      la ruta.</li>
-    <li><b>Alojamiento</b>: el sitio está en Netlify, que registra datos técnicos de las visitas (como la dirección IP) para funcionar y
-      protegerse de abusos.</li>
-  </ul>
-</main>
-</body>
+      <h2>Otros servicios</h2>
+      <ul>
+        <li>
+          <b>Google Street View</b>: solo cuando juegas "¿Dónde estás?", el ruteo con Street View o recorres
+          una calle, tu navegador pide las imágenes a Google (<a
+            href="https://policies.google.com/privacy"
+            rel="noopener"
+            >política de privacidad de Google</a
+          >).
+        </li>
+        <li>
+          <b>Mapa, relieve y fotos</b>: tu navegador pide el mapa a OpenFreeMap, el relieve a AWS Terrain
+          Tiles y las fotos a Wikimedia Commons y Panoramax.
+        </li>
+        <li>
+          <b>Búsqueda de "Mis calles" y del punto fijo del ruteo</b>: lo que escribes se envía a Nominatim
+          (OpenStreetMap) para encontrarlo.
+        </li>
+        <li>
+          <b>Ruteo desde tu punto fijo</b>: las coordenadas de tu punto y del destino se envían a Valhalla
+          (valhalla1.openstreetmap.de, de FOSSGIS) para calcular la ruta.
+        </li>
+        <li>
+          <b>Alojamiento</b>: el sitio está en Netlify, que registra datos técnicos de las visitas (como la
+          dirección IP) para funcionar y protegerse de abusos.
+        </li>
+      </ul>
+    </main>
+  </body>
 </html>

@@ -7,12 +7,47 @@ import { crearApi } from '../servidor/api.js'
 import { restablecerClave } from '../servidor/autenticacion.js'
 import { aplicarEsquema } from '../servidor/esquema.js'
 import { COSTO, cifrarClave, claveFiltrada } from '../servidor/claves.js'
+import { ID_DE_CLIENTE_DE_GOOGLE } from '../compartido/configuracion.js'
+
+// Un "Google" de mentira: firma tokens con su propia llave, que la API recibe como si fuera de Google.
+const ALGORITMO_DE_GOOGLE = { name: 'RSASSA-PKCS1-v1_5', hash: 'SHA-256' }
+const generarLlaves = () =>
+  crypto.subtle.generateKey(
+    { ...ALGORITMO_DE_GOOGLE, modulusLength: 2048, publicExponent: new Uint8Array([1, 0, 1]) },
+    true,
+    ['sign', 'verify'],
+  )
+const llavesDeGoogle = await generarLlaves()
+const llavePublicaDeGoogle = {
+  ...(await crypto.subtle.exportKey('jwk', llavesDeGoogle.publicKey)),
+  kid: 'llave-de-prueba',
+  alg: 'RS256',
+}
+const base64url = valor => Buffer.from(JSON.stringify(valor)).toString('base64url')
+
+async function tokenDeGoogle(cambios = {}, llavePrivada = llavesDeGoogle.privateKey) {
+  const contenido = {
+    iss: 'https://accounts.google.com',
+    aud: ID_DE_CLIENTE_DE_GOOGLE,
+    sub: '1234567890',
+    email: 'alguien@gmail.com',
+    name: 'Alguien Real',
+    exp: Math.floor(Date.now() / 1000) + 3600,
+    ...cambios,
+  }
+  const firmado = `${base64url({ alg: 'RS256', kid: 'llave-de-prueba', typ: 'JWT' })}.${base64url(contenido)}`
+  const firma = await crypto.subtle.sign(ALGORITMO_DE_GOOGLE, llavePrivada, new TextEncoder().encode(firmado))
+  return `${firmado}.${Buffer.from(firma).toString('base64url')}`
+}
 
 let db, manejar
 
 beforeEach(async () => {
   db = await abrirBaseLocal()
-  manejar = crearApi(db, { estaFiltrada: async clave => clave === 'filtrada123' })
+  manejar = crearApi(db, {
+    estaFiltrada: async clave => clave === 'filtrada123',
+    llavesDeGoogle: async () => [llavePublicaDeGoogle],
+  })
 })
 
 // Un "navegador" mínimo: recuerda la cookie de sesión entre llamadas.
@@ -386,7 +421,7 @@ test('al actualizar la base no se pierde ninguna marca: las anteriores quedan en
   const antigua = new PGlite()
   const consulta = async (texto, parametros = []) => (await antigua.query(texto, parametros)).rows
   await consulta(
-    'create table users (id integer generated always as identity primary key, name text not null, name_key text not null unique, password_hash text not null, created_at timestamptz not null default now())',
+    'create table users (id integer generated always as identity primary key, name text not null, name_key text not null unique, password_hash text not null, recovery_hash text not null, created_at timestamptz not null default now())',
   )
   await consulta(
     'create table sessions (token_hash text primary key, user_id integer not null references users (id) on delete cascade, expires_at timestamptz not null)',
@@ -395,7 +430,9 @@ test('al actualizar la base no se pierde ninguna marca: las anteriores quedan en
     'create table scores (id integer generated always as identity primary key, user_id integer not null references users (id) on delete cascade, mode text not null, correct integer not null, total integer not null, ms integer not null, created_at timestamptz not null default now())',
   )
   await consulta('create table failed_logins (name_key text not null, at timestamptz not null default now())')
-  await consulta("insert into users (name, name_key, password_hash) values ('Ana', 'ana', 'x')")
+  await consulta(
+    "insert into users (name, name_key, password_hash, recovery_hash) values ('Ana', 'ana', 'x', 'y')",
+  )
   const antes = [
     ['ch-all', 33, 34, 70000],
     ['ch-city', 12, 15, 55000],
@@ -435,6 +472,16 @@ test('al actualizar la base no se pierde ninguna marca: las anteriores quedan en
     tabla.filas.map(fila => [fila.nombre, fila.aciertos, fila.total]),
     [['Ana', 33, 34]],
   )
+
+  // y se pueden crear cuentas nuevas (antes la columna recovery_hash, ya sin uso, lo impedía)
+  const registro = await api(
+    new Request('https://juego.test/api/registrarse', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ nombre: 'Beto', clave: 'secreto1' }),
+    }),
+  )
+  assert.equal(registro.status, 201)
 })
 
 test('el progreso de práctica se comparte entre dispositivos y gana lo más reciente', async () => {
@@ -467,4 +514,80 @@ test('el progreso de práctica se comparte entre dispositivos y gana lo más rec
 
   await celular('POST', '/progreso/borrar')
   assert.deepEqual((await computador('GET', '/progreso')).datos.estadisticas, {})
+})
+
+test('con Google se crea la cuenta eligiendo un nombre, y después se entra directo', async () => {
+  const llamar = cliente()
+  const credencial = await tokenDeGoogle()
+  const primeraVez = await llamar('POST', '/google', { credencial })
+  assert.deepEqual(primeraVez.datos, { necesitaNombre: true })
+  assert.equal(primeraVez.galleta, null)
+
+  const creada = await llamar('POST', '/google', { credencial, nombre: 'Gugle' })
+  assert.equal(creada.estado, 201)
+  assert.deepEqual(creada.datos.usuario, { nombre: 'Gugle', google: true })
+  assert.match(creada.galleta, /HttpOnly; SameSite=Lax/)
+  assert.deepEqual((await llamar('GET', '/yo')).datos.usuario, { nombre: 'Gugle', google: true })
+
+  const [fila] = await db.query(`select * from usuarios where nombre = 'Gugle'`)
+  assert.equal(fila.google_sub, '1234567890')
+  assert.equal(fila.clave_cifrada, null)
+  assert.ok(!JSON.stringify(fila).includes('alguien'), 'no se guarda ni el correo ni el nombre de Google')
+
+  const otroDispositivo = cliente()
+  const deNuevo = await otroDispositivo('POST', '/google', { credencial: await tokenDeGoogle() })
+  assert.deepEqual(deNuevo.datos.usuario, { nombre: 'Gugle', google: true })
+  assert.ok(deNuevo.galleta)
+
+  const conClave = await cliente()('POST', '/entrar', { nombre: 'Gugle', clave: '' })
+  assert.equal(conClave.estado, 401, 'una cuenta sin clave no se abre con nombre y clave vacía')
+})
+
+test('con Google no se puede tomar un nombre ocupado', async () => {
+  await registrado('Ana')
+  const respuesta = await cliente()('POST', '/google', { credencial: await tokenDeGoogle(), nombre: 'ana' })
+  assert.equal(respuesta.estado, 409)
+  assert.equal(respuesta.datos.error, 'nombre_en_uso')
+})
+
+test('se rechazan los tokens de Google falsos, vencidos o para otra app', async () => {
+  const otraLlave = (await generarLlaves()).privateKey
+  const malos = [
+    await tokenDeGoogle({}, otraLlave),
+    await tokenDeGoogle({ aud: 'otra-app.apps.googleusercontent.com' }),
+    await tokenDeGoogle({ iss: 'https://evil.example' }),
+    await tokenDeGoogle({ exp: Math.floor(Date.now() / 1000) - 3600 }),
+    await tokenDeGoogle({ sub: '' }),
+    'no.es.un-token',
+    'nada',
+    undefined,
+  ]
+  for (const credencial of malos) {
+    const respuesta = await cliente()('POST', '/google', { credencial, nombre: 'Intruso' })
+    assert.equal(respuesta.estado, 401, String(credencial).slice(0, 40))
+    assert.equal(respuesta.datos.error, 'google_invalido')
+  }
+  assert.equal((await db.query(`select * from usuarios`)).length, 0)
+})
+
+test('una cuenta con clave se vincula con Google solo con la sesión iniciada', async () => {
+  const credencial = await tokenDeGoogle({ sub: 'sub-de-ana' })
+  assert.equal((await cliente()('POST', '/google/vincular', { credencial })).estado, 401)
+
+  const { llamar: ana } = await registrado('Ana')
+  const vinculada = await ana('POST', '/google/vincular', { credencial })
+  assert.deepEqual(vinculada.datos.usuario, { nombre: 'Ana', google: true })
+
+  const desdeGoogle = await cliente()('POST', '/google', { credencial })
+  assert.deepEqual(desdeGoogle.datos.usuario, { nombre: 'Ana', google: true })
+  assert.equal((await cliente()('POST', '/entrar', { nombre: 'Ana', clave: 'secreto1' })).estado, 200)
+
+  const { llamar: beto } = await registrado('Beto')
+  const robo = await beto('POST', '/google/vincular', { credencial })
+  assert.equal(robo.estado, 409)
+  assert.equal(robo.datos.error, 'google_en_uso')
+  const otroGoogle = await ana('POST', '/google/vincular', {
+    credencial: await tokenDeGoogle({ sub: 'otro' }),
+  })
+  assert.equal(otroGoogle.datos.error, 'ya_vinculada')
 })

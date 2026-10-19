@@ -8,11 +8,12 @@ import {
 import { conflicto, invalido, demasiados, noAutorizado } from './errores.js'
 import { cifrarClave, necesitaRecifrado, claveCoincide } from './claves.js'
 import { terminarTodasLasSesiones, terminarSesion, iniciarSesion } from './sesiones.js'
+import { identificadorDeGoogle } from './google.js'
 
 const INTENTOS_FALLIDOS_MAXIMOS = 10
 const MINUTOS_DE_VENTANA_DE_INTENTOS = 15
 
-const usuarioPublico = usuario => ({ nombre: usuario.nombre })
+const usuarioPublico = usuario => ({ nombre: usuario.nombre, ...(usuario.google_sub && { google: true }) })
 
 function nombreValido(cuerpo) {
   const nombre = String(cuerpo.nombre ?? '').trim()
@@ -79,7 +80,10 @@ export async function entrar({ db, solicitud, cuerpo }) {
   const llaveDeNombre = llaveDeUsuario(String(cuerpo.nombre ?? '').trim())
   await exigirSinLimite(db, llaveDeNombre)
   const usuario = await buscarUsuario(db, llaveDeNombre)
-  if (!usuario || !(await claveCoincide(String(cuerpo.clave ?? ''), usuario.clave_cifrada))) {
+  // Las cuentas creadas con Google no tienen clave.
+  const claveCorrecta =
+    usuario?.clave_cifrada && (await claveCoincide(String(cuerpo.clave ?? ''), usuario.clave_cifrada))
+  if (!claveCorrecta) {
     await registrarFalla(db, llaveDeNombre)
     throw noAutorizado('credenciales_incorrectas', 'Nombre o clave incorrectos')
   }
@@ -93,6 +97,49 @@ export async function entrar({ db, solicitud, cuerpo }) {
     datos: { usuario: usuarioPublico(usuario) },
     galleta: await iniciarSesion(db, solicitud, usuario.id),
   }
+}
+
+const sesionIniciada = async (db, solicitud, usuario) => ({
+  datos: { usuario: usuarioPublico(usuario) },
+  galleta: await iniciarSesion(db, solicitud, usuario.id),
+})
+
+const buscarPorGoogle = async (db, idDeGoogle) =>
+  (await db.query(`select * from usuarios where google_sub = $1`, [idDeGoogle]))[0]
+
+// "Continuar con Google": entra a la cuenta vinculada a ese Google o, si no hay, la crea. La primera vez falta el
+// nombre de usuario (no se usa el de Google, para no publicar nombres reales en el ranking): se responde
+// necesitaNombre y el navegador vuelve a mandar el mismo token con el nombre elegido.
+export async function entrarConGoogle({ db, solicitud, cuerpo, llavesDeGoogle }) {
+  const idDeGoogle = await identificadorDeGoogle(cuerpo.credencial, llavesDeGoogle)
+  const existente = await buscarPorGoogle(db, idDeGoogle)
+  if (existente) return sesionIniciada(db, solicitud, existente)
+  if (cuerpo.nombre === undefined) return { datos: { necesitaNombre: true } }
+  const nombre = nombreValido(cuerpo)
+  const [creado] = await db.query(
+    `insert into usuarios (nombre, llave_de_nombre, google_sub) values ($1, $2, $3)
+     on conflict do nothing returning *`,
+    [nombre, llaveDeUsuario(nombre), idDeGoogle],
+  )
+  if (creado) return { estado: 201, ...(await sesionIniciada(db, solicitud, creado)) }
+  const creadoEnParalelo = await buscarPorGoogle(db, idDeGoogle)
+  if (creadoEnParalelo) return sesionIniciada(db, solicitud, creadoEnParalelo)
+  throw conflicto('nombre_en_uso', 'Ese nombre ya está en uso')
+}
+
+// Vincular solo se puede con la sesión ya iniciada y a pedido de la persona: nunca se juntan cuentas por el nombre.
+export async function vincularGoogle({ db, cuerpo, usuario, llavesDeGoogle }) {
+  if (!usuario) throw noAutorizado('sin_sesion', 'Entra a tu cuenta para vincularla con Google')
+  const idDeGoogle = await identificadorDeGoogle(cuerpo.credencial, llavesDeGoogle)
+  const otro = await buscarPorGoogle(db, idDeGoogle)
+  if (otro && otro.id !== usuario.id)
+    throw conflicto('google_en_uso', 'Esa cuenta de Google ya está vinculada a otro usuario')
+  const [vinculado] = await db.query(
+    `update usuarios set google_sub = $1 where id = $2 and (google_sub is null or google_sub = $1) returning *`,
+    [idDeGoogle, usuario.id],
+  )
+  if (!vinculado) throw conflicto('ya_vinculada', 'Tu cuenta ya está vinculada a otra cuenta de Google')
+  return { datos: { usuario: usuarioPublico(vinculado) } }
 }
 
 // Para el administrador (servidor/admin.js): el usuario no puede recuperar su cuenta por su cuenta.
