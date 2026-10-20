@@ -19,6 +19,7 @@ export const MODOS_OFICIALES = [
   'com-all',
   'cc-name',
   'cc-find',
+  'cc-hard',
   'lm-loc',
   'lm-com',
   'mt-find',

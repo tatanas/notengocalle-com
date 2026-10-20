@@ -2,12 +2,14 @@ import { DATOS, REGIONES, comunaPorNombre } from './datos.js'
 
 // Las comunas de todo Chile. El índice (nombre, región, punto de la etiqueta, límites, km²) viene en data.js; los polígonos, que
 // pesan, se bajan recién al jugarlas (public/data/comunas-chile.js, hecho por tools/comunas_chile.js). Las de la Región
-// Metropolitana ya están en data.js, con más detalle.
+// Metropolitana ya están en data.js, con más detalle. Un nombre repetido entre regiones lleva la región entre paréntesis
+// ("Santa María (Valparaíso)"), así cada comuna tiene un nombre único; `original` es el nombre sin eso.
 
 export const REGIONES_DE_COMUNAS = REGIONES.map(region => region.properties.name)
 export const COMUNAS_DE_CHILE = (DATOS.comunasChile ?? []).map(
-  ([name, region, lat, lon, sur, oeste, norte, este, km2]) => ({
+  ([name, region, lat, lon, sur, oeste, norte, este, km2, original = name]) => ({
     name,
+    original,
     region,
     lab: [lat, lon],
     limites: [
@@ -41,23 +43,23 @@ export function cargarComunasDeChile() {
   return promesaDeLosPoligonos
 }
 
-// La comuna como rasgo GeoJSON, igual a las de la Región Metropolitana (properties: name, region, lab [lon, lat], km2).
-// Solo sirve después de cargarComunasDeChile().
+// La comuna como rasgo GeoJSON (properties: name único, region, lab [lon, lat], km2). Solo sirve después de cargarComunasDeChile().
+const REGION_METROPOLITANA = 'Metropolitana de Santiago'
 const rasgos = new Map()
 export function rasgoDeComuna(comuna) {
   if (!rasgos.has(comuna.name))
-    rasgos.set(
-      comuna.name,
-      comunaPorNombre[comuna.name] ?? {
-        type: 'Feature',
-        properties: {
-          name: comuna.name,
-          region: comuna.region,
-          lab: [comuna.lab[1], comuna.lab[0]],
-          km2: comuna.km2,
-        },
-        geometry: window.COMUNAS_CHILE[comuna.name],
+    rasgos.set(comuna.name, {
+      type: 'Feature',
+      properties: {
+        name: comuna.name,
+        region: comuna.region,
+        lab: [comuna.lab[1], comuna.lab[0]],
+        km2: comuna.km2,
       },
-    )
+      geometry:
+        comuna.region === REGION_METROPOLITANA
+          ? comunaPorNombre[comuna.original].geometry
+          : window.COMUNAS_CHILE[comuna.name],
+    })
   return rasgos.get(comuna.name)
 }

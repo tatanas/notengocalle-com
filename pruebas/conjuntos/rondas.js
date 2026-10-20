@@ -307,8 +307,8 @@ export async function disenoMenu(navegador, { verificar }) {
   )
   const regionesParaElegir = await pagina.$$eval('#setRegiones input', fichas => fichas.length)
   verificar(
-    practicaDeComunasDeChile === 2 && regionesParaElegir === 16,
-    `comunas de Chile tiene su subsección de práctica con los dos juegos y las 16 regiones para elegir (${practicaDeComunasDeChile} juegos, ${regionesParaElegir} regiones)`,
+    practicaDeComunasDeChile === 3 && regionesParaElegir === 16,
+    `comunas de Chile tiene su subsección de práctica con sus tres juegos y las 16 regiones para elegir (${practicaDeComunasDeChile} juegos, ${regionesParaElegir} regiones)`,
   )
   verificar(
     chicos.every(etiqueta => etiqueta === '🏋️'),

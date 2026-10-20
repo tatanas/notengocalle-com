@@ -27,6 +27,7 @@ const CONJUNTOS_DEL_RANKING = ['cuentas', 'categorias-ranking', 'rondas-oficiale
 // Prefijo de los ids de juego que juega cada archivo de src/juego/modos/, para que la prueba de humo juegue solo esos.
 const PREFIJO_DE_JUEGO_POR_ARCHIVO = {
   comunas: 'com-',
+  comunasDeChile: 'cc-',
   lugares: 'lm-',
   metro: 'mt-',
   calles: 'st-',

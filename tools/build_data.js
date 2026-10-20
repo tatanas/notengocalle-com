@@ -81,8 +81,15 @@ const micros=rd('micros.json')||[];
 // y los polígonos, que pesan, en public/data/comunas-chile.js, que el juego baja recién al jugarlas. Las de la RM usan las de arriba.
 const comunasChile=rd('comunas_chile.json')||[];
 const comunasDeLaRM=feats.map(f=>{const [oeste,sur,este,norte]=turf.bbox(f);return [f.properties.name,'Metropolitana de Santiago',f.properties.lab[1],f.properties.lab[0],+sur.toFixed(3),+oeste.toFixed(3),+norte.toFixed(3),+este.toFixed(3),Math.round(f.properties.km2)];});
-const indiceDeComunasChile=[...comunasDeLaRM,...comunasChile.map(c=>[c.name,c.region,c.lab[0],c.lab[1],...c.bb,c.km2])];
-fs.writeFileSync(require('path').join(require('path').dirname(OUT),'comunas-chile.js'),'// Polígonos simplificados de las comunas de Chile fuera de la RM (OpenStreetMap, ODbL). Generado por tools/: no editar a mano\nwindow.COMUNAS_CHILE='+JSON.stringify(Object.fromEntries(comunasChile.map(c=>[c.name,c.g])))+';\n');
+// Un nombre de comuna repetido entre regiones lleva la región entre paréntesis ("Santa María (Valparaíso)"): así sigue siendo único.
+// El índice guarda el nombre original al final (solo en esos casos) para buscar las de la RM en data.js.
+const nombresDeComunas=[...comunasDeLaRM.map(c=>c[0]),...comunasChile.map(c=>c.name)];
+const nombresRepetidos=new Set(nombresDeComunas.filter((n,i)=>nombresDeComunas.indexOf(n)!==i));
+const nombreUnico=(nombre,region)=>nombresRepetidos.has(nombre)?`${nombre} (${region})`:nombre;
+console.log('comunas de Chile:',nombresDeComunas.length,'| nombres repetidos entre regiones:',[...nombresRepetidos].join(', ')||'ninguno');
+const indiceDeComunasChile=[...comunasDeLaRM,...comunasChile.map(c=>[c.name,c.region,c.lab[0],c.lab[1],...c.bb,c.km2])]
+  .map(c=>nombresRepetidos.has(c[0])?[nombreUnico(c[0],c[1]),...c.slice(1),c[0]]:c);
+fs.writeFileSync(require('path').join(require('path').dirname(OUT),'comunas-chile.js'),'// Polígonos simplificados de las comunas de Chile fuera de la RM (OpenStreetMap, ODbL). Generado por tools/: no editar a mano\nwindow.COMUNAS_CHILE='+JSON.stringify(Object.fromEntries(comunasChile.map(c=>[nombreUnico(c.name,c.region),c.g])))+';\n');
 const data={comunas:{type:'FeatureCollection',features:feats},comunasChile:indiceDeComunasChile,metro,streets,landmarks,cerros,photos,inter:R.inter,para:R.para,dudosos:R.dudosos,steps,salidas,transit,micros,zones,chile,metroAlong,rotondas,built:new Date().toISOString().slice(0,10)};
 fs.writeFileSync(OUT,'// Datos generados desde OpenStreetMap (ODbL) y OSRM. No editar a mano: ver tools/\nwindow.DATA='+JSON.stringify(data)+';\n');
 console.log('wrote',OUT,fs.statSync(OUT).size,'bytes');

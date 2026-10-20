@@ -979,6 +979,7 @@ test('el largo de la ronda: 10, 20 o todas, salvo en los juegos de largo fijo o 
   assert.equal(largoDeRondaDe('sv-ubicar', 20), 10, 'Street View siempre son 10')
   assert.deepEqual(categoriasValidasDe('cc-name'), ['10', '20', 'todas'])
   assert.deepEqual(categoriasValidasDe('cc-find'), ['10', '20', 'todas'])
+  assert.deepEqual(categoriasValidasDe('cc-hard'), ['10', '20', 'todas'])
 })
 
 test('una ronda de 10 preguntas es válida en su ranking y una de otro largo no', () => {
