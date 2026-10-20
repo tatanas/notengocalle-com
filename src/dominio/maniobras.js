@@ -37,14 +37,25 @@ export const GRADOS_DE_VUELTA_EN_U = 150
 export const ladoDelGiro = grados => (grados > 0 ? 'derecha' : 'izquierda')
 
 // La instrucción como la diría un navegador: "Dobla a la derecha en Av. Grecia", "Sigue derecho por Av. Apoquindo"…
-export function textoDeManiobra(grados, calle, { autopista = false } = {}) {
+// El lado solo se dice cuando importa: en una salida o entrada de autopista hay una sola rampa (y en un trébol el giro
+// medido en el mapa no coincide con el lado de la salida), y cuando la calle sale hacia un solo lado (`conLado: false`)
+// no hay de dónde elegir.
+export function textoDeManiobra(
+  grados,
+  calle,
+  { desdeAutopista = false, haciaAutopista = false, numeroDeSalida = null, conLado = true } = {},
+) {
   const cuanto = Math.abs(grados)
-  if (cuanto < GRADOS_DE_SEGUIR_DERECHO) return `Sigue derecho por ${calle}`
-  const lado = ladoDelGiro(grados)
   if (cuanto > GRADOS_DE_VUELTA_EN_U) return `Da la vuelta y sigue por ${calle}`
-  if (autopista) return `Toma ${calle} por la ${lado}`
-  if (cuanto < GRADOS_DE_DESVIO_SUAVE) return `Mantente a la ${lado} hacia ${calle}`
-  return `Dobla a la ${lado} en ${calle}`
+  // Al dejar una autopista por otra calle siempre es una salida, aunque la rampa salga derecho: "sigue derecho" confunde.
+  if (desdeAutopista && (!haciaAutopista || numeroDeSalida || cuanto >= GRADOS_DE_SEGUIR_DERECHO))
+    return `Toma la salida${numeroDeSalida ? ` ${numeroDeSalida}` : ''} hacia ${calle}`
+  if (haciaAutopista && !desdeAutopista) return `Toma la entrada a ${calle}`
+  if (cuanto < GRADOS_DE_SEGUIR_DERECHO) return `Sigue derecho por ${calle}`
+  const suave = cuanto < GRADOS_DE_DESVIO_SUAVE
+  if (!conLado) return suave ? `Sigue hacia ${calle}` : `Dobla en ${calle}`
+  const lado = ladoDelGiro(grados)
+  return suave ? `Mantente a la ${lado} hacia ${calle}` : `Dobla a la ${lado} en ${calle}`
 }
 
 const PUNTOS_CARDINALES = [

@@ -14,6 +14,46 @@ const PASO_MINIMO_DEL_CAMINO_KM = 0.005
 
 export const streetViewDisponible = () => !!LLAVE
 
+// Los autos de Google van por su pista: el panorama más cercano a la línea de una calle puede ser el de la pista contraria, y se
+// vería el tránsito de frente. Al ir siguiendo una ruta se busca un panorama tomado en el sentido en que se avanza, corriéndose
+// hacia la derecha (donde va el tránsito en Chile) si hace falta.
+const GRADOS_DE_SENTIDO_ACEPTADO = 70
+const METROS_A_LA_DERECHA = [4, 8, 12]
+const RADIO_ALREADEDOR_DE_LA_PISTA_M = 12
+const M_POR_GRADO_LATITUD = 111200
+const M_POR_GRADO_LONGITUD = 92900
+
+const diferenciaDeRumbo = (a, b) => Math.abs(((b - a + 540) % 360) - 180)
+// El sentido en que iba el auto al tomar el panorama (si Google no lo dice, se lo da por bueno).
+const esDelSentido = (resultado, rumbo) => {
+  const sentido = resultado.data.tiles?.originHeading ?? resultado.data.tiles?.centerHeading
+  return sentido == null || diferenciaDeRumbo(sentido, rumbo) <= GRADOS_DE_SENTIDO_ACEPTADO
+}
+
+function corridoALaDerecha(lat, lon, rumbo, metros) {
+  const radianes = ((rumbo + 90) * Math.PI) / 180
+  return {
+    lat: lat + (Math.cos(radianes) * metros) / M_POR_GRADO_LATITUD,
+    lng: lon + (Math.sin(radianes) * metros) / M_POR_GRADO_LONGITUD,
+  }
+}
+
+async function buscarPanorama(servicio, { lat, lon, rumbo }, enLaPista) {
+  const pedir = (location, radius) =>
+    servicio.getPanorama({ location, radius, preference: 'nearest', sources: ['google'] })
+  const primero = await pedir({ lat, lng: lon }, RADIO_DE_BUSQUEDA_M)
+  if (!enLaPista || esDelSentido(primero, rumbo)) return primero
+  for (const metros of METROS_A_LA_DERECHA) {
+    try {
+      const otro = await pedir(corridoALaDerecha(lat, lon, rumbo, metros), RADIO_ALREADEDOR_DE_LA_PISTA_M)
+      if (esDelSentido(otro, rumbo)) return otro
+    } catch {
+      // ahí no hay panorama: se prueba más a la derecha
+    }
+  }
+  return primero
+}
+
 let promesaDeGoogle = null
 
 function cargarGoogleMaps() {
@@ -159,7 +199,8 @@ function crearElementos() {
 
 // Deja al jugador en el panorama de Street View más cercano a (lat, lon). En una pregunta puede caminar un poco, sin
 // nombres de calles; con recorrerCalle: true camina sin límite y con nombres.
-// Devuelve el punto real del panorama (puede quedar a unos metros del pedido) o null si ahí no hay cobertura.
+// Devuelve el punto real del panorama (puede quedar a unos metros del pedido) o null si ahí no hay cobertura. Con enLaPista busca
+// uno tomado en el sentido de `rumbo` (para seguir una ruta sin ver el tránsito de frente).
 // alReportarTunel se llama cuando el jugador avisa que ese punto está en un túnel.
 export async function mostrarPanorama(
   { lat, lon, rumbo = Math.random() * 360 },
@@ -168,18 +209,14 @@ export async function mostrarPanorama(
     recorrerCalle = false,
     alVerElMapa: encuadrarAlVerElMapa = null,
     alGirarLaVista: alGirar = null,
+    enLaPista = false,
   } = {},
 ) {
   const maps = await cargarGoogleMaps()
   const { StreetViewPanorama, StreetViewService } = await maps.importLibrary('streetView')
   let resultado
   try {
-    resultado = await new StreetViewService().getPanorama({
-      location: { lat, lng: lon },
-      radius: RADIO_DE_BUSQUEDA_M,
-      preference: 'nearest',
-      sources: ['google'],
-    })
+    resultado = await buscarPanorama(new StreetViewService(), { lat, lon, rumbo }, enLaPista)
   } catch {
     return null
   }

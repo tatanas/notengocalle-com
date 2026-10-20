@@ -6,6 +6,16 @@ import { test } from 'node:test'
 import { llaveDeUsuario, PATRON_DE_USUARIO } from '../compartido/cuentas.js'
 import { textoParaCompartir, tiempoEnPalabras } from '../src/dominio/compartir.js'
 import {
+  completarAlternativas,
+  crucesPorNombrar,
+  nombreDeLaCalle,
+  rutaDelJuego,
+} from '../compartido/rutaEnAuto.js'
+import { destinoDeLaSalida, secuenciaDeSalidas, ventanasDeSalidas } from '../src/dominio/salidas.js'
+import { decisionesConStreetView } from '../src/dominio/decisionesConStreetView.js'
+import { decisionesEnAuto, nombresDeLaRuta } from '../src/dominio/decisionesEnAuto.js'
+import { textoDeManiobra } from '../src/dominio/maniobras.js'
+import {
   COMUNAS_POR_ALCANCE,
   categoriaDe,
   categoriasValidasDe,
@@ -355,4 +365,565 @@ test('el texto para compartir parte por el récord y termina con el sitio', () =
     textoParaCompartir({ ...ronda, idDeModo: 'rs-any-car', nombreDelJuego: 'En auto' }),
     /"En auto"/,
   )
+})
+
+// ----- ruteo en auto: pasos desde la traza de Valhalla y solo alternativas que existen en el cruce
+// Un barrio de juguete en kilómetros (x al oriente, y al norte) pasado a [lat, lon].
+const aPunto = (x, y) => [-33.45 + y / 111.2, -70.65 + x / 92.9]
+const trazado = (...puntos) => puntos.map(([x, y]) => aPunto(x, y))
+
+// Polilínea de 6 decimales como la que entrega Valhalla.
+function codificarPolilinea(puntos) {
+  const valor = numero => {
+    let resto = numero < 0 ? ~(numero << 1) : numero << 1
+    let texto = ''
+    while (resto >= 0x20) {
+      texto += String.fromCharCode((0x20 | (resto & 0x1f)) + 63)
+      resto >>= 5
+    }
+    return texto + String.fromCharCode(resto + 63)
+  }
+  let anterior = [0, 0]
+  return puntos
+    .map(([lat, lon]) => {
+      const actual = [Math.round(lat * 1e6), Math.round(lon * 1e6)]
+      const texto = valor(actual[0] - anterior[0]) + valor(actual[1] - anterior[1])
+      anterior = actual
+      return texto
+    })
+    .join('')
+}
+
+const NOMBRES_DE_LA_RUTA = ['G-99', 'Villa Norte - Av. Central - Cerro Alto']
+// Una traza de juguete: aristas [nombres, km, clase, rumboFinal, cruces] sobre los puntos de la ruta.
+function viajeYTraza(puntos, aristas) {
+  const viaje = {
+    summary: { length: 3, time: 300 },
+    legs: [{ shape: codificarPolilinea(trazado(...puntos)) }],
+  }
+  const traza = {
+    edges: aristas.map(([names, length, road_class, end_heading, cruces = []], indice) => ({
+      names,
+      length,
+      road_class,
+      end_heading,
+      begin_shape_index: indice,
+      end_shape_index: indice + 1,
+      end_node: {
+        intersecting_edges: cruces.map(([begin_heading, clase, driveability = 'both']) => ({
+          begin_heading,
+          road_class: clase,
+          use: 'road',
+          driveability,
+        })),
+      },
+    })),
+  }
+  return { viaje, traza }
+}
+const sinLineas = { lineasPorNombre: new Map() }
+
+test('los pasos llevan el nombre de cada calle, no el de la ruta que comparten', () => {
+  const { viaje, traza } = viajeYTraza(
+    [
+      [-1.5, 0],
+      [0, 0],
+      [0, 1.2],
+    ],
+    [
+      [['Avenida Uno', ...NOMBRES_DE_LA_RUTA], 1.5, 'secondary', 90],
+      [['Avenida Dos', ...NOMBRES_DE_LA_RUTA], 1.2, 'secondary', 0],
+    ],
+  )
+  const ruta = rutaDelJuego(viaje, traza, sinLineas)
+  assert.deepEqual(
+    ruta.steps.map(paso => paso.n),
+    ['Av. Uno', 'Av. Dos'],
+  )
+})
+
+test('una calle sin nombre propio queda con el número de su ruta, nunca con el nombre del recorrido', () => {
+  assert.equal(nombreDeLaCalle(NOMBRES_DE_LA_RUTA), 'Ruta G-99')
+  assert.equal(nombreDeLaCalle(['Avenida Uno', ...NOMBRES_DE_LA_RUTA]), 'Av. Uno')
+  const delJuego = nombre => nombre === 'Av. Dos'
+  assert.equal(
+    nombreDeLaCalle(['Avenida Uno', 'Avenida Dos'], delJuego),
+    'Av. Dos',
+    'se prefiere una calle del juego',
+  )
+})
+
+test('el cruce de un paso es donde se deja la calle anterior, antes de la rampa sin nombre', () => {
+  const { viaje, traza } = viajeYTraza(
+    [
+      [-2, 0],
+      [0, 0],
+      [0.3, -0.3],
+      [3, -0.3],
+    ],
+    [
+      [['Avenida Uno'], 2, 'primary', 90, [[100, 'primary', 'forward']]],
+      [undefined, 0.4, 'primary', 135],
+      [['Avenida Dos'], 2.7, 'primary', 90],
+    ],
+  )
+  const [uno, dos] = rutaDelJuego(viaje, traza, sinLineas).steps
+  assert.deepEqual([uno.n, dos.n], ['Av. Uno', 'Av. Dos'])
+  assert.deepEqual(dos.ent, [{ h: 100, k: 2 }])
+  assert.deepEqual(
+    dos.x,
+    aPunto(0, 0).map(numero => +numero.toFixed(5)),
+  )
+})
+
+const respuestaDeCruces = (...calles) => [
+  {
+    edges: calles.map(([heading, names]) => ({
+      percent_along: 0,
+      heading,
+      edge_info: { names },
+      edge: { classification: { use: 'road' } },
+    })),
+  },
+]
+const contextoDeNombres = {
+  lineasPorNombre: new Map(),
+  nombresDeAutopistas: new Set(),
+  esAutopista: () => false,
+}
+
+test('las calles que salen de un cruce se nombran con lo que responde Valhalla; las que no se pueden nombrar se descartan', () => {
+  const { viaje, traza } = viajeYTraza(
+    [
+      [-1.5, 0],
+      [0, 0],
+      [0, 1.2],
+    ],
+    [
+      [
+        ['Avenida Uno'],
+        1.5,
+        'secondary',
+        90,
+        [
+          [180, 'secondary'],
+          [270, 'tertiary'],
+        ],
+      ],
+      [['Avenida Dos'], 1.2, 'secondary', 0],
+    ],
+  )
+  const ruta = rutaDelJuego(viaje, traza, sinLineas)
+  const cruces = crucesPorNombrar(ruta)
+  assert.deepEqual(cruces.indices, [1])
+  completarAlternativas(
+    ruta,
+    cruces,
+    respuestaDeCruces([180, ['Avenida Tres']], [0, ['Avenida Dos']]),
+    contextoDeNombres,
+  )
+  assert.deepEqual(ruta.steps[1].ent, [{ h: 180, k: 3, n: 'Av. Tres' }])
+})
+
+// Tres tramos de la misma calle con una bifurcación (otra calle igual de importante que sale casi derecho) en el medio.
+const conBifurcacion = (clase = 'primary') =>
+  viajeYTraza(
+    [
+      [-1.5, 0],
+      [-0.5, 0],
+      [0.5, 0],
+      [0.5, 1.2],
+    ],
+    [
+      [['Avenida Uno'], 1, clase, 90, [[100, clase, 'forward']]],
+      [['Avenida Uno'], 1, clase, 90],
+      [['Avenida Dos'], 1.2, clase, 0],
+    ],
+  )
+
+test('una bifurcación parte la calle en dos pasos si lleva a otra calle con nombre; si no, no es una decisión', () => {
+  const { viaje, traza } = conBifurcacion()
+  const ruta = rutaDelJuego(viaje, traza, sinLineas)
+  assert.deepEqual(
+    ruta.steps.map(paso => paso.n),
+    ['Av. Uno', 'Av. Uno', 'Av. Dos'],
+  )
+  const cruces = crucesPorNombrar(ruta)
+  completarAlternativas(ruta, cruces, respuestaDeCruces([100, ['Avenida Tres']]), contextoDeNombres)
+  assert.deepEqual(
+    ruta.steps.map(paso => paso.n),
+    ['Av. Uno', 'Av. Uno', 'Av. Dos'],
+  )
+
+  const otra = conBifurcacion()
+  const rutaSinNombres = rutaDelJuego(otra.viaje, otra.traza, sinLineas)
+  completarAlternativas(
+    rutaSinNombres,
+    crucesPorNombrar(rutaSinNombres),
+    respuestaDeCruces([100, []]),
+    contextoDeNombres,
+  )
+  assert.deepEqual(
+    rutaSinNombres.steps.map(paso => paso.n),
+    ['Av. Uno', 'Av. Dos'],
+    'sin saber a dónde lleva, se vuelve a una sola calle',
+  )
+})
+
+test('en una autopista no se parte la calle en cada bifurcación: las salidas son su propia pregunta', () => {
+  const { viaje, traza } = conBifurcacion('motorway')
+  assert.deepEqual(
+    rutaDelJuego(viaje, traza, sinLineas).steps.map(paso => paso.n),
+    ['Av. Uno', 'Av. Dos'],
+  )
+})
+
+test('el lado de una maniobra solo se dice donde hay dos lados posibles', () => {
+  assert.equal(textoDeManiobra(-90, 'Av. Grecia'), 'Dobla a la izquierda en Av. Grecia')
+  assert.equal(textoDeManiobra(-90, 'Av. Grecia', { conLado: false }), 'Dobla en Av. Grecia')
+  assert.equal(textoDeManiobra(40, 'Av. Grecia'), 'Mantente a la derecha hacia Av. Grecia')
+  assert.equal(textoDeManiobra(5, 'Av. Grecia'), 'Sigue derecho por Av. Grecia')
+  assert.equal(textoDeManiobra(-70, 'Vespucio', { haciaAutopista: true }), 'Toma la entrada a Vespucio')
+  assert.equal(textoDeManiobra(5, 'Vespucio', { haciaAutopista: true }), 'Toma la entrada a Vespucio')
+  assert.equal(
+    textoDeManiobra(70, 'Av. Kennedy', { desdeAutopista: true }),
+    'Toma la salida hacia Av. Kennedy',
+  )
+  assert.equal(
+    textoDeManiobra(2, 'Av. Kennedy', { desdeAutopista: true }),
+    'Toma la salida hacia Av. Kennedy',
+    'al dejar una autopista nunca es "sigue derecho", aunque la salida salga derecho',
+  )
+  assert.equal(
+    textoDeManiobra(70, 'Av. Kennedy', { desdeAutopista: true, numeroDeSalida: '11' }),
+    'Toma la salida 11 hacia Av. Kennedy',
+  )
+  assert.equal(
+    textoDeManiobra(3, 'Ruta 5', { desdeAutopista: true, haciaAutopista: true }),
+    'Sigue derecho por Ruta 5',
+    'una autopista que solo cambia de nombre sigue derecho',
+  )
+})
+
+const esAutopistaDeJuguete = nombre => nombre === 'Autopista X'
+const contextoDeJuguete = (salidas = []) => ({ esAutopista: esAutopistaDeJuguete, salidas })
+const calle = (n, h, k = 3, extra = {}) => ({ n, h, k, ...extra })
+// Un paso de juguete que termina donde empieza el siguiente. `ent`: las calles que salen del cruce donde se entra a él.
+const paso = (n, puntos, ent = []) => ({
+  n,
+  km: 1,
+  g: trazado(...puntos),
+  fin: aPunto(...puntos.at(-1)),
+  x: aPunto(...puntos[0]),
+  ent,
+})
+
+test('Street View: el lado se dice solo si la calle sale hacia los dos lados, y se ofrece lo que existe en el cruce', () => {
+  // Viniendo hacia el oriente por Av. Norte, la ruta dobla al norte por Av. Cruce, que también sale hacia el sur.
+  const pasos = [
+    paso('Av. Norte', [
+      [-1, 0],
+      [0.5, 0],
+    ]),
+    paso(
+      'Av. Cruce',
+      [
+        [0.5, 0],
+        [0.5, 1],
+      ],
+      [calle('Av. Cruce', 180), calle('Av. Norte', 90), calle('Calle Lateral', 135, 5)],
+    ),
+  ]
+  const decision = decisionesConStreetView(pasos, contextoDeJuguete())[1]
+  assert.equal(decision.correcta, 'Dobla a la izquierda en Av. Cruce')
+  assert.deepEqual(
+    [...decision.incorrectas].sort(),
+    ['Dobla a la derecha en Av. Cruce', 'Sigue derecho por Av. Norte', 'Sigue hacia Calle Lateral'].sort(),
+  )
+})
+
+test('Street View: si la calle a la que se va sale hacia un solo lado, no se dice el lado ni se ofrece el contrario', () => {
+  const pasos = [
+    paso('Av. Norte', [
+      [-1, 0],
+      [0.5, 0],
+    ]),
+    paso(
+      'Av. Cruce',
+      [
+        [0.5, 0],
+        [0.5, 1],
+      ],
+      [calle('Av. Norte', 90)],
+    ),
+  ]
+  const decision = decisionesConStreetView(pasos, contextoDeJuguete())[1]
+  assert.equal(decision.correcta, 'Dobla en Av. Cruce')
+  assert.deepEqual(decision.incorrectas, ['Sigue derecho por Av. Norte'])
+})
+
+test('Street View: si en el cruce no hay otra cosa que hacer, no hay alternativas', () => {
+  const pasos = [
+    paso('Av. Norte', [
+      [-1, 0],
+      [0.5, 0],
+    ]),
+    paso('Calle Sola', [
+      [0.5, 0],
+      [0.5, 1],
+    ]),
+  ]
+  assert.deepEqual(decisionesConStreetView(pasos, contextoDeJuguete())[1].incorrectas, [])
+})
+
+test('Street View: la salida de una autopista dice su número y a dónde lleva, sin lado, y se puede seguir derecho', () => {
+  const pasos = [
+    paso('Autopista X', [
+      [-3, 0],
+      [1, 0],
+    ]),
+    paso(
+      'Av. Salida',
+      [
+        [1, 0],
+        [1.3, -0.3],
+        [1.3, -1],
+      ],
+      [calle('Autopista X', 90, 0)],
+    ),
+  ]
+  const salidas = [
+    { r: '8', p: aPunto(0.95, 0.005), v: ['Autopista X'], a: ['Vespucio'], c: [], m: 'Providencia' },
+  ]
+  const decision = decisionesConStreetView(pasos, contextoDeJuguete(salidas))[1]
+  assert.equal(decision.correcta, 'Toma la salida 8 hacia Américo Vespucio')
+  assert.deepEqual(decision.incorrectas, ['Sigue derecho por Autopista X'])
+})
+
+test('Street View: tras una salida que sale casi derecho tampoco se dice "sigue derecho"', () => {
+  const pasos = [
+    paso('Autopista X', [
+      [-3, 0],
+      [1, 0],
+    ]),
+    paso(
+      'Av. Salida',
+      [
+        [1, 0],
+        [1.5, 0.02],
+        [3, 0.1],
+      ],
+      [calle('Autopista X', 90, 0)],
+    ),
+  ]
+  const decision = decisionesConStreetView(pasos, contextoDeJuguete())[1]
+  assert.equal(decision.correcta, 'Toma la salida hacia Av. Salida')
+})
+
+// Una autopista de 10 km con salidas cada kilómetro: la ruta la deja por la `correcta`.
+function autopistaConSalidas({ pasadas, correcta, despues }) {
+  const salida = (r, x, a) => ({
+    r: String(r),
+    p: aPunto(x, 0.005),
+    v: ['Autopista X'],
+    a: [a],
+    c: [],
+    m: 'Comuna',
+  })
+  const kmDeLaCorrecta = pasadas + 1
+  const salidas = [
+    ...Array.from({ length: pasadas }, (_, i) => salida(i + 1, 1 + i, `Destino ${i + 1}`)),
+    salida(correcta, kmDeLaCorrecta, `Destino ${correcta}`),
+    ...Array.from({ length: despues }, (_, i) =>
+      salida(correcta + 1 + i, kmDeLaCorrecta + 1 + i, `Destino ${correcta + 1 + i}`),
+    ),
+  ]
+  const pasos = [
+    paso('Av. Acceso', [
+      [-1, 1],
+      [0, 0],
+    ]),
+    {
+      ...paso(
+        'Autopista X',
+        [
+          [0, 0],
+          [kmDeLaCorrecta, 0],
+        ],
+        [calle('Av. Acceso', 270)],
+      ),
+      km: kmDeLaCorrecta,
+    },
+    paso(
+      'Av. Salida',
+      [
+        [kmDeLaCorrecta, 0],
+        [kmDeLaCorrecta + 0.3, -1],
+      ],
+      [calle('Autopista X', 90, 0)],
+    ),
+  ]
+  return { pasos, salidas }
+}
+
+test('en el mapa, al ir por una autopista se pregunta por las salidas de a tres en orden, con "seguir derecho"', () => {
+  const { pasos, salidas } = autopistaConSalidas({ pasadas: 5, correcta: 6, despues: 3 })
+  const { decisiones, antes } = decisionesEnAuto(pasos, contextoDeJuguete(salidas))
+  assert.deepEqual(
+    decisiones.map(decision => decision.tipo),
+    ['salidas', 'salidas'],
+  )
+  assert.equal(
+    antes.length,
+    1,
+    'solo la calle de acceso se dibuja de entrada: la autopista se dibuja de a poco',
+  )
+  const [primera, segunda] = decisiones
+  assert.deepEqual(primera.opciones, [
+    'Salida 1 · Destino 1',
+    'Salida 2 · Destino 2',
+    'Salida 3 · Destino 3',
+    'Seguir derecho por Autopista X',
+  ])
+  assert.equal(primera.correcta, 'Seguir derecho por Autopista X', 'ninguna de las tres era la buena')
+  assert.deepEqual(segunda.opciones, [
+    'Salida 4 · Destino 4',
+    'Salida 5 · Destino 5',
+    'Salida 6 · Destino 6',
+    'Seguir derecho por Autopista X',
+  ])
+  assert.equal(segunda.correcta, 'Salida 6 · Destino 6')
+  assert.deepEqual(segunda.salidaElegida, { texto: 'Salida 6', paso: 1 })
+  assert.equal(segunda.trazos.length, 2, 'al acertar la salida se dibuja también la calle a la que se llega')
+  assert.equal(nombresDeLaRuta(pasos, decisiones)[1], 'Autopista X (salida 6)')
+})
+
+test('en el mapa, la salida correcta no es siempre la última de las que se muestran', () => {
+  const { pasos, salidas } = autopistaConSalidas({ pasadas: 4, correcta: 5, despues: 3 })
+  const decisiones = decisionesEnAuto(pasos, contextoDeJuguete(salidas)).decisiones
+  assert.deepEqual(decisiones.at(-1).opciones, [
+    'Salida 4 · Destino 4',
+    'Salida 5 · Destino 5',
+    'Salida 6 · Destino 6',
+    'Seguir derecho por Autopista X',
+  ])
+  assert.equal(decisiones.at(-1).correcta, 'Salida 5 · Destino 5')
+})
+
+test('en el mapa, nunca hay una pregunta con una sola opción: sin alternativas la calle se dibuja con la respuesta anterior', () => {
+  const pasos = [
+    paso(
+      'Av. Norte',
+      [
+        [-1, 0],
+        [0.5, 0],
+      ],
+      [calle('Av. Otra', 0)],
+    ),
+    paso(
+      'Av. Cruce',
+      [
+        [0.5, 0],
+        [0.5, 1],
+      ],
+      [calle('Av. Norte', 90), calle('Av. Lateral', 180)],
+    ),
+    paso('Calle Sola', [
+      [0.5, 1],
+      [2, 1],
+    ]),
+  ]
+  const { decisiones, antes } = decisionesEnAuto(pasos, contextoDeJuguete())
+  assert.ok(decisiones.every(decision => decision.opciones.length > 1))
+  assert.equal(decisiones.length, 2, 'Calle Sola no tiene alternativas: no es pregunta')
+  assert.equal(antes.length, 0)
+  assert.equal(decisiones[1].trazos.length, 2, 'y se dibuja junto con la respuesta anterior')
+})
+
+test('en el mapa, las alternativas son las calles que salen del cruce y seguir derecho; nada de otras partes de la ciudad', () => {
+  const pasos = [
+    paso('Av. Norte', [
+      [-1, 0],
+      [0.5, 0],
+    ]),
+    paso(
+      'Av. Cruce',
+      [
+        [0.5, 0],
+        [0.5, 1],
+      ],
+      [calle('Av. Norte', 90), calle('Calle Lateral', 180, 5)],
+    ),
+  ]
+  const decision = decisionesEnAuto(pasos, contextoDeJuguete()).decisiones.find(d => d.tipo === 'calle')
+  assert.equal(decision.correcta, 'Av. Cruce')
+  assert.deepEqual(
+    [...decision.opciones].sort(),
+    ['Av. Cruce', 'Calle Lateral', 'Seguir derecho por Av. Norte'].sort(),
+  )
+})
+
+test('en el mapa, si la calle sigue con el mismo nombre pero hay que elegir, lo correcto es seguir derecho', () => {
+  const pasos = [
+    paso('Av. Uno', [
+      [-1.5, 0],
+      [-0.5, 0],
+    ]),
+    paso(
+      'Av. Uno',
+      [
+        [-0.5, 0],
+        [0.5, 0],
+      ],
+      [calle('Av. Tres', 100, 2)],
+    ),
+    paso(
+      'Av. Dos',
+      [
+        [0.5, 0],
+        [0.5, 1],
+      ],
+      [calle('Av. Cuatro', 180)],
+    ),
+  ]
+  const decision = decisionesEnAuto(pasos, contextoDeJuguete()).decisiones[0]
+  assert.equal(decision.correcta, 'Seguir derecho por Av. Uno')
+  assert.deepEqual([...decision.opciones].sort(), ['Av. Tres', 'Seguir derecho por Av. Uno'].sort())
+})
+
+test('el destino de una salida es lo que dicen los carteles; a falta de eso, la calle de al lado y, al final, la comuna', () => {
+  const base = { r: '3', p: aPunto(0, 0), v: ['Autopista X'], c: [], m: 'Peñalolén' }
+  assert.equal(
+    destinoDeLaSalida({ ...base, a: ['Av. Tabancura', 'Vitacura', 'Las Condes'] }, 'Autopista X'),
+    'Av. Tabancura / Vitacura',
+  )
+  assert.equal(
+    destinoDeLaSalida({ ...base, a: ['Autopista X'], c: [['Av. Vitacura', 120]] }, 'Autopista X'),
+    'Av. Vitacura',
+  )
+  assert.equal(destinoDeLaSalida({ ...base, c: [['Av. Lejana', 900]] }, 'Autopista X'), 'Peñalolén')
+})
+
+test('las preguntas por las salidas siguen hasta la que trae la correcta', () => {
+  const { pasos, salidas } = autopistaConSalidas({ pasadas: 8, correcta: 9, despues: 3 })
+  const secuencia = secuenciaDeSalidas(pasos[1], null, salidas)
+  const ventanas = ventanasDeSalidas(secuencia, 9)
+  assert.equal(ventanas.length, 3)
+  assert.deepEqual(
+    ventanas.map(ventana => ventana.indiceDeLaCorrecta),
+    [-1, -1, 2],
+  )
+  assert.ok(
+    ventanas[1].desdeKm > ventanas[0].hastaKm,
+    'cada pregunta parte después de las salidas de la anterior',
+  )
+})
+
+test('en una autopista larga solo se pregunta cerca de la salida: lo de más atrás se recorre sin preguntar', () => {
+  const { pasos, salidas } = autopistaConSalidas({ pasadas: 14, correcta: 15, despues: 3 })
+  const { decisiones, antes } = decisionesEnAuto(pasos, contextoDeJuguete(salidas))
+  assert.equal(decisiones.length, 3)
+  assert.equal(decisiones.at(-1).correcta, 'Salida 15 · Destino 15')
+  assert.equal(antes.length, 2, 'la calle de acceso y el tramo de autopista sin preguntas')
+  assert.ok(antes[1].g.length >= 2 && antes[1].rotulo === 'Autopista X')
 })

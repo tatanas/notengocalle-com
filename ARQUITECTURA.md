@@ -39,7 +39,8 @@ src/                    el juego (navegador)
   datos/                  datos.js lee window.DATA y arma los índices; lugaresStreetView.json (preguntas de Street View),
                           pistasCalles.json (tramos que ayudan a reconocer cada calle), recintos.json (polígonos de cerros)
   mapa/                   el mapa Leaflet (mapa.js), cómo se dibuja cada cosa (dibujo.js), ayudas y el visor de Street View (streetView.js)
-  dominio/                ayudas por tema (comunas, lugares, calles, metro, cerros, zonas, Chile, streetView.js = puntaje, ubicacion.js = descripciones)
+  dominio/                ayudas por tema (comunas, lugares, calles, metro, cerros, zonas, Chile, streetView.js = puntaje, ubicacion.js = descripciones);
+                          preguntas del ruteo en auto: decisionesEnAuto.js (mapa), decisionesConStreetView.js, cruceDeRuta.js (qué calles salen de un cruce), salidas.js (salidas numeradas de autopistas)
   juego/                  el motor de las rondas y los juegos
     engine.js               ciclo de una ronda: sortear, preguntar, corregir, cronometrar, resultado
     options.js              botones de alternativas (selección única y múltiple)
@@ -341,7 +342,7 @@ separarlas, Netlify permite dar a cada contexto de despliegue un valor distinto 
 | Qué                                              | De dónde                                                             |
 | ------------------------------------------------ | -------------------------------------------------------------------- |
 | Comunas, calles, metro, lugares, barrios, cerros | OpenStreetMap (ODbL), vía Overpass y Nominatim                       |
-| Rutas en auto                                    | Valhalla (valhalla1.openstreetmap.de, FOSSGIS)                       |
+| Rutas en auto                                    | Valhalla (valhalla1.openstreetmap.de, FOSSGIS): ruta, traza con nombres y cruces |
 | Rutas en micro y metro, recorridos               | GTFS de Red (DTPM)                                                   |
 | Regiones, ciudades y parques nacionales          | OpenStreetMap; población de las ciudades                             |
 | Fotos                                            | Wikimedia Commons y Panoramax, siempre con autor y licencia visibles |
@@ -353,7 +354,7 @@ Todo es gratis y sin API keys, salvo Street View (llave de Google Maps, restring
 
 `comunas` (GeoJSON), `metro` (`lines`, `stations`), `streets`, `landmarks`, `cerros`, `zones` (barrios con
 perímetro), `photos` (por clave `l:` lugar, `s:` calle, `c:` cerro, `p:` parque), `inter` y `para` (cruces y
-paralelas entre calles), `steps` (rutas en auto), `transit` (rutas en transporte público), `micros`,
+paralelas entre calles), `steps` (rutas en auto), `salidas` (salidas numeradas de las autopistas), `transit` (rutas en transporte público), `micros`,
 `metroAlong`, `rotondas`, `chile` (`regions`, `cities`, `parks`) y `built` (fecha).
 
 ### Pipeline
@@ -392,7 +393,7 @@ l1…` se corren; esto reasigna las rutas) → `node merge_st.js` → `npm run b
   400 m de la línea ya dibujada. Para prolongar otra calle, se agrega a la lista `ROADS` de ese archivo y se
   corre `node extensions.js` y luego `npm run build`.
 - **Otros**: `metro.js`, `cerros.js`, `chile.js`/`chile2.js`, `extras.js` (rotondas, calles por línea de
-  metro), `cruces.js` (cruces según OpenStreetMap: calles que comparten un nodo, o cuyo extremo queda a menos de 20 m de la otra; los que pasan uno sobre otro, aparte → `cruces.json`), `relations.js` (comunas de cada calle, paralelas, cruces y pares dudosos que el juego no debe preguntar), `steproutes.js` (Valhalla, con `compartido/rutaEnAuto.js`), `transit.js` (GTFS → itinerarios),
+  metro), `cruces.js` (cruces según OpenStreetMap: calles que comparten un nodo, o cuyo extremo queda a menos de 20 m de la otra; los que pasan uno sobre otro, aparte → `cruces.json`), `relations.js` (comunas de cada calle, paralelas, cruces y pares dudosos que el juego no debe preguntar), `steproutes.js` (Valhalla, con `compartido/rutaEnAuto.js`), `salidas.js` (salidas numeradas de las autopistas con a dónde llevan: nodos `motorway_junction` y rampas de OpenStreetMap → `salidas.json`; las descargas quedan en `salidas_raw.json` y `rampas_raw.json`), `transit.js` (GTFS → itinerarios),
   `micros.js`.
 - **Descargas crudas**: consultas Overpass en `q*.txt`. GTFS: el enlace vigente está en
   https://www.dtpm.cl/index.php/noticias/gtfs-vigente

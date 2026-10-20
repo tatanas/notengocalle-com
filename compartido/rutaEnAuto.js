@@ -1,14 +1,22 @@
-// Rutas en auto con Valhalla (servidor público de FOSSGIS, valhalla1.openstreetmap.de). De su respuesta se arman los pasos
-// de los juegos de ruteo: las calles principales en orden, con su trazado, el punto donde de verdad se deja cada calle
-// (fin: ahí se decide qué hacer) y alternativas incorrectas cercanas. Lo usan el navegador (rutas desde el punto fijo
-// del jugador, en el momento) y tools/steproutes.js (las rutas entre lugares, precalculadas).
-// Se cambió de OSRM a Valhalla porque el servidor público de OSRM evitaba la Costanera Norte por el centro.
+// Rutas en auto con Valhalla (servidor público de FOSSGIS, valhalla1.openstreetmap.de). Se arman con tres consultas:
+//   1. la ruta (/route): el camino, su largo y su duración;
+//   2. la traza de ese camino (/trace_attributes): cada tramo de calle con su nombre de verdad, su clase y las calles que salen
+//      de cada cruce (sin nombre);
+//   3. los cruces (/locate): los nombres de esas calles, en los cruces donde se decide algo.
+// De ahí salen los pasos de los juegos de ruteo: las calles principales en orden, con su trazado, el punto donde de verdad se
+// deja cada calle (fin) y las calles que de verdad salen del cruce donde empieza (ent), que son las alternativas posibles.
+// Lo usan el navegador (rutas desde el punto fijo del jugador, en el momento) y tools/steproutes.js (las precalculadas).
+// Se cambió de OSRM a Valhalla porque el servidor público de OSRM evitaba la Costanera Norte por el centro. Los pasos se arman con
+// la traza y no con las maniobras de la ruta porque las maniobras juntan tramos que comparten un nombre de recorrido
+// ("Villa Norte - Av. Central - Cerro Alto" es la ruta G-99, no una calle) y esconden decisiones.
 
-const URL_DE_VALHALLA = 'https://valhalla1.openstreetmap.de/route'
+const URL_DE_VALHALLA = 'https://valhalla1.openstreetmap.de/'
+export const URL_DE_TRAZA = URL_DE_VALHALLA + 'trace_attributes'
+export const URL_DE_CRUCES = URL_DE_VALHALLA + 'locate'
 
 export const consultaDeRuta = (desde, hasta) =>
   URL_DE_VALHALLA +
-  '?json=' +
+  'route?json=' +
   encodeURIComponent(
     JSON.stringify({
       locations: [
@@ -19,6 +27,38 @@ export const consultaDeRuta = (desde, hasta) =>
       directions_options: { units: 'kilometers', language: 'es-ES' },
     }),
   )
+
+// Las consultas de la traza y de los cruces van por POST: la ruta larga no cabe en una dirección.
+export const cuerpoDeLaTraza = viaje => ({
+  encoded_polyline: viaje.legs[0].shape,
+  costing: 'auto',
+  shape_match: 'edge_walk',
+  filters: {
+    action: 'include',
+    attributes: [
+      'edge.names',
+      'edge.length',
+      'edge.road_class',
+      'edge.use',
+      'edge.begin_shape_index',
+      'edge.end_shape_index',
+      'edge.end_heading',
+      'edge.sign.exit_number',
+      'edge.sign.exit_branch',
+      'edge.sign.exit_toward',
+      'node.intersecting_edge.begin_heading',
+      'node.intersecting_edge.road_class',
+      'node.intersecting_edge.use',
+      'node.intersecting_edge.driveability',
+    ],
+  },
+})
+
+export const cuerpoDeLosCruces = puntos => ({
+  locations: puntos.map(([lat, lon]) => ({ lat, lon })),
+  costing: 'auto',
+  verbose: true,
+})
 
 const KM_POR_GRADO_LONGITUD = 92.9
 const KM_POR_GRADO_LATITUD = 111.2
@@ -96,36 +136,128 @@ export const nombreDeRuteoDeCalle = nombreDelJuego =>
   nombreDeRuteo(nombreDelJuego.replace(/\s*\(.*\)/, '').replace(/^Av\. /, 'Avenida '))
 
 const esCodigoDeRuta = nombre => /^[A-Z]?-?\d+$/.test(nombre)
+// Los recorridos y rutas turísticas se nombran con guiones ("Villa Norte - Av. Central - Cerro Alto"): no son una calle.
+const esNombreDeRecorrido = nombre => / - /.test(nombre)
 
-// Valhalla da varios nombres a un mismo tramo (calle, número de ruta, autopista): se prefiere el de una calle del juego.
-function nombreDelTramo(nombres, esCalleDelJuego) {
+// Valhalla da varios nombres a una misma calle (la calle, el número de ruta, el recorrido, la autopista): se prefiere el de una
+// calle del juego y, si no, el primero que sea de una calle. Sin nombre propio queda el número de ruta ("Ruta G-99").
+export function nombreDeLaCalle(nombres, esCalleDelJuego = () => false) {
   const candidatos = nombres.map(nombreDeRuteo)
+  const codigo = candidatos.find(esCodigoDeRuta)
   return (
     candidatos.find(esCalleDelJuego) ??
-    candidatos.find(nombre => !esCodigoDeRuta(nombre)) ??
-    (candidatos[0] ? 'Ruta ' + candidatos[0] : '')
+    candidatos.find(nombre => !esCodigoDeRuta(nombre) && !esNombreDeRecorrido(nombre)) ??
+    (codigo ? 'Ruta ' + codigo : (candidatos[0] ?? ''))
   )
 }
 
-// Un tramo cuenta como paso si es largo, o algo largo y de una calle del juego; lo demás se pega al paso anterior.
+// "Manuel Rodríguez Norte", "Av. Manuel Rodríguez" y "Camino Manuel Rodríguez" son la misma calle.
+const nucleoDelNombre = nombre =>
+  (nombre ?? '')
+    .replace(/^(Av\.|Avenida|Camino|Calle) /, '')
+    .replace(/ (Norte|Sur|Oriente|Poniente)$/, '')
+    .toLowerCase()
+export const esLaMismaCalle = (a, b) => !!b && nucleoDelNombre(a) === nucleoDelNombre(b)
+
+// De más a menos importante; una calle de la clase `k` no es más importante que otra de clase menor.
+const RANGO_DE_CLASE = {
+  motorway: 0,
+  trunk: 1,
+  primary: 2,
+  secondary: 3,
+  tertiary: 4,
+  unclassified: 5,
+  residential: 6,
+}
+const rangoDe = clase => RANGO_DE_CLASE[clase] ?? 7
+// Hasta qué rango una calle cuenta como importante (terciaria).
+export const RANGO_DE_CALLE_IMPORTANTE = 4
+const RANGO_DE_CALLE_QUE_SE_OFRECE = 6
+const RANGO_DE_AUTOPISTA = 1
+
+const diferenciaDeRumbo = (a, b) => ((b - a + 540) % 360) - 180
+// Una bifurcación es una calle tan importante como la actual que sale casi derecho: ahí hay que elegir, aunque el nombre siga.
+const GRADOS_DE_BIFURCACION = 60
+
+// Un tramo cuenta como paso si es largo, o algo largo y de una calle del juego, o si es el que sigue de una bifurcación; lo
+// demás se pega al paso anterior.
 const METROS_DE_TRAMO_LARGO = 500
 const METROS_DE_TRAMO_PRINCIPAL = 250
+const METROS_DE_TRAMO_DE_BIFURCACION = 30
 
-function tramosDeLaRuta(viaje, esCalleDelJuego) {
-  const puntos = decodificarPolilinea(viaje.legs[0].shape)
-  return viaje.legs[0].maneuvers
-    .filter(maniobra => maniobra.end_shape_index > maniobra.begin_shape_index)
-    .map(maniobra => ({
-      nombre: nombreDelTramo(maniobra.street_names || [], esCalleDelJuego),
-      metros: maniobra.length * 1000,
-      g: puntos.slice(maniobra.begin_shape_index, maniobra.end_shape_index + 1),
-    }))
+// Las calles que salen de un cruce y a las que se puede entrar (no las que solo llegan, ni veredas ni accesos de servicio).
+const esCalleQueSale = calle =>
+  calle.driveability !== 'backward' &&
+  ['road', 'ramp'].includes(calle.use) &&
+  rangoDe(calle.road_class) <= RANGO_DE_CALLE_QUE_SE_OFRECE
+
+// Cada arista de la traza es un trocito de calle entre dos cruces.
+function aristasDeLaTraza(traza, puntos, esCalleDelJuego) {
+  return traza.edges.map(arista => ({
+    nombre: arista.names?.length ? nombreDeLaCalle(arista.names, esCalleDelJuego) : '',
+    metros: arista.length * 1000,
+    g: puntos.slice(arista.begin_shape_index, arista.end_shape_index + 1),
+    clase: arista.road_class,
+    rumboFinal: arista.end_heading,
+    cruces: (arista.end_node?.intersecting_edges ?? [])
+      .filter(esCalleQueSale)
+      .map(calle => ({ h: Math.round(calle.begin_heading), k: rangoDe(calle.road_class) })),
+    salida: arista.sign?.exit_number?.length
+      ? {
+          r: arista.sign.exit_number[0],
+          a: arista.sign.exit_branch?.[0] ?? arista.sign.exit_toward?.[0],
+        }
+      : null,
+  }))
+}
+
+function bifurcacionesEn(previa) {
+  const rango = rangoDe(previa.clase)
+  return previa.cruces.filter(
+    calle =>
+      calle.k <= RANGO_DE_CALLE_IMPORTANTE &&
+      calle.k <= rango &&
+      Math.abs(diferenciaDeRumbo(previa.rumboFinal, calle.h)) <= GRADOS_DE_BIFURCACION,
+  )
+}
+
+// Las aristas seguidas con el mismo nombre forman un tramo, salvo donde hay una bifurcación (ahí empieza otro).
+function tramosDeLasAristas(aristas) {
+  const tramos = []
+  aristas.forEach((arista, indice) => {
+    const previa = aristas[indice - 1]
+    const ultimo = tramos.at(-1)
+    const siguePorLaMismaCalle =
+      ultimo && (arista.nombre ? esLaMismaCalle(ultimo.nombre, arista.nombre) : !ultimo.nombre)
+    // En una autopista las salidas ya son su propia pregunta (src/dominio/salidas.js): no se parte en cada bifurcación.
+    const bifurcaciones =
+      siguePorLaMismaCalle && arista.nombre && rangoDe(previa.clase) > RANGO_DE_AUTOPISTA
+        ? bifurcacionesEn(previa)
+        : []
+    if (siguePorLaMismaCalle && !bifurcaciones.length) {
+      ultimo.aristas.push(arista)
+      ultimo.metros += arista.metros
+      ultimo.g = ultimo.g.concat(arista.g.slice(1))
+      return
+    }
+    tramos.push({
+      nombre: arista.nombre,
+      metros: arista.metros,
+      g: arista.g,
+      aristas: [arista],
+      entrada: (previa?.cruces ?? []).map(calle =>
+        bifurcaciones.includes(calle) ? { ...calle, f: 1 } : calle,
+      ),
+      bifurcacion: bifurcaciones.length > 0,
+    })
+  })
+  return tramos
 }
 
 // Los caminos sin nombre (o internos) del comienzo y del final no son parte de la ruta: se parte donde se sale a una
 // calle y se llega donde se la deja, no en medio de un recinto.
-function sinCaminosInternos(tramos, esNombreInterno) {
-  const interno = tramo => !tramo.nombre || esNombreInterno(tramo.nombre)
+function sinCaminosInternos(tramos) {
+  const interno = tramo => !tramo.nombre || tramo.aristas.every(arista => arista.clase === 'service_other')
   let inicio = 0
   let fin = tramos.length
   while (inicio < fin && interno(tramos[inicio])) inicio++
@@ -133,8 +265,25 @@ function sinCaminosInternos(tramos, esNombreInterno) {
   return tramos.slice(inicio, fin)
 }
 
+// El cruce donde se decide entrar a un paso: si la calle anterior se deja por una rampa o un acceso sin nombre, es donde se la
+// deja (el comienzo de ese acceso); si se pasa por calles chicas con nombre, es donde se llega a la nueva (se pregunta ahí).
+function nuevoPaso(tramo, anterior) {
+  const cruceDeSalida = anterior && !anterior.conectores.length ? anterior.cruceDeSalida : null
+  return {
+    nombre: tramo.nombre,
+    metros: tramo.metros,
+    g: tramo.g,
+    fin: tramo.g.at(-1),
+    conectores: [],
+    entrada: cruceDeSalida ? cruceDeSalida.entrada : tramo.entrada,
+    cruce: cruceDeSalida ? cruceDeSalida.punto : tramo.g[0],
+    bifurcacion: tramo.bifurcacion,
+  }
+}
+
 // Lo chico se pega al paso anterior, pero la calle se deja donde terminó su último tramo propio (fin), y las calles chicas
-// con nombre por las que se pasa hasta la siguiente quedan anotadas (conectores: "doblaste por Vital Apoquindo").
+// con nombre por las que se pasa hasta la siguiente quedan anotadas (conectores: "doblaste por Vital Apoquindo"). La salida
+// por la que se deja una autopista (su rampa, sin nombre) queda anotada en el paso de la autopista.
 function pasosPrincipales(tramos, esCalleDelJuego) {
   const pasos = []
   for (const tramo of tramos) {
@@ -142,21 +291,29 @@ function pasosPrincipales(tramos, esCalleDelJuego) {
       tramo.nombre &&
       (tramo.metros >= METROS_DE_TRAMO_LARGO ||
         (tramo.metros >= METROS_DE_TRAMO_PRINCIPAL &&
-          (esCalleDelJuego(tramo.nombre) || /^Rotonda/.test(tramo.nombre))))
+          (esCalleDelJuego(tramo.nombre) || /^Rotonda/.test(tramo.nombre))) ||
+        (tramo.bifurcacion && tramo.metros >= METROS_DE_TRAMO_DE_BIFURCACION))
     const ultimo = pasos.at(-1)
-    if (relevante && ultimo?.nombre === tramo.nombre) {
+    if (relevante && !tramo.bifurcacion && ultimo && esLaMismaCalle(ultimo.nombre, tramo.nombre)) {
       ultimo.metros += tramo.metros
       ultimo.g = ultimo.g.concat(tramo.g)
       ultimo.fin = tramo.g.at(-1)
       ultimo.conectores = []
-    } else if (relevante) pasos.push({ ...tramo, fin: tramo.g.at(-1), conectores: [] })
+      ultimo.cruceDeSalida = null
+    } else if (relevante) pasos.push(nuevoPaso(tramo, ultimo))
     else if (ultimo) {
       ultimo.metros += tramo.metros
       ultimo.g = ultimo.g.concat(tramo.g)
+      ultimo.cruceDeSalida ??= { entrada: tramo.entrada, punto: tramo.g[0] }
       const esConector =
-        tramo.nombre && tramo.nombre !== ultimo.nombre && tramo.nombre !== ultimo.conectores.at(-1)
+        tramo.nombre &&
+        !esCodigoDeRuta(tramo.nombre.replace(/^Ruta /, '')) &&
+        !esLaMismaCalle(tramo.nombre, ultimo.nombre) &&
+        tramo.nombre !== ultimo.conectores.at(-1)
       if (esConector) ultimo.conectores.push(tramo.nombre)
-    } else pasos.push({ ...tramo, nombre: '', fin: tramo.g.at(-1), conectores: [] })
+      const salida = tramo.aristas.find(arista => arista.salida)?.salida
+      if (salida) ultimo.salida = salida
+    } else pasos.push({ ...nuevoPaso(tramo), nombre: '' })
   }
   // El trayecto inicial por calles chicas se pega a la primera calle relevante.
   if (pasos.length > 1 && !pasos[0].nombre) {
@@ -198,38 +355,22 @@ function simplificar(trazado) {
   return trazado.filter((_, i) => conservar[i])
 }
 
-// Alternativas incorrectas: calles del juego que pasan cerca de donde empieza el paso.
-const RADIO_DE_ALTERNATIVAS_KM = 1
-const ALTERNATIVAS_POR_PASO = 6
-function alternativasCercanas(inicio, nombresDeLaRuta, lineasPorNombre) {
-  const cercanas = [...lineasPorNombre]
-    .filter(([nombre]) => !nombresDeLaRuta.has(nombre))
-    .map(([nombre, lineas]) => ({ nombre, km: distanciaALinea(inicio, lineas) }))
-    .filter(({ km }) => km < RADIO_DE_ALTERNATIVAS_KM)
-    .sort((a, b) => a.km - b.km)
-  return cercanas.slice(0, ALTERNATIVAS_POR_PASO).map(({ nombre }) => nombre)
-}
-
-// "Manuel Rodríguez Norte" y "Av. Manuel Rodríguez" son la misma calle.
-const nucleoDelNombre = nombre =>
-  (nombre ?? '')
-    .replace(/^(Av\.|Avenida) /, '')
-    .replace(/ (Norte|Sur|Oriente|Poniente)$/, '')
-    .toLowerCase()
-const esLaMismaCalle = (a, b) => !!b && nucleoDelNombre(a) === nucleoDelNombre(b)
-
-// Arma la ruta del juego a partir de la respuesta de Valhalla. lineasPorNombre: Map de nombre de ruteo → líneas de las
-// calles del juego. { km, min, steps: [{ n, km, g, fin, c?, x }] } (c: conectores), o null si no alcanza pasosMinimos.
-export function rutaDelJuego(viaje, { lineasPorNombre, pasosMinimos = 2, esNombreInterno = () => false }) {
+// Arma la ruta del juego a partir de la respuesta de /route y de /trace_attributes. lineasPorNombre: Map de nombre de ruteo →
+// líneas de las calles del juego. { km, min, steps: [{ n, km, g, fin, c?, salida?, x, ent, bif? }] } o null si no alcanza pasosMinimos.
+//   c: calles chicas por las que se pasa hasta la siguiente; salida: la salida que se toma al dejar una autopista;
+//   x: el cruce donde se decide entrar al paso; ent: las calles que salen de ese cruce, [{ h: rumbo, k: clase (0 autopista … 6 residencial), n: nombre,
+//   f: 1 si es una bifurcación }]; sin nombre hasta que completarAlternativas los pone.
+export function rutaDelJuego(viaje, traza, { lineasPorNombre, pasosMinimos = 2 }) {
   const esCalleDelJuego = nombre => lineasPorNombre.has(nombre)
-  const tramos = sinCaminosInternos(tramosDeLaRuta(viaje, esCalleDelJuego), esNombreInterno)
+  const puntos = decodificarPolilinea(viaje.legs[0].shape)
+  const aristas = aristasDeLaTraza(traza, puntos, esCalleDelJuego)
+  const tramos = sinCaminosInternos(tramosDeLasAristas(aristas))
   const pasos = pasosPrincipales(tramos, esCalleDelJuego)
   if (pasos.length < pasosMinimos) return null
   // Un "conector" que es un trozo de la calle siguiente (su lateral, por ejemplo) no es un desvío.
   pasos.forEach((paso, indice) => {
     paso.conectores = paso.conectores.filter(nombre => !esLaMismaCalle(nombre, pasos[indice + 1]?.nombre))
   })
-  const nombresDeLaRuta = new Set(pasos.map(paso => paso.nombre))
   return {
     km: +viaje.summary.length.toFixed(1),
     min: Math.round(viaje.summary.time / 60),
@@ -239,7 +380,83 @@ export function rutaDelJuego(viaje, { lineasPorNombre, pasosMinimos = 2, esNombr
       g: simplificar(paso.g),
       fin: paso.fin,
       ...(paso.conectores.length && { c: paso.conectores }),
-      x: alternativasCercanas(paso.g[0], nombresDeLaRuta, lineasPorNombre),
+      ...(paso.salida && { salida: paso.salida }),
+      x: paso.cruce,
+      ent: paso.entrada,
+      ...(paso.bifurcacion && { bif: 1 }),
     })),
   }
+}
+
+// Los puntos donde hay que preguntarle a /locate cómo se llaman las calles que salen del cruce: el cruce de cada paso que
+// tiene alguna. `indices` dice a qué paso corresponde cada punto.
+export function crucesPorNombrar(ruta) {
+  const indices = []
+  ruta.steps.forEach((paso, indice) => {
+    if (paso.ent.length) indices.push(indice)
+  })
+  return { indices, puntos: indices.map(indice => ruta.steps[indice].x) }
+}
+
+const GRADOS_PARA_EMPAREJAR_CALLES = 25
+const KM_PARA_NOMBRAR_UNA_RAMPA = 0.35
+
+// El nombre de la calle de una arista de /locate. Una rampa sin nombre que sale de una calle común (no de una autopista) lleva a
+// la autopista más cercana.
+function nombreDeLaCalleDelCruce(arista, punto, { esCalleDelJuego, autopistas, ramaDeAutopista }) {
+  const nombres = arista.edge_info?.names ?? []
+  if (nombres.length) return nombreDeLaCalle(nombres, esCalleDelJuego)
+  const esRampa = arista.edge?.classification?.use === 'ramp' || arista.edge?.classification?.link
+  if (!esRampa || ramaDeAutopista) return null
+  const cercana = [...autopistas]
+    .map(([nombre, lineas]) => ({ nombre, km: distanciaALinea(punto, lineas) }))
+    .filter(({ km }) => km <= KM_PARA_NOMBRAR_UNA_RAMPA)
+    .sort((a, b) => a.km - b.km)[0]
+  return cercana?.nombre ?? null
+}
+
+// Pone el nombre a las calles que salen de cada cruce, con la respuesta de /locate (una por punto, en el mismo orden que
+// cruces.puntos). Las que no se pueden nombrar se descartan: no se puede ofrecer algo que no se sabe cómo se llama. Una
+// bifurcación que no lleva a otra calle con nombre no es una decisión: el paso se junta con el anterior.
+export function completarAlternativas(
+  ruta,
+  cruces,
+  respuestas,
+  { lineasPorNombre, nombresDeAutopistas, esAutopista },
+) {
+  const esCalleDelJuego = nombre => lineasPorNombre.has(nombre)
+  const autopistas = [...lineasPorNombre].filter(([nombre]) => nombresDeAutopistas.has(nombre))
+  cruces.indices.forEach((indice, orden) => {
+    const paso = ruta.steps[indice]
+    const salientes = (respuestas[orden]?.edges ?? []).filter(arista => (arista.percent_along ?? 0) < 0.5)
+    const ramaDeAutopista = indice > 0 && esAutopista(ruta.steps[indice - 1].n)
+    for (const calle of paso.ent) {
+      const parecida = salientes
+        .map(arista => ({ arista, grados: Math.abs(diferenciaDeRumbo(arista.heading, calle.h)) }))
+        .filter(({ grados }) => grados <= GRADOS_PARA_EMPAREJAR_CALLES)
+        .sort((a, b) => a.grados - b.grados)[0]
+      const nombre =
+        parecida &&
+        nombreDeLaCalleDelCruce(parecida.arista, paso.x, { esCalleDelJuego, autopistas, ramaDeAutopista })
+      if (nombre) calle.n = nombre
+    }
+    paso.ent = paso.ent.filter(calle => calle.n)
+  })
+  const pasos = []
+  for (const paso of ruta.steps) {
+    const previo = pasos.at(-1)
+    const hayQueElegir = paso.ent.some(calle => calle.f && !esLaMismaCalle(calle.n, paso.n))
+    if (paso.bif && previo && !hayQueElegir) {
+      previo.km = +(previo.km + paso.km).toFixed(1)
+      previo.g = previo.g.concat(paso.g)
+      previo.fin = paso.fin
+      if (paso.c) previo.c = paso.c
+      else delete previo.c
+      if (paso.salida) previo.salida = paso.salida
+      else delete previo.salida
+    } else pasos.push(paso)
+    delete paso.bif
+  }
+  ruta.steps = pasos
+  return ruta
 }

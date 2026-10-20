@@ -778,6 +778,9 @@ table.stats th {
 .pin.b {
   background: #db2777;
 }
+.pin.salida {
+  background: #7c3aed;
+}
 .pulse {
   width: 22px;
   height: 22px;
