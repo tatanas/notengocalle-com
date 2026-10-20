@@ -671,15 +671,6 @@ body.ruteo-sv.con-panorama:not(.ver-mapa) #panel {
   color: var(--muted);
   white-space: nowrap;
 }
-.settings {
-  margin-top: 14px;
-}
-.settings label {
-  display: block;
-  font-size: 13px;
-  color: var(--muted);
-  margin: 8px 0 4px;
-}
 select,
 input[type='text'],
 input[type='search'] {

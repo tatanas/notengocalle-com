@@ -304,7 +304,14 @@ test('cada juego tiene su largo normal de ronda', () => {
   assert.equal(largoNormalDe('sv-ubicar'), 10)
   assert.equal(largoNormalDe('st-name'), 20)
   assert.deepEqual(categoriasValidasDe('sv-ubicar'), ['facil', 'medio', 'dificil', 'extremo'])
-  assert.deepEqual(categoriasValidasDe('rs-any-car'), ['10', '20'])
+  assert.deepEqual(categoriasValidasDe('rs-any-car'), ['10'])
+  assert.deepEqual(categoriasValidasDe('rs-any-tp'), ['10'])
+  assert.deepEqual(
+    categoriasValidasDe('rs-sv-car'),
+    ['10'],
+    'las rutas con Street View también tienen ranking',
+  )
+  assert.equal(largoNormalDe('rs-sv-car'), 10)
   assert.deepEqual(categoriasValidasDe('st-name'), ['10', '20', 'todas'])
 })
 
@@ -974,8 +981,9 @@ test('el largo de la ronda: 10, 20 o todas, salvo en los juegos de largo fijo o 
   assert.equal(largoDeRondaDe('st-name', 10), 10)
   assert.equal(largoDeRondaDe('st-name', 20), 20)
   assert.equal(largoDeRondaDe('st-name', 999), 999)
-  assert.equal(largoDeRondaDe('rs-any-car', 10), 10)
-  assert.equal(largoDeRondaDe('rs-any-car', 999), 20, 'el ruteo no tiene ronda de todas')
+  assert.equal(largoDeRondaDe('rs-any-car', 20), 10, 'las rutas siempre son de 10')
+  assert.equal(largoDeRondaDe('rs-any-tp', 999), 10, 'y no tienen ronda de todas')
+  assert.equal(largoDeRondaDe('rs-sv-car', 20), 10)
   assert.equal(largoDeRondaDe('sv-ubicar', 20), 10, 'Street View siempre son 10')
   assert.deepEqual(categoriasValidasDe('cc-name'), ['10', '20', 'todas'])
   assert.deepEqual(categoriasValidasDe('cc-find'), ['10', '20', 'todas'])
@@ -1004,6 +1012,8 @@ test('cada juego figura solo en las pestañas del ranking que existen para él',
   assert.equal(categoriaEnElResumen('st-name', '10'), '10')
   assert.equal(categoriaEnElResumen('st-name', 'todas'), 'todas')
   assert.equal(categoriaEnElResumen('rs-any-car', 'todas'), null, 'el ruteo no tiene ronda de todas')
+  assert.equal(categoriaEnElResumen('rs-any-car', '20'), null)
+  assert.equal(categoriaEnElResumen('rs-sv-car', '10'), '10')
   assert.deepEqual(categoriasValidasDe('ch-find'), ['todas'])
   assert.deepEqual(categoriasDelResumen('20'), ['20', 'extremo'])
   assert.deepEqual(categoriasDelResumen('10'), ['10', '10'])

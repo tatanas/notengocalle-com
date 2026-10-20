@@ -39,9 +39,10 @@ const GRUPOS = [
     blurb: `${callesDelJuego().length} avenidas, autopistas y carreteras.`,
   },
   {
-    name: 'Street View',
-    emoji: '👀',
-    blurb: 'Te dejo parado en un punto de Santiago visto desde la calle y lo ubicas en el mapa.',
+    name: 'Ruteo',
+    emoji: '🧭',
+    blurb:
+      'Arma rutas paso a paso: en auto entre dos puntos cualquiera y en micro y metro. En Explorar puedes ver los recorridos de micro más importantes.',
   },
   {
     name: 'Comunas',
@@ -49,20 +50,14 @@ const GRUPOS = [
     blurb: 'Ubica las comunas del Gran Santiago',
   },
   {
-    name: 'Comunas de Chile',
-    emoji: '🏘️',
-    blurb: `Las ${COMUNAS_DE_CHILE.length} comunas de las 16 regiones de Chile. En la práctica puedes elegir qué regiones.`,
+    name: 'Street View',
+    emoji: '👀',
+    blurb: 'Te dejo parado en un punto de Santiago visto desde la calle y lo ubicas en el mapa.',
   },
   {
     name: 'Lugares emblemáticos',
     emoji: '📍',
     blurb: `${DATOS.landmarks.length} lugares: estadios, parques, malls, universidades, colegios, barrios, ríos y restaurantes.`,
-  },
-  {
-    name: 'Ruteo',
-    emoji: '🧭',
-    blurb:
-      'Arma rutas paso a paso: en auto entre dos puntos cualquiera y en micro y metro. En Explorar puedes ver los recorridos de micro más importantes.',
   },
   {
     name: 'Metro',
@@ -73,6 +68,11 @@ const GRUPOS = [
     name: 'Chile',
     emoji: '🇨🇱',
     blurb: `Las 16 regiones y ${CHILE.cities.length} ciudades (con su población).`,
+  },
+  {
+    name: 'Comunas de Chile',
+    emoji: '🏘️',
+    blurb: `Las ${COMUNAS_DE_CHILE.length} comunas de las 16 regiones de Chile. En la práctica puedes elegir qué regiones.`,
   },
   {
     name: 'Parques nacionales',
@@ -240,6 +240,12 @@ function ajustesDeLaTarjeta(grupo, modos) {
     : ''
 }
 
+// "Mis calles" va dentro de la tarjeta de Calles, al final: las calles propias aparecen en esos juegos.
+const htmlDeMisCalles = () => `<hr class="separador"><div class="ajustes-de-tarjeta">
+      <h4 class="subseccion">➕ Mis calles</h4>
+      <p class="muted">Agrega calles que te importan a ti (la de tu casa, la de un amigo). Aparecen en los juegos de calles y se guardan solo en este navegador.</p>
+      <div id="myst"></div></div>`
+
 function tarjetaDeGrupo(grupo) {
   const modos = MODOS.filter(modo => modo.group === grupo.name && (modo.disponible?.() ?? true)).sort(
     pasosPrimero,
@@ -250,6 +256,7 @@ function tarjetaDeGrupo(grupo) {
     <div class="modes">${modos.map(filaDeModo).join('')}</div>
     ${PRACTICA_APARTE[grupo.name] ? subseccionDePractica(grupo.name, modos) : ''}
     ${ajustesDeLaTarjeta(grupo, modos)}
+    ${grupo.name === 'Calles' ? htmlDeMisCalles() : ''}
   </div>`
 }
 
@@ -260,11 +267,6 @@ const htmlDeInicio = () => `<div class="home-backdrop" aria-hidden="true"></div>
   ${htmlDeAnuncio('menu')}
   <div class="grid">
     ${GRUPOS.map(tarjetaDeGrupo).join('')}
-  </div>
-  <div class="grid settings">
-    <div class="card"><h3><span class="em">➕</span>Mis calles</h3>
-      <p>Agrega calles que te importan a ti (la de tu casa, la de un amigo). Aparecen en los juegos de calles y se guardan solo en este navegador.</p>
-      <div id="myst"></div></div>
   </div>
   ${htmlDelPie()}
 </div>`

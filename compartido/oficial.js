@@ -29,6 +29,7 @@ export const MODOS_OFICIALES = [
   'st-find',
   'rs-any-car',
   'rs-any-tp',
+  'rs-sv-car',
   'ch-find',
   'ch-city',
   'ch-cityreg',
@@ -50,17 +51,16 @@ export const LARGOS_ELEGIBLES = [10, 20]
 export const CATEGORIAS_DE_RONDA = [...LARGOS_ELEGIBLES.map(String), TODAS_LAS_PREGUNTAS]
 
 // Las rondas son de 20 preguntas (o 10 si se prefiere), salvo en los juegos que se juegan más largo y por eso van de a menos y
-// siempre del mismo largo.
-const LARGO_FIJO = { 'sv-ubicar': 10, 'rs-sv-car': 5 }
+// siempre del mismo largo: Street View y las rutas (de más largas no vale la pena, y no tiene sentido un "todas").
+const LARGO_FIJO = { 'sv-ubicar': 10, 'rs-any-car': 10, 'rs-any-tp': 10, 'rs-sv-car': 10 }
 export const largoNormalDe = modo => LARGO_FIJO[modo] ?? 20
 // Los juegos que recorren siempre todo su conjunto (las regiones de Chile: son 16) no tienen largos: solo "todas".
 const SIEMPRE_TODAS = new Set(['ch-find', 'ch-all'])
 // Los de comunas y Street View se separan por un ajuste (alcance, nivel) y no tienen largos elegibles.
 export const tieneLargoElegible = modo =>
   !(modo in LARGO_FIJO) && !SIEMPRE_TODAS.has(modo) && !ajusteDeCategoria(modo)
-// Hay juegos con demasiadas preguntas para recorrerlas todas: su ronda es de 10 o de 20, nunca "todas".
-const SIN_RONDA_DE_TODAS = new Set(['sv-ubicar', 'rs-any-car', 'rs-any-tp', 'rs-sv-car'])
-export const tieneRondaDeTodas = modo => !SIN_RONDA_DE_TODAS.has(modo)
+// Los de largo fijo no tienen ronda de "todas".
+export const tieneRondaDeTodas = modo => !(modo in LARGO_FIJO)
 
 // Cuántas preguntas pide una ronda de este juego según lo que eligió el jugador (10, 20 o LARGO_DE_TODAS).
 export function largoDeRondaDe(modo, elegido) {

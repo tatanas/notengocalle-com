@@ -104,6 +104,9 @@ export async function callesPropias(navegador, { verificar }) {
   await pagina.close()
 }
 
+// Los juegos con Street View (sv-ubicar, rs-sv-car) cargan el script de Google y gastan cuota: se prueban a mano.
+const esDeStreetView = id => /(^|-)sv(-|$)/.test(id)
+
 // Cada juego con ranking debe poder iniciar su ronda oficial con el largo que el servidor espera.
 export async function rondasOficiales(navegador, { verificar }) {
   const { page: pagina, errors: errores } = await abrirPagina(navegador, {
@@ -112,8 +115,8 @@ export async function rondasOficiales(navegador, { verificar }) {
   // Street View carga el script de Google y gasta cuota: se prueba a mano.
   const ofrecidos = (
     await pagina.$$eval('[data-official]', botones => botones.map(boton => boton.dataset.official))
-  ).filter(id => !id.startsWith('sv-'))
-  const oficialesSinStreetView = MODOS_OFICIALES.filter(id => !id.startsWith('sv-'))
+  ).filter(id => !esDeStreetView(id))
+  const oficialesSinStreetView = MODOS_OFICIALES.filter(id => !esDeStreetView(id))
   verificar(
     ofrecidos.length === oficialesSinStreetView.length && ofrecidos.every(id => MODOS_OFICIALES.includes(id)),
     `los ${ofrecidos.length} juegos del menú tienen ronda oficial definida`,
@@ -126,7 +129,9 @@ export async function rondasOficiales(navegador, { verificar }) {
     const encabezado = iniciado ? await texto(pagina, '.q-head') : ''
     const total = +(encabezado.match(/de (\d+)/) || [])[1]
     // Las comunas se piden según el alcance elegido (aquí, toda la RM: 52).
-    const esperado = { 'com-name': 52, 'com-all': 52, 'ch-all': 16, 'ch-find': 16 }[id] ?? 20
+    const esperado =
+      { 'com-name': 52, 'com-all': 52, 'ch-all': 16, 'ch-find': 16, 'rs-any-car': 10, 'rs-any-tp': 10 }[id] ??
+      20
     if (total !== esperado || /Práctica/.test(encabezado)) incorrectas.push(`${id} (${total || 'no partió'})`)
   }
   verificar(
@@ -249,13 +254,27 @@ export async function disenoMenu(navegador, { verificar }) {
   const titulos = await pagina.$eval('.grid', cuadricula =>
     [...cuadricula.querySelectorAll('.card h3')].map(titulo => titulo.innerText.trim()),
   )
-  const orden = ['Calles', 'Comunas', 'Lugares emblemáticos', 'Ruteo']
-  const posiciones = orden.map(nombre =>
-    titulos.findIndex(encabezadoDeTarjeta => encabezadoDeTarjeta.endsWith(nombre)),
+  // Street View solo sale si hay llave de Google: el orden se comprueba sin él y, si está, debe ir donde corresponde.
+  const orden = [
+    'Calles',
+    'Ruteo',
+    'Comunas',
+    'Street View',
+    'Lugares emblemáticos',
+    'Metro',
+    'Chile',
+    'Comunas de Chile',
+    'Parques nacionales',
+  ]
+  const nombres = titulos.map(titulo => titulo.split('\n').at(-1).trim())
+  const esperados = orden.filter(nombre => nombre !== 'Street View' || nombres.includes(nombre))
+  verificar(
+    nombres.join('|') === esperados.join('|'),
+    `las tarjetas salen en el orden Calles, Ruteo, Comunas, Street View, Lugares emblemáticos, Metro, Chile, Comunas de Chile, Parques nacionales (${nombres.join(' · ')})`,
   )
   verificar(
-    posiciones.every((posicion, i) => posicion >= 0 && (i === 0 || posicion > posiciones[i - 1])),
-    `las tarjetas salen en el orden Calles, Comunas, Lugares emblemáticos, Ruteo (${titulos.join(' · ')})`,
+    (await pagina.$('.card:first-child #myst')) !== null,
+    '"Mis calles" está dentro de la tarjeta de Calles',
   )
   verificar(
     titulos.some(encabezadoDeTarjeta => encabezadoDeTarjeta.endsWith('Metro')),
@@ -268,14 +287,15 @@ export async function disenoMenu(navegador, { verificar }) {
   // Street View solo aparece si hay llave de Google: se cuenta aparte (un botón oficial por nivel, sin práctica).
   // Comunas, Chile y Parques nacionales no tienen práctica; en Metro y Lugares emblemáticos la práctica no va al lado
   // sino abajo, con las líneas o categorías elegidas.
+  // Los juegos con Street View solo salen si hay llave de Google: se cuentan aparte, así la prueba no depende de eso.
   const grandes = await pagina.$$eval(
     '.mode-row .mode.ranked',
-    botones => botones.filter(boton => !boton.dataset.official.startsWith('sv-')).length,
+    botones => botones.filter(boton => !/(^|-)sv(-|$)/.test(boton.dataset.official)).length,
   )
   const chicos = await pagina.$$eval('.mode-row .practice', botones =>
-    botones.map(boton => boton.innerText.trim()),
+    botones.filter(boton => !/(^|-)sv(-|$)/.test(boton.dataset.mode)).map(boton => boton.innerText.trim()),
   )
-  const sinStreetView = MODOS_OFICIALES.filter(id => !id.startsWith('sv-'))
+  const sinStreetView = MODOS_OFICIALES.filter(id => !esDeStreetView(id))
   const cantidadEsperada = sinStreetView.length
   const chicosEsperados = sinStreetView.filter(
     id => !['mt-', 'lm-', 'com-', 'cc-', 'ch-', 'pn-'].some(prefijo => id.startsWith(prefijo)),
