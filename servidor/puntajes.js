@@ -2,6 +2,7 @@ import {
   PERIODOS,
   MODOS_OFICIALES,
   CATEGORIAS_DE_CONSULTA,
+  categoriasDelResumen,
   esMejorPuntaje,
   categoriaHeredada,
   problemaDelPuntaje,
@@ -93,11 +94,6 @@ export async function tablaDePosiciones({ db, url, usuario }) {
     },
   }
 }
-
-// En el resumen de todos los juegos, "20 preguntas" incluye a Street View en su nivel más difícil (extremo) y "todas",
-// a las comunas del Gran Santiago.
-const categoriasDelResumen = categoria =>
-  categoria === '20' ? ['20', 'extremo'] : categoria === 'todas' ? ['todas', 'core'] : [categoria, categoria]
 
 // Por cada juego: quién va primero en la categoría pedida y, si hay sesión, en qué puesto va el usuario.
 export async function lideres({ db, url, usuario }) {

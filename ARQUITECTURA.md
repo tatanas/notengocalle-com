@@ -352,7 +352,7 @@ Todo es gratis y sin API keys, salvo Street View (llave de Google Maps, restring
 
 ### Qué trae `DATA`
 
-`comunas` (GeoJSON), `metro` (`lines`, `stations`), `streets`, `landmarks`, `cerros`, `zones` (barrios con
+`comunas` (GeoJSON, las 52 de la RM), `comunasChile` (índice de las 345 comunas de Chile; sus polígonos van aparte en `public/data/comunas-chile.js`, que se baja al jugarlas), `metro` (`lines`, `stations`), `streets`, `landmarks`, `cerros`, `zones` (barrios con
 perímetro), `photos` (por clave `l:` lugar, `s:` calle, `c:` cerro, `p:` parque), `inter` y `para` (cruces y
 paralelas entre calles), `steps` (rutas en auto), `salidas` (salidas numeradas de las autopistas), `transit` (rutas en transporte público), `micros`,
 `metroAlong`, `rotondas`, `chile` (`regions`, `cities`, `parks`) y `built` (fecha).
@@ -393,7 +393,7 @@ l1…` se corren; esto reasigna las rutas) → `node merge_st.js` → `npm run b
   400 m de la línea ya dibujada. Para prolongar otra calle, se agrega a la lista `ROADS` de ese archivo y se
   corre `node extensions.js` y luego `npm run build`.
 - **Otros**: `metro.js`, `cerros.js`, `chile.js`/`chile2.js`, `extras.js` (rotondas, calles por línea de
-  metro), `cruces.js` (cruces según OpenStreetMap: calles que comparten un nodo, o cuyo extremo queda a menos de 20 m de la otra; los que pasan uno sobre otro, aparte → `cruces.json`), `relations.js` (comunas de cada calle, paralelas, cruces y pares dudosos que el juego no debe preguntar), `steproutes.js` (Valhalla, con `compartido/rutaEnAuto.js`), `salidas.js` (salidas numeradas de las autopistas con a dónde llevan: nodos `motorway_junction` y rampas de OpenStreetMap → `salidas.json`; las descargas quedan en `salidas_raw.json` y `rampas_raw.json`), `transit.js` (GTFS → itinerarios),
+  metro), `cruces.js` (cruces según OpenStreetMap: calles que comparten un nodo, o cuyo extremo queda a menos de 20 m de la otra; los que pasan uno sobre otro, aparte → `cruces.json`), `relations.js` (comunas de cada calle, paralelas, cruces y pares dudosos que el juego no debe preguntar), `steproutes.js` (Valhalla, con `compartido/rutaEnAuto.js`), `salidas.js` (salidas numeradas de las autopistas con a dónde llevan: nodos `motorway_junction` y rampas de OpenStreetMap → `salidas.json`; las descargas quedan en `salidas_raw.json` y `rampas_raw.json`), `comunas_chile.js` (polígonos simplificados de las comunas de Chile fuera de la RM: Overpass para la lista y Nominatim para cada polígono → `comunas_chile.json`; `build_data.js` lo parte en el índice de data.js y `public/data/comunas-chile.js`), `transit.js` (GTFS → itinerarios),
   `micros.js`.
 - **Descargas crudas**: consultas Overpass en `q*.txt`. GTFS: el enlace vigente está en
   https://www.dtpm.cl/index.php/noticias/gtfs-vigente

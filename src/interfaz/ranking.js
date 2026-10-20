@@ -1,7 +1,7 @@
 import {
   CATEGORIAS_DE_RONDA,
-  TODAS_LAS_PREGUNTAS,
   ajusteDeCategoria,
+  categoriaEnElResumen,
   categoriasValidasDe,
   etiquetaDeCategoria,
   textoDeCategoria,
@@ -34,12 +34,8 @@ const vista = {
 // Cuántos jugadores tiene cada categoría del juego mirado; solo se conoce al cargar su tabla.
 let jugadoresPorCategoria = {}
 
-// Los juegos que recorren siempre todo su conjunto (las comunas) no tienen largos: solo "todas".
-const categoriasDe = idDeModo => {
-  if (!idDeModo) return CATEGORIAS_DE_RONDA
-  if (ajusteDeCategoria(idDeModo)) return categoriasValidasDe(idDeModo)
-  return modoPorId(idDeModo)?.all ? [TODAS_LAS_PREGUNTAS] : categoriasValidasDe(idDeModo)
-}
+// Cada juego tiene solo los largos que existen para él (las comunas y las regiones recorren todo su conjunto: no tienen de 10 ni de 20).
+const categoriasDe = idDeModo => (idDeModo ? categoriasValidasDe(idDeModo) : CATEGORIAS_DE_RONDA)
 
 const modosOficiales = () => MODOS.filter(tieneRondaOficial)
 const gruposDe = modos => [...new Set(modos.map(modo => modo.group))]
@@ -100,14 +96,20 @@ function htmlDeTabla({ filas, jugadores, yo }) {
     <p class="muted" style="font-size:12.5px">${jugadores} ${jugadores === 1 ? 'jugador' : 'jugadores'} en ${textoDeCategoria(vista.modo, vista.categoria)}. Cuenta la mejor ronda de cada uno.</p>`
 }
 
+// Solo los juegos que tienen la pestaña elegida; los de comunas y Street View, con el alcance o el nivel que cuenta en ella.
 function htmlDeLideres({ modos }) {
-  const filas = modosOficiales().map(modo => {
+  const filas = modosOficiales().flatMap(modo => {
+    const categoria = categoriaEnElResumen(modo.id, vista.categoria)
+    if (!categoria) return []
     const entrada = modos[modo.id]
+    const detalle = ajusteDeCategoria(modo.id) ? ` · ${etiquetaDeCategoria(categoria)}` : ''
     const lider = entrada
       ? `<td>${escaparHtml(entrada.lider.nombre)}</td><td>${puntaje(entrada.lider)} · ${formatearTiempoExacto(entrada.lider.ms)}</td>`
       : '<td class="muted" colspan="2">sin marcas todavía</td>'
     const mia = entrada?.yo ? `${entrada.yo.puesto}.º de ${entrada.jugadores}` : '—'
-    return `<tr data-open="${modo.id}"><td><b>${escaparHtml(modo.name)}</b><br><small class="muted">${escaparHtml(modo.group)}</small></td>${lider}<td>${mia}</td></tr>`
+    return [
+      `<tr data-open="${modo.id}"><td><b>${escaparHtml(modo.name)}</b><br><small class="muted">${escaparHtml(modo.group)}${escaparHtml(detalle)}</small></td>${lider}<td>${mia}</td></tr>`,
+    ]
   })
   return `<table class="stats board clickable"><tr><th>Juego</th><th>Líder</th><th>Marca</th><th>Tu puesto</th></tr>${filas.join('')}</table>`
 }

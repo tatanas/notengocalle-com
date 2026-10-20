@@ -10,7 +10,9 @@ import {
   puntoCardinal,
   puntoDesdeElInicio,
   rumbo,
+  textoDeBifurcacion,
   textoDeManiobra,
+  GRADOS_DE_DESVIO_SUAVE,
 } from './maniobras.js'
 import {
   largoDelTrazado,
@@ -95,7 +97,14 @@ function decisionDeCruce(anterior, paso, { esAutopista, salidas }, esDeLaRuta) {
       Math.abs(calle.grados) <= GRADOS_DE_VUELTA_EN_U,
   )
   const desdeLaCalleActual = !cruce.conConectores && desdeAutopista
-  const correcta = maniobra(cruce.grados, paso.n, {
+  // Cada opción lleva su texto y hacia dónde va (grados): si dos salen casi derecho, el texto se dice por el lado.
+  const opcion = (grados, calle, opciones = {}) => ({
+    grados,
+    calle,
+    texto: maniobra(grados, calle, opciones),
+    cambiaDeAutopista: !!opciones.desdeAutopista || esAutopista(calle),
+  })
+  const correctaOpcion = opcion(cruce.grados, paso.n, {
     desdeAutopista: desdeLaCalleActual,
     numeroDeSalida,
     conLado: mismaCalle || !!otroLado,
@@ -104,26 +113,43 @@ function decisionDeCruce(anterior, paso, { esAutopista, salidas }, esDeLaRuta) {
   const candidatas = []
   // Seguir derecho por la calle actual, si continúa. Si lo correcto ya es seguir derecho (la calle solo cambia de nombre), no hay
   // otra calle por la que seguir.
-  if (!mismaCalle && seguirDerechoEs(cruce, cruce.calleActual))
-    candidatas.push(seguirDerechoPor(cruce.calleActual))
+  const sigueDerecho = !mismaCalle && seguirDerechoEs(cruce, cruce.calleActual)
+  if (sigueDerecho)
+    candidatas.push({
+      grados: sigueDerecho.grados,
+      calle: cruce.calleActual,
+      texto: seguirDerechoPor(cruce.calleActual),
+      cambiaDeAutopista: false,
+    })
   const esRampa = desdeLaCalleActual || esAutopista(paso.n)
-  if (otroLado && !esRampa) candidatas.push(maniobra(otroLado.grados, paso.n))
+  if (otroLado && !esRampa) candidatas.push(opcion(otroLado.grados, paso.n))
   for (const calle of otrasCalles(cruce, esDeLaRuta)) {
     const direcciones = cruce.calles.filter(
       otra => esLaMismaCalle(otra.n, calle.n) && Math.abs(otra.grados) <= GRADOS_DE_VUELTA_EN_U,
     )
     if (direcciones.length)
       candidatas.push(
-        maniobra(elegir(direcciones).grados, calle.n, {
+        opcion(elegir(direcciones).grados, calle.n, {
           desdeAutopista: desdeLaCalleActual,
           conLado: direcciones.length > 1,
         }),
       )
   }
-  const incorrectas = mezclar([...new Set(candidatas)].filter(texto => texto !== correcta)).slice(
-    0,
-    OPCIONES - 1,
-  )
+  const elegidas = mezclar(
+    [...new Map(candidatas.map(candidata => [candidata.texto, candidata])).values()].filter(
+      candidata => candidata.texto !== correctaOpcion.texto,
+    ),
+  ).slice(0, OPCIONES - 1)
+  // Una bifurcación: dos o más opciones que salen casi derecho se distinguen por el lado en que salen.
+  const casiDerechas = [correctaOpcion, ...elegidas]
+    .filter(candidata => !candidata.cambiaDeAutopista && Math.abs(candidata.grados) < GRADOS_DE_DESVIO_SUAVE)
+    .sort((a, b) => a.grados - b.grados)
+  if (casiDerechas.length > 1)
+    casiDerechas.forEach((candidata, posicion) => {
+      candidata.texto = textoDeBifurcacion(posicion, casiDerechas.length, candidata.calle)
+    })
+  const correcta = correctaOpcion.texto
+  const incorrectas = elegidas.map(candidata => candidata.texto)
 
   if (!cruce.conConectores)
     return {

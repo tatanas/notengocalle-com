@@ -1,5 +1,6 @@
 // Juegos activos. El orden de carga es el orden en que aparecen dentro de cada grupo del menú.
 import './comunas.js'
+import './comunasDeChile.js'
 import './lugares.js'
 import './metro.js'
 import './calles.js'

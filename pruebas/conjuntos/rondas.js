@@ -278,11 +278,11 @@ export async function disenoMenu(navegador, { verificar }) {
   const sinStreetView = MODOS_OFICIALES.filter(id => !id.startsWith('sv-'))
   const cantidadEsperada = sinStreetView.length
   const chicosEsperados = sinStreetView.filter(
-    id => !['mt-', 'lm-', 'com-', 'ch-', 'pn-'].some(prefijo => id.startsWith(prefijo)),
+    id => !['mt-', 'lm-', 'com-', 'cc-', 'ch-', 'pn-'].some(prefijo => id.startsWith(prefijo)),
   ).length
   verificar(
     grandes === cantidadEsperada && chicos.length === chicosEsperados,
-    `cada juego tiene botón grande (oficial) y chico (práctica), salvo metro, lugares, comunas, Chile y parques: ${grandes} y ${chicos.length}`,
+    `cada juego tiene botón grande (oficial) y chico (práctica), salvo metro, lugares, comunas, comunas de Chile, Chile y parques: ${grandes} y ${chicos.length}`,
   )
   verificar(
     !(await existe(pagina, '[data-mode^="com-"], [data-mode^="ch-"], [data-mode^="pn-"]')),
@@ -300,6 +300,15 @@ export async function disenoMenu(navegador, { verificar }) {
   verificar(
     practicaDeLugares === 2,
     'los lugares emblemáticos tienen su subsección de práctica con los dos juegos',
+  )
+  const practicaDeComunasDeChile = await pagina.$$eval(
+    '.card .separador ~ .modes [data-mode^="cc-"]',
+    botones => botones.length,
+  )
+  const regionesParaElegir = await pagina.$$eval('#setRegiones input', fichas => fichas.length)
+  verificar(
+    practicaDeComunasDeChile === 2 && regionesParaElegir === 16,
+    `comunas de Chile tiene su subsección de práctica con los dos juegos y las 16 regiones para elegir (${practicaDeComunasDeChile} juegos, ${regionesParaElegir} regiones)`,
   )
   verificar(
     chicos.every(etiqueta => etiqueta === '🏋️'),
@@ -494,10 +503,10 @@ export async function categoriasRanking(navegador, { verificar }) {
     elementos.map(elemento => elemento.innerText.replace(/\s+/g, ' ').trim()),
   )
   verificar(
-    pestanas.length === 2 && /^20/.test(pestanas[0]) && /^Todas/.test(pestanas[1]),
-    `el ranking tiene pestañas 20 y Todas (${pestanas.join(' | ')})`,
+    pestanas.length === 3 && /^10/.test(pestanas[0]) && /^20/.test(pestanas[1]) && /^Todas/.test(pestanas[2]),
+    `el ranking tiene pestañas 10, 20 y Todas (${pestanas.join(' | ')})`,
   )
-  verificar(/^20 1$/.test(pestanas[0]), 'la pestaña "20" muestra que tiene 1 jugador')
+  verificar(/^20 1$/.test(pestanas[1]), 'la pestaña "20" muestra que tiene 1 jugador')
   verificar(
     await pagina.$eval('.tab.on', pestana => pestana.dataset.category === '20'),
     'y se abre en la del largo recién jugado',
@@ -512,6 +521,33 @@ export async function categoriasRanking(navegador, { verificar }) {
   await pagina.$eval('[data-category="20"]', pestana => pestana.click())
   await pagina.waitForSelector('table.board tr.me')
   verificar(true, 'y la de 20 sigue mostrando la marca')
+
+  // En el resumen de líderes cada pestaña lista solo los juegos que la tienen: no hay "completa el mapa" de 10 ni de 20.
+  const juegosEnLaPestana = async categoria => {
+    await pagina.$eval(`[data-category="${categoria}"]`, pestana => pestana.click())
+    await pagina.waitForSelector('#rankBody table.board')
+    return pagina.$$eval('#rankBody tr[data-open]', filas => filas.map(fila => fila.dataset.open))
+  }
+  await pagina.select('#rankMode', '')
+  const en10 = await juegosEnLaPestana('10')
+  const en20 = await juegosEnLaPestana('20')
+  const enTodas = await juegosEnLaPestana('todas')
+  verificar(
+    ['com-all', 'ch-all', 'ch-find'].every(
+      id => !en10.includes(id) && !en20.includes(id) && enTodas.includes(id),
+    ),
+    'los "completa el mapa" y "ubica la región" solo aparecen entre los líderes de "Todas"',
+  )
+  verificar(
+    en10.includes('cc-find') &&
+      en10.includes('rs-any-car') &&
+      !en10.includes('com-name') &&
+      !en10.includes('sv-ubicar'),
+    'en la pestaña de 10 están los juegos que la tienen y no los de comunas de la RM ni Street View',
+  )
+  await juegosEnLaPestana('20')
+  await pagina.select('#rankMode', 'st-name')
+  await pagina.waitForSelector('table.board tr.me')
 
   await pagina.click('#rankPlay')
   await pagina.waitForSelector('#panel .q-head', { timeout: 8000 })

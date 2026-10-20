@@ -31,11 +31,14 @@ const PREFERENCIAS_POR_DEFECTO = {
   nivelStreetView: 'facil',
   // Punto propio de la práctica de ruteo en auto: { nombre, lat, lon, sentido: 'desde' | 'hacia' } o null.
   puntoDeRuteo: null,
+  // Regiones que se practican en "Comunas de Chile" (nombres de región) o null para todas.
+  regiones: null,
   // La práctica siempre es fácil (bordes de las comunas y líneas del metro); las rondas oficiales, difíciles.
 }
 const LARGO_TODAS = 999
-// Antes se podía elegir 10, 15 o 30: ahora solo 20 o todas.
-const largoSimplificado = largo => (largo >= LARGO_TODAS ? LARGO_TODAS : PREFERENCIAS_POR_DEFECTO.len)
+// Antes se podía elegir 10, 15, 20 o 30: ahora 10, 20 o todas (los otros valores guardados pasan a 20).
+const largoSimplificado = largo =>
+  largo >= LARGO_TODAS ? LARGO_TODAS : largo === 10 ? 10 : PREFERENCIAS_POR_DEFECTO.len
 const guardado = almacen.get('settings', {})
 const preferencias = {
   ...PREFERENCIAS_POR_DEFECTO,

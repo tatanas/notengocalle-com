@@ -14,6 +14,14 @@ const KM_DE_SALIDA_ANTES_DEL_FIN = 0.6
 const KM_DE_SALIDA_DESPUES_DEL_FIN = 0.15
 // Con el número de salida que dice Valhalla se acepta una salida más lejos del fin.
 const KM_DE_SALIDA_CONOCIDA_ANTES_DEL_FIN = 1.5
+// Una salida es de la calzada por la que se va si el rumbo de la autopista ahí (`o`) va con el de la ruta; las de la calzada
+// contraria están pegadas pero hacia el otro lado. En lo que viene más adelante se perdona más, porque la autopista se curva.
+const GRADOS_DE_LA_MISMA_CALZADA = 70
+const GRADOS_DE_LA_MISMA_CALZADA_MAS_ADELANTE = 85
+const diferenciaDeRumbo = (a, b) => Math.abs(((b - a + 540) % 360) - 180)
+const esDeLaCalzada = (salida, rumboDeLaRuta, tolerancia) =>
+  salida.o == null || diferenciaDeRumbo(salida.o, rumboDeLaRuta) <= tolerancia
+
 // Salidas que se pasaron antes de la correcta y salidas que vienen después de ella.
 const KM_ENTRE_SALIDAS_DE_LA_SECUENCIA = 0.3
 const KM_MINIMOS_ADELANTE = 0.4
@@ -43,7 +51,7 @@ const aPlano = punto => [punto[1] * KM_POR_GRADO_LONGITUD, punto[0] * KM_POR_GRA
 function proyeccionEnElTrazado(punto, trazado) {
   const [px, py] = aPlano(punto)
   let recorrido = 0
-  let mejor = { km: Infinity, avance: 0 }
+  let mejor = { km: Infinity, avance: 0, rumboDelTramo: 0 }
   for (let i = 0; i < trazado.length - 1; i++) {
     const [ax, ay] = aPlano(trazado[i])
     const [bx, by] = aPlano(trazado[i + 1])
@@ -52,7 +60,12 @@ function proyeccionEnElTrazado(punto, trazado) {
     const largoCuadrado = dx * dx + dy * dy
     const t = largoCuadrado ? Math.max(0, Math.min(1, ((px - ax) * dx + (py - ay) * dy) / largoCuadrado)) : 0
     const km = Math.hypot(ax + t * dx - px, ay + t * dy - py)
-    if (km < mejor.km) mejor = { km, avance: recorrido + t * Math.sqrt(largoCuadrado) }
+    if (km < mejor.km)
+      mejor = {
+        km,
+        avance: recorrido + t * Math.sqrt(largoCuadrado),
+        rumboDelTramo: ((Math.atan2(dx, dy) * 180) / Math.PI + 360) % 360,
+      }
     recorrido += Math.sqrt(largoCuadrado)
   }
   return mejor
@@ -77,6 +90,7 @@ function salidasEnElPaso(paso, salidas) {
     .filter(salida => perteneceALaAutopista(salida, paso.n, sentido))
     .map(salida => ({ ...salida, ...proyeccionEnElTrazado(salida.p, paso.g) }))
     .filter(salida => salida.km <= KM_DE_SALIDA_EN_EL_TRAZADO)
+    .filter(salida => esDeLaCalzada(salida, salida.rumboDelTramo, GRADOS_DE_LA_MISMA_CALZADA))
     .sort((a, b) => a.avance - b.avance)
 }
 
@@ -147,7 +161,11 @@ export function secuenciaDeSalidas(paso, destinoDeLaCorrecta, salidas) {
   )
   const porVenir = unaPorNumero(
     salidas
-      .filter(salida => perteneceALaAutopista(salida, paso.n, sentido))
+      .filter(
+        salida =>
+          perteneceALaAutopista(salida, paso.n, sentido) &&
+          esDeLaCalzada(salida, rumboDelFin, GRADOS_DE_LA_MISMA_CALZADA_MAS_ADELANTE),
+      )
       .map(salida => {
         const [x, y] = aPlano(salida.p)
         return {

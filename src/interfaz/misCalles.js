@@ -106,7 +106,7 @@ export function mostrarMisCalles(caja) {
           )
           .join('')
       : '<span class="muted" style="font-size:13px">Todavía no agregas ninguna.</span>'
-  caja.innerHTML = `<div class="row"><input type="text" id="mystQ" placeholder="Nombre de la calle (ej.: Las Nieves)" style="flex:1;min-width:180px"><button class="btn small" id="mystGo">Buscar</button></div><div id="mystRes" style="margin-top:8px"></div><div class="chips" style="margin-top:8px">${lista()}</div>`
+  caja.innerHTML = `<div class="row"><input type="text" id="mystQ" placeholder="Nombre de la calle (ej.: Alameda)" style="flex:1;min-width:180px"><button class="btn small" id="mystGo">Buscar</button></div><div id="mystRes" style="margin-top:8px"></div><div class="chips" style="margin-top:8px">${lista()}</div>`
   caja.querySelectorAll('[data-del]').forEach(
     a =>
       (a.onclick = e => {

@@ -10,12 +10,15 @@ export const REGLAS_OFICIALES = {
   ownStreets: false,
   easy: false,
   puntoDeRuteo: null,
+  regiones: null,
 }
 
 // Juegos con ranking.
 export const MODOS_OFICIALES = [
   'com-name',
   'com-all',
+  'cc-name',
+  'cc-find',
   'lm-loc',
   'lm-com',
   'mt-find',
@@ -39,16 +42,31 @@ export const MODOS_OFICIALES = [
 const PUNTOS_POR_PREGUNTA = { 'sv-ubicar': 5 }
 export const puntosPorPregunta = modo => PUNTOS_POR_PREGUNTA[modo] ?? 1
 
-// Categorías de ranking según el largo de la ronda: 20 preguntas o "todas" las del juego.
+// Categorías de ranking según el largo de la ronda: 10 o 20 preguntas, o "todas" las del juego.
 export const TODAS_LAS_PREGUNTAS = 'todas'
-export const CATEGORIAS_DE_RONDA = ['20', TODAS_LAS_PREGUNTAS]
+export const LARGO_DE_TODAS = 999
+export const LARGOS_ELEGIBLES = [10, 20]
+export const CATEGORIAS_DE_RONDA = [...LARGOS_ELEGIBLES.map(String), TODAS_LAS_PREGUNTAS]
 
-// Las rondas son de 20 preguntas, salvo en los juegos que se juegan más largo y por eso van de a menos.
-const LARGO_NORMAL = { 'sv-ubicar': 10, 'rs-sv-car': 5 }
-export const largoNormalDe = modo => LARGO_NORMAL[modo] ?? 20
-// Hay juegos con demasiadas preguntas para recorrerlas todas: su ronda siempre es del largo normal.
+// Las rondas son de 20 preguntas (o 10 si se prefiere), salvo en los juegos que se juegan más largo y por eso van de a menos y
+// siempre del mismo largo.
+const LARGO_FIJO = { 'sv-ubicar': 10, 'rs-sv-car': 5 }
+export const largoNormalDe = modo => LARGO_FIJO[modo] ?? 20
+// Los juegos que recorren siempre todo su conjunto (las regiones de Chile: son 16) no tienen largos: solo "todas".
+const SIEMPRE_TODAS = new Set(['ch-find', 'ch-all'])
+// Los de comunas y Street View se separan por un ajuste (alcance, nivel) y no tienen largos elegibles.
+export const tieneLargoElegible = modo =>
+  !(modo in LARGO_FIJO) && !SIEMPRE_TODAS.has(modo) && !ajusteDeCategoria(modo)
+// Hay juegos con demasiadas preguntas para recorrerlas todas: su ronda es de 10 o de 20, nunca "todas".
 const SIN_RONDA_DE_TODAS = new Set(['sv-ubicar', 'rs-any-car', 'rs-any-tp', 'rs-sv-car'])
 export const tieneRondaDeTodas = modo => !SIN_RONDA_DE_TODAS.has(modo)
+
+// Cuántas preguntas pide una ronda de este juego según lo que eligió el jugador (10, 20 o LARGO_DE_TODAS).
+export function largoDeRondaDe(modo, elegido) {
+  if (!tieneLargoElegible(modo)) return largoNormalDe(modo)
+  if (elegido >= LARGO_DE_TODAS) return tieneRondaDeTodas(modo) ? LARGO_DE_TODAS : largoNormalDe(modo)
+  return LARGOS_ELEGIBLES.includes(elegido) ? elegido : largoNormalDe(modo)
+}
 
 // Algunos juegos no se separan por largo sino por un ajuste del jugador, y cada valor tiene su propio ranking:
 // Street View por nivel de dificultad (siempre 10 preguntas) y los de comunas por alcance (cuántas comunas hay).
@@ -79,19 +97,34 @@ export const etiquetaDeCategoria = categoria => ETIQUETA_DE_CATEGORIA[categoria]
 export const categoriasValidasDe = modo => {
   const delAjuste = ajusteDeCategoria(modo)
   if (delAjuste) return delAjuste.valores
-  return tieneRondaDeTodas(modo)
-    ? [String(largoNormalDe(modo)), TODAS_LAS_PREGUNTAS]
-    : [String(largoNormalDe(modo))]
+  if (SIEMPRE_TODAS.has(modo)) return [TODAS_LAS_PREGUNTAS]
+  if (!tieneLargoElegible(modo)) return [String(largoNormalDe(modo))]
+  return tieneRondaDeTodas(modo) ? CATEGORIAS_DE_RONDA : LARGOS_ELEGIBLES.map(String)
 }
 // Lo que se puede pedir al ranking: cualquiera de los largos y ajustes que algún juego use.
 export const CATEGORIAS_DE_CONSULTA = [
   ...new Set([
-    ...Object.values(LARGO_NORMAL).map(String),
+    ...Object.values(LARGO_FIJO).map(String),
     ...CATEGORIAS_DE_RONDA,
     ...NIVELES_DE_STREET_VIEW,
     ...ALCANCES_DE_COMUNAS,
   ]),
 ]
+
+// El resumen de líderes tiene una pestaña por largo de ronda. Street View y las comunas de la RM no tienen largos: "20 preguntas" incluye
+// a Street View en su nivel más difícil (extremo) y "todas", a las comunas del Gran Santiago.
+const AJUSTE_EN_EL_RESUMEN = { 20: 'extremo', [TODAS_LAS_PREGUNTAS]: 'core' }
+export const categoriasDelResumen = pestana => [pestana, AJUSTE_EN_EL_RESUMEN[pestana] ?? pestana]
+// La categoría con que un juego figura en una pestaña del resumen, o null si ese juego no tiene esa pestaña (no hay "completa
+// el mapa" de 10 ni de 20).
+export function categoriaEnElResumen(modo, pestana) {
+  const delAjuste = ajusteDeCategoria(modo)
+  if (delAjuste) {
+    const categoria = AJUSTE_EN_EL_RESUMEN[pestana]
+    return delAjuste.valores.includes(categoria) ? categoria : null
+  }
+  return categoriasValidasDe(modo).includes(pestana) ? pestana : null
+}
 
 // Cuántas preguntas tiene una ronda de esta categoría (null = las que sean: "todas").
 export function preguntasDeCategoria(modo, categoria) {

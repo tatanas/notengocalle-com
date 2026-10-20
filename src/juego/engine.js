@@ -2,8 +2,7 @@ import {
   REGLAS_OFICIALES,
   MODOS_OFICIALES,
   ajusteDeCategoria,
-  largoNormalDe,
-  tieneRondaDeTodas,
+  largoDeRondaDe,
   TODAS_LAS_PREGUNTAS,
   categoriaDe,
   etiquetaDeCategoria,
@@ -44,7 +43,6 @@ const maximoDe = (modo, preguntas) => preguntas * (modo.puntosPorPregunta ?? 1)
 
 export const tieneRondaOficial = modo => MODOS_OFICIALES.includes(modo.id)
 
-const LARGO_DE_TODAS = 999
 const SEGUNDOS_DE_CUENTA_REGRESIVA = 3
 let temporizadorDeCuenta = null
 
@@ -130,9 +128,7 @@ export function iniciarPartida(
       ? categoria === TODAS_LAS_PREGUNTAS
         ? conjunto.length
         : +categoria
-      : largoPara(modo.group) >= LARGO_DE_TODAS && tieneRondaDeTodas(modo.id)
-        ? LARGO_DE_TODAS
-        : largoNormalDe(modo.id)
+      : largoDeRondaDe(modo.id, largoPara(modo.group))
   const tamano = modo.all ? conjunto.length : Math.min(pedidas, conjunto.length)
   if (!conjunto.length) {
     aplicarReglasDeRonda(null)

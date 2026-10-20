@@ -31,7 +31,7 @@ export const puntoAntesDelFinal = (linea, km) => puntoDesdeElInicio([...linea].r
 
 // "Sigue derecho" es solo cuando la calle cambia de nombre sin doblar; un desvío suave es "mantente a la derecha".
 export const GRADOS_DE_SEGUIR_DERECHO = 20
-const GRADOS_DE_DESVIO_SUAVE = 60
+export const GRADOS_DE_DESVIO_SUAVE = 60
 export const GRADOS_DE_VUELTA_EN_U = 150
 
 export const ladoDelGiro = grados => (grados > 0 ? 'derecha' : 'izquierda')
@@ -56,6 +56,14 @@ export function textoDeManiobra(
   if (!conLado) return suave ? `Sigue hacia ${calle}` : `Dobla en ${calle}`
   const lado = ladoDelGiro(grados)
   return suave ? `Mantente a la ${lado} hacia ${calle}` : `Dobla a la ${lado} en ${calle}`
+}
+
+// Cuando dos o más opciones saldrían casi derecho (una bifurcación), "sigue derecho" no distingue: se dicen por el lado, de
+// izquierda a derecha ("Mantente a la izquierda hacia X", "Sigue por el centro hacia Y", "Mantente a la derecha hacia Z").
+export function textoDeBifurcacion(posicion, total, calle) {
+  if (posicion === 0) return `Mantente a la izquierda hacia ${calle}`
+  if (posicion === total - 1) return `Mantente a la derecha hacia ${calle}`
+  return `Sigue por el centro hacia ${calle}`
 }
 
 const PUNTOS_CARDINALES = [

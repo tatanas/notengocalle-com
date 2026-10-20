@@ -114,6 +114,30 @@ function destinosDeLaRampa(rampa) {
     )
   ).elements.filter(elemento => elemento.type === 'way')
 
+  // El rumbo de la calzada en cada salida (hacia dónde se avanza ahí): las salidas de la calzada contraria no sirven.
+  const calzadas = (
+    await leerOBajar(
+      'autopistas_raw.json',
+      `[out:json][timeout:180];
+      node["highway"="motorway_junction"](${CAJA})->.salidas;
+      way(bn.salidas)["highway"~"^(motorway|trunk)$"];
+      out body geom;`,
+    )
+  ).elements.filter(elemento => elemento.type === 'way')
+  const rumboEnLaSalida = new Map()
+  for (const via of calzadas) {
+    if (via.tags.oneway !== 'yes' && via.tags.oneway !== '-1' && via.tags.highway !== 'motorway') continue
+    const sentido = via.tags.oneway === '-1' ? -1 : 1
+    via.nodes.forEach((nodo, indice) => {
+      const antes = via.geometry[Math.max(0, indice - 1)]
+      const despues = via.geometry[Math.min(via.nodes.length - 1, indice + 1)]
+      if (antes === despues) return
+      const grados =
+        (Math.atan2((despues.lon - antes.lon) * KX, (despues.lat - antes.lat) * KY) * 180) / Math.PI
+      rumboEnLaSalida.set(nodo, Math.round((((grados + (sentido < 0 ? 180 : 0)) % 360) + 360) % 360))
+    })
+  }
+
   const viasPorNodo = new Map()
   for (const via of vias)
     for (const nodo of via.nodes) {
@@ -182,6 +206,7 @@ function destinosDeLaRampa(rampa) {
       ...leerReferencia(nodo.tags.ref),
       p: [+nodo.lat.toFixed(5), +nodo.lon.toFixed(5)],
       v: deLaAutopista.map(calle => calle.name),
+      ...(rumboEnLaSalida.has(nodo.id) && { o: rumboEnLaSalida.get(nodo.id) }),
       ...(destinos.size && { a: [...destinos].slice(0, DESTINOS_ANOTADOS) }),
       c: cercanas,
       m: comunas.find(comuna => turf.booleanPointInPolygon([nodo.lon, nodo.lat], comuna))?.properties.name,

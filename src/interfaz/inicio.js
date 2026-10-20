@@ -1,8 +1,10 @@
 import { estadisticas } from '../nucleo/progreso.js'
 import {
+  LARGOS_ELEGIBLES,
+  LARGO_DE_TODAS,
   NIVELES_DE_STREET_VIEW,
   etiquetaDeCategoria,
-  largoNormalDe,
+  tieneLargoElegible,
   tieneRondaDeTodas,
 } from '../../compartido/oficial.js'
 import { aplicarReglasDeRonda, largoPara, guardarAjustes, ajustes } from '../nucleo/almacen.js'
@@ -17,6 +19,7 @@ import {
   callesDelJuego,
   estaciones,
 } from '../datos/datos.js'
+import { REGIONES_DE_COMUNAS, COMUNAS_DE_CHILE } from '../datos/comunasDeChile.js'
 import { lineasElegidas } from '../dominio/metro.js'
 import { limpiarCapa, fijarChile, fijarRelieve } from '../mapa/mapa.js'
 import { tieneRondaOficial, iniciarPartida, detenerPartida } from '../juego/engine.js'
@@ -46,20 +49,25 @@ const GRUPOS = [
     blurb: 'Ubica las comunas del Gran Santiago',
   },
   {
+    name: 'Comunas de Chile',
+    emoji: '🏘️',
+    blurb: `Las ${COMUNAS_DE_CHILE.length} comunas de las 16 regiones de Chile. En la práctica puedes elegir qué regiones.`,
+  },
+  {
     name: 'Lugares emblemáticos',
     emoji: '📍',
     blurb: `${DATOS.landmarks.length} lugares: estadios, parques, malls, universidades, colegios, barrios, ríos y restaurantes.`,
-  },
-  {
-    name: 'Metro',
-    emoji: '🚇',
-    blurb: `${estaciones.length} estaciones de las líneas L1 a L6, con sus combinaciones.`,
   },
   {
     name: 'Ruteo',
     emoji: '🧭',
     blurb:
       'Arma rutas paso a paso: en auto entre dos puntos cualquiera y en micro y metro. En Explorar puedes ver los recorridos de micro más importantes.',
+  },
+  {
+    name: 'Metro',
+    emoji: '🚇',
+    blurb: `${estaciones.length} estaciones de las líneas L1 a L6, con sus combinaciones.`,
   },
   {
     name: 'Chile',
@@ -98,6 +106,7 @@ function dominio(modo) {
 const PRACTICA_APARTE = {
   Metro: { sinFiltro: { lines: null }, fichas: () => fichasDeLineasDeMetro() },
   'Lugares emblemáticos': { sinFiltro: { cats: null }, fichas: () => fichasDeCategoriasDeLugares() },
+  'Comunas de Chile': { sinFiltro: { regiones: null }, fichas: () => fichasDeRegionesDeComunas() },
 }
 
 // El "% dominado" de un juego con otras reglas que las del jugador (todas las líneas del metro, un nivel de Street View).
@@ -190,17 +199,25 @@ function fichasDeLineasDeMetro() {
 // Los juegos paso a paso van primero dentro de su grupo.
 const pasosPrimero = (a, b) => (b.id.startsWith('rs-') ? 1 : 0) - (a.id.startsWith('rs-') ? 1 : 0)
 
-const OPCIONES_DE_LARGO = [20, 999]
-
-// Cuántas preguntas por ronda, en la tarjeta del juego. Los juegos que siempre recorren todo su conjunto
-// (las comunas: son pocas) no lo ofrecen.
+// Cuántas preguntas por ronda, en la tarjeta del juego: 10, 20 o todas (si algún juego del grupo las tiene todas). Los juegos
+// que siempre recorren todo su conjunto (las comunas: son pocas) o tienen un largo fijo no lo ofrecen.
 function selectorDeLargo(grupo, modos) {
-  if (modos.every(modo => modo.all || !tieneRondaDeTodas(modo.id))) return ''
-  const opciones = OPCIONES_DE_LARGO.map(
+  const conLargoElegible = modos.filter(modo => tieneLargoElegible(modo.id))
+  if (!conLargoElegible.length) return ''
+  const hayRondaDeTodas = conLargoElegible.some(modo => tieneRondaDeTodas(modo.id))
+  const opciones = [...LARGOS_ELEGIBLES, ...(hayRondaDeTodas ? [LARGO_DE_TODAS] : [])].map(
     eleccion =>
-      `<option value="${eleccion}" ${eleccion === largoPara(grupo) ? 'selected' : ''}>${eleccion === 999 ? 'Todas' : largoNormalDe(modos[0].id)}</option>`,
+      `<option value="${eleccion}" ${eleccion === largoPara(grupo) ? 'selected' : ''}>${eleccion === LARGO_DE_TODAS ? 'Todas' : eleccion}</option>`,
   )
   return `<label class="length-row">Preguntas por ronda <select data-length-group="${escaparHtml(grupo)}">${opciones.join('')}</select></label>`
+}
+
+function fichasDeRegionesDeComunas() {
+  const elegidas = ajustes.regiones || REGIONES_DE_COMUNAS
+  const fichas = REGIONES_DE_COMUNAS.map(region =>
+    pastilla(escaparHtml(region), elegidas.includes(region), `data-region="${escaparHtml(region)}"`),
+  )
+  return `<div class="chips" id="setRegiones" style="margin-bottom:10px">${fichas.join('')}</div>`
 }
 
 function fichasDeCategoriasDeLugares() {
@@ -284,6 +301,15 @@ function conectarAjustes() {
     selectorElegido.onchange = () => {
       ajustes.lengths = { ...ajustes.lengths, [selectorElegido.dataset.lengthGroup]: +selectorElegido.value }
       guardarAjustes()
+    }
+
+  const regiones = $('#setRegiones')
+  for (const entrada of regiones?.querySelectorAll('input') ?? [])
+    entrada.onchange = () => {
+      const elegidas = valoresMarcados(regiones, 'region')
+      ajustes.regiones = !elegidas.length || elegidas.length === REGIONES_DE_COMUNAS.length ? null : elegidas
+      guardarAjustes()
+      redibujarInicioSinSaltar()
     }
 
   const categorias = $('#setCats')

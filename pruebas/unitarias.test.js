@@ -18,9 +18,12 @@ import { textoDeManiobra } from '../src/dominio/maniobras.js'
 import {
   COMUNAS_POR_ALCANCE,
   categoriaDe,
+  categoriaEnElResumen,
+  categoriasDelResumen,
   categoriasValidasDe,
   esMejorPuntaje,
   categoriaHeredada,
+  largoDeRondaDe,
   largoNormalDe,
   problemaDelPuntaje,
 } from '../compartido/oficial.js'
@@ -301,8 +304,8 @@ test('cada juego tiene su largo normal de ronda', () => {
   assert.equal(largoNormalDe('sv-ubicar'), 10)
   assert.equal(largoNormalDe('st-name'), 20)
   assert.deepEqual(categoriasValidasDe('sv-ubicar'), ['facil', 'medio', 'dificil', 'extremo'])
-  assert.deepEqual(categoriasValidasDe('rs-any-car'), ['20'])
-  assert.deepEqual(categoriasValidasDe('st-name'), ['20', 'todas'])
+  assert.deepEqual(categoriasValidasDe('rs-any-car'), ['10', '20'])
+  assert.deepEqual(categoriasValidasDe('st-name'), ['10', '20', 'todas'])
 })
 
 test('los juegos de comunas se separan por alcance, con su cantidad de comunas', () => {
@@ -638,7 +641,11 @@ test('Street View: el lado se dice solo si la calle sale hacia los dos lados, y 
   assert.equal(decision.correcta, 'Dobla a la izquierda en Av. Cruce')
   assert.deepEqual(
     [...decision.incorrectas].sort(),
-    ['Dobla a la derecha en Av. Cruce', 'Sigue derecho por Av. Norte', 'Sigue hacia Calle Lateral'].sort(),
+    [
+      'Dobla a la derecha en Av. Cruce',
+      'Mantente a la izquierda hacia Av. Norte',
+      'Mantente a la derecha hacia Calle Lateral',
+    ].sort(),
   )
 })
 
@@ -926,4 +933,77 @@ test('en una autopista larga solo se pregunta cerca de la salida: lo de más atr
   assert.equal(decisiones.at(-1).correcta, 'Salida 15 · Destino 15')
   assert.equal(antes.length, 2, 'la calle de acceso y el tramo de autopista sin preguntas')
   assert.ok(antes[1].g.length >= 2 && antes[1].rotulo === 'Autopista X')
+})
+
+test('Street View: en una bifurcación las opciones se dicen por el lado, no todas "sigue derecho"', () => {
+  // Viniendo por Av. Uno hacia el oriente, sale casi derecho Gran Vía (a la izquierda, 10°) y Santa Teresa (a la derecha, 25°).
+  const pasos = [
+    paso('Av. Uno', [
+      [-2, 0],
+      [0, 0],
+    ]),
+    paso(
+      'Gran Vía',
+      [
+        [0, 0],
+        [2, 0.1],
+      ],
+      [calle('Santa Teresa', 115, 2)],
+    ),
+  ]
+  const decision = decisionesConStreetView(pasos, contextoDeJuguete())[1]
+  assert.equal(decision.correcta, 'Mantente a la izquierda hacia Gran Vía')
+  assert.deepEqual(decision.incorrectas, ['Mantente a la derecha hacia Santa Teresa'])
+})
+
+test('las salidas de la calzada contraria no se ofrecen: el rumbo de la autopista en la salida tiene que ir con el de la ruta', () => {
+  const { pasos, salidas } = autopistaConSalidas({ pasadas: 4, correcta: 5, despues: 3 })
+  // Las salidas 2 y 7 existen, pero en la calzada que va hacia el poniente (270°): la ruta va hacia el oriente.
+  const conCalzadas = salidas.map(salida => ({
+    ...salida,
+    o: ['2', '7'].includes(salida.r) ? 270 : 90,
+  }))
+  const secuencia = secuenciaDeSalidas(pasos[1], null, conCalzadas)
+  assert.deepEqual(
+    secuencia.salidas.map(({ salida }) => salida.r),
+    ['1', '3', '4', '5', '6', '8'],
+  )
+})
+
+test('el largo de la ronda: 10, 20 o todas, salvo en los juegos de largo fijo o sin ronda de todas', () => {
+  assert.equal(largoDeRondaDe('st-name', 10), 10)
+  assert.equal(largoDeRondaDe('st-name', 20), 20)
+  assert.equal(largoDeRondaDe('st-name', 999), 999)
+  assert.equal(largoDeRondaDe('rs-any-car', 10), 10)
+  assert.equal(largoDeRondaDe('rs-any-car', 999), 20, 'el ruteo no tiene ronda de todas')
+  assert.equal(largoDeRondaDe('sv-ubicar', 20), 10, 'Street View siempre son 10')
+  assert.deepEqual(categoriasValidasDe('cc-name'), ['10', '20', 'todas'])
+  assert.deepEqual(categoriasValidasDe('cc-find'), ['10', '20', 'todas'])
+})
+
+test('una ronda de 10 preguntas es válida en su ranking y una de otro largo no', () => {
+  const ronda = { modo: 'st-name', categoria: '10', aciertos: 8, total: 10, ms: 40_000 }
+  assert.equal(problemaDelPuntaje(ronda), null)
+  assert.ok(problemaDelPuntaje({ ...ronda, total: 20 }))
+})
+
+test('cada juego figura solo en las pestañas del ranking que existen para él', () => {
+  // No hay "completa el mapa" de comunas ni de regiones de 10 ni de 20 preguntas.
+  for (const pestana of ['10', '20']) {
+    assert.equal(categoriaEnElResumen('com-all', pestana) === 'core', pestana === 'todas')
+    assert.equal(categoriaEnElResumen('ch-all', pestana), null)
+    assert.equal(categoriaEnElResumen('ch-find', pestana), null)
+  }
+  assert.equal(categoriaEnElResumen('ch-all', 'todas'), 'todas')
+  assert.equal(categoriaEnElResumen('com-all', 'todas'), 'core')
+  assert.equal(categoriaEnElResumen('com-all', '10'), null)
+  assert.equal(categoriaEnElResumen('com-name', '20'), null)
+  assert.equal(categoriaEnElResumen('sv-ubicar', '20'), 'extremo')
+  assert.equal(categoriaEnElResumen('sv-ubicar', '10'), null)
+  assert.equal(categoriaEnElResumen('st-name', '10'), '10')
+  assert.equal(categoriaEnElResumen('st-name', 'todas'), 'todas')
+  assert.equal(categoriaEnElResumen('rs-any-car', 'todas'), null, 'el ruteo no tiene ronda de todas')
+  assert.deepEqual(categoriasValidasDe('ch-find'), ['todas'])
+  assert.deepEqual(categoriasDelResumen('20'), ['20', 'extremo'])
+  assert.deepEqual(categoriasDelResumen('10'), ['10', '10'])
 })

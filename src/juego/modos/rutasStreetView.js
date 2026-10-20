@@ -194,7 +194,7 @@ function recorrerConStreetView(q, { A, B, recorrido, ruta }) {
 registrarModo({
   id: 'rs-sv-car',
   group: 'Ruteo',
-  name: 'Paso a paso · con Street View',
+  name: 'Rutas en auto · con Street View',
   noHint: true,
   disponible: streetViewDisponible,
   balance: ruta => lugarDeLaRuta(ruta)?.comuna,

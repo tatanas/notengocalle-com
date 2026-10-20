@@ -4,7 +4,7 @@ Pensado para una sesión nueva de Claude (o de cualquiera) que quiera avanzar **
 Orden de lectura: este archivo → `CLAUDE.md` (decisiones de contenido y forma de trabajar) → solo lo que necesites de `ARQUITECTURA.md` y `docs/streetview.md`.
 
 ## Estado (octubre 2026)
-- 19 juegos, todos con ronda oficial y ranking; cuentas y ranking con Neon (producción) o PGlite (local). `npm test` pasa.
+- 21 juegos (20 con ronda oficial y ranking); cuentas y ranking con Neon (producción) o PGlite (local). `npm test` pasa.
 - Street View ("¿Dónde estás?") completo: 4 niveles, rondas de 10, puntos repartidos por calle, cerros con recinto, pistas. Ver `docs/streetview.md`.
 - Juegos de calles: `st-find` perdona los cruces; `st-punto` es la versión "difícil" de `st-name` (marca solo un punto); los tres permiten recorrer la calle en Street View al responder.
 - **Sin probar a mano** (las pruebas automáticas no juegan Street View): recorrer la calle en celular y escritorio, que "Cerrar Street View" devuelva bien el mapa, el recinto del San Cristóbal
@@ -75,6 +75,8 @@ node servidor/admin.js reportes     túneles reportados por los jugadores
 
 ## Ruteo en auto (`rs-sv-car` con Street View y `rs-any-car` sobre el mapa, oct. 2026)
 Los dos juegos comparten las rutas y las reglas; solo cambia cómo se pregunta. **Si hay que corregir algo del ruteo, empezar por aquí.**
+
+**Diferencias entre los dos juegos** (por si se quiere dejar solo uno): "Rutas en auto" (mapa) tiene ranking (10 o 20 preguntas), no usa Google y responde al instante; elige el *nombre* de la calle siguiente. "Rutas en auto · con Street View" no tiene ranking (rondas fijas de 5), necesita la llave de Google (cuota) y carga un panorama por decisión; las instrucciones son de navegador ("dobla a la izquierda") y trae lado, y "Abrir mapa" muestra dónde se está. Comparten rutas, alternativas y salidas. Dejar solo el de Street View obligaría a pasarle el ranking (otro id de juego) y perder el del mapa.
 
 **Cómo se arma una ruta** (`compartido/rutaEnAuto.js`; lo usan el navegador y `tools/steproutes.js`). Valhalla (servidor público de FOSSGIS), tres consultas:
 `/route` (el camino) → `/trace_attributes` (cada tramo de calle con su nombre, su clase y las calles que salen de cada cruce, sin nombre) →
