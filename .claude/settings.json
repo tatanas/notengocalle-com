@@ -1,0 +1,22 @@
+{
+  "permissions": {
+    "deny": [
+      "Read(/public/data/**)",
+      "Read(/public/vendor/**)",
+      "Read(/public/fuentes/**)",
+      "Read(/dist/**)",
+      "Read(/node_modules/**)",
+      "Read(/tools/node_modules/**)",
+      "Read(/package-lock.json)",
+      "Read(/tools/package-lock.json)",
+      "Read(/tools/*.json)",
+      "Read(/tools/*.geojson)",
+      "Read(/tools/btiles/**)",
+      "Read(/tools/gtfs/**)",
+      "Read(/tools/shots/**)",
+      "Read(/src/datos/lugaresStreetView.json)",
+      "Read(/src/datos/pistasCalles.json)",
+      "Read(/.local/db/**)"
+    ]
+  }
+}

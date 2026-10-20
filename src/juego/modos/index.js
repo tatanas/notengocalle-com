@@ -9,4 +9,4 @@ import './rutas.js'
 import './rutasStreetView.js'
 import './chile.js'
 import './parques.js'
-// Conexiones está retirado por mientras (sus preguntas de cruces y de comunas tenían errores): ver docs/siguiente-sesion.md.
+// Conexiones está retirado por mientras (sus preguntas de cruces y de comunas tenían errores): ver docs/pendientes.md.

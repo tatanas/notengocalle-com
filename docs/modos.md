@@ -1,0 +1,48 @@
+# Juegos, menú y reglas de ronda
+
+Leer solo si la tarea agrega, cambia o retira un juego, toca el menú o las reglas de ronda y ranking. Son decisiones del dueño: no re-discutirlas.
+
+## Modos actuales (ids)
+
+22 juegos con ronda oficial 🏆 y ranking. Además: Explorar (capas activables), "Mis calles" (el usuario busca una calle en Nominatim y se guarda en su navegador), cronómetro + récord personal por juego.
+
+- **Comunas de Chile**: `cc-name` ("¿Qué comuna de Chile es esta?"), `cc-find` ("Ubica la comuna", fácil: te dice la región y se encuadra en ella), `cc-hard` ("Ubica la comuna (difícil)": sin pista de región, en todo Chile, 3 intentos y el mapa queda pintado entre preguntas, como "Completa el mapa" de la RM). Las 345 comunas de las 16 regiones (falta la Antártica). Como Metro y Lugares: arriba las rondas oficiales (siempre de todo Chile, con ranking por largo 10/20/todas) y abajo la **Práctica** con fichas de regiones. Los polígonos pesan (580 KB) y van aparte en `public/data/comunas-chile.js`, que el juego baja recién al jugar; las de la RM usan las de data.js. Un nombre repetido entre regiones lleva la región entre paréntesis ("Santa María (Valparaíso)"): lo resuelve `build_data.js` (hoy no hay ninguno). Se arman con `tools/comunas_chile.js`.
+- **Comunas**: `com-name`, `com-all` (**solo ronda oficial**, sin práctica; siempre con todas las comunas del alcance elegido; **el ranking se separa por alcance**: `core` Gran Santiago 34, `peri` con periferia 42, `all` toda la RM 52).
+- **Lugares emblemáticos** (antes "Landmarks"): `lm-loc`, `lm-com`. Incluye barrios con perímetro, 17 cerros y los 6 ríos y canales (categoría "Ríos y canales": se aciertan tocando a menos de 400 m del cauce; no entran en "¿en qué comuna?"). Las estaciones de metro **ya no son lugares emblemáticos**.
+- **Street View** (necesita la llave de Google): `sv-ubicar` ("¿Dónde estás?", 0 a 5 puntos por pregunta, rondas de 10, se puede caminar hasta 500 m sin nombres de calles; 4 niveles, **solo ronda oficial**: un botón por nivel, cada uno con su ranking). **Todo el detalle está en [streetview.md](streetview.md).**
+- **Metro**: `mt-find` (tocar dónde está la estación, sin dibujarlas), `mt-name` (alternativas), filtrables por línea.
+- **Calles**: `st-name` (destaca la calle completa), `st-punto` ("(difícil)": marca solo un punto), `st-find` (acierta quien toca sobre la calle: margen de unos 14 píxeles, entre 80 y 250 m según el zoom, y la calle pedida debe ser la más cercana; con landmarks cercanos al responder, tramos con nombre, bordes de comunas/metro activables).
+- **Ruteo** (detalle en [ruteo.md](ruteo.md)): `rs-any-car` y `rs-any-tp` (paso a paso, GTFS de Red), `rs-sv-car` ("Paso a paso · con Street View": de decisión en decisión con instrucciones tipo navegador y punto cardinal —"Vas hacia el oriente por…"—, cuenta las calles chicas entre dos principales, botón para ver el mapa con una flecha hacia donde se mira; `src/juego/modos/rutasStreetView.js`). En la práctica en auto el jugador puede fijar un punto propio del que parten o al que llegan las rutas, calculadas en el momento con Valhalla (`compartido/rutaEnAuto.js` + `src/dominio/rutaEnAuto.js`); las rutas parten donde se sale del recinto a una calle y terminan donde se la deja, no en medio de un estadio o un parque. 10 rutas por ronda, con ranking y práctica. **Las alternativas deben ser siempre posibles**: nada de calles al azar ni de lados que no existen en el cruce; nunca una pregunta con una sola opción; en autopistas se pregunta por las salidas numeradas de a tres, con a dónde llevan, más "seguir derecho".
+- **Chile**: `ch-find`, `ch-city`, `ch-cityreg`, `ch-all`.
+- **Parques nacionales**: `pn-reg`, `pn-photo` (Chile y Parques: **solo ronda oficial**).
+- **Conexiones (`cx`) está retirado por mientras** (ver [pendientes.md](pendientes.md)).
+
+Los juegos que se retiraron del menú (fronteras, metro, cerros, fotos, barrios, rutas desde un punto fijo, etc.) se **borraron del código**; su historia está en git (commits anteriores a "Quita los juegos retirados").
+
+## Calles: modos de juego
+
+- `st-find`: si la calle más cercana al toque cruza la pedida a menos de 120 m, no se exige que la pedida sea la más cercana y el margen mínimo sube a 120 m (cruces perdonados). Constantes arriba de `st-find` en `src/juego/modos/calles.js`.
+- `st-punto` es un juego aparte de `st-name` (con su propio ranking): el punto se elige lejos (≥120 m) de otras calles (`puntoParaPreguntar`, `src/dominio/calles.js`); si no se puede, se marca además una franja de ±150 m de la calle.
+- Después de responder en `st-name`, `st-punto` y `st-find` hay un botón para **recorrer la calle en Street View** (`src/interfaz/recorrerCalle.js`).
+
+## Rondas, práctica y ranking
+
+- **Ya no se dice "ronda oficial" en la interfaz** (oct. 2026): hay rondas (cuentan para el ranking, 🏆) y **práctica** (🏋️). En el código el concepto sigue llamándose `ranked`/`oficial`/`MODOS_OFICIALES`; renombrarlo es opcional. Al ir bien la ronda dice "¡Teni calle! 🏆".
+- La práctica es siempre "modo fácil" (bordes de comunas y líneas del metro dibujados); la ronda oficial, siempre difícil. No hay botón para cambiarlo. Street View, Comunas, Chile y Parques nacionales no tienen práctica (no se beneficiaban de ella).
+- Largos de ronda: 10, 20 (el de siempre) o todas, y cada largo tiene su ranking (las regiones y las comunas de la RM siempre van completas; Street View y **todo el Ruteo van siempre de 10**, sin "todas": hacer más cansa). Las marcas antiguas de 10 vuelven a salir en el ranking; las de 15 y 30 no. **El ranking muestra cada juego solo en las pestañas que existen para él** (no hay "completa el mapa" de 10 ni de 20; Street View y las comunas de la RM se separan por nivel y alcance): la regla está en `categoriaEnElResumen` y `categoriasValidasDe` de `compartido/oficial.js`, que usan el navegador y el servidor.
+- El progreso de práctica ("% dominado", puntos débiles) se comparte entre dispositivos para quien tiene cuenta (`src/cuenta/progresoCompartido.js`, tabla `progreso`); los récords personales (`best`) siguen siendo locales.
+- **Compartir** (`src/dominio/compartir.js` arma el texto, `src/interfaz/compartir.js` el botón): solo al terminar una ronda, nunca en práctica (sus reglas cambian según cada uno). Usa el menú de compartir del sistema (`navigator.share`) y, si no existe, copia el texto. Texto: "¡Saqué nuevo récord en "<juego>"!" primero si corresponde, luego el logro con el tiempo en palabras, el puesto en el ranking si ya llegó, y "¿Teni calle? notengocalle.com". Sin cuadrícula de emojis (quizás para un juego diario) ni imagen para historias de Instagram por ahora.
+
+## Menú (decisiones de diseño del dueño)
+
+- Orden de las tarjetas: Calles, **Ruteo**, Comunas, Street View, Lugares emblemáticos, Metro, Chile, Comunas de Chile, Parques nacionales. **"Mis calles" va dentro de la tarjeta de Calles**, al final, bajo una raya. Los juegos de ruteo se llaman "Rutas en auto", "Rutas en micro" y "Rutas en auto · con Street View".
+- Las tarjetas de cada grupo van **apiladas, una por línea** (no en cuadrícula). Lo configurable de cada tarjeta va **al final, bajo una raya** ("Preguntas por ronda", comunas incluidas, punto fijo del ruteo). No hay tarjeta de Ajustes ni modo estricto (retirado).
+- Descripciones: Calles, Street View, Comunas (¿Qué comuna es esta?), Lugares emblemáticos y Ruteo van **sin descripción** de juego (Calles: solo las de los dos "¿Qué calle es esta?"); Ruteo no cuenta cuántas rutas hay.
+- La **barra superior son pestañas**, como las de Chrome (`#pestanas`, `marcarPestana` en `src/interfaz/navegacion.js`): NoTengoCalle (el menú y las rondas), Ranking, Explorar y Mi progreso; la activa va en un color más claro. El título no cambia según la pantalla. Mi progreso es su propia página (`src/interfaz/progreso.js`).
+- El pie (créditos, Privacidad, "Hecho a punta de Claude por tatanas") sale en el menú, el ranking y Mi progreso (`src/interfaz/pie.js`).
+- Comunas: "Comunas incluidas" (periferia o no) vive en la tarjeta de Comunas y **cada alcance es un ranking distinto**.
+- Metro: arriba, los dos juegos con **todas las líneas** (solo ronda oficial); abajo, tras una raya, **Práctica** con las fichas de líneas y los dos juegos usando solo esas líneas.
+- Lugares emblemáticos: igual que Metro. Arriba, los dos juegos con **todas las categorías** (solo ronda oficial); abajo, tras una raya, **Práctica** con las fichas de categorías y los dos juegos usando solo esas.
+- Street View: un botón por nivel (Fácil, Medio, Difícil, Extremo, con una línea que lo describe), todos ronda oficial (ranking por nivel). Sin práctica.
+- Revisión de calles por sector y tamaño (candidatas a sacar del juego para todos): [revision-calles.md](revision-calles.md).
+- El ranking usa más ancho en escritorio.

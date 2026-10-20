@@ -25,13 +25,13 @@ muestra.
 
 El sitio se publica en Netlify directamente desde este repositorio: cada push a `main` despliega. La puesta
 en marcha (conectar el repositorio y crear la base de datos) está en
-[ARQUITECTURA.md](ARQUITECTURA.md#publicar-netlify--github).
+[docs/publicar.md](docs/publicar.md).
 
 ## Documentación
 
-- [ARQUITECTURA.md](ARQUITECTURA.md): cómo funciona todo, carpeta por carpeta; fuentes de datos; pipeline;
-  pruebas; decisiones.
-- [CLAUDE.md](CLAUDE.md): acuerdos de trabajo y decisiones de contenido (qué se sacó, qué está pendiente).
+- [ARQUITECTURA.md](ARQUITECTURA.md): cómo está organizado el código, carpeta por carpeta; pruebas; decisiones.
+- [docs/](docs/): el detalle por tema (servidor, datos y pipeline, juegos y menú, ruteo, Street View, publicación…).
+- [CLAUDE.md](CLAUDE.md): acuerdos de trabajo y reglas del producto.
 
 ## Créditos de los datos
 

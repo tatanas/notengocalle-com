@@ -1,20 +1,41 @@
 # NoTengoCalle — contexto para continuar el proyecto
 
-Juego web para aprender la geografía de Santiago: comunas, calles, lugares, metro, rutas, y regiones/ciudades/parques de Chile. Tiene cuentas (usuario y clave, sin correo, o "Continuar con Google") y ranking por juego; también se puede jugar sin cuenta. Partió pensado para el sector oriente y se está generalizando a todo Santiago: se saca lo demasiado específico de un sector y cada usuario puede agregar lo suyo (Mis calles, punto fijo del ruteo). **No guardar en el repo nada que ubique al dueño** (dónde vive o estudia): el repo es público.
-"NoTengoCalle" es solo el **nombre mostrado**; el dominio lo define Netlify.
+Juego web para aprender la geografía de Santiago (comunas, calles, lugares, metro, rutas) y de Chile (regiones, ciudades, parques). Tiene cuentas (usuario y clave, sin correo, o "Continuar con Google") y ranking por juego; también se puede jugar sin cuenta. Partió pensado para el sector oriente y se está generalizando a todo Santiago: se saca lo demasiado específico de un sector y cada usuario puede agregar lo suyo (Mis calles, punto fijo del ruteo). **No guardar en el repo nada que ubique al dueño** (dónde vive o estudia): el repo es público. "NoTengoCalle" es solo el **nombre mostrado**; el dominio lo define Netlify.
 
-**Para retomar el trabajo rápido (y gastar pocos tokens), empieza por [docs/siguiente-sesion.md](docs/siguiente-sesion.md).** **La estructura del código, el servidor, la base de datos, el pipeline de datos, las pruebas y el despliegue están explicados en [ARQUITECTURA.md](ARQUITECTURA.md). Léelo antes de tocar código y mantenlo al día.** Este archivo solo guarda lo que no está ahí: cómo trabajar y las decisiones de contenido.
+## Qué leer
+
+Este archivo se carga siempre; lo demás, **solo el documento que la tarea toque** (no leer por si acaso).
+
+| Si la tarea… | Leer |
+|---|---|
+| toca código (mapa de carpetas y "dónde tocar cada cosa") | [ARQUITECTURA.md](ARQUITECTURA.md) |
+| retoma el trabajo (estado, comandos, ahorro de tokens) | [docs/siguiente-sesion.md](docs/siguiente-sesion.md) |
+| agrega, cambia o retira un juego; toca el menú, rondas o ranking | [docs/modos.md](docs/modos.md) |
+| agrega o quita calles, lugares o barrios | [docs/decisiones-contenido.md](docs/decisiones-contenido.md) (lo ya descartado) y [docs/datos.md](docs/datos.md) (pipeline) |
+| toca el ruteo (`rs-*`) | [docs/ruteo.md](docs/ruteo.md) |
+| toca Street View | [docs/streetview.md](docs/streetview.md) |
+| toca cuentas, ranking o la base de datos | [docs/servidor.md](docs/servidor.md) |
+| publica o configura Netlify/Neon | [docs/publicar.md](docs/publicar.md) |
+| toca anuncios | [docs/publicidad.md](docs/publicidad.md) |
+| busca qué hacer después | [docs/pendientes.md](docs/pendientes.md) |
+| revisa qué calles sacar (25 KB: buscar con grep) | [docs/revision-calles.md](docs/revision-calles.md) |
 
 ## Cómo hablar y trabajar con el usuario
 
 - Español de Chile, directo y conciso. Reportar con honestidad: si algo no se probó o falló, decirlo.
 - Verificar con las pruebas automáticas antes de decir "listo"; revisar visualmente las capturas de `pruebas/capturas/` lo que se pueda.
-- **Pruebas: no correr la suite completa por costumbre** (`npm run test:full` tarda más de 10 minutos). `npm test` = lint + unitarias + solo las suites de navegador que corresponden a los archivos modificados (`pruebas/seleccion.js`; sin cambios sin confirmar usa el último commit). La completa solo cuando el cambio es amplio (motor de rondas, datos, ranking/servidor, `package.json`, el propio arnés de pruebas, más de 30 archivos) o antes de un despliegue grande; `pruebas/ejecutar.js` ya la elige sola con `--cambios` en esos casos.
+- **Pruebas: no correr la suite completa por costumbre** (`npm run test:full` tarda más de 10 minutos). `npm test` = lint + unitarias + solo las suites de navegador que corresponden a los archivos modificados (`pruebas/seleccion.js`; sin cambios sin confirmar usa el último commit). La completa solo cuando el cambio es amplio (motor de rondas, datos, ranking/servidor, `package.json`, el propio arnés de pruebas, más de 30 archivos) o antes de un despliegue grande; `pruebas/ejecutar.js` ya la elige sola con `--cambios` en esos casos. Las pruebas imprimen solo lo que falla (`--verboso` para ver todo).
 - Para **sacar** cosas (calles, lugares) el usuario prefiere que se le liste primero y decida una a una.
+- El usuario hace los `git push`; commit solo cuando se lo piden.
+
+## Reglas del producto (decisiones del dueño; no re-discutir)
+
+- Preguntas "justas": el nombre no debe delatar la comuna ni la ubicación (campo `obvious` para los inevitables, como "Plaza de Maipú").
+- El juego es instantáneo: nada de frameworks ni de esperar al servidor para jugar.
+- **No se dice "ronda oficial" en la interfaz**: hay rondas (cuentan para el ranking, 🏆) y **práctica** (🏋️). En el código sigue siendo `ranked`/`oficial`/`MODOS_OFICIALES`. La práctica es siempre "modo fácil"; la ronda, siempre difícil.
+- Se prefiere lo gratis, pero ya no rige "sin API keys". Llaves e IDs públicos en uso: Google Maps (Street View) y el ID de cliente OAuth de Google (`compartido/configuracion.js`); publicidad con AdSense. **Nada de imágenes de Google fuera de Street View.** Fotos: solo Wikimedia Commons (con autor y licencia visibles) y Panoramax (Mapillary se eliminó).
 - Tipografía: gobCL (Kit Digital del Gobierno de Chile), **en prueba** (`public/fuentes/gobcl/`, `@font-face` al comienzo de `estilos.css`); el zip no trae licencia: confirmar si se puede usar fuera del Estado antes de dejarla.
-- La regla inicial de "todo gratis y sin API keys" era solo para sacar el MVP: ya no rige (oct. 2026), pero se sigue prefiriendo lo gratis. Llaves y IDs públicos en uso: Google Maps (Street View) y el ID de cliente OAuth de Google (`compartido/configuracion.js`). Publicidad: Google AdSense (dominio notengocalle.com, script en `index.html`, `public/ads.txt`, `public/privacidad.html`); estado y planes en `docs/siguiente-sesion.md`. Nada de imágenes de Google fuera de Street View. Fotos: solo Wikimedia Commons (con autor y licencia visibles) y Panoramax. Mapillary se probó y se **eliminó** (las fotos eran inútiles).
-- Preguntas deben ser "justas": el nombre no debe delatar la comuna ni la ubicación (campo `obvious` para los inevitables, como "Plaza de Maipú").
-- Que el juego siga siendo instantáneo: nada de frameworks ni de esperar al servidor para jugar.
+- Conexiones (`cx`) está retirado por mientras (`docs/pendientes.md`). Lo que ya se sacó del juego y no vuelve sin preguntar: `docs/decisiones-contenido.md`.
 
 ## Estilo de código
 
@@ -22,74 +43,16 @@ Juego web para aprender la geografía de Santiago: comunas, calles, lugares, met
 - Prettier (`npm run format`) y ESLint (`npm run lint`) mandan; no discutir formato a mano.
 - Los archivos de `src/juego/modos/` y `src/interfaz/explorar.js`, `src/interfaz/misCalles.js`, `src/juego/pasos.js` se migraron del antiguo `js/app.js` casi tal cual (solo reformateados y con imports): todavía usan nombres cortos (`f`, `l`, `s`, `q`). Al tocarlos, mejorar los nombres de lo que se toque.
 
-## Modos actuales (ids)
+## Ahorro de tokens
 
-Comunas de Chile: `cc-name`, `cc-find` (fácil), `cc-hard` (difícil) (ver Menú; práctica por regiones) · Comunas: `com-name`, `com-all` (**solo ronda oficial**, sin práctica; siempre con todas las comunas del alcance elegido; **el ranking se separa por alcance**: `core` Gran Santiago 34, `peri` con periferia 42, `all` toda la RM 52) · Lugares emblemáticos (antes "Landmarks"): `lm-loc`, `lm-com` (incluye barrios con perímetro, 17 cerros y los 6 ríos y canales —categoría "Ríos y canales", se aciertan tocando a menos de 400 m del cauce; no entran en "¿en qué comuna?"—; las estaciones de metro **ya no son lugares emblemáticos**) · Street View (necesita la llave de Google): `sv-ubicar` ("¿Dónde estás?", 0 a 5 puntos por pregunta, rondas de 10, se puede caminar hasta 500 m sin nombres de calles; 4 niveles, **solo ronda oficial** (un botón por nivel, cada uno con su ranking); **todo el detalle está en [docs/streetview.md](docs/streetview.md)**) · Metro: `mt-find` (tocar dónde está la estación, sin dibujarlas), `mt-name` (alternativas), filtrables por línea · Calles: `st-name` (destaca la calle completa), `st-punto` ("(difícil)": marca solo un punto), `st-find` (acierta quien toca sobre la calle: margen de unos 14 píxeles, entre 80 y 250 m según el zoom, y la calle pedida debe ser la más cercana; con landmarks cercanos al responder, tramos con nombre, bordes de comunas/metro activables) · Ruteo (**las alternativas deben ser siempre posibles**, decisión del dueño: nada de calles al azar ni de lados que no existen en el cruce; nunca una pregunta con una sola opción; en autopistas se pregunta por las salidas numeradas de a tres, con a dónde llevan, más "seguir derecho"; ver "Ruteo en auto" en docs/siguiente-sesion.md): `rs-any-car`, `rs-any-tp` (paso a paso, GTFS de Red; en la práctica en auto el jugador puede fijar un punto propio del que parten o al que llegan las rutas, calculadas en el momento con Valhalla: `compartido/rutaEnAuto.js` + `src/dominio/rutaEnAuto.js`; las rutas parten donde se sale del recinto a una calle y terminan donde se la deja, no en medio de un estadio o un parque) y `rs-sv-car` ("Paso a paso · con Street View": de decisión en decisión con instrucciones tipo navegador y punto cardinal ("Vas hacia el oriente por…"), cuenta las calles chicas entre dos principales ("doblaste por Vital Apoquindo; ahora llegas a General Blanche"), botón para ver el mapa con una flecha hacia donde se mira, 10 rutas por ronda, con ranking y práctica (con el punto fijo); `src/juego/modos/rutasStreetView.js`) · Chile: `ch-find`, `ch-city`, `ch-cityreg`, `ch-all` · Parques nacionales: `pn-reg`, `pn-photo` (Chile y Parques: **solo ronda oficial**). **Conexiones (`cx`) está retirado por mientras** (el código sigue en `src/juego/modos/conexiones.js`, sin cargar; ver docs/siguiente-sesion.md). 22 juegos con ronda oficial 🏆 y ranking. Más: Explorar (capas activables), "Mis calles" (el usuario busca una calle en Nominatim y se guarda en su navegador), cronómetro + récord personal por juego.
-Los juegos que se retiraron del menú (fronteras, metro, cerros, fotos, barrios, rutas desde un punto fijo, etc.) se **borraron del código**; su historia está en git (commits anteriores a "Quita los juegos retirados").
+- `.claude/settings.json` bloquea Read/Grep sobre lo pesado o generado: `public/data/` (`data.js` son 2 MB en 2 líneas), `public/vendor/`, `tools/*.json`, `src/datos/lugaresStreetView.json` y `pistasCalles.json`, `dist/`, `node_modules/`, `package-lock.json`. Consultar los datos del juego con `npm run datos -- "<expresión sobre D>"` (corta la salida); `tools/package.json` cae en el bloqueo de `tools/*.json`: usar `cat`.
+- Buscar con grep antes de leer; los archivos de `src/juego/modos/` llegan a 22 KB: leerlos por rango.
+- Escribir scripts Python/JS a archivos (`.local/`, ignorado por git) y no en línea en Bash: las comillas y las barras invertidas se rompen.
 
 ## Trampas conocidas
 
-- **Overpass**: overpass-api.de suele dar 504/timeout (probar espejos kumi.systems, private.coffee, mandar `User-Agent` descriptivo); **no sirve desde el navegador** (CORS). Para la búsqueda de "Mis calles" se usa Nominatim, que sí funciona desde el navegador.
-- **Wikimedia**: con User-Agent genérico responde 429; usar uno descriptivo con contacto. Nominatim: máx. 1 req/s.
-- **Rutas en auto: Valhalla** (valhalla1.openstreetmap.de, de FOSSGIS; solo uso liviano). Se dejó OSRM porque su servidor público evitaba la Costanera Norte por el centro. Aun así, desde La Dehesa al aeropuerto prefiere Vespucio Norte (sin taco es más rápido): no se puede forzar.
-- `tools/remap_routes.js` reconoce los lugares por sus coordenadas exactas: si solo se **mueve** un lugar (sin agregar ni quitar), no correrlo, o tomará el lugar movido como eliminado y botará sus rutas.
-- En Bash, escribir scripts Python/JS a archivos en vez de en línea (las comillas y las barras invertidas se rompen).
-- Los landmarks de cerros, zonas y ríos/canales se **agregan en runtime** a `DATA.landmarks` en `src/datos/datos.js` (ids `k`, `z`, `w`), no están en landmarks.json. Los ríos y canales siguen en `DATA.streets` (kind `agua`, para Explorar y Conexiones) pero no entran a los juegos de calles.
-- Calles con el mismo nombre en distintas comunas llevan sufijo ("Av. Condell (Renca)", "Av. Padre Hurtado (sur)").
 - ESLint no revisa que un `import { x }` exista en el archivo de origen; eso lo detecta `npm run build`.
-- En producción la base es Neon con su driver HTTP; en local y en las pruebas es PGlite. El SQL es el mismo, pero **el camino con Neon real no se ha probado todavía** (a la fecha de este cambio no había base creada).
-- El límite de solicitudes por IP declarado en `netlify/functions/api.js` (`rateLimit`) tampoco se ha visto funcionar: verificarlo en el primer despliegue.
-
+- Los landmarks de cerros, zonas y ríos/canales se **agregan en runtime** a `DATA.landmarks` en `src/datos/datos.js` (ids `k`, `z`, `w`); no están en `landmarks.json`.
+- En producción la base es Neon (driver HTTP); en local y en las pruebas, PGlite. **El camino con Neon real y el `rateLimit` por IP de `netlify/functions/api.js` nunca se han visto funcionar**: verificarlos en el primer despliegue.
 - **Llave de Google Maps** (Street View): `GOOGLE_MAPS_KEY` en Netlify o `.env.local`; detalles y restricciones en [docs/streetview.md](docs/streetview.md).
-
-## Estado y decisiones de contenido (resumen)
-
-- **Ya no se dice "ronda oficial" en la interfaz** (oct. 2026, decisión del dueño): hay rondas (cuentan para el ranking, 🏆) y **práctica** (🏋️). En el código el concepto sigue llamándose `ranked`/`oficial`/`MODOS_OFICIALES`; renombrarlo es opcional. Al ir bien la ronda dice "¡Teni calle! 🏆".
-- **Compartir** (`src/dominio/compartir.js` arma el texto, `src/interfaz/compartir.js` el botón): solo al terminar una ronda, nunca en práctica (sus reglas cambian según cada uno). Usa el menú de compartir del sistema (`navigator.share`) y, si no existe, copia el texto. Texto: "¡Saqué nuevo récord en "<juego>"!" primero si corresponde, luego el logro con el tiempo en palabras, el puesto en el ranking si ya llegó, y "¿Teni calle? notengocalle.com". Sin cuadrícula de emojis (quizás para un juego diario) ni imagen para historias de Instagram por ahora.
-- Largos de ronda: 10, 20 (el de siempre) o todas, y cada largo tiene su ranking (las regiones y las comunas de la RM siempre van completas; Street View y **todo el Ruteo van siempre de 10**, sin "todas": hacer más cansa; decisión del dueño). Las marcas antiguas de 10 vuelven a salir en el ranking; las de 15 y 30 no. **El ranking muestra cada juego solo en las pestañas que existen para él** (no hay "completa el mapa" de 10 ni de 20; Street View y las comunas de la RM se separan por nivel y alcance): la regla está en `categoriaEnElResumen` y `categoriasValidasDe` de `compartido/oficial.js`, que usan el navegador y el servidor.
-- La práctica es siempre "modo fácil" (bordes de comunas y líneas del metro dibujados); la ronda oficial, siempre difícil. No hay botón para cambiarlo. Street View, Comunas, Chile y Parques nacionales no tienen práctica (no se beneficiaban de ella).
-- El progreso de práctica ("% dominado", puntos débiles) se comparte entre dispositivos para quien tiene cuenta (`src/cuenta/progresoCompartido.js`, tabla `progreso`); los récords personales (`best`) siguen siendo locales.
-- 164 calles jugables (153 calles y 11 autopistas; los 6 ríos/canales y las líneas de tren solo salen en Explorar), 234 landmarks en landmarks.json y **260 lugares en el juego** contando barrios con perímetro, 17 cerros y 6 ríos/canales; 93 ciudades, 46 parques nacionales y 22 recorridos de micro troncales en Explorar.
-- Sacados por irrelevantes (no volver a agregar sin preguntar): El Cortijo, Av. Lo Barnechea, Las Nieves, Río Tajo, Av. El Mirador, calles "Cerro El Plomo/Cerro Colorado", San Damián como calle (sigue como barrio), muchos colegios específicos del oriente, clubes de golf/polo/Stade Français, varios restaurantes. Quedan bares Liguria y Nacional (el usuario puede querer sacarlos). También (por decisión del dueño): Embajada de EE.UU., Plaza Las Lilas y San Enrique, los colegios Craighouse, Verbo Divino, Villa María, Lycée Saint-Exupéry, Nido de Águilas y The Grange (los colegios que quedan son los históricos), Prince of Wales, Teleférico Bicentenario (proyecto aparte; el Teleférico del San Cristóbal queda con perímetro), la mayoría de las sedes repetidas de universidades y CFT (se dejaron las más concurridas y repartidas por la ciudad), Av. Pintor Benito Rebolledo, Santos Dumont, Chesterton, Charles Hamilton, Juan XXIII, Bicentenario, Pedro Montt, Condell (Renca), Domingo Santa María, Eduardo Castillo Velasco, Walker Martínez, Camino Lo Boza, Av. Camilo Henríquez y Av. Consistorial, Av. Mariano Sánchez Fontecilla (quedaba cortada en 51 tramos por 7 comunas: confusa). En oct. 2026, por ser chicas y del oriente alto (ver docs/revision-calles.md): El Rodeo, Raúl Labbé, Las Hualtatas, Martín de Zamora, Candelaria Goyenechea, Luis Carrera, Alonso de Camargo, Francisco Bulnes Correa, Camino Las Flores, Paul Harris, Las Tranqueras y Sucre.  En oct. 2026, por apretar la franja norte–sur de Providencia: Av. José Manuel Infante, Luis Thayer Ojeda y Av. Holanda (Suecia y Ricardo Lyon se quedan). Se quedan San Carlos de Apoquindo, Escrivá de Balaguer, Av. La Dehesa e Isabel La Católica. También se sacó el barrio Los Trapenses (lugar emblemático y barrio con perímetro). En oct. 2026 también: los colegios San Ignacio (El Bosque y Alonso Ovalle) y Santiago College, y el Castillo Forestal. La Confitería Torres volvió, con su ubicación fija en la Alameda (el geocodificador daba la sucursal de Las Condes). Se dejó Av. Miraflores (Renca) por ser la que llega al aeropuerto.
-- Pendientes de confirmar con el usuario: Estadio Español (club de socios, sigue), Colegio SEK de Las Condes (no se encontró; el que había estaba en Peñalolén y se sacó), "Av. Pedro Aguirre Cerda" se tomó la de Cerrillos, "Las Flores" se tomó Camino Las Flores de Las Condes, falta la Gerónimo de Alderete de La Florida.
-- Secciones retiradas de la UI pero con datos disponibles: Barrios (ahora dentro de Lugares emblemáticos), Fotos, Cerros (solo 17 pasaron a landmarks; los 44 siguen en la capa Cerros de Explorar). Fronteras se retiró y en oct. 2026 se borró también su cálculo (`tools/border.js`, en git).
-- Los juegos de rutas desde un punto fijo del dueño (`rs-home-*`, `mt-route`) se borraron, y en oct. 2026 también sus datos (rutas, micros "cercanas", scripts de `tools/`).
-
-- Las calles que siguen fuera de Santiago (Ruta 5, 68, 78, 57, Camino a Melipilla) llevan una prolongación punteada (`ext`); ver `tools/extensions.js`.
-
-## Ideas pendientes
-
-0. **Más modos difíciles de calles** (ideas del dueño, aún sin hacer):
-   - _Sin mapa_: **probado y descartado** (juego `st-text`, ya borrado; está en git). Las pistas salían de los cruces de `inter`, que están mal detectados (cruces que caen todos juntos o en el lugar equivocado) y no alcanzan para separar calles paralelas. Solo se rehace si antes se arregla la detección de cruces (`tools/relations.js`).
-   - _Wordle diario_: una calle por día que parte con la pista más amplia (región, comuna) y baja a pistas más específicas con cada intento.
-   - _Con vista de calle_ (probado: **Panoramax no alcanza**; de 424 puntos repartidos en 53 calles, solo 5 tenían una foto a menos de 30 m, o sea ~1 %; las zonas con foto son Vitacura, Andrés Bello, Colón y Pedro de Valdivia. Volver a medir si la cobertura crece): encontrar la calle en el mapa a partir de cómo se ve, pudiendo moverse un poco y con la calle pedida marcada en el piso. **Choca con "nada de imágenes de Google"**: Street View exige API key y es de pago; las alternativas libres son Panoramax (ya se usa para fotos sueltas, tiene visor propio) y Mapillary (descartado antes). Hay que ver cobertura de Panoramax en Santiago.
-   - _Modo extremo_: preguntar por **cualquier** calle de Santiago, no solo las anotadas, y encontrarla en el mapa (sin callejones ni cosas muy chicas). Requiere un conjunto de calles de OSM por comuna (descarga pesada: el pipeline actual solo guarda las anotadas) y decidir qué tamaño mínimo cuenta.
-
-1. Sincronizar también los récords personales (`best`) entre dispositivos (el progreso de práctica ya se sincroniza).
-2. **Lugares propios** del usuario (como "Mis calles"), para poder sacar lo hiperlocal del juego base.
-3. Seguir recortando lo demasiado específico si se generaliza la app.
-4. Ranking: tabla general que combine todos los juegos, e historial personal de rondas (los datos ya se guardan).
-5. Ordenar `tools/` (unas 100 piezas sueltas en una sola carpeta). No se hizo junto con la reestructuración porque la mayoría de los scripts descargan datos y no se pueden volver a correr para verificar que sigan funcionando.
-6. Si el juego se abre a desconocidos: validar los puntajes en el servidor (hoy los calcula el navegador) y moderar nombres de usuario.
-
-## Calles: modos de juego (resumen; ver docs/siguiente-sesion.md)
-
-- `st-find`: si la calle más cercana al toque cruza la pedida a menos de 120 m, no se exige que la pedida sea la más cercana y el margen mínimo sube a 120 m (cruces perdonados).
-- `st-punto` es un juego aparte de `st-name` (con su propio ranking): el punto se elige lejos (≥120 m) de otras calles (`puntoParaPreguntar`, `src/dominio/calles.js`); si no se puede, se marca además una franja de ±150 m de la calle.
-- Después de responder en `st-name`, `st-punto` y `st-find` hay un botón para **recorrer la calle en Street View** (`src/interfaz/recorrerCalle.js`).
-
-## Menú (decisiones de diseño del dueño)
-
-- Orden de las tarjetas (decisión del dueño): Calles, **Ruteo**, Comunas, Street View, Lugares emblemáticos, Metro, Chile, Comunas de Chile, Parques nacionales. **"Mis calles" va dentro de la tarjeta de Calles**, al final, bajo una raya. Los juegos de ruteo se llaman "Rutas en auto", "Rutas en micro" y "Rutas en auto · con Street View"; los tres van de a 10 rutas, con ranking y práctica.
-- **Comunas de Chile** (`cc-name` "¿Qué comuna de Chile es esta?", `cc-find` "Ubica la comuna" —fácil: te dice la región y se encuadra en ella— y `cc-hard` "Ubica la comuna (difícil)" —sin pista de región, en todo Chile, 3 intentos y el mapa queda pintado entre preguntas, como "Completa el mapa" de la RM—): las 345 comunas de las 16 regiones (falta la Antártica). Como Metro y Lugares: arriba las rondas oficiales (siempre de todo Chile, con ranking por largo 10/20/todas) y abajo la **Práctica** con fichas de regiones para elegir cuáles. Los polígonos pesan (580 KB) y van aparte en `public/data/comunas-chile.js`, que el juego baja recién al jugar; las de la RM usan las de data.js. Un nombre repetido entre regiones lleva la región entre paréntesis ("Santa María (Valparaíso)"): lo resuelve `build_data.js` (hoy no hay ninguno). Se arman con `tools/comunas_chile.js` (OpenStreetMap vía Overpass y Nominatim, simplificados).
-
-- Las tarjetas de cada grupo van **apiladas, una por línea** (no en cuadrícula). Lo configurable de cada tarjeta va **al final, bajo una raya** ("Preguntas por ronda", comunas incluidas, punto fijo del ruteo). No hay tarjeta de Ajustes ni modo estricto (retirado).
-- Descripciones: Calles, Street View, Comunas (¿Qué comuna es esta?), Lugares emblemáticos y Ruteo van **sin descripción** de juego (Calles: solo las de los dos "¿Qué calle es esta?"); Ruteo no cuenta cuántas rutas hay.
-- La **barra superior son pestañas**, como las de Chrome (`#pestanas`, `marcarPestana` en `src/interfaz/navegacion.js`): NoTengoCalle (el menú y las rondas), Ranking, Explorar y Mi progreso; la activa va en un color más claro. El título no cambia según la pantalla. Mi progreso es su propia página (`src/interfaz/progreso.js`).
-- El pie (créditos, Privacidad, "Hecho a punta de Claude por tatanas") sale en el menú, el ranking y Mi progreso (`src/interfaz/pie.js`).
-- Comunas: "Comunas incluidas" (periferia o no) vive en la tarjeta de Comunas y **cada alcance es un ranking distinto**.
-- Metro: arriba, los dos juegos con **todas las líneas** (solo ronda oficial); abajo, tras una raya, **Práctica** con las fichas de líneas y los dos juegos usando solo esas líneas.
-- Lugares emblemáticos: igual que Metro. Arriba, los dos juegos con **todas las categorías** (solo ronda oficial); abajo, tras una raya, **Práctica** con las fichas de categorías y los dos juegos usando solo esas.
-- Street View: un botón por nivel (Fácil, Medio, Difícil, Extremo, con una línea que lo describe), todos ronda oficial (ranking por nivel). Sin práctica.
-- Revisión de calles por sector y tamaño (candidatas a sacar del juego para todos): [docs/revision-calles.md](docs/revision-calles.md).
-- El ranking usa más ancho en escritorio.
+- Trampas del pipeline de datos (Overpass, Wikimedia, Valhalla, `remap_routes.js`, nombres repetidos de calles): [docs/datos.md](docs/datos.md#trampas-del-pipeline).

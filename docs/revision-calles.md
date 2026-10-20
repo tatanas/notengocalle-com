@@ -72,197 +72,197 @@ Calles primarias o secundarias largas de OSM que no están en el juego (sin las 
 
 ### Ejes que cruzan varios sectores: 7
 
-| Calle                                       |    km | % grande | Comunas                                              |
-| ------------------------------------------- | ----: | -------: | ---------------------------------------------------- |
-| Autopista del Sol (Ruta 78) (autopista)     |  76,3 |    100 % | Maipú, Talagante, Peñaflor, Padre Hurtado, Cerrillos |
-| Costanera Norte (autopista)                 |  69,6 |    100 % | Vitacura, Renca, Providencia, Pudahuel               |
-| Av. Lo Espejo                               |  10,3 |     97 % | Cerrillos, Lo Espejo, Maipú, San Bernardo, El Bosque |
-| Alameda (Av. Libertador Bernardo O'Higgins) |  16,2 |     93 % | Santiago, Estación Central                           |
-| Américo Vespucio (autopista)                | 248,1 |     92 % | Pudahuel, Quilicura, Maipú                           |
-| Av. Dorsal                                  |  14,1 |     80 % | Renca, Recoleta, Conchalí                            |
-| Catedral                                    |   5,3 |     70 % | Santiago, Quinta Normal, Lo Prado                    |
+| Calle | km | % grande | Comunas |
+|---|---:|---:|---|
+| Autopista del Sol (Ruta 78) (autopista) | 76,3 | 100 % | Maipú, Talagante, Peñaflor, Padre Hurtado, Cerrillos |
+| Costanera Norte (autopista) | 69,6 | 100 % | Vitacura, Renca, Providencia, Pudahuel |
+| Av. Lo Espejo | 10,3 | 97 % | Cerrillos, Lo Espejo, Maipú, San Bernardo, El Bosque |
+| Alameda (Av. Libertador Bernardo O'Higgins) | 16,2 | 93 % | Santiago, Estación Central |
+| Américo Vespucio (autopista) | 248,1 | 92 % | Pudahuel, Quilicura, Maipú |
+| Av. Dorsal | 14,1 | 80 % | Renca, Recoleta, Conchalí |
+| Catedral | 5,3 | 70 % | Santiago, Quinta Normal, Lo Prado |
 
 ### Centro (Santiago): 28
 
-| Calle                            |  km | % grande | Comunas                                   |
+| Calle | km | % grande | Comunas |
 | -------------------------------- | --: | -------: | ----------------------------------------- |
-| Av. Matta (Manuel Antonio Matta) | 5,5 |    100 % | Santiago, Ñuñoa                           |
-| Av. Ricardo Cumming              | 4,2 |    100 % | Santiago                                  |
-| Agustinas                        | 3,3 |    100 % | Santiago                                  |
-| Av. Matucana                     | 3,1 |    100 % | Santiago, Estación Central, Quinta Normal |
-| Av. Diez de Julio                | 2,6 |    100 % | Santiago                                  |
-| Teatinos                         | 1,4 |    100 % | Santiago                                  |
-| Diagonal Paraguay                | 1,1 |    100 % | Santiago                                  |
-| Monjitas                         | 0,9 |    100 % | Santiago                                  |
-| Av. Santa Isabel                 | 4,8 |     98 % | Santiago, Providencia                     |
-| Av. Manuel Rodríguez             | 6,3 |     96 % | Santiago                                  |
-| Franklin                         | 2,6 |     93 % | Santiago                                  |
-| Ñuble                            |   3 |     89 % | Santiago                                  |
-| Av. Brasil                       | 2,7 |     86 % | Santiago                                  |
-| Av. Presidente Balmaceda         |   3 |     84 % | Santiago, Quinta Normal                   |
-| Av. Blanco Encalada              | 4,2 |     82 % | Santiago                                  |
-| Bascuñán Guerrero                | 3,3 |     82 % | Santiago, Pedro Aguirre Cerda             |
-| Exposición                       | 2,4 |     82 % | Santiago, Estación Central                |
-| Av. Beauchef                     | 2,8 |     78 % | Santiago, Pedro Aguirre Cerda             |
-| Merced                           | 1,7 |     76 % | Santiago                                  |
-| Av. Portugal                     | 3,7 |     75 % | Santiago                                  |
-| Bandera                          | 1,4 |     31 % | Santiago                                  |
-| Moneda                           | 3,3 |      0 % | Santiago                                  |
-| Compañía de Jesús                | 2,7 |      0 % | Santiago                                  |
-| Toesca                           | 1,8 |      0 % | Santiago                                  |
-| Morandé                          | 1,4 |      0 % | Santiago                                  |
-| Paseo Ahumada                    | 0,6 |      0 % | Santiago                                  |
-| Paseo Estado                     | 0,6 |      0 % | Santiago                                  |
-| Nueva York                       | 0,2 |      0 % | Santiago                                  |
+| Av. Matta (Manuel Antonio Matta) | 5,5 | 100 % | Santiago, Ñuñoa |
+| Av. Ricardo Cumming | 4,2 | 100 % | Santiago |
+| Agustinas | 3,3 | 100 % | Santiago |
+| Av. Matucana | 3,1 | 100 % | Santiago, Estación Central, Quinta Normal |
+| Av. Diez de Julio | 2,6 | 100 % | Santiago |
+| Teatinos | 1,4 | 100 % | Santiago |
+| Diagonal Paraguay | 1,1 | 100 % | Santiago |
+| Monjitas | 0,9 | 100 % | Santiago |
+| Av. Santa Isabel | 4,8 | 98 % | Santiago, Providencia |
+| Av. Manuel Rodríguez | 6,3 | 96 % | Santiago |
+| Franklin | 2,6 | 93 % | Santiago |
+| Ñuble | 3 | 89 % | Santiago |
+| Av. Brasil | 2,7 | 86 % | Santiago |
+| Av. Presidente Balmaceda | 3 | 84 % | Santiago, Quinta Normal |
+| Av. Blanco Encalada | 4,2 | 82 % | Santiago |
+| Bascuñán Guerrero | 3,3 | 82 % | Santiago, Pedro Aguirre Cerda |
+| Exposición | 2,4 | 82 % | Santiago, Estación Central |
+| Av. Beauchef | 2,8 | 78 % | Santiago, Pedro Aguirre Cerda |
+| Merced | 1,7 | 76 % | Santiago |
+| Av. Portugal | 3,7 | 75 % | Santiago |
+| Bandera | 1,4 | 31 % | Santiago |
+| Moneda | 3,3 | 0 % | Santiago |
+| Compañía de Jesús | 2,7 | 0 % | Santiago |
+| Toesca | 1,8 | 0 % | Santiago |
+| Morandé | 1,4 | 0 % | Santiago |
+| Paseo Ahumada | 0,6 | 0 % | Santiago |
+| Paseo Estado | 0,6 | 0 % | Santiago |
+| Nueva York | 0,2 | 0 % | Santiago |
 
 ### Oriente (Providencia, Ñuñoa, La Reina, Peñalolén): 36
 
-| Calle                      |   km | % grande | Comunas                                      |
-| -------------------------- | ---: | -------: | -------------------------------------------- |
-| Av. Grecia                 | 20,1 |    100 % | Ñuñoa, Peñalolén                             |
-| Av. Francisco Bilbao       | 16,7 |    100 % | Providencia, La Reina, Las Condes            |
-| Av. Irarrázaval            | 11,4 |    100 % | Ñuñoa                                        |
-| Av. Pedro de Valdivia      | 10,6 |    100 % | Ñuñoa, Providencia, Macul                    |
-| Av. Andrés Bello           |  5,6 |    100 % | Providencia, Las Condes                      |
-| Av. Los Leones             |  5,6 |    100 % | Providencia                                  |
-| Av. Príncipe de Gales      |  5,5 |    100 % | La Reina                                     |
-| Av. José Pedro Alessandri  |  4,1 |    100 % | Ñuñoa                                        |
-| Av. Eliodoro Yáñez         |  3,3 |    100 % | Providencia                                  |
-| Av. Salvador               |  3,2 |    100 % | Providencia, Ñuñoa                           |
-| Av. General Bustamante     |  3,1 |    100 % | Providencia, Ñuñoa                           |
-| Av. Antonio Varas          |    3 |    100 % | Providencia, Ñuñoa                           |
-| Av. Nueva Providencia      |  2,3 |    100 % | Providencia                                  |
-| Av. Larraín                |  2,2 |    100 % | La Reina                                     |
-| Av. Providencia            |  5,3 |     99 % | Providencia                                  |
-| Av. Diagonal Oriente       |  5,1 |     95 % | Ñuñoa, Providencia                           |
-| Dublé Almeyda              |  4,8 |     95 % | Ñuñoa                                        |
-| Av. Ossa                   |  5,4 |     91 % | La Reina, Ñuñoa                              |
-| Los Conquistadores         |  3,5 |     90 % | Providencia, Vitacura                        |
-| Av. Tobalaba               | 18,5 |     88 % | Peñalolén, Providencia, La Reina, La Florida |
-| Av. José Arrieta           |  6,3 |     85 % | Peñalolén, La Reina                          |
-| Av. Quilín                 | 13,5 |     74 % | Peñalolén, Macul                             |
-| Av. Manuel Montt           |  3,1 |     74 % | Providencia, Ñuñoa                           |
-| Av. Pocuro                 |  4,2 |     68 % | Providencia                                  |
-| ⚪ Av. Chile España        |  2,1 |     53 % | Ñuñoa, Providencia                           |
-| Diagonal Las Torres        |  6,4 |     48 % | Peñalolén                                    |
-| ⚪ Av. El Cerro            |  3,1 |     40 % | Providencia                                  |
-| Av. El Bosque              |  4,3 |     20 % | Providencia, Las Condes                      |
-| Av. Los Presidentes        |  8,6 |      0 % | Peñalolén                                    |
-| ⚪ Av. Simón Bolívar       |  7,3 |      0 % | Ñuñoa, La Reina                              |
-| ⚪ Av. Echeñique           |  6,6 |      0 % | La Reina, Ñuñoa                              |
-| Av. Suecia                 |  4,4 |      0 % | Providencia, Ñuñoa                           |
-| ⚪ Av. Holanda             |  4,3 |      0 % | Providencia, Ñuñoa                           |
-| ⚪ Av. Ricardo Lyon        |  3,7 |      0 % | Providencia, Ñuñoa                           |
-| ⚪ Av. José Manuel Infante |  3,4 |      0 % | Providencia, Ñuñoa                           |
-| ⚪ Luis Thayer Ojeda       |    3 |      0 % | Providencia                                  |
+| Calle | km | % grande | Comunas |
+|---|---:|---:|---|
+| Av. Grecia | 20,1 | 100 % | Ñuñoa, Peñalolén |
+| Av. Francisco Bilbao | 16,7 | 100 % | Providencia, La Reina, Las Condes |
+| Av. Irarrázaval | 11,4 | 100 % | Ñuñoa |
+| Av. Pedro de Valdivia | 10,6 | 100 % | Ñuñoa, Providencia, Macul |
+| Av. Andrés Bello | 5,6 | 100 % | Providencia, Las Condes |
+| Av. Los Leones | 5,6 | 100 % | Providencia |
+| Av. Príncipe de Gales | 5,5 | 100 % | La Reina |
+| Av. José Pedro Alessandri | 4,1 | 100 % | Ñuñoa |
+| Av. Eliodoro Yáñez | 3,3 | 100 % | Providencia |
+| Av. Salvador | 3,2 | 100 % | Providencia, Ñuñoa |
+| Av. General Bustamante | 3,1 | 100 % | Providencia, Ñuñoa |
+| Av. Antonio Varas | 3 | 100 % | Providencia, Ñuñoa |
+| Av. Nueva Providencia | 2,3 | 100 % | Providencia |
+| Av. Larraín | 2,2 | 100 % | La Reina |
+| Av. Providencia | 5,3 | 99 % | Providencia |
+| Av. Diagonal Oriente | 5,1 | 95 % | Ñuñoa, Providencia |
+| Dublé Almeyda | 4,8 | 95 % | Ñuñoa |
+| Av. Ossa | 5,4 | 91 % | La Reina, Ñuñoa |
+| Los Conquistadores | 3,5 | 90 % | Providencia, Vitacura |
+| Av. Tobalaba | 18,5 | 88 % | Peñalolén, Providencia, La Reina, La Florida |
+| Av. José Arrieta | 6,3 | 85 % | Peñalolén, La Reina |
+| Av. Quilín | 13,5 | 74 % | Peñalolén, Macul |
+| Av. Manuel Montt | 3,1 | 74 % | Providencia, Ñuñoa |
+| Av. Pocuro | 4,2 | 68 % | Providencia |
+| ⚪ Av. Chile España | 2,1 | 53 % | Ñuñoa, Providencia |
+| Diagonal Las Torres | 6,4 | 48 % | Peñalolén |
+| ⚪ Av. El Cerro | 3,1 | 40 % | Providencia |
+| Av. El Bosque | 4,3 | 20 % | Providencia, Las Condes |
+| Av. Los Presidentes | 8,6 | 0 % | Peñalolén |
+| ⚪ Av. Simón Bolívar | 7,3 | 0 % | Ñuñoa, La Reina |
+| ⚪ Av. Echeñique | 6,6 | 0 % | La Reina, Ñuñoa |
+| Av. Suecia | 4,4 | 0 % | Providencia, Ñuñoa |
+| ⚪ Av. Holanda | 4,3 | 0 % | Providencia, Ñuñoa |
+| ⚪ Av. Ricardo Lyon | 3,7 | 0 % | Providencia, Ñuñoa |
+| ⚪ Av. José Manuel Infante | 3,4 | 0 % | Providencia, Ñuñoa |
+| ⚪ Luis Thayer Ojeda | 3 | 0 % | Providencia |
 
 ### Oriente alto (Las Condes, Vitacura, Lo Barnechea): 28
 
-| Calle                                     |   km | % grande | Comunas                            |
-| ----------------------------------------- | ---: | -------: | ---------------------------------- |
-| Av. Vitacura                              | 14,7 |    100 % | Vitacura, Las Condes               |
-| Av. Padre Hurtado                         | 13,8 |    100 % | Las Condes, Vitacura, La Reina     |
-| General Blanche                           |  4,7 |    100 % | Las Condes                         |
-| Av. Nueva Costanera                       |  3,6 |    100 % | Vitacura                           |
-| Av. Isabel La Católica                    |  3,4 |    100 % | Las Condes                         |
-| Av. Presidente Errázuriz                  |  2,4 |    100 % | Las Condes                         |
-| 🟡 Gerónimo de Alderete                   |  1,7 |    100 % | Vitacura, Las Condes               |
-| Av. Presidente Kennedy                    | 27,9 |     98 % | Vitacura, Las Condes               |
-| Av. Apoquindo                             | 10,7 |     98 % | Las Condes                         |
-| 🟡 Av. José Alcalde Délano                |    6 |     98 % | Lo Barnechea                       |
-| Av. Presidente Sebastián Piñera Echenique |  3,9 |     97 % | Las Condes                         |
-| Av. Manquehue                             | 11,8 |     95 % | Las Condes, Vitacura               |
-| Av. Presidente Riesco                     |  6,4 |     94 % | Las Condes                         |
-| Av. Alonso de Córdova                     |  5,3 |     94 % | Las Condes, Vitacura               |
-| Camino a Farellones (G-21) (autopista)    | 15,2 |     92 % | Lo Barnechea, Las Condes           |
-| Camino El Alba                            |  5,2 |     89 % | Las Condes                         |
-| Los Militares                             |  3,6 |     89 % | Las Condes                         |
-| Av. Las Condes                            | 16,8 |     88 % | Las Condes, Lo Barnechea, Vitacura |
-| 🟡 Camino San Francisco de Asís           |  6,4 |     85 % | Las Condes, Lo Barnechea           |
-| Av. Tomás Moro                            |  3,6 |     85 % | Las Condes                         |
-| Av. Cristóbal Colón                       |  8,5 |     84 % | Las Condes                         |
-| 🟡 Av. Alexander Fleming                  |  3,3 |     68 % | Las Condes                         |
-| Av. Santa María                           |  9,4 |     67 % | Vitacura                           |
-| 🟡 Av. Luis Pasteur                       |  4,9 |     65 % | Vitacura                           |
-| 🟠 Av. La Dehesa                          | 11,1 |     50 % | Lo Barnechea                       |
-| 🟠 Av. Monseñor Escrivá de Balaguer       | 13,9 |     42 % | Vitacura, Lo Barnechea             |
-| Isidora Goyenechea                        |  1,3 |     35 % | Las Condes                         |
-| 🟠 Av. San Carlos de Apoquindo            |  8,5 |      0 % | Las Condes                         |
+| Calle | km | % grande | Comunas |
+|---|---:|---:|---|
+| Av. Vitacura | 14,7 | 100 % | Vitacura, Las Condes |
+| Av. Padre Hurtado | 13,8 | 100 % | Las Condes, Vitacura, La Reina |
+| General Blanche | 4,7 | 100 % | Las Condes |
+| Av. Nueva Costanera | 3,6 | 100 % | Vitacura |
+| Av. Isabel La Católica | 3,4 | 100 % | Las Condes |
+| Av. Presidente Errázuriz | 2,4 | 100 % | Las Condes |
+| 🟡 Gerónimo de Alderete | 1,7 | 100 % | Vitacura, Las Condes |
+| Av. Presidente Kennedy | 27,9 | 98 % | Vitacura, Las Condes |
+| Av. Apoquindo | 10,7 | 98 % | Las Condes |
+| 🟡 Av. José Alcalde Délano | 6 | 98 % | Lo Barnechea |
+| Av. Presidente Sebastián Piñera Echenique | 3,9 | 97 % | Las Condes |
+| Av. Manquehue | 11,8 | 95 % | Las Condes, Vitacura |
+| Av. Presidente Riesco | 6,4 | 94 % | Las Condes |
+| Av. Alonso de Córdova | 5,3 | 94 % | Las Condes, Vitacura |
+| Camino a Farellones (G-21) (autopista) | 15,2 | 92 % | Lo Barnechea, Las Condes |
+| Camino El Alba | 5,2 | 89 % | Las Condes |
+| Los Militares | 3,6 | 89 % | Las Condes |
+| Av. Las Condes | 16,8 | 88 % | Las Condes, Lo Barnechea, Vitacura |
+| 🟡 Camino San Francisco de Asís | 6,4 | 85 % | Las Condes, Lo Barnechea |
+| Av. Tomás Moro | 3,6 | 85 % | Las Condes |
+| Av. Cristóbal Colón | 8,5 | 84 % | Las Condes |
+| 🟡 Av. Alexander Fleming | 3,3 | 68 % | Las Condes |
+| Av. Santa María | 9,4 | 67 % | Vitacura |
+| 🟡 Av. Luis Pasteur | 4,9 | 65 % | Vitacura |
+| 🟠 Av. La Dehesa | 11,1 | 50 % | Lo Barnechea |
+| 🟠 Av. Monseñor Escrivá de Balaguer | 13,9 | 42 % | Vitacura, Lo Barnechea |
+| Isidora Goyenechea | 1,3 | 35 % | Las Condes |
+| 🟠 Av. San Carlos de Apoquindo | 8,5 | 0 % | Las Condes |
 
 ### Norte: 13
 
-| Calle                                                |   km | % grande | Comunas                                                  |
-| ---------------------------------------------------- | ---: | -------: | -------------------------------------------------------- |
-| Autopista Nororiente (Radial Nororiente) (autopista) |   43 |    100 % | Colina, Huechuraba                                       |
-| Autopista Los Libertadores (Ruta 57) (autopista)     | 27,9 |    100 % | Colina, Quilicura                                        |
-| Ruta 5 Norte (Panamericana) (autopista)              | 26,2 |    100 % | Quilicura, Colina, Lampa                                 |
-| Av. Los Zapadores                                    |  7,6 |    100 % | Recoleta, Conchalí                                       |
-| Av. Fermín Vivaceta                                  |  5,9 |    100 % | Independencia, Conchalí                                  |
-| Av. El Salto                                         |  5,5 |    100 % | Huechuraba, Recoleta                                     |
-| Pío Nono                                             |  0,7 |    100 % | Recoleta, Santiago                                       |
-| Av. Independencia                                    | 17,3 |     95 % | Conchalí, Independencia                                  |
-| Av. Recoleta                                         | 12,3 |     94 % | Recoleta, Huechuraba                                     |
-| Av. Presidente Eduardo Frei Montalva                 | 41,9 |     85 % | Quilicura, Colina, Lampa, Renca, Conchalí, Independencia |
-| Av. Einstein                                         |  4,1 |     34 % | Recoleta, Independencia                                  |
-| Av. Pedro Fontova                                    | 10,6 |     14 % | Huechuraba, Conchalí                                     |
-| Camino La Pirámide                                   |  5,7 |      0 % | Huechuraba                                               |
+| Calle | km | % grande | Comunas |
+|---|---:|---:|---|
+| Autopista Nororiente (Radial Nororiente) (autopista) | 43 | 100 % | Colina, Huechuraba |
+| Autopista Los Libertadores (Ruta 57) (autopista) | 27,9 | 100 % | Colina, Quilicura |
+| Ruta 5 Norte (Panamericana) (autopista) | 26,2 | 100 % | Quilicura, Colina, Lampa |
+| Av. Los Zapadores | 7,6 | 100 % | Recoleta, Conchalí |
+| Av. Fermín Vivaceta | 5,9 | 100 % | Independencia, Conchalí |
+| Av. El Salto | 5,5 | 100 % | Huechuraba, Recoleta |
+| Pío Nono | 0,7 | 100 % | Recoleta, Santiago |
+| Av. Independencia | 17,3 | 95 % | Conchalí, Independencia |
+| Av. Recoleta | 12,3 | 94 % | Recoleta, Huechuraba |
+| Av. Presidente Eduardo Frei Montalva | 41,9 | 85 % | Quilicura, Colina, Lampa, Renca, Conchalí, Independencia |
+| Av. Einstein | 4,1 | 34 % | Recoleta, Independencia |
+| Av. Pedro Fontova | 10,6 | 14 % | Huechuraba, Conchalí |
+| Camino La Pirámide | 5,7 | 0 % | Huechuraba |
 
 ### Poniente: 23
 
-| Calle                              |   km | % grande | Comunas                                                                                         |
-| ---------------------------------- | ---: | -------: | ----------------------------------------------------------------------------------------------- |
-| Ruta 68 (a Valparaíso) (autopista) | 41,5 |    100 % | Pudahuel                                                                                        |
-| Av. Teniente Cruz                  |  9,9 |    100 % | Pudahuel, Lo Prado, Cerro Navia                                                                 |
-| Av. Lo Errázuriz                   |  9,3 |    100 % | Cerrillos                                                                                       |
-| José Joaquín Pérez                 |  9,1 |    100 % | Cerro Navia, Pudahuel, Quinta Normal                                                            |
-| Av. Gladys Marín                   |  4,7 |    100 % | Estación Central                                                                                |
-| Av. Portales                       |  1,5 |    100 % | Estación Central, Santiago                                                                      |
-| Av. Carrascal                      |    8 |     98 % | Quinta Normal, Cerro Navia                                                                      |
-| San Francisco (Pudahuel)           |  6,1 |     97 % | Pudahuel, Lo Prado                                                                              |
-| Av. Las Rejas                      |  5,1 |     97 % | Estación Central                                                                                |
-| Av. Mapocho                        |  7,8 |     92 % | Quinta Normal, Cerro Navia, Santiago                                                            |
-| Camino a Melipilla                 | 20,1 |     91 % | Maipú, Cerrillos                                                                                |
-| Av. Pajaritos                      | 13,2 |     90 % | Maipú                                                                                           |
-| Av. Ecuador                        |  2,7 |     88 % | Estación Central, Lo Prado                                                                      |
-| Av. General Velásquez              | 53,9 |     87 % | San Bernardo, Renca, Quinta Normal, Cerrillos, Estación Central, Lo Espejo, Pedro Aguirre Cerda |
-| Av. 5 de Abril                     |  8,4 |     82 % | Estación Central                                                                                |
-| Av. Neptuno                        |  6,9 |     82 % | Lo Prado, Cerro Navia, Quinta Normal, Estación Central                                          |
-| Av. Pedro Aguirre Cerda            | 12,8 |     78 % | Cerrillos, Estación Central                                                                     |
-| Av. Miraflores (Renca)             |  7,3 |     72 % | Renca, Pudahuel                                                                                 |
-| Av. Rolando Petersen               |    2 |     72 % | Cerro Navia, Renca                                                                              |
-| Camino a Rinconada                 |  9,4 |     71 % | Maipú                                                                                           |
-| Av. San Pablo                      | 14,1 |     70 % | Pudahuel, Lo Prado, Santiago, Quinta Normal                                                     |
-| Av. José Miguel Infante            |    9 |     39 % | Renca                                                                                           |
-| Av. Las Torres (poniente)          | 14,9 |     14 % | Cerrillos, Cerro Navia, Maipú, Lo Prado, Estación Central, Pudahuel                             |
+| Calle | km | % grande | Comunas |
+|---|---:|---:|---|
+| Ruta 68 (a Valparaíso) (autopista) | 41,5 | 100 % | Pudahuel |
+| Av. Teniente Cruz | 9,9 | 100 % | Pudahuel, Lo Prado, Cerro Navia |
+| Av. Lo Errázuriz | 9,3 | 100 % | Cerrillos |
+| José Joaquín Pérez | 9,1 | 100 % | Cerro Navia, Pudahuel, Quinta Normal |
+| Av. Gladys Marín | 4,7 | 100 % | Estación Central |
+| Av. Portales | 1,5 | 100 % | Estación Central, Santiago |
+| Av. Carrascal | 8 | 98 % | Quinta Normal, Cerro Navia |
+| San Francisco (Pudahuel) | 6,1 | 97 % | Pudahuel, Lo Prado |
+| Av. Las Rejas | 5,1 | 97 % | Estación Central |
+| Av. Mapocho | 7,8 | 92 % | Quinta Normal, Cerro Navia, Santiago |
+| Camino a Melipilla | 20,1 | 91 % | Maipú, Cerrillos |
+| Av. Pajaritos | 13,2 | 90 % | Maipú |
+| Av. Ecuador | 2,7 | 88 % | Estación Central, Lo Prado |
+| Av. General Velásquez | 53,9 | 87 % | San Bernardo, Renca, Quinta Normal, Cerrillos, Estación Central, Lo Espejo, Pedro Aguirre Cerda |
+| Av. 5 de Abril | 8,4 | 82 % | Estación Central |
+| Av. Neptuno | 6,9 | 82 % | Lo Prado, Cerro Navia, Quinta Normal, Estación Central |
+| Av. Pedro Aguirre Cerda | 12,8 | 78 % | Cerrillos, Estación Central |
+| Av. Miraflores (Renca) | 7,3 | 72 % | Renca, Pudahuel |
+| Av. Rolando Petersen | 2 | 72 % | Cerro Navia, Renca |
+| Camino a Rinconada | 9,4 | 71 % | Maipú |
+| Av. San Pablo | 14,1 | 70 % | Pudahuel, Lo Prado, Santiago, Quinta Normal |
+| Av. José Miguel Infante | 9 | 39 % | Renca |
+| Av. Las Torres (poniente) | 14,9 | 14 % | Cerrillos, Cerro Navia, Maipú, Lo Prado, Estación Central, Pudahuel |
 
 ### Sur: 27
 
-| Calle                                   |   km | % grande | Comunas                                                                    |
-| --------------------------------------- | ---: | -------: | -------------------------------------------------------------------------- |
-| Autopista Central (autopista)           | 81,9 |    100 % | San Bernardo, Santiago                                                     |
-| Autopista Acceso Sur (autopista)        | 50,6 |    100 % | Buin, Puente Alto, La Pintana, San Bernardo, La Granja                     |
-| Gran Avenida (José Miguel Carrera)      | 26,5 |    100 % | San Miguel, El Bosque, La Cisterna, San Bernardo                           |
-| Camino al Volcán (G-25) (autopista)     | 12,7 |    100 % | San José de Maipo                                                          |
-| Av. Las Industrias                      | 10,1 |    100 % | San Joaquín, La Granja                                                     |
-| Av. Macul                               |  7,7 |    100 % | Macul                                                                      |
-| Av. Presidente Salvador Allende Gossens |  7,4 |    100 % | San Joaquín, San Miguel, Pedro Aguirre Cerda                               |
-| Av. El Parrón                           |  4,9 |    100 % | La Cisterna, San Ramón, Lo Espejo                                          |
-| Av. Cerrillos                           |  2,9 |    100 % | Pedro Aguirre Cerda                                                        |
-| Av. Santa Rosa                          | 39,9 |     98 % | La Pintana, San Ramón, San Joaquín, San Miguel, Santiago                   |
-| Av. Marathon                            |  9,7 |     98 % | Macul, Ñuñoa                                                               |
-| Av. Gabriela                            | 12,9 |     97 % | Puente Alto, La Pintana                                                    |
-| Av. Lo Ovalle                           | 11,5 |     95 % | La Granja, San Miguel, Pedro Aguirre Cerda, San Joaquín, La Cisterna       |
-| Av. Trinidad                            |  8,1 |     93 % | La Florida, Puente Alto                                                    |
-| Av. Padre Hurtado (sur)                 | 30,3 |     90 % | San Bernardo, Buin, El Bosque                                              |
-| Av. Vicuña Mackenna                     | 37,4 |     89 % | La Florida, Santiago, San Joaquín, Macul, Ñuñoa                            |
-| San Francisco (La Pintana)              |  9,4 |     88 % | El Bosque, La Pintana, San Ramón                                           |
-| Av. Carlos Valdovinos                   | 10,3 |     87 % | Pedro Aguirre Cerda, San Joaquín, San Miguel, Santiago                     |
-| Camino a Lonquén                        | 26,7 |     86 % | Calera de Tango, San Bernardo, Cerrillos, Maipú                            |
-| Av. Eyzaguirre                          | 13,6 |     85 % | Puente Alto                                                                |
-| Av. San José de la Estrella             |  8,7 |     85 % | La Florida, La Granja, Puente Alto                                         |
-| Av. Departamental                       | 30,6 |     84 % | La Florida, San Miguel, Pedro Aguirre Cerda, Peñalolén, San Joaquín, Macul |
-| Av. Rodrigo de Araya                    |  7,5 |     84 % | Macul, Ñuñoa                                                               |
-| Av. Concha y Toro                       | 16,4 |     80 % | Puente Alto, Pirque                                                        |
-| Av. La Florida                          | 17,7 |     65 % | La Florida                                                                 |
-| Rojas Magallanes                        |  8,3 |     18 % | La Florida                                                                 |
-| Ureta Cox                               |  3,6 |      0 % | San Joaquín, San Miguel                                                    |
+| Calle | km | % grande | Comunas |
+|---|---:|---:|---|
+| Autopista Central (autopista) | 81,9 | 100 % | San Bernardo, Santiago |
+| Autopista Acceso Sur (autopista) | 50,6 | 100 % | Buin, Puente Alto, La Pintana, San Bernardo, La Granja |
+| Gran Avenida (José Miguel Carrera) | 26,5 | 100 % | San Miguel, El Bosque, La Cisterna, San Bernardo |
+| Camino al Volcán (G-25) (autopista) | 12,7 | 100 % | San José de Maipo |
+| Av. Las Industrias | 10,1 | 100 % | San Joaquín, La Granja |
+| Av. Macul | 7,7 | 100 % | Macul |
+| Av. Presidente Salvador Allende Gossens | 7,4 | 100 % | San Joaquín, San Miguel, Pedro Aguirre Cerda |
+| Av. El Parrón | 4,9 | 100 % | La Cisterna, San Ramón, Lo Espejo |
+| Av. Cerrillos | 2,9 | 100 % | Pedro Aguirre Cerda |
+| Av. Santa Rosa | 39,9 | 98 % | La Pintana, San Ramón, San Joaquín, San Miguel, Santiago |
+| Av. Marathon | 9,7 | 98 % | Macul, Ñuñoa |
+| Av. Gabriela | 12,9 | 97 % | Puente Alto, La Pintana |
+| Av. Lo Ovalle | 11,5 | 95 % | La Granja, San Miguel, Pedro Aguirre Cerda, San Joaquín, La Cisterna |
+| Av. Trinidad | 8,1 | 93 % | La Florida, Puente Alto |
+| Av. Padre Hurtado (sur) | 30,3 | 90 % | San Bernardo, Buin, El Bosque |
+| Av. Vicuña Mackenna | 37,4 | 89 % | La Florida, Santiago, San Joaquín, Macul, Ñuñoa |
+| San Francisco (La Pintana) | 9,4 | 88 % | El Bosque, La Pintana, San Ramón |
+| Av. Carlos Valdovinos | 10,3 | 87 % | Pedro Aguirre Cerda, San Joaquín, San Miguel, Santiago |
+| Camino a Lonquén | 26,7 | 86 % | Calera de Tango, San Bernardo, Cerrillos, Maipú |
+| Av. Eyzaguirre | 13,6 | 85 % | Puente Alto |
+| Av. San José de la Estrella | 8,7 | 85 % | La Florida, La Granja, Puente Alto |
+| Av. Departamental | 30,6 | 84 % | La Florida, San Miguel, Pedro Aguirre Cerda, Peñalolén, San Joaquín, Macul |
+| Av. Rodrigo de Araya | 7,5 | 84 % | Macul, Ñuñoa |
+| Av. Concha y Toro | 16,4 | 80 % | Puente Alto, Pirque |
+| Av. La Florida | 17,7 | 65 % | La Florida |
+| Rojas Magallanes | 8,3 | 18 % | La Florida |
+| Ureta Cox | 3,6 | 0 % | San Joaquín, San Miguel |

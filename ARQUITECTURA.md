@@ -1,11 +1,10 @@
 # Cómo está hecho NoTengoCalle
 
-Este archivo explica el programa completo: qué hay en cada carpeta, cómo se conectan las partes, de dónde
-salen los datos y cómo se prueba y se publica. Si cambias la estructura, actualízalo.
+Mapa del código: qué hay en cada carpeta y cómo se conectan las partes. Es corto a propósito; el detalle de cada tema está en `docs/` (tabla al final). Si cambias la estructura, actualízalo.
 
 ## En un minuto
 
-Es un solo repositorio que se publica como un solo sitio en Netlify (un monolito):
+Un solo repositorio que se publica como un solo sitio en Netlify (monolito):
 
 ```
 Navegador                                   Netlify
@@ -18,425 +17,155 @@ Navegador                                   Netlify
 └───────────────────────────────┘           └──────────────────────────────────────┘
 ```
 
-- **El juego corre entero en el navegador.** No hay framework: es JavaScript en módulos, empaquetado con
-  Vite. Todas las preguntas se generan localmente a partir de `data.js`; por eso responde al instante.
-- **El servidor solo existe para cuentas y ranking.** Son ocho rutas bajo `/api`. El juego nunca espera al
-  servidor para funcionar: sin cuenta, sin conexión o sin base de datos configurada se juega igual.
-- **Los datos del juego son un archivo generado** (`public/data/data.js`) por el pipeline de `tools/`, que
-  se corre a mano cuando se agrega o quita contenido.
+- **El juego corre entero en el navegador.** Sin framework: JavaScript en módulos empaquetado con Vite. Las preguntas se generan localmente a partir de `data.js`; por eso responde al instante.
+- **El servidor solo existe para cuentas y ranking.** El juego nunca espera al servidor: sin cuenta, sin conexión o sin base de datos se juega igual.
+- **Los datos son un archivo generado** (`public/data/data.js`) por el pipeline de `tools/`, que se corre a mano cuando se agrega o quita contenido.
 
 ## Carpetas
-
-> **Ojo:** el código se pasó a español (carpetas, archivos, funciones). Esta sección está al día; en el resto del documento
-> pueden quedar nombres en inglés de antes de ese cambio (`quiz/`, `registerMode`, `tests/`…): la equivalencia es la de
-> este árbol, y ante la duda manda `ls` / buscar con grep.
 
 ```
 index.html              página única; carga las librerías del mapa, los datos y src/main.js
 src/                    el juego (navegador)
   main.js                 punto de entrada: carga los modos y las pantallas, abre el menú
-  nucleo/                 piezas sin dependencias: utilidades, geometría, localStorage (almacen.js: ajustes), progreso, parecido entre calles
-  datos/                  datos.js lee window.DATA y arma los índices; lugaresStreetView.json (preguntas de Street View),
-                          pistasCalles.json (tramos que ayudan a reconocer cada calle), recintos.json (polígonos de cerros)
-  mapa/                   el mapa Leaflet (mapa.js), cómo se dibuja cada cosa (dibujo.js), ayudas y el visor de Street View (streetView.js)
-  dominio/                ayudas por tema (comunas, lugares, calles, metro, cerros, zonas, Chile, streetView.js = puntaje, ubicacion.js = descripciones);
-                          preguntas del ruteo en auto: decisionesEnAuto.js (mapa), decisionesConStreetView.js, cruceDeRuta.js (qué calles salen de un cruce), salidas.js (salidas numeradas de autopistas)
+  nucleo/                 sin dependencias: utilidades, geografia, almacen.js (localStorage y `ajustes`), progreso (sorteo), parecido entre calles
+  datos/                  datos.js lee window.DATA y arma los índices; lugaresStreetView.json, pistasCalles.json, recintos.json
+  mapa/                   mapa.js (el mapa Leaflet y su estado), dibujo.js (cómo se dibuja cada cosa), ayudas.js, streetView.js (visor)
+  dominio/                lógica por tema: calles, comunas, lugares, metro, cerros, zonas, chile, streetView (puntaje), ubicacion,
+                          compartir; ruteo en auto: decisionesEnAuto, decisionesConStreetView, cruceDeRuta, salidas, maniobras, rutaEnAuto
   juego/                  el motor de las rondas y los juegos
-    engine.js               ciclo de una ronda: sortear, preguntar, corregir, cronometrar, resultado
-    options.js              botones de alternativas (selección única y múltiple)
-    pasos.js                juegos "paso a paso" (rutas en auto y en transporte público)
-    registry.js             lista de juegos registrados (registrarModo)
-    modos/                  un archivo por tema; cada juego es un registrarModo({...})
-  interfaz/               pantallas: menú (inicio.js), Explorar, ranking, cuenta, Mis calles, fotos, recorrerCalle.js (Street View caminable tras responder)
-  cuenta/                 cliente del servidor: sesión, puntajes, reportes de túneles
+    engine.js               ciclo de una ronda: sortear, preguntar, corregir, cronometrar, resultado (arriba, el contrato de un modo)
+    options.js              botones de alternativas      pasos.js   juegos "paso a paso" (ruteo)      registry.js   registrarModo
+    modos/                  un archivo por tema; cada juego es un registrarModo({...}); index.js los carga
+  interfaz/               pantallas: inicio.js (menú), explorar, ranking, progreso, cuenta, misCalles, fotos, recorrerCalle,
+                          resultadoOficial, compartir, anuncios, pie, panel.js (panel y barra), navegacion.js, confirmar.js
+  cuenta/                 cliente del servidor: sesión, puntajes, progresoCompartido, reportes, google
   estilos/estilos.css     todos los estilos
   service-worker.js       caché para abrir rápido y sin conexión
-compartido/             reglas que usan el navegador y el servidor (rondas oficiales, largos, categorías, nombres de usuario)
-servidor/               el API: cuentas, sesiones, puntajes, ranking, reportes, esquema de la base (admin.js: tareas de administración)
+compartido/             reglas que usan el navegador y el servidor (oficial.js: rondas, largos, categorías; cuentas.js; rutaEnAuto.js)
+servidor/               el API: autenticacion, puntajes, progreso, reportes, esquema.sql, admin.js (api.js enruta)
 netlify/functions/      api.js: publica servidor/ como una Function de Netlify
-desarrollo/             solo para trabajar en local: API sobre base local y generación del service worker
-public/                 archivos que se publican tal cual
-  data/data.js            GENERADO por tools/ — no editar a mano
-  vendor/                 Leaflet 1.9.4, MapLibre GL 4.7.1 y leaflet-maplibre-gl (copias fijas)
-  icons/, manifest.webmanifest
-tools/                  pipeline de datos (se corre a mano; tiene su propio package.json; los de Street View se corren desde la raíz)
+desarrollo/             solo para trabajar en local: API sobre base local (PGlite) y generación del service worker
+public/                 se publica tal cual: data/ (GENERADO, no editar), vendor/ (Leaflet, MapLibre), fuentes/, icons/
+tools/                  pipeline de datos (a mano; su propio package.json; los scripts de Street View se corren desde la raíz)
 pruebas/                unitarias, del servidor y de navegador (conjuntos/: las suites; ejecutar.js; seleccion.js elige cuáles correr)
-docs/                   guías para seguir el desarrollo: siguiente-sesion.md (empezar aquí) y streetview.md
-netlify.toml            cómo construye y publica Netlify
-vite.config.js, eslint.config.js, .prettierrc.json, package.json
+docs/                   detalle por tema (ver el final)
 ```
 
-Cómo dependen entre sí dentro de `src/`: `nucleo` y `datos` son la base y no conocen al resto; `mapa` dibuja;
-`dominio` combina datos y mapa por tema; `juego` usa todo eso para hacer preguntas; las pantallas de `interfaz` van
-encima, y `cuenta` solo depende de `nucleo`. Tres piezas pequeñas de `interfaz` son de uso común para cualquier
-capa: `panel.js` (el panel y la barra), `fotos.js` y `navegacion.js`. Las pantallas (menú, Explorar, ranking) no se
-importan entre sí: se abren por nombre con `navegar('home' | 'explore' | 'ranking')`. Antes de cambiar de pantalla,
-`navegar` pregunta a quien tenga algo en curso: el motor de rondas lo usa para pedir confirmación (`confirmar.js`) si
-se sale a media ronda.
+Dependencias dentro de `src/`: `nucleo` y `datos` son la base y no conocen al resto; `mapa` dibuja; `dominio` combina datos y mapa por tema; `juego` usa todo eso para hacer preguntas; las pantallas de `interfaz` van encima, y `cuenta` solo depende de `nucleo`. Tres piezas de `interfaz` son de uso común: `panel.js`, `fotos.js` y `navegacion.js`. Las pantallas (menú, Explorar, ranking) no se importan entre sí: se abren por nombre con `navegar('home' | 'explore' | 'ranking' | 'progress')`, que antes de cambiar pregunta a quien tenga algo en curso (el motor pide confirmación con `confirmar.js` si se sale a media ronda).
 
 ## Trabajar en local
 
 ```
 npm install          una vez
 npm run dev          juego + API en http://localhost:5173 (recarga sola al guardar)
-npm test             lint + pruebas unitarias y del servidor + pruebas de navegador
-npm run build        genera dist/ igual que lo hará Netlify
+npm test             lint + unitarias + solo las suites de navegador que corresponden a lo modificado
+npm run build        migra la base y genera dist/ igual que Netlify (detecta imports rotos que ESLint no ve)
 npm run preview      sirve dist/ en http://127.0.0.1:8766 con el API local
 npm run format       Prettier sobre todo el código
 ```
 
-En local el API usa **PGlite**: un Postgres real que corre dentro de Node y guarda en `.local/db/` (ignorado
-por git). No hay que instalar ni configurar nada; para partir de cero se borra esa carpeta.
+En local el API usa **PGlite** (un Postgres real dentro de Node) y guarda en `.local/db/` (ignorado por git); para partir de cero se borra esa carpeta.
 
 ## El juego (src/)
 
-### Arranque
+**Arranque.** `index.html` carga Leaflet y MapLibre (globales `L` y `maplibregl`), `data.js` (`window.DATA`) y `src/main.js`, que importa los modos (`juego/modos/index.js`) y las pantallas, abre el menú y, en paralelo, pregunta al servidor si hay sesión. El menú no espera esa respuesta.
 
-`index.html` carga, en orden: Leaflet y MapLibre (definen las globales `L` y `maplibregl`), `data.js` (define
-`window.DATA`) y `src/main.js`. `main.js` importa los modos (`quiz/modes/index.js`) y las pantallas, abre el
-menú y, en paralelo, pregunta al servidor si hay sesión (`restoreSession`). El menú no espera esa respuesta.
+**Datos en memoria.** `src/datos/datos.js` expone los datos más índices derivados y **completa los landmarks** con lo que no viene en `landmarks.json` (barrios con perímetro `z…`, 17 cerros `k…`, ríos y canales `w…`) y las calles propias del usuario ("Mis calles", marcadas `custom`). Qué trae `DATA`: [docs/datos.md](docs/datos.md). Alternativas de "¿Qué calle es?": `dominio/calles.js` (`distractoresDeCalle`) y `nucleo/parecido.js`; cada candidata pesa por cercanía, parecido de orientación, si corre pegada a la pedida y las confusiones previas del jugador (estas se ignoran en rondas oficiales). En una ronda oficial se excluyen las calles propias.
 
-### Datos en memoria (`data/dataset.js`)
+**Mapa.** `mapa/mapa.js` crea el mapa y concentra su estado: nombres del mapa base (`fijarModoDeEtiquetas`: durante las preguntas se ocultan), relieve, paso entre "solo RM" y "todo Chile" (`fijarChile`) y los encuadres (`encuadrar`, `encuadrarCiudad`…; animados). Un encuadre se calcula con el tamaño que tiene el panel en ese momento: los juegos de calles dibujan primero las alternativas y recién entonces encuadran (y en la respuesta, al revés). Esos juegos marcan `roomy: true` (`fijarDesplazamientoAmplio`): sin eso, Leaflet empuja de vuelta el mapa cuando una calle larga queda en el borde y la deja bajo el panel. Todo lo que dibuja la pregunta en curso va a `capa`, que se vacía con `limpiarCapa()`. Mapa base: OpenFreeMap (vectorial, sin API key) con MapLibre; relieve: AWS Terrain Tiles.
 
-Expone `DATA` (el objeto generado) más índices derivados: `comunaByName`, `streetByName`, `stationByName`,
-`landmarkById`, `CATEGORIES`, etc. También **completa los landmarks** con lo que no viene en `landmarks.json`:
-barrios con perímetro (ids `z…`), 17 cerros destacados (`k…`) y los ríos y canales (`w…`, con su cauce en `line`). Las estaciones de metro no son landmarks: tienen sus propios juegos (`quiz/modes/metro.js`: `mt-find`, `mt-name`). Y agrega a
-`DATA.streets` las calles propias del usuario ("Mis calles", guardadas en su navegador, marcadas `custom`).
-
-**Alternativas de "¿Qué calle es?"** (`domain/streets.js`, `core/lookalike.js`): cada candidata pesa por cercanía, parecido de orientación
-(`streetShape`), si corre pegada a la pedida (`parallelPartnersOf`) y las confusiones previas del jugador (estas últimas se ignoran en rondas oficiales).
-
-`roads()` y `quizStreets()` son funciones y no listas porque dependen de la ronda: en una ronda oficial
-excluyen las calles propias.
-
-### Mapa (`map/`)
-
-`map.js` crea el mapa y concentra su estado: qué nombres muestra el mapa base (`setLabelMode('plain' |
-'streets' | 'labels')`: durante las preguntas se ocultan), el relieve, el paso entre "solo Región
-Metropolitana" y "todo Chile" (`setChile`) y los encuadres que respetan el panel (`fit`, `fitCity`; animados). Un encuadre se calcula con el tamaño
-que tiene el panel en ese momento, así que los juegos de calles dibujan primero las alternativas y recién
-entonces encuadran (y en la respuesta, al revés: primero la respuesta, después el encuadre). Esos juegos
-marcan `roomy: true`, que deja correr el mapa más allá de los límites de la región (`setRoomyPanning`):
-sin eso, Leaflet empuja de vuelta el mapa cuando una calle larga queda en el borde (el Maipo) y la deja
-bajo el panel. Todo lo
-que dibuja la pregunta en curso va a `layer`, que se vacía con `clearLayer()`.
-
-`draw.js` sabe dibujar cada cosa: comunas y regiones (`comunaLayer`), metro, calles, tramos con nombre,
-barrios, etiquetas y marcadores.
-
-Mapa base: OpenFreeMap (vectorial, sin API key) mediante MapLibre; relieve: AWS Terrain Tiles.
-
-### Una ronda (`quiz/engine.js`)
-
-Un **modo** es un objeto registrado con `registerMode`:
-
-```js
-registerMode({
-  id: 'com-name',                 // también es la clave de sus estadísticas y de su ranking
-  group: 'Comunas',               // tarjeta del menú donde aparece
-  name: '¿Qué comuna es?',
-  desc: 'Te marco una comuna y eliges su nombre.',
-  pool: () => scopeComunas(),     // todos los ítems preguntables, según los ajustes vigentes
-  key: f => f.properties.name,    // identificador estable del ítem (para estadísticas)
-  ask(item, quiz) { ... },        // dibuja la pregunta y, cuando el jugador responde, llama a answer()
-})
-```
-
-Opcionales: `label(item)`, `balance(item)` (grupo para que ninguna comuna domine la ronda), `setup(quiz)`,
-`all` (pregunta el conjunto entero), `keepLayer`, `noHint`, `relief`, `chile`, `tall`.
-
-`startQuiz(mode)` sortea los ítems, y por cada uno llama a `mode.ask`. El modo termina la pregunta con
-`answer(ok, htmlDeExplicación, { points, partial })`, que registra el resultado, detiene el reloj y muestra
-el botón "Siguiente". El cronómetro solo cuenta el tiempo de pensar: se detiene mientras se lee la respuesta.
-
-El sorteo (`core/progress.js`) es ponderado: lo nuevo y lo fallado pesa más, lo dominado pesa menos.
+**Una ronda** (`juego/engine.js`). Un **modo** es un objeto registrado con `registrarModo` (campos obligatorios y opcionales: comentario al comienzo de `engine.js`). `iniciarPartida(modo, …)` sortea los ítems y por cada uno llama a `modo.ask`; el modo termina la pregunta con `responder(ok, htmlDeExplicación, { points, partial })`, que registra el resultado, detiene el reloj y muestra "Siguiente". El cronómetro solo cuenta el tiempo de pensar. El sorteo (`nucleo/progreso.js`) es ponderado: lo nuevo y lo fallado pesa más, lo dominado menos.
 
 ### Práctica y rondas oficiales
 
-Hay dos formas de jugar el mismo modo:
+|  | Práctica | Ronda oficial (botón grande) |
+|---|---|---|
+| Ajustes | los del jugador (comunas, largo, categorías, líneas) | fijos: `REGLAS_OFICIALES` en `compartido/oficial.js` |
+| Ayudas | siempre modo fácil (bordes de comunas y metro) y "Ver nombres" | ninguna: siempre difícil, sin botones |
+| Sorteo | ponderado por lo que el jugador falla | parejo para todos |
+| Calles propias | incluidas | excluidas |
+| Largo | el elegido (10, 20 o todas) | el elegido; cada largo tiene su ranking |
+| Va al ranking | no | sí, si hay cuenta |
+| Al empezar | de inmediato | cuenta regresiva de 3 segundos |
 
-|                | Práctica                                                            | Ronda oficial (botón grande)                  |
-| -------------- | ------------------------------------------------------------------- | --------------------------------------------- |
-| Ajustes        | los del jugador (comunas, largo, categorías, líneas) | fijos: `REGLAS_OFICIALES` en `compartido/oficial.js` |
-| Ayudas         | siempre modo fácil (bordes de comunas y metro) y "Ver nombres"      | ninguna: siempre difícil, sin botones         |
-| Sorteo         | ponderado por lo que el jugador falla                               | parejo para todos                             |
-| Calles propias | incluidas                                                           | excluidas                                     |
-| Largo          | el elegido (20 o todas)                                             | el elegido; cada largo tiene su ranking       |
-| Va al ranking  | no                                                                  | sí, si hay cuenta                             |
-| Al empezar     | de inmediato                                                        | cuenta regresiva de 3 segundos                |
+El **botón grande** de cada juego es la ronda oficial y el **chico** ("Práctica") la de práctica; los juegos con `soloOficial: true` no tienen práctica. La cuenta regresiva (`correrCuentaRegresiva`) tapa el mapa antes de la primera pregunta; el reloj parte con la pregunta, no con la cuenta, y salir durante la cuenta no pide confirmación. Durante la cuenta el mapa se puede mover: si la persona lo acomodó, el encuadre inicial no lo pisa (`vigilarAjustesDeVista`). Las rondas oficiales tienen un botón de reiniciar en la barra (`#btnRestart`).
 
-En el menú, el **botón grande** de cada juego es la ronda oficial y el **chico** ("Práctica") es la ronda de
-práctica. Los juegos con `soloOficial: true` (Street View y Comunas) no tienen práctica. La cuenta regresiva (`runCountdown`, `quiz/engine.js`) tapa el mapa antes de la primera pregunta; el
-reloj de la ronda parte con la pregunta, no con la cuenta, y salir durante la cuenta no pide confirmación.
-Durante la cuenta el mapa se puede mover: si la persona lo acomodó, el encuadre general del comienzo (ciudad
-o Chile) no lo pisa (`watchViewAdjustments`, `src/map/map.js`). Las rondas oficiales tienen un botón de
-reiniciar en la barra (`#btnRestart`): vuelve a partir, con otras preguntas, mismo juego y mismo largo.
+Las reglas fijas se imponen en un solo lugar: `ajustes` (`nucleo/almacen.js`) devuelve las preferencias del jugador, salvo durante una ronda oficial, donde devuelve las de la ronda (`aplicarReglasDeRonda`). Los modos no necesitan saber qué tipo de ronda es: siguen leyendo `ajustes.scope`, `ajustes.cats`, etc.
 
-Las reglas fijas se imponen en un solo lugar: `settings` (`core/store.js`) devuelve las preferencias del
-jugador, salvo durante una ronda oficial, donde devuelve las de la ronda. Por eso los modos no necesitan
-saber qué tipo de ronda es: siguen leyendo `settings.scope`, `settings.cats`, etc.
-
-Al terminar una ronda oficial (`ui/officialOutcome.js` → `account/scores.js`):
-
-- con sesión, el puntaje se envía y se muestra el puesto;
-- sin sesión, queda en una cola local y se sube al entrar o crear cuenta;
-- sin conexión, queda en la misma cola y se sube solo la próxima vez.
+Al terminar una ronda oficial (`interfaz/resultadoOficial.js` → `cuenta/puntajes.js`): con sesión, el puntaje se envía y se muestra el puesto; sin sesión o sin conexión, queda en una cola local (`outbox`) y se sube al entrar o la próxima vez.
 
 ### Lo que se guarda en el navegador
 
-`localStorage`, con prefijo `ntc:`:
+`localStorage`, con prefijo `ntc:` (`nucleo/almacen.js`):
 
-| Clave                | Contenido                                                   |
-| -------------------- | ----------------------------------------------------------- |
-| `settings`           | preferencias de práctica                                    |
-| `stats`              | por cada `modo:ítem`: respuestas, aciertos y racha          |
-| `best`               | récord personal por `modo:largo`                            |
-| `conf`               | pares de calles que el jugador ha confundido                |
-| `myStreets`          | calles agregadas por el usuario                             |
-| `explore`, `ranking` | última vista de esas pantallas                              |
-| `user`               | nombre de la sesión (solo para pintar el botón al instante) |
-| `outbox`             | rondas oficiales pendientes de enviar                       |
-
-Sin cuenta, el progreso de práctica es local a cada navegador. Con cuenta, `stats` se comparte entre dispositivos
-(`src/cuenta/progresoCompartido.js` ↔ `servidor/progreso.js`, tabla `progreso`, una fila por pregunta): al entrar se
-trae y se junta con el local (de cada pregunta gana la respuesta más reciente) y cada respuesta se sube a los pocos
-segundos; lo pendiente se guarda en `progresoPendiente`. `best` sigue siendo local. Otras claves: `rutasPropias`
-(rutas en auto ya calculadas desde el punto fijo del jugador, `ajustes.puntoDeRuteo`).
+| Clave | Contenido |
+|---|---|
+| `settings` | preferencias de práctica |
+| `stats` | por cada `modo:ítem`: respuestas, aciertos y racha |
+| `best` | récord personal por `modo:largo` |
+| `conf` | pares de calles que el jugador ha confundido |
+| `myStreets` | calles agregadas por el usuario |
+| `explore`, `ranking` | última vista de esas pantallas |
+| `user` | nombre de la sesión (solo para pintar el botón al instante) |
+| `outbox` | rondas oficiales pendientes de enviar |
+| `progresoPendiente` | respuestas de práctica aún no subidas (con cuenta, `stats` se comparte entre dispositivos) |
+| `salidasDelPunto`, `rutasEnAutoV2` | caché del ruteo en auto: por dónde se sale de cada punto; rutas ya calculadas |
+| `puntosReportados` | puntos de Street View que el jugador marcó como túnel |
 
 ### Service worker
 
-`src/service-worker.js` guarda el sitio para abrir sin conexión. Al construir, `dev/serviceWorkerPlugin.js`
-le antepone la lista de archivos y una versión calculada de su contenido: **ya no hay que subir un número a
-mano** en cada despliegue. Nunca intercepta `/api/` ni las teselas del mapa.
-
-## El servidor (servidor/)
-
-Es una sola Function de Netlify. `servidor/api.js` recibe un `Request` y devuelve un `Response` (el estándar
-web), así que el mismo código corre en Netlify y en el servidor local de desarrollo.
-
-| Ruta                                           | Qué hace                                                                                                      |
-| ---------------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
-| `POST /api/register`                           | crea la cuenta e inicia sesión                                                                                |
-| `POST /api/login`                              | inicia sesión                                                                                                 |
-| `POST /api/logout`                             | cierra la sesión                                                                                              |
-| `GET /api/me`                                  | usuario de la sesión, o `null`                                                                                |
-| `POST /api/scores`                             | guarda una ronda oficial; responde puesto y mejor marca                                                       |
-| `GET /api/leaderboard?mode=&category=&period=` | los 50 mejores de un juego en esa categoría, más la fila del usuario y cuántos jugadores tiene cada categoría |
-| `GET /api/leaders?category=&period=`           | el líder de cada juego en esa categoría y el puesto del usuario en cada uno                                   |
-| `GET /api/progreso`                            | el progreso de práctica de la cuenta (`stats`)                                                                |
-| `POST /api/progreso`                           | sube entradas de `stats`; de cada pregunta queda la más reciente                                              |
-| `POST /api/progreso/borrar`                    | borra el progreso de práctica de la cuenta                                                                    |
-
-Los errores siempre salen como `{ "error": "código", "message": "texto para mostrar" }`.
-
-### Cuentas
-
-Nombre de usuario y clave, sin correo, o "Continuar con Google". Decisiones:
-
-- **Google** (`servidor/google.js`, `src/cuenta/google.js`): el navegador carga Google Identity Services recién al
-  abrir el diálogo de cuenta y recibe un ID token; `POST /api/google` lo verifica con las llaves públicas de Google
-  (WebCrypto, sin dependencias; firma RS256, `aud` = `ID_DE_CLIENTE_DE_GOOGLE` de `compartido/configuracion.js`,
-  `iss` de Google, no vencido) y guarda **solo `sub`** (columna `usuarios.google_sub`); nombre, correo y foto se
-  descartan. La primera vez responde `necesitaNombre` y el navegador reenvía el token con el nombre elegido (no se
-  usa el de Google). Esas cuentas no tienen clave (`clave_cifrada` nula). Una cuenta con clave se vincula con
-  `POST /api/google/vincular`, solo con la sesión iniciada; nunca se juntan cuentas por el nombre. En Google Cloud
-  la app está en modo Testing: solo entran los usuarios de prueba hasta publicarla.
-
-- **Claves** con scrypt (`servidor/claves.js`); nunca se guardan en claro. El costo (hoy 64 MB por intento)
-  va dentro de cada hash: al subirlo, las claves antiguas se recalculan solas la próxima vez que la persona
-  entra. Mínimo 8 caracteres, distinta del nombre de usuario y **que no aparezca en filtraciones públicas**:
-  al registrarse se consulta Pwned Passwords (Have I Been Pwned) enviando solo 5 caracteres del SHA-1, nunca
-  la clave. Si ese servicio no responde, el registro sigue.
-- **Sesión** en una cookie `HttpOnly` (el JavaScript de la página no puede leerla), `SameSite=Lax`, de 180
-  días. En la base solo queda la huella del token.
-- **No hay recuperación de clave.** Sin correo no hay a dónde mandar nada, y se descartó un código de
-  recuperación. "Olvidé mi clave" solo muestra un aviso. Si alguien pierde la clave, el administrador puede
-  ponerle otra (ver "Administrar") o puede crear una cuenta nueva.
-- **Nombres**: 3 a 20 letras, números, `.`, `_` o `-`. "Ñandú" y "nandu" cuentan como el mismo nombre.
-- **Freno a fuerza bruta**: 10 intentos fallidos por nombre en 15 minutos bloquean ese nombre por un rato.
-- Los `POST` que vienen de otro sitio se rechazan (cabecera `Origin`).
-
-### Ranking
-
-- Un ranking por juego **y por largo de ronda** (categorías `10`, `15`, `20`, `30` y `all` = todas las preguntas del
-  juego): 15 preguntas y todas no se pueden comparar. El largo lo elige el jugador en la tarjeta de cada grupo de juegos
-  (`settings.lengths`, con `settings.len` como valor por defecto); desde el ranking también se puede jugar el largo
-  de la pestaña abierta. Los juegos de comunas (`all: true`: son pocas) siempre recorren todas y solo tienen la
-  pestaña "todas". Ordena por aciertos y, a igual número, por
-  menor tiempo.
-- De cada jugador cuenta su mejor ronda; todas las rondas quedan guardadas (permite el ranking "últimos 7
-  días" y, a futuro, historial).
-- **El puntaje lo calcula el navegador.** El servidor solo descarta lo imposible (`scoreProblem` en
-  `compartido/oficial.js`: modo desconocido, largo distinto al oficial, tiempo inhumano). Alguien con ganas puede
-  hacer trampa; es un riesgo aceptado para un juego entre amigos. Para borrar una marca tramposa, ver
-  "Administrar".
-
-### Base de datos
-
-Postgres. El esquema completo está en `servidor/esquema.sql` y se aplica solo en cada build
-(`servidor/migrar.js`); cada sentencia es repetible (`create … if not exists`). Para cambiarlo, se agregan
-sentencias repetibles al final (por ejemplo `alter table … add column if not exists …`).
-
-| Tabla           | Para qué                                                                                  |
-| --------------- | ----------------------------------------------------------------------------------------- |
-| `users`         | nombre y clave (hash)                                                                     |
-| `sessions`      | sesiones abiertas                                                                         |
-| `scores`        | cada ronda oficial jugada: usuario, modo, categoría, aciertos, total, milisegundos, fecha |
-| `failed_logins` | intentos fallidos recientes (freno a fuerza bruta)                                        |
-
-En producción la base es **Neon** (Postgres serverless, plan gratis): se duerme sin uso y despierta sola con
-la primera consulta, que por eso puede tardar cerca de un segundo.
-
-### Administrar
-
-Con la cadena de conexión de Neon en la variable `DATABASE_URL`:
-
-```
-node servidor/admin.js usuarios            lista de cuentas con cuántas rondas tiene cada una
-node servidor/admin.js clave <nombre> <nueva>   cambia la clave de alguien y cierra sus sesiones
-node servidor/admin.js borrar <nombre>     borra la cuenta y sus puntajes
-```
-
-Para todo lo demás, el editor SQL de la consola de Neon. Por ejemplo, las últimas rondas guardadas:
-
-```sql
-select scores.id, users.name, mode, correct, total, ms, scores.created_at
-from scores join users on users.id = scores.user_id
-order by scores.created_at desc limit 50;
-
-delete from scores where id = 123;   -- borrar una marca
-```
-
-## Publicar (Netlify + GitHub)
-
-Netlify construye el sitio desde GitHub: cada push a la rama de producción publica, y las demás ramas pueden
-tener su propia vista previa. La configuración está en `netlify.toml`.
-
-**Una vez, para conectar el repositorio** (en el sitio que ya existe, para conservar la dirección):
-
-1. Netlify → el sitio → _Project configuration_ → _Build & deploy_ → _Continuous deployment_ → _Link
-   repository_ → GitHub → `tatanas/notengocalle-com`.
-2. Rama de producción: `main`. El comando y la carpeta se leen de `netlify.toml`; no hay que escribirlos.
-3. En _Branches and deploy contexts_, activar los _branch deploys_ para ver ramas como esta en una dirección
-   propia antes de pasarlas a `main`.
-
-**Una vez, para activar cuentas y ranking** (sin esto el sitio funciona igual, solo sin cuentas):
-
-- Opción A, dentro de Netlify: agregar una base con **Netlify DB** (extensión de Neon). Crea la variable
-  `NETLIFY_DATABASE_URL` sola. Hay que "reclamar" la base con una cuenta de Neon para que no caduque.
-- Opción B, directo en Neon: crear un proyecto gratis en neon.tech, copiar la cadena de conexión y guardarla
-  en Netlify como variable de entorno `DATABASE_URL` (disponible para _Builds_ y _Functions_).
-
-Después, volver a desplegar. En el registro del build debe aparecer `Base de datos: esquema al día.`
-
-Los nombres exactos de los menús de Netlify y Neon cambian con el tiempo; si no calzan, la idea es la misma:
-enlazar el repositorio y dejar la cadena de conexión en una variable de entorno.
-
-Ojo: mientras producción y las vistas previas compartan la misma variable, comparten también la base. Para
-separarlas, Netlify permite dar a cada contexto de despliegue un valor distinto de la variable.
-
-## Datos: fuentes y pipeline (tools/)
-
-### Fuentes
-
-| Qué                                              | De dónde                                                             |
-| ------------------------------------------------ | -------------------------------------------------------------------- |
-| Comunas, calles, metro, lugares, barrios, cerros | OpenStreetMap (ODbL), vía Overpass y Nominatim                       |
-| Rutas en auto                                    | Valhalla (valhalla1.openstreetmap.de, FOSSGIS): ruta, traza con nombres y cruces |
-| Rutas en micro y metro, recorridos               | GTFS de Red (DTPM)                                                   |
-| Regiones, ciudades y parques nacionales          | OpenStreetMap; población de las ciudades                             |
-| Fotos                                            | Wikimedia Commons y Panoramax, siempre con autor y licencia visibles |
-| Mapa base y relieve (en vivo, no en data.js)     | OpenFreeMap / OpenMapTiles y AWS Terrain Tiles                       |
-
-Todo es gratis y sin API keys, salvo Street View (llave de Google Maps, restringida por dominio: ver docs/streetview.md). No se usan imágenes de Google fuera de Street View.
-
-### Qué trae `DATA`
-
-`comunas` (GeoJSON, las 52 de la RM), `comunasChile` (índice de las 345 comunas de Chile; sus polígonos van aparte en `public/data/comunas-chile.js`, que se baja al jugarlas), `metro` (`lines`, `stations`), `streets`, `landmarks`, `cerros`, `zones` (barrios con
-perímetro), `photos` (por clave `l:` lugar, `s:` calle, `c:` cerro, `p:` parque), `inter` y `para` (cruces y
-paralelas entre calles), `steps` (rutas en auto), `salidas` (salidas numeradas de las autopistas), `transit` (rutas en transporte público), `micros`,
-`metroAlong`, `rotondas`, `chile` (`regions`, `cities`, `parks`) y `built` (fecha).
-
-### Pipeline
-
-Vive en `tools/`, con sus propias dependencias (`cd tools && npm install`) y **se ejecuta desde `tools/`**.
-Los datos crudos pesados están ignorados por git (`btiles/`, `gtfs/`, `*_raw*.json`, cachés…); las salidas
-curadas sí se versionan (`streets.json`, `landmarks.json`, `zones.json`, `chile.json`, `photos_*.json`,
-`steproutes.json`, `transit.json`…).
-
-Regenerar el archivo final (minutos): `npm run build` dentro de `tools/`
-(equivale a `node build_data.js ../public/data/data.js`).
-
-- **Agregar o quitar una calle**: editar `streetlist.js` → `node streets.js` → `node cruces.js` → `node merge_st.js` →
-  `npm run build`.
-  Cada entrada es `[nombre_mostrado, regex_OSM, pista, ancla[lon,lat]|null, {bt:1, kind, gap, trMin}]`:
-  `bt:1` busca en `btiles/` (descarga completa de la RM); `kind` es `calle|autopista|agua|tren`; `box:[lonMín,latMín,lonMáx,latMáx]` limita a las vías dentro de esa caja (para dos calles con el mismo nombre en OSM); `gap` es la
-  distancia en km para unir tramos separados; `trMin` el largo mínimo para mostrar "tramos con nombre".
-  Para ver cómo figura una calle en OSM: `nameidx.json`, `ways_named.json`,
-  `node cross.js "<nombre OSM>" lat|lon`.
-- **Agregar o quitar un landmark**: editar `lmlist.js` (`[nombre, categoría, consulta Nominatim, comuna
-esperada, descripción]`) → `cp landmarks.json landmarks.prev.json` → `node geocode.js` (1 consulta por
-  segundo) → `node finalize_lm.js` (ajustes en el objeto `F`: coordenadas `ll`, renombres, `obvious`, foto
-  prestada `pk`, `alt`; lista `DROP`; carreras en `careers.js`) → **`node remap_routes.js`** (los ids `l0,
-l1…` se corren; esto reasigna las rutas) → `node merge_st.js` → `npm run build`.
-- **Barrios con perímetro**: `zones.js` (esquinas como cruces de calles por regex, o `axis`/`at` para zonas
-  aproximadas) → `zones.json`. Si el barrio ya existe como landmark con otro nombre, se enlazan en
-  `LANDMARK_NAME_OF_ZONE` (`src/data/dataset.js`).
-- **Fotos**: `photos.js` (landmarks), `photos_streets*.js` (calles; las numeradas son tandas sucesivas),
-  `parkphotos.js`. Revisar siempre a ojo con `sheets.py` (arma mosaicos). La selección revisada está fijada
-  **por índice** en `merge_st.js` (`BAD`/`KEEP` por tanda) y en `build_data.js` (`BADP`): si se regenera un
-  JSON de fotos, los índices cambian y hay que revisar de nuevo.
-- **Prolongaciones de rutas**: `extensions.js` (→ `extensions.json`) agrega a algunas calles (`ext`, en data.js)
-  lo que siguen fuera de la zona descargada: Ruta 5 hacia el norte y el sur, Ruta 68 a Valparaíso, Ruta 78 a San
-  Antonio, Ruta 57 a Los Andes y el Camino a Melipilla. El juego las dibuja en línea segmentada. Descarga las
-  rutas numeradas de toda la RM una vez (`ruta_raw.json`, ignorado por git) y se queda con lo que está a más de
-  400 m de la línea ya dibujada. Para prolongar otra calle, se agrega a la lista `ROADS` de ese archivo y se
-  corre `node extensions.js` y luego `npm run build`.
-- **Otros**: `metro.js`, `cerros.js`, `chile.js`/`chile2.js`, `extras.js` (rotondas, calles por línea de
-  metro), `cruces.js` (cruces según OpenStreetMap: calles que comparten un nodo, o cuyo extremo queda a menos de 20 m de la otra; los que pasan uno sobre otro, aparte → `cruces.json`), `relations.js` (comunas de cada calle, paralelas, cruces y pares dudosos que el juego no debe preguntar), `steproutes.js` (Valhalla, con `compartido/rutaEnAuto.js`), `salidas.js` (salidas numeradas de las autopistas con a dónde llevan: nodos `motorway_junction` y rampas de OpenStreetMap → `salidas.json`; las descargas quedan en `salidas_raw.json` y `rampas_raw.json`), `comunas_chile.js` (polígonos simplificados de las comunas de Chile fuera de la RM: Overpass para la lista y Nominatim para cada polígono → `comunas_chile.json`; `build_data.js` lo parte en el índice de data.js y `public/data/comunas-chile.js`), `transit.js` (GTFS → itinerarios),
-  `micros.js`.
-- **Descargas crudas**: consultas Overpass en `q*.txt`. GTFS: el enlace vigente está en
-  https://www.dtpm.cl/index.php/noticias/gtfs-vigente
-
-Los juegos de "completa el mapa" recorren siempre todo su conjunto (hoy 34 comunas del Gran Santiago y 16
-regiones) y caen en la categoría "todas"; no hay nada que actualizar si ese tamaño cambia.
+`src/service-worker.js` guarda el sitio para abrir sin conexión. Al construir, `desarrollo/pluginServiceWorker.js` le antepone la lista de archivos y una versión calculada de su contenido (no hay que subir un número a mano). Nunca intercepta `/api/` ni las teselas del mapa.
 
 ## Pruebas (pruebas/)
 
-| Comando             | Qué cubre                                                                                                                                                                                                                                |
-| ------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `npm run lint`      | nombres no definidos, imports sobrantes                                                                                                                                                                                                  |
-| `npm run test:unit` | `unit.test.js` (geometría, sorteo, reglas compartidas) y `api.test.js` (el servidor completo contra un Postgres en memoria)                                                                                                              |
-| `npm test`          | lint + unitarias + las suites de navegador que corresponden a lo modificado (`pruebas/seleccion.js`; si el cambio es amplio, corre todo)                                                                                                   |
-| `npm run test:full` | lint + unitarias + todas las suites de navegador (más de 10 minutos)                                                                                                                                                                     |
-| `npm run test:e2e`  | Chrome real sobre el build: recorre todos los juegos en escritorio y celular, el cronómetro, las calles propias, el inicio de las 17 rondas (Street View se prueba a mano) oficiales, las fotos y el flujo completo de cuentas y ranking |
+| Comando | Qué cubre |
+|---|---|
+| `npm run lint` | nombres no definidos, imports sobrantes |
+| `npm run test:unit` | `unitarias.test.js` (geometría, sorteo, reglas compartidas) y `api.test.js` (servidor contra Postgres en memoria; ~3 min) |
+| `npm test` | lint + unitarias + las suites de navegador que corresponden a lo modificado (`seleccion.js`; si el cambio es amplio, corre todo) |
+| `npm run test:full` | lint + unitarias + todas las suites de navegador (más de 10 minutos) |
+| `node pruebas/ejecutar.js humo cuentas` | solo esas suites. `--sin-build` reutiliza `dist/`; `--dev` sirve el código sin empaquetar (errores con archivo y línea reales); `--verboso` lista también lo que pasa |
 
-`node pruebas/ejecutar.js smoke accounts` corre solo algunas suites; `--sin-build` reutiliza `dist/`; `--dev` sirve el
-código sin empaquetar, para que un error apunte al archivo y la línea reales. Las capturas quedan en
-`pruebas/capturas/`. Chrome se busca en las rutas habituales o en la variable `CHROME_PATH`.
+Las pruebas imprimen **solo lo que falla** más un resumen (unitarias con reporte `dot`; navegador sin las líneas `✓`), para no gastar tokens. Las capturas quedan en `pruebas/capturas/` (ignoradas por git). Chrome se busca en las rutas habituales o en `CHROME_PATH`. Street View no se prueba de forma automática.
+
+## Dónde tocar cada cosa
+
+| Quiero… | Archivo(s) |
+|---|---|
+| Un juego nuevo | `registrarModo({...})` en `src/juego/modos/<tema>.js`; si tiene ranking, su id en `MODOS_OFICIALES` (`compartido/oficial.js`) |
+| Retirar un juego | borrar su `registrarModo` y quitarlo de `MODOS_OFICIALES` (sus marcas quedan en la base) |
+| Un ajuste de práctica nuevo | valor por defecto en `nucleo/almacen.js`, control en `interfaz/inicio.js` y, si afecta la dificultad, su valor fijo en `REGLAS_OFICIALES` |
+| Una ruta nueva del API | función en `servidor/`, línea en `ROUTES` (`servidor/api.js`), prueba en `pruebas/api.test.js` |
+| Agregar/quitar una calle, un lugar o un barrio | [docs/datos.md](docs/datos.md) (pipeline) y antes [docs/decisiones-contenido.md](docs/decisiones-contenido.md) |
+| Reglas de "Encuentra la calle" / `st-punto` | `src/juego/modos/calles.js` (constantes arriba de `st-find`); el punto: `puntoParaPreguntar` en `src/dominio/calles.js` |
+| Niveles de Street View | listas de `tools/niveles_streetview.mjs`; selector en `src/interfaz/inicio.js`; `NIVEL_MAXIMO` en `src/juego/modos/streetView.js` |
+| Visor de Street View | `src/mapa/streetView.js` (un solo panorama reutilizado; ver [docs/streetview.md](docs/streetview.md)) |
+| Rankings por ajuste (nivel de Street View, alcance de comunas) | `ajusteDeCategoria` y `COMUNAS_POR_ALCANCE` en `compartido/oficial.js`; el motor lo aplica en `iniciarPartida` |
+| Rondas oficiales / largos / categorías | `compartido/oficial.js` (lo comparten navegador y servidor) |
+| Puntajes y ranking del servidor | `servidor/puntajes.js`, `servidor/api.js` |
+| Menú / barra superior / Mi progreso | `src/interfaz/inicio.js`, `index.html` (pestañas), `src/interfaz/progreso.js` |
+| Ruteo en auto | [docs/ruteo.md](docs/ruteo.md): construcción `compartido/rutaEnAuto.js`; mapa `src/dominio/decisionesEnAuto.js`; Street View `src/dominio/decisionesConStreetView.js`; cruces `src/dominio/cruceDeRuta.js`; salidas `src/dominio/salidas.js` |
+| Qué suite corre por archivo cambiado | `pruebas/seleccion.js` |
 
 ## Decisiones y sus razones
 
-- **Sin React ni otro framework.** La interfaz es un mapa y un panel; el estado vive en el mapa de Leaflet,
-  que es imperativo. Un framework agregaría peso y una reescritura sin dar nada a cambio. Lo que el juego
-  necesitaba era orden (módulos) y eso lo da Vite sin costo en el navegador: el código propio pesa unos
-  33 KB comprimidos.
-- **Librerías del mapa y datos fuera del bundle** (`public/`). Son grandes y cambian poco: así el navegador
-  las guarda aparte y un cambio en el juego no obliga a bajarlas de nuevo. Además Leaflet y sus plugins
-  funcionan mejor como globales que empaquetados.
-- **API propio en vez de un servicio de autenticación.** Usuario y clave sin correo no calza con los
-  servicios listos (piden correo o teléfono), y son pocas rutas. Todo queda en un repositorio y un despliegue.
-- **Postgres (Neon).** Un ranking es una consulta ordenada; SQL lo resuelve directo. Neon no exige mantener
-  nada encendido y no se pausa de forma que requiera intervención manual.
-- **Sin "entrar con Google".** Obliga a registrar una aplicación en Google Cloud y mantenerla; para un
-  apodo y una clave no se justifica. Se puede agregar después sin tocar el ranking.
+- **Sin React ni otro framework.** La interfaz es un mapa y un panel; el estado vive en el mapa de Leaflet, que es imperativo. Lo que el juego necesitaba era orden (módulos) y eso lo da Vite sin costo en el navegador.
+- **Librerías del mapa y datos fuera del bundle** (`public/`). Son grandes y cambian poco: el navegador las guarda aparte y un cambio en el juego no obliga a bajarlas de nuevo. Leaflet y sus plugins funcionan mejor como globales que empaquetados.
+- **API propio en vez de un servicio de autenticación.** Usuario y clave sin correo no calza con los servicios listos (piden correo o teléfono), y son pocas rutas. Google se agregó aparte, sin quitar la cuenta con clave (ver `docs/servidor.md`).
+- **Postgres (Neon).** Un ranking es una consulta ordenada; SQL lo resuelve directo, y Neon no exige mantener nada encendido.
 
-## Cambios frecuentes
+## Detalle por tema (leer solo el que corresponda)
 
-- **Nuevo juego**: `registerMode({...})` en el archivo del tema dentro de `src/quiz/modes/`. Si debe tener
-  ranking, agregar su id a `MODOS_OFICIALES` (`compartido/oficial.js`).
-- **Retirar un juego**: borrar su `registerMode` y quitarlo de `MODOS_OFICIALES`. Sus marcas guardadas quedan en la base.
-- **Nuevo ajuste de práctica**: valor por defecto en `core/store.js`, control en `ui/home.js` y, si afecta la
-  dificultad, su valor fijo en `REGLAS_OFICIALES`.
-- **Nueva ruta del API**: función en `servidor/` y una línea en `ROUTES` (`servidor/api.js`); prueba en
-  `pruebas/api.test.js`.
+| Documento | Contenido |
+|---|---|
+| [docs/siguiente-sesion.md](docs/siguiente-sesion.md) | estado actual, comandos útiles, trucos para gastar pocos tokens |
+| [docs/modos.md](docs/modos.md) | ids de los juegos, reglas de cada uno, menú, rondas y ranking |
+| [docs/decisiones-contenido.md](docs/decisiones-contenido.md) | qué se sacó del juego y no se vuelve a agregar; pendientes de confirmar |
+| [docs/datos.md](docs/datos.md) | fuentes, qué trae `DATA`, pipeline de `tools/`, trampas de Overpass/Wikimedia |
+| [docs/ruteo.md](docs/ruteo.md) | rutas en auto y en micro: cómo se arman y las reglas del dueño |
+| [docs/streetview.md](docs/streetview.md) | Street View: niveles, puntos, llave de Google |
+| [docs/servidor.md](docs/servidor.md) | rutas del API, cuentas, ranking, base de datos, administración |
+| [docs/publicar.md](docs/publicar.md) | Netlify, GitHub y Neon |
+| [docs/publicidad.md](docs/publicidad.md) | AdSense |
+| [docs/pendientes.md](docs/pendientes.md) | ideas, pendientes y juegos retirados que podrían volver |
+| [docs/revision-calles.md](docs/revision-calles.md) | calles candidatas a sacar, por sector (25 KB: buscar con grep, no leer entero) |

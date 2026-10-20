@@ -4,6 +4,7 @@
 //   node pruebas/ejecutar.js --cambios        solo lo que corresponde a los archivos modificados (ver seleccion.js)
 //   node pruebas/ejecutar.js --sin-build      reutiliza el dist/ existente
 //   node pruebas/ejecutar.js --dev            sirve el código sin empaquetar (errores con archivo y línea reales)
+//   node pruebas/ejecutar.js --verboso        lista también cada verificación que pasa (por defecto solo las fallas)
 import { execSync } from 'node:child_process'
 import { cuentas } from './conjuntos/cuentas.js'
 import { humo } from './conjuntos/humo.js'
@@ -133,7 +134,8 @@ for (const nombre of elegidos) {
     await guardarPaginasComoEvidencia(navegador, nombre)
   }
   fallas.push(...verificador.fallas)
-  console.log(`  (${Math.round((Date.now() - inicioDelConjunto) / 1000)} s)`)
+  const segundos = Math.round((Date.now() - inicioDelConjunto) / 1000)
+  console.log(`  ${verificador.aprobadas} verificaciones bien (${segundos} s)`)
 }
 await navegador.close()
 await detenerServidor()

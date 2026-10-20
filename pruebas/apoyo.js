@@ -152,15 +152,22 @@ export async function jugarRondaDeAlternativas(pagina, { thinkMs: msDePensar = 3
   }
 }
 
+// Las verificaciones que pasan solo se listan con --verboso: una corrida limpia no necesita cientos de líneas.
+const LISTAR_LAS_QUE_PASAN = process.argv.includes('--verboso')
+
 export function crearVerificador(conjunto) {
   const fallas = []
-  return {
+  const verificador = {
     fallas,
+    aprobadas: 0,
     verificar(condicion, descripcionDeLaPrueba) {
-      console.log(`  ${condicion ? '✓' : '✗'} ${descripcionDeLaPrueba}`)
+      if (condicion) verificador.aprobadas++
+      if (!condicion || LISTAR_LAS_QUE_PASAN)
+        console.log(`  ${condicion ? '✓' : '✗'} ${descripcionDeLaPrueba}`)
       if (!condicion) fallas.push(`${conjunto}: ${descripcionDeLaPrueba}`)
     },
   }
+  return verificador
 }
 
 // "Siguiente" queda al final del panel, que se desplaza suavemente al responder: un clic por coordenadas puede
