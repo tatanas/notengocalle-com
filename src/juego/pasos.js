@@ -27,13 +27,23 @@ const KM_MINIMOS_DESDE_EL_PUNTO = 3
 const KM_MAXIMOS_DESDE_EL_PUNTO = 30
 const esLugarDeLandmarks = lugar => /^l\d+$/.test(lugar.id)
 
+// Un barrio sin límites precisos (Lo Curro, Santa María de Manquehue) no tiene un punto al que llegar: solo sirven los barrios
+// que son un lugar concreto (una plaza, un persa, un mercado).
+const BARRIO_CON_PUNTO_CONCRETO = /^(Plaza|Persa|Mercado|Feria|Pueblo)/
+const sirveParaRuteo = lugar => lugar.cat !== 'Barrios' || BARRIO_CON_PUNTO_CONCRETO.test(lugar.name)
+
 function rutasDelPuntoPropio() {
   const punto = puntoPropio()
   const desde = ajustes.puntoDeRuteo.sentido !== 'hacia'
   return DATOS.landmarks
     .filter(lugar => {
       const km = distanciaKm([punto.lat, punto.lon], [lugar.lat, lugar.lon])
-      return esLugarDeLandmarks(lugar) && km >= KM_MINIMOS_DESDE_EL_PUNTO && km <= KM_MAXIMOS_DESDE_EL_PUNTO
+      return (
+        esLugarDeLandmarks(lugar) &&
+        sirveParaRuteo(lugar) &&
+        km >= KM_MINIMOS_DESDE_EL_PUNTO &&
+        km <= KM_MAXIMOS_DESDE_EL_PUNTO
+      )
     })
     .map(lugar => {
       const [from, to] = desde ? [PUNTO_PROPIO, lugar.id] : [lugar.id, PUNTO_PROPIO]
@@ -42,7 +52,9 @@ function rutasDelPuntoPropio() {
 }
 
 // Las rutas en auto de la práctica: las de todos o, si el jugador fijó un punto, las de su punto.
-export const rutasEnAuto = () => (ajustes.puntoDeRuteo ? rutasDelPuntoPropio() : DATOS.steps || [])
+const rutasEntreLugares = () =>
+  (DATOS.steps || []).filter(ruta => [ruta.from, ruta.to].every(id => sirveParaRuteo(lugarPorId[id])))
+export const rutasEnAuto = () => (ajustes.puntoDeRuteo ? rutasDelPuntoPropio() : rutasEntreLugares())
 
 // Las rutas del punto propio se piden a Valhalla al llegar a la pregunta (y la siguiente se adelanta).
 export async function rutaCalculada(ruta, q) {

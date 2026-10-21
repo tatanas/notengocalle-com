@@ -1,6 +1,6 @@
 import { escaparHtml } from '../nucleo/utilidades.js'
 import { esLaMismaCalle } from '../../compartido/rutaEnAuto.js'
-import { cruceDeLaRuta, otrasCalles, seguirDerechoEs } from './cruceDeRuta.js'
+import { cruceDeLaRuta, otrasCalles, seguirDerechoEs, sentidosDeLaMismaCalle } from './cruceDeRuta.js'
 import { puntoDesdeElInicio } from './maniobras.js'
 import {
   largoDelTrazado,
@@ -24,6 +24,7 @@ import {
 const ALTERNATIVAS = 3
 // Al partir no hay cruce: valen las salidas que ya se conocen del lugar de partida y las calles que salen del primer cruce.
 const seguirDerechoPor = calle => `Seguir derecho por ${calle}`
+const haciaDonde = (calle, cardinal) => `${calle} hacia el ${cardinal}`
 const formatearKm = km => String(km).replace('.', ',')
 const trazoDelPaso = paso => ({ g: paso.g, rotulo: paso.n })
 
@@ -45,15 +46,22 @@ function decisionDeCalle(anterior, paso, esDeLaRuta) {
   const cruce = cruceDeLaRuta(anterior, paso)
   const mismaCalle = !cruce.conConectores && esLaMismaCalle(anterior.n, paso.n)
   const puedeSeguir = !mismaCalle && !cruce.conConectores && seguirDerechoEs(cruce, anterior.n)
+  const sentidos = mismaCalle ? null : sentidosDeLaMismaCalle(cruce, paso)
+  const correcta = mismaCalle
+    ? seguirDerechoPor(paso.n)
+    : sentidos
+      ? haciaDonde(paso.n, sentidos.correcto)
+      : paso.n
   const alternativas = [
+    ...(sentidos ? [haciaDonde(paso.n, sentidos.opuesto)] : []),
     ...(puedeSeguir ? [seguirDerechoPor(anterior.n)] : []),
     ...otrasCalles(cruce, esDeLaRuta).map(calle => calle.n),
   ]
   return {
     tipo: 'calle',
     pregunta: '¿a qué calle sigues?',
-    opciones: [mismaCalle ? seguirDerechoPor(paso.n) : paso.n, ...alternativas.slice(0, ALTERNATIVAS)],
-    correcta: mismaCalle ? seguirDerechoPor(paso.n) : paso.n,
+    opciones: [correcta, ...alternativas.slice(0, ALTERNATIVAS)],
+    correcta,
     marcador: cruce.cruce,
   }
 }
@@ -68,7 +76,7 @@ function textoDeLasSalidas(ventana) {
 function decisionesDeSalidas(indice, pasos, contexto, { dibujaElDestino }) {
   const autopista = pasos[indice]
   const destino = pasos[indice + 1]
-  if (!destino || !contexto.esAutopista(autopista.n)) return null
+  if (!contexto.esAutopista(autopista.n)) return null
   const secuencia = secuenciaDeSalidas(autopista, null, contexto.salidas)
   if (!secuencia) return null
   const seguir = seguirDerechoPor(autopista.n)
@@ -100,7 +108,16 @@ function decisionesDeSalidas(indice, pasos, contexto, { dibujaElDestino }) {
           g: trozoDelTrazado(autopista.g, ventana.desdeKm, ventana.hastaKm),
           rotulo: orden === 0 && !previo.length ? autopista.n : '',
         },
-        ...(esLaUltima && dibujaElDestino ? [trazoDelPaso(destino)] : []),
+        ...(esLaUltima && dibujaElDestino
+          ? [
+              destino
+                ? trazoDelPaso(destino)
+                : {
+                    g: trozoDelTrazado(autopista.g, ventana.hastaKm, largoDelTrazado(autopista.g)),
+                    rotulo: '',
+                  },
+            ]
+          : []),
       ],
       ...(salidaElegida && { salidaElegida: { texto: `Salida ${salidaElegida.r}`, paso: indice } }),
     }

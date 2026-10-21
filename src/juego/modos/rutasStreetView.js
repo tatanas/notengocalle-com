@@ -166,7 +166,13 @@ function recorrerConStreetView(q, { A, B, recorrido, ruta }) {
     mostrarPanel(cabecera() + progreso + '<p class="muted tight">Cargando Street View…</p>')
     const [lat, lon] = decision.camara
     const conImagen = await mostrarPanorama(
-      { lat, lon, rumbo: decision.rumbo },
+      {
+        lat,
+        lon,
+        rumbo: decision.rumbo,
+        camarasDeRespaldo: decision.camarasDeRespaldo,
+        lugarDeLaDecision: decision.lugarDeLaDecision,
+      },
       { alVerElMapa: verDondeEstoy, alGirarLaVista: girarFlecha, enLaPista: true },
     ).catch(() => null)
     if (partida !== q || q.answered) return

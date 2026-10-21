@@ -184,6 +184,10 @@ const GRADOS_DE_BIFURCACION = 60
 const METROS_DE_TRAMO_LARGO = 500
 const METROS_DE_TRAMO_PRINCIPAL = 250
 const METROS_DE_TRAMO_DE_BIFURCACION = 30
+// Un tramo corto con nombre también cuenta si al entrar había otra calle importante donde elegir (doblar por José Alcalde Délano
+// hacia El Rodeo o hacia Gran Vía): es una decisión de orientación, no un detalle.
+const METROS_DE_TRAMO_CON_DECISION = 150
+const hayDondeElegir = tramo => tramo.entrada.some(calle => calle.k <= RANGO_DE_CALLE_IMPORTANTE)
 
 // Las calles que salen de un cruce y a las que se puede entrar (no las que solo llegan, ni veredas ni accesos de servicio).
 const esCalleQueSale = calle =>
@@ -292,7 +296,8 @@ function pasosPrincipales(tramos, esCalleDelJuego) {
       (tramo.metros >= METROS_DE_TRAMO_LARGO ||
         (tramo.metros >= METROS_DE_TRAMO_PRINCIPAL &&
           (esCalleDelJuego(tramo.nombre) || /^Rotonda/.test(tramo.nombre))) ||
-        (tramo.bifurcacion && tramo.metros >= METROS_DE_TRAMO_DE_BIFURCACION))
+        (tramo.bifurcacion && tramo.metros >= METROS_DE_TRAMO_DE_BIFURCACION) ||
+        (tramo.metros >= METROS_DE_TRAMO_CON_DECISION && hayDondeElegir(tramo)))
     const ultimo = pasos.at(-1)
     if (relevante && !tramo.bifurcacion && ultimo && esLaMismaCalle(ultimo.nombre, tramo.nombre)) {
       ultimo.metros += tramo.metros

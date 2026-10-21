@@ -1018,3 +1018,26 @@ test('cada juego figura solo en las pestañas del ranking que existen para él',
   assert.deepEqual(categoriasDelResumen('20'), ['20', 'extremo'])
   assert.deepEqual(categoriasDelResumen('10'), ['10', '10'])
 })
+
+test('si la calle a la que se entra sale del cruce en los dos sentidos sin lado que decir, se pregunta por hacia dónde va', () => {
+  const pasos = [
+    paso('Av. Norte', [
+      [-1, 0],
+      [0.5, 0],
+    ]),
+    paso(
+      'Av. Cruce',
+      [
+        [0.5, 0],
+        [0.5, 1],
+      ],
+      [calle('Av. Cruce', 90)],
+    ),
+  ]
+  const conStreetView = decisionesConStreetView(pasos, contextoDeJuguete())[1]
+  assert.equal(conStreetView.correcta, 'Toma Av. Cruce hacia el norte')
+  assert.ok(conStreetView.incorrectas.includes('Toma Av. Cruce hacia el sur'))
+  const enElMapa = decisionesEnAuto(pasos, contextoDeJuguete()).decisiones.find(d => d.tipo === 'calle')
+  assert.equal(enElMapa.correcta, 'Av. Cruce hacia el norte')
+  assert.ok(enElMapa.opciones.includes('Av. Cruce hacia el sur'))
+})

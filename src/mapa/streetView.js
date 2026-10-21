@@ -38,9 +38,47 @@ function corridoALaDerecha(lat, lon, rumbo, metros) {
   }
 }
 
-async function buscarPanorama(servicio, { lat, lon, rumbo }, enLaPista) {
+// Un panorama que quedó pasado el lugar de la decisión muestra el cruce ya cruzado (o la calle de al lado): no sirve.
+const METROS_DE_TOLERANCIA_PASADO_EL_LUGAR = 8
+const RADIO_ESTRECHO_M = 25
+function quedaAntesDelLugar(resultado, lugar, rumbo) {
+  const { latLng } = resultado.data.location
+  const radianes = (rumbo * Math.PI) / 180
+  const haciaDelante =
+    (latLng.lat() - lugar[0]) * M_POR_GRADO_LATITUD * Math.cos(radianes) +
+    (latLng.lng() - lugar[1]) * M_POR_GRADO_LONGITUD * Math.sin(radianes)
+  return haciaDelante <= METROS_DE_TOLERANCIA_PASADO_EL_LUGAR
+}
+
+// Prueba cada cámara con un radio estrecho y se queda con el primer panorama bien orientado y antes del lugar de la decisión.
+async function buscarAntesDelLugar(pedir, camaras, lugar, rumbo) {
+  for (const [lat, lon] of camaras) {
+    try {
+      const resultado = await pedir({ lat, lng: lon }, RADIO_ESTRECHO_M)
+      if (esDelSentido(resultado, rumbo) && quedaAntesDelLugar(resultado, lugar, rumbo)) return resultado
+    } catch {
+      // ahí no hay panorama: se prueba más atrás
+    }
+  }
+  return null
+}
+
+async function buscarPanorama(
+  servicio,
+  { lat, lon, rumbo, camarasDeRespaldo, lugarDeLaDecision },
+  enLaPista,
+) {
   const pedir = (location, radius) =>
     servicio.getPanorama({ location, radius, preference: 'nearest', sources: ['google'] })
+  if (lugarDeLaDecision) {
+    const antes = await buscarAntesDelLugar(
+      pedir,
+      [[lat, lon], ...(camarasDeRespaldo ?? [])],
+      lugarDeLaDecision,
+      rumbo,
+    )
+    if (antes) return antes
+  }
   const primero = await pedir({ lat, lng: lon }, RADIO_DE_BUSQUEDA_M)
   if (!enLaPista || esDelSentido(primero, rumbo)) return primero
   for (const metros of METROS_A_LA_DERECHA) {
@@ -200,10 +238,11 @@ function crearElementos() {
 // Deja al jugador en el panorama de Street View más cercano a (lat, lon). En una pregunta puede caminar un poco, sin
 // nombres de calles; con recorrerCalle: true camina sin límite y con nombres.
 // Devuelve el punto real del panorama (puede quedar a unos metros del pedido) o null si ahí no hay cobertura. Con enLaPista busca
-// uno tomado en el sentido de `rumbo` (para seguir una ruta sin ver el tránsito de frente).
+// uno tomado en el sentido de `rumbo` (para seguir una ruta sin ver el tránsito de frente). Con lugarDeLaDecision, el panorama
+// tiene que quedar antes de ese punto (si ahí no hay uno, se prueba en camarasDeRespaldo, cada vez más atrás).
 // alReportarTunel se llama cuando el jugador avisa que ese punto está en un túnel.
 export async function mostrarPanorama(
-  { lat, lon, rumbo = Math.random() * 360 },
+  { lat, lon, rumbo = Math.random() * 360, camarasDeRespaldo, lugarDeLaDecision },
   {
     alReportarTunel = null,
     recorrerCalle = false,
@@ -216,7 +255,11 @@ export async function mostrarPanorama(
   const { StreetViewPanorama, StreetViewService } = await maps.importLibrary('streetView')
   let resultado
   try {
-    resultado = await buscarPanorama(new StreetViewService(), { lat, lon, rumbo }, enLaPista)
+    resultado = await buscarPanorama(
+      new StreetViewService(),
+      { lat, lon, rumbo, camarasDeRespaldo, lugarDeLaDecision },
+      enLaPista,
+    )
   } catch {
     return null
   }

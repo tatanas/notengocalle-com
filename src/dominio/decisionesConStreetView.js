@@ -1,6 +1,6 @@
 import { elegir, escaparHtml, mezclar } from '../nucleo/utilidades.js'
 import { esLaMismaCalle } from '../../compartido/rutaEnAuto.js'
-import { cruceDeLaRuta, otrasCalles, seguirDerechoEs } from './cruceDeRuta.js'
+import { cruceDeLaRuta, otrasCalles, seguirDerechoEs, sentidosDeLaMismaCalle } from './cruceDeRuta.js'
 import {
   GRADOS_DE_SEGUIR_DERECHO,
   GRADOS_DE_VUELTA_EN_U,
@@ -35,9 +35,14 @@ import {
 // la salida de la ruta.
 //
 // Cada decisión: { tipo, pregunta (html), camara, rumbo, correcta, incorrectas, hecha (cómo se cuenta al final), km,
-// alResponder: [trazado] (lo que se dibuja al responder), opciones? (en este orden; si no, se mezclan), pines?, salidaElegida? }.
+// camarasDeRespaldo?/lugarDeLaDecision? (más atrás, y el punto que el panorama no debe pasar), alResponder: [trazado] (lo que se dibuja al responder), opciones? (en este orden; si no, se mezclan), pines?, salidaElegida? }.
 const KM_ANTES_DE_DECIDIR = 0.05
 const KM_ANTES_DE_LLEGAR_A_LA_CALLE = 0.03
+// Si no hay panorama justo ahí, se prueba más atrás por la misma calle: siempre antes de la decisión, nunca después.
+const KM_DE_RESPALDO_ANTES_DE_DECIDIR = [0.08, 0.12, 0.18]
+const KM_DE_RESPALDO_ANTES_DE_LLEGAR = [0.06, 0.1]
+const camarasAntesDelFinal = (linea, kmDeLaPrimera, kmDeRespaldo) =>
+  [kmDeLaPrimera, ...kmDeRespaldo].map(km => puntoAntesDelFinal(linea, km))
 const KM_PARA_MEDIR_EL_RUMBO = 0.06
 const OPCIONES = 4
 // Más calles chicas que esto entre dos principales se resumen ("por X y otras calles chicas").
@@ -104,15 +109,27 @@ function decisionDeCruce(anterior, paso, { esAutopista, salidas }, esDeLaRuta) {
     texto: maniobra(grados, calle, opciones),
     cambiaDeAutopista: !!opciones.desdeAutopista || esAutopista(calle),
   })
-  const correctaOpcion = opcion(cruce.grados, paso.n, {
-    desdeAutopista: desdeLaCalleActual,
-    numeroDeSalida,
-    conLado: mismaCalle || !!otroLado,
-  })
+  const sentidos = mismaCalle || otroLado ? null : sentidosDeLaMismaCalle(cruce, paso)
+  const tomarHacia = cardinal => `Toma ${paso.n} hacia el ${cardinal}`
+  const correctaOpcion = {
+    ...opcion(cruce.grados, paso.n, {
+      desdeAutopista: desdeLaCalleActual,
+      numeroDeSalida,
+      conLado: mismaCalle || !!otroLado,
+    }),
+    ...(sentidos && { texto: tomarHacia(sentidos.correcto), fija: true }),
+  }
 
   const candidatas = []
   // Seguir derecho por la calle actual, si continúa. Si lo correcto ya es seguir derecho (la calle solo cambia de nombre), no hay
   // otra calle por la que seguir.
+  if (sentidos)
+    candidatas.push({
+      grados: 180,
+      calle: paso.n,
+      texto: tomarHacia(sentidos.opuesto),
+      cambiaDeAutopista: true,
+    })
   const sigueDerecho = !mismaCalle && seguirDerechoEs(cruce, cruce.calleActual)
   if (sigueDerecho)
     candidatas.push({
@@ -142,7 +159,12 @@ function decisionDeCruce(anterior, paso, { esAutopista, salidas }, esDeLaRuta) {
   ).slice(0, OPCIONES - 1)
   // Una bifurcación: dos o más opciones que salen casi derecho se distinguen por el lado en que salen.
   const casiDerechas = [correctaOpcion, ...elegidas]
-    .filter(candidata => !candidata.cambiaDeAutopista && Math.abs(candidata.grados) < GRADOS_DE_DESVIO_SUAVE)
+    .filter(
+      candidata =>
+        !candidata.fija &&
+        !candidata.cambiaDeAutopista &&
+        Math.abs(candidata.grados) < GRADOS_DE_DESVIO_SUAVE,
+    )
     .sort((a, b) => a.grados - b.grados)
   if (casiDerechas.length > 1)
     casiDerechas.forEach((candidata, posicion) => {
@@ -157,6 +179,12 @@ function decisionDeCruce(anterior, paso, { esAutopista, salidas }, esDeLaRuta) {
       paso,
       pregunta: `Vas hacia el ${puntoCardinal(cruce.rumboEnElFin)} por <b>${escaparHtml(anterior.n)}</b> (${formatearKm(anterior.km)} km). <b>¿Qué haces en el cruce que viene?</b>`,
       camara: puntoAntesDelFinal(cruce.propio, KM_ANTES_DE_DECIDIR),
+      camarasDeRespaldo: camarasAntesDelFinal(
+        cruce.propio,
+        KM_ANTES_DE_DECIDIR,
+        KM_DE_RESPALDO_ANTES_DE_DECIDIR,
+      ).slice(1),
+      lugarDeLaDecision: cruce.fin,
       rumbo: cruce.rumboEnElFin,
       correcta,
       incorrectas,
@@ -172,6 +200,12 @@ function decisionDeCruce(anterior, paso, { esAutopista, salidas }, esDeLaRuta) {
     paso,
     pregunta: `Ibas hacia el ${puntoCardinal(cruce.rumboEnElFin)} por <b>${escaparHtml(anterior.n)}</b> y ${verbo} por <b>${escaparHtml(calles)}</b>. Ahora vas hacia el ${puntoCardinal(cruce.rumbo)} y llegas a <b>${escaparHtml(paso.n)}</b>: <b>¿qué haces?</b>`,
     camara: puntoAntesDelFinal(cruce.conector, KM_ANTES_DE_LLEGAR_A_LA_CALLE),
+    camarasDeRespaldo: camarasAntesDelFinal(
+      cruce.conector,
+      KM_ANTES_DE_LLEGAR_A_LA_CALLE,
+      KM_DE_RESPALDO_ANTES_DE_LLEGAR,
+    ).slice(1),
+    lugarDeLaDecision: cruce.conector.at(-1),
     rumbo: cruce.rumbo,
     correcta,
     incorrectas,
@@ -185,7 +219,7 @@ function decisionDeCruce(anterior, paso, { esAutopista, salidas }, esDeLaRuta) {
 function decisionesDeSalidas(indice, pasos, contexto, { dibujaElDestino }) {
   const autopista = pasos[indice]
   const destino = pasos[indice + 1]
-  if (!destino || !contexto.esAutopista(autopista.n)) return null
+  if (!contexto.esAutopista(autopista.n)) return null
   const secuencia = secuenciaDeSalidas(autopista, null, contexto.salidas)
   if (!secuencia) return null
   const seguir = seguirDerechoPor(autopista.n)
@@ -224,7 +258,13 @@ function decisionesDeSalidas(indice, pasos, contexto, { dibujaElDestino }) {
       km: +(ventana.hastaKm - ventana.desdeKm).toFixed(1),
       alResponder: [
         trozoDelTrazado(autopista.g, ventana.desdeKm, ventana.hastaKm),
-        ...(esLaUltima && dibujaElDestino ? [destino.g] : []),
+        ...(esLaUltima && dibujaElDestino
+          ? [
+              destino
+                ? destino.g
+                : trozoDelTrazado(autopista.g, ventana.hastaKm, largoDelTrazado(autopista.g)),
+            ]
+          : []),
       ],
       pines: ventana.salidas.map(({ salida }) => ({ p: salida.p, texto: `Salida ${salida.r}` })),
       ...(esLaUltima && {

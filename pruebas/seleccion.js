@@ -32,6 +32,7 @@ const PREFIJO_DE_JUEGO_POR_ARCHIVO = {
   metro: 'mt-',
   calles: 'st-',
   rutas: 'rs-',
+  rutasStreetView: 'rs-',
   chile: 'ch-',
   parques: 'pn-',
   conexiones: 'cx',
