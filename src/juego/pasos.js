@@ -87,7 +87,7 @@ const MS_TRAS_ERRAR = 1700
 
 /* Los juegos de pasos preguntan decisión por decisión: cada una con su pregunta, sus opciones (siempre más de una) y lo que
    se dibuja al responder. cfg: {A, B, pasos: [{g}] (para encuadrar), antes: [trazo] (se dibuja antes de la primera pregunta),
-   decisiones: [{pregunta, opciones, correcta, marcador, trazos: [{g, rotulo, color?}], pines?, ordenadas?}],
+   decisiones: [{pregunta, opciones, correcta, marcador, trazos: [{g, rotulo, color?}], ordenadas?}],
    html?, sub, summary(decisiones), porLaCalle, pre?} */
 // Con porLaCalle, A y B se marcan donde la ruta sale a la calle y donde la deja (no en medio de un recinto).
 export function preguntarPasos(q, cfg) {
@@ -130,12 +130,6 @@ export function preguntarPasos(q, cfg) {
           .addTo(capa)
     }
   }
-  const dibujarPines = pines => {
-    for (const pin of pines ?? [])
-      L.marker(pin.p, { icon: iconoDiv('pin salida', '', 18), pane: 'points' })
-        .addTo(capa)
-        .bindTooltip(escaparHtml(pin.texto), { permanent: true, direction: 'top', offset: [0, -12] })
-  }
 
   const terminar = () => {
     if (aqui) capa.removeLayer(aqui)
@@ -177,7 +171,6 @@ export function preguntarPasos(q, cfg) {
     )
     if (aqui) capa.removeLayer(aqui)
     aqui = L.marker(decision.marcador, { icon: iconoDiv('pulse', '', 22), pane: 'points' }).addTo(capa)
-    dibujarPines(decision.pines)
     if (i > 0) encuadrar(L.latLngBounds([decision.marcador, llegada]).pad(0.3), 14)
     const opciones = decision.ordenadas ? decision.opciones : mezclar(decision.opciones)
     const caja = document.createElement('div')

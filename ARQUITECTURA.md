@@ -144,6 +144,7 @@ Las pruebas imprimen **solo lo que falla** más un resumen (unitarias con report
 | Rondas oficiales / largos / categorías | `compartido/oficial.js` (lo comparten navegador y servidor) |
 | Puntajes y ranking del servidor | `servidor/puntajes.js`, `servidor/api.js` |
 | Menú / barra superior / Mi progreso | `src/interfaz/inicio.js`, `index.html` (pestañas), `src/interfaz/progreso.js` |
+| Ruta libre (grafo vial, decisiones, puntaje) | [docs/ruta-libre.md](docs/ruta-libre.md): `compartido/grafoVial.js`, `src/dominio/rutaLibre.js`, `src/juego/modos/rutaLibre.js`, `tools/grafo/` |
 | Ruteo en auto | [docs/ruteo.md](docs/ruteo.md): construcción `compartido/rutaEnAuto.js`; mapa `src/dominio/decisionesEnAuto.js`; Street View `src/dominio/decisionesConStreetView.js`; cruces `src/dominio/cruceDeRuta.js`; salidas `src/dominio/salidas.js` |
 | Qué suite corre por archivo cambiado | `pruebas/seleccion.js` |
 
@@ -163,6 +164,7 @@ Las pruebas imprimen **solo lo que falla** más un resumen (unitarias con report
 | [docs/decisiones-contenido.md](docs/decisiones-contenido.md) | qué se sacó del juego y no se vuelve a agregar; pendientes de confirmar |
 | [docs/datos.md](docs/datos.md) | fuentes, qué trae `DATA`, pipeline de `tools/`, trampas de Overpass/Wikimedia |
 | [docs/ruteo.md](docs/ruteo.md) | rutas en auto y en micro: cómo se arman y las reglas del dueño |
+| [docs/ruta-libre.md](docs/ruta-libre.md) | Ruta libre: grafo vial, cuándo se pregunta, puntaje, cómo agregar una ruta |
 | [docs/streetview.md](docs/streetview.md) | Street View: niveles, puntos, llave de Google |
 | [docs/servidor.md](docs/servidor.md) | rutas del API, cuentas, ranking, base de datos, administración |
 | [docs/publicar.md](docs/publicar.md) | Netlify, GitHub y Neon |

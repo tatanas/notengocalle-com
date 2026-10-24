@@ -23,3 +23,6 @@ tools/nameidx.json
 tools/rb_raw.json
 tools/*cache*.json
 tools/comunas_all.geojson
+
+# Ruta libre: los grafos con direcciones propias (de quien desarrolla) no se suben; los de lugares públicos sí
+public/data/ruta-libre/privadas/

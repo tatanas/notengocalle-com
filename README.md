@@ -3,10 +3,11 @@
 **Jugar en [notengocalle.com](https://notengocalle.com)**
 
 Juego web para aprender la geografía de Santiago (comunas, calles, lugares, metro, rutas) y de Chile
-(regiones, ciudades, parques nacionales). Se puede jugar sin cuenta; con cuenta, las rondas oficiales
-(el botón grande de cada juego) entran al ranking.
+(regiones, ciudades, parques nacionales). Se puede jugar sin cuenta; con cuenta, las rondas 🏆 (el botón
+grande de cada juego) entran al ranking.
 
-Todo es gratis y sin API keys. El juego corre en el navegador; un servidor mínimo guarda cuentas y puntajes.
+El juego corre en el navegador; un servidor mínimo guarda cuentas y puntajes. Street View usa una llave de
+Google Maps (ver [docs/streetview.md](docs/streetview.md)); el resto funciona sin llaves.
 
 ## Empezar
 
@@ -15,7 +16,7 @@ Necesitas Node 22 o superior.
 ```
 npm install
 npm run dev        # http://localhost:5173, con cuentas y ranking sobre una base local
-npm test           # lint, pruebas unitarias, del servidor y de navegador (usa Chrome)
+npm test           # lint, pruebas unitarias y las de navegador que corresponden a lo modificado (usa Chrome)
 ```
 
 Para probarlo desde el celular en la misma red WiFi: `npx vite --host` y abrir la dirección "Network" que
@@ -36,6 +37,7 @@ en marcha (conectar el repositorio y crear la base de datos) está en
 ## Créditos de los datos
 
 - Límites comunales, calles, metro y lugares: © OpenStreetMap contributors (ODbL), vía Overpass y Nominatim.
-- Rutas en auto: OSRM. Rutas y recorridos de transporte público: GTFS de Red (DTPM).
+- Rutas en auto: Valhalla (FOSSGIS). Rutas y recorridos de transporte público: GTFS de Red (DTPM).
+- Street View: Google Maps.
 - Mapa base: OpenFreeMap / OpenMapTiles. Relieve: AWS Terrain Tiles. Librerías: Leaflet y MapLibre GL.
 - Fotos: Wikimedia Commons y Panoramax; cada foto muestra su autor y licencia.

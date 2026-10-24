@@ -3,6 +3,7 @@ import { esLaMismaCalle } from '../../compartido/rutaEnAuto.js'
 import { cruceDeLaRuta, otrasCalles, seguirDerechoEs, sentidosDeLaMismaCalle } from './cruceDeRuta.js'
 import { puntoDesdeElInicio } from './maniobras.js'
 import {
+  kmHastaDondeSeDibuja,
   largoDelTrazado,
   secuenciaDeSalidas,
   textoDeSalida,
@@ -19,7 +20,7 @@ import {
 // ninguna de las tres sirva y lo correcto sea seguir. Se sigue de ventana en ventana hasta la salida de la ruta.
 //
 // Cada decisión: { tipo: 'partida' | 'calle' | 'salidas', pregunta (html), opciones, correcta, marcador (dónde se está),
-// trazos: [{ g, rotulo }] (lo que se dibuja al responder), pines?: [{ p, texto }], ordenadas?, salidaElegida? }.
+// trazos: [{ g, rotulo }] (lo que se dibuja al responder), ordenadas?, salidaElegida? }.
 
 const ALTERNATIVAS = 3
 // Al partir no hay cruce: valen las salidas que ya se conocen del lugar de partida y las calles que salen del primer cruce.
@@ -83,8 +84,8 @@ function decisionesDeSalidas(indice, pasos, contexto, { dibujaElDestino }) {
   const ventanas = ventanasDeSalidas(secuencia, largoDelTrazado(autopista.g))
   // Lo que se recorre antes de la primera pregunta se dibuja con la respuesta anterior.
   const previo =
-    ventanas[0].desdeKm > 0
-      ? [{ g: trozoDelTrazado(autopista.g, 0, ventanas[0].desdeKm), rotulo: autopista.n }]
+    ventanas[0].camaraKm > 0
+      ? [{ g: trozoDelTrazado(autopista.g, 0, ventanas[0].camaraKm), rotulo: autopista.n }]
       : []
   const preguntas = ventanas.map((ventana, orden) => {
     const textos = ventana.salidas.map(({ salida, destino: adonde }) => textoDeSalida(salida, adonde))
@@ -102,10 +103,9 @@ function decisionesDeSalidas(indice, pasos, contexto, { dibujaElDestino }) {
       ordenadas: true,
       correcta,
       marcador: puntoDesdeElInicio(autopista.g, ventana.camaraKm),
-      pines: ventana.salidas.map(({ salida }) => ({ p: salida.p, texto: `Salida ${salida.r}` })),
       trazos: [
         {
-          g: trozoDelTrazado(autopista.g, ventana.desdeKm, ventana.hastaKm),
+          g: trozoDelTrazado(autopista.g, ventana.camaraKm, kmHastaDondeSeDibuja(ventanas, orden)),
           rotulo: orden === 0 && !previo.length ? autopista.n : '',
         },
         ...(esLaUltima && dibujaElDestino

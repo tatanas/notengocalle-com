@@ -75,10 +75,6 @@ function recorrerConStreetView(q, { A, B, recorrido, ruta }) {
     posicionActual = L.marker(decision.camara, { icon: flechaDeRumbo(decision.rumbo), pane: 'points' })
       .addTo(capaDelRecorrido)
       .bindTooltip('Estás aquí', { permanent: true, direction: 'top', offset: [0, -14] })
-    for (const pin of decision.pines ?? [])
-      L.marker(pin.p, { icon: iconoDiv('pin salida', '', 18), pane: 'points' })
-        .addTo(capaDelRecorrido)
-        .bindTooltip(escaparHtml(pin.texto), { permanent: true, direction: 'top', offset: [0, -12] })
   }
   // Lo que se recorrió con la respuesta, del color de si se acertó.
   function marcarRecorrido(decision, acierto) {

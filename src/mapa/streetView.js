@@ -9,6 +9,9 @@ const RADIO_DE_BUSQUEDA_M = 60
 // En las preguntas se puede caminar para ubicarse, pero sin nombres de calles y sin alejarse más que esto del punto de
 // partida (el puntaje se mide desde ahí). Al terminar una pregunta de calles se recorre la calle sin límite y con nombres.
 export const DISTANCIA_MAXIMA_DE_CAMINATA_KM = 0.5
+// Sin caminar (Ruta libre): el panorama es un lugar fijo desde donde se mira alrededor; cualquier paso se deshace.
+const DISTANCIA_SIN_CAMINAR_KM = 0.002
+let distanciaMaximaDeCaminataKm = DISTANCIA_MAXIMA_DE_CAMINATA_KM
 // Para dibujar lo caminado basta un punto cada tantos metros.
 const PASO_MINIMO_DEL_CAMINO_KM = 0.005
 
@@ -179,6 +182,7 @@ function crearPanorama(StreetViewPanorama) {
     motionTrackingControl: false,
     panControl: false,
   })
+  if (import.meta.env.DEV) window.__panorama = panorama
   panorama.addListener('pov_changed', () => alGirarLaVista?.(panorama.getPov().heading))
   panorama.addListener('position_changed', () => {
     const posicion = panorama.getPosition()
@@ -188,10 +192,12 @@ function crearPanorama(StreetViewPanorama) {
       return
     }
     const lugar = [posicion.lat(), posicion.lng()]
-    if (distanciaKm(lugar, inicioDeLaPregunta) > DISTANCIA_MAXIMA_DE_CAMINATA_KM) {
+    if (distanciaKm(lugar, inicioDeLaPregunta) > distanciaMaximaDeCaminataKm) {
       volverAlPanorama(ultimoPanoPermitido)
       aviso(
-        `Hasta aquí: puedes alejarte hasta ${DISTANCIA_MAXIMA_DE_CAMINATA_KM * 1000} m del punto de partida.`,
+        distanciaMaximaDeCaminataKm === DISTANCIA_SIN_CAMINAR_KM
+          ? 'En esta pregunta no se puede avanzar: mira alrededor y decide.'
+          : `Hasta aquí: puedes alejarte hasta ${distanciaMaximaDeCaminataKm * 1000} m del punto de partida.`,
       )
       return
     }
@@ -238,7 +244,7 @@ function crearElementos() {
 // Deja al jugador en el panorama de Street View más cercano a (lat, lon). En una pregunta puede caminar un poco, sin
 // nombres de calles; con recorrerCalle: true camina sin límite y con nombres.
 // Devuelve el punto real del panorama (puede quedar a unos metros del pedido) o null si ahí no hay cobertura. Con enLaPista busca
-// uno tomado en el sentido de `rumbo` (para seguir una ruta sin ver el tránsito de frente). Con lugarDeLaDecision, el panorama
+// uno tomado en el sentido de `rumbo` (para seguir una ruta sin ver el tránsito de frente). Con sinCaminar no se puede avanzar. Con lugarDeLaDecision, el panorama
 // tiene que quedar antes de ese punto (si ahí no hay uno, se prueba en camarasDeRespaldo, cada vez más atrás).
 // alReportarTunel se llama cuando el jugador avisa que ese punto está en un túnel.
 export async function mostrarPanorama(
@@ -249,6 +255,7 @@ export async function mostrarPanorama(
     alVerElMapa: encuadrarAlVerElMapa = null,
     alGirarLaVista: alGirar = null,
     enLaPista = false,
+    sinCaminar = false,
   } = {},
 ) {
   const maps = await cargarGoogleMaps()
@@ -278,7 +285,8 @@ export async function mostrarPanorama(
   contenedor.hidden = false
   botones.hidden = false
   if (!panorama) crearPanorama(StreetViewPanorama)
-  panorama.setOptions({ showRoadLabels: recorrerCalle })
+  panorama.setOptions({ showRoadLabels: recorrerCalle, clickToGo: !sinCaminar, linksControl: !sinCaminar })
+  distanciaMaximaDeCaminataKm = sinCaminar ? DISTANCIA_SIN_CAMINAR_KM : DISTANCIA_MAXIMA_DE_CAMINATA_KM
   document.getElementById('reportarTunel').hidden = !alReportarTunel
   document.getElementById('volverAlInicio').hidden = recorrerCalle
   document.getElementById('cerrarRecorrido').hidden = !recorrerCalle
@@ -287,7 +295,13 @@ export async function mostrarPanorama(
   panoDeInicio = lugar.pano
   ultimoPanoPermitido = lugar.pano
   panorama.setPano(lugar.pano)
-  panorama.setPov({ heading: rumbo, pitch: 0 })
+  const mirarHaciaDondeSeAvanza = () => panorama.setPov({ heading: rumbo, pitch: 0 })
+  mirarHaciaDondeSeAvanza()
+  // Si el panorama termina de cargar después, Google puede devolver la vista al rumbo del auto que lo tomó.
+  const alCargar = panorama.addListener('status_changed', () => {
+    alCargar.remove()
+    mirarHaciaDondeSeAvanza()
+  })
   panorama.setVisible(true)
   return inicio
 }

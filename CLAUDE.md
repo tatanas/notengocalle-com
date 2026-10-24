@@ -13,6 +13,7 @@ Este archivo se carga siempre; lo demás, **solo el documento que la tarea toque
 | agrega, cambia o retira un juego; toca el menú, rondas o ranking | [docs/modos.md](docs/modos.md) |
 | agrega o quita calles, lugares o barrios | [docs/decisiones-contenido.md](docs/decisiones-contenido.md) (lo ya descartado) y [docs/datos.md](docs/datos.md) (pipeline) |
 | toca el ruteo (`rs-*`) | [docs/ruteo.md](docs/ruteo.md) |
+| toca "Ruta libre" (`rl-sv`) o el grafo vial | [docs/ruta-libre.md](docs/ruta-libre.md) |
 | toca Street View | [docs/streetview.md](docs/streetview.md) |
 | toca cuentas, ranking o la base de datos | [docs/servidor.md](docs/servidor.md) |
 | publica o configura Netlify/Neon | [docs/publicar.md](docs/publicar.md) |

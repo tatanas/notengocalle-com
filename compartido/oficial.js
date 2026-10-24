@@ -30,6 +30,7 @@ export const MODOS_OFICIALES = [
   'rs-any-car',
   'rs-any-tp',
   'rs-sv-car',
+  'rl-sv',
   'ch-find',
   'ch-city',
   'ch-cityreg',
@@ -39,9 +40,10 @@ export const MODOS_OFICIALES = [
   'sv-ubicar',
 ]
 
-// Cuánto vale cada pregunta: casi todos los juegos suman 1 por acierto; Street View suma de 0 a 5 según la distancia.
+// Cuánto vale cada pregunta: casi todos los juegos suman 1 por acierto; Street View suma de 0 a 5 según la distancia
+// y Ruta libre, de 0 a 100 según cuánto más lenta que la óptima fue la ruta.
 // En esos juegos "aciertos" son los puntos de la ronda y "total" el máximo posible (preguntas × puntos).
-const PUNTOS_POR_PREGUNTA = { 'sv-ubicar': 5 }
+const PUNTOS_POR_PREGUNTA = { 'sv-ubicar': 5, 'rl-sv': 100 }
 export const puntosPorPregunta = modo => PUNTOS_POR_PREGUNTA[modo] ?? 1
 
 // Categorías de ranking según el largo de la ronda: 10 o 20 preguntas, o "todas" las del juego.
@@ -52,7 +54,8 @@ export const CATEGORIAS_DE_RONDA = [...LARGOS_ELEGIBLES.map(String), TODAS_LAS_P
 
 // Las rondas son de 20 preguntas (o 10 si se prefiere), salvo en los juegos que se juegan más largo y por eso van de a menos y
 // siempre del mismo largo: Street View y las rutas (de más largas no vale la pena, y no tiene sentido un "todas").
-const LARGO_FIJO = { 'sv-ubicar': 10, 'rs-any-car': 10, 'rs-any-tp': 10, 'rs-sv-car': 10 }
+// Ruta libre es una sola ruta por ronda: es larga, y lo que se compara es qué tan bien se la recorre.
+const LARGO_FIJO = { 'sv-ubicar': 10, 'rs-any-car': 10, 'rs-any-tp': 10, 'rs-sv-car': 10, 'rl-sv': 1 }
 export const largoNormalDe = modo => LARGO_FIJO[modo] ?? 20
 // Los juegos que recorren siempre todo su conjunto (las regiones de Chile: son 16) no tienen largos: solo "todas".
 const SIEMPRE_TODAS = new Set(['ch-find', 'ch-all'])
@@ -84,6 +87,7 @@ const AJUSTE_DE_CATEGORIA = {
 export const ajusteDeCategoria = modo => AJUSTE_DE_CATEGORIA[modo] ?? null
 
 const ETIQUETA_DE_CATEGORIA = {
+  1: 'Una ruta',
   [TODAS_LAS_PREGUNTAS]: 'Todas',
   facil: 'Fácil',
   medio: 'Medio',
@@ -137,6 +141,7 @@ export function preguntasDeCategoria(modo, categoria) {
 // Cómo se nombra la categoría al contar dónde quedó la ronda: "con 20 preguntas", "en el nivel Fácil"…
 export function textoDeCategoria(modo, categoria) {
   if (categoria === TODAS_LAS_PREGUNTAS) return 'todas las preguntas'
+  if (categoria === '1') return 'una ruta'
   if (ajusteDeCategoria(modo))
     return modo === 'sv-ubicar'
       ? `el nivel ${etiquetaDeCategoria(categoria)}`

@@ -789,8 +789,8 @@ test('en el mapa, al ir por una autopista se pregunta por las salidas de a tres 
   )
   assert.equal(
     antes.length,
-    1,
-    'solo la calle de acceso se dibuja de entrada: la autopista se dibuja de a poco',
+    2,
+    'de entrada se dibujan la calle de acceso y la autopista hasta donde está el jugador; el resto, de a poco',
   )
   const [primera, segunda] = decisiones
   assert.deepEqual(primera.opciones, [

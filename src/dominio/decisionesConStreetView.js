@@ -15,6 +15,7 @@ import {
   GRADOS_DE_DESVIO_SUAVE,
 } from './maniobras.js'
 import {
+  kmHastaDondeSeDibuja,
   largoDelTrazado,
   salidaPorLaQueSeSale,
   secuenciaDeSalidas,
@@ -225,7 +226,7 @@ function decisionesDeSalidas(indice, pasos, contexto, { dibujaElDestino }) {
   const seguir = seguirDerechoPor(autopista.n)
   const ventanas = ventanasDeSalidas(secuencia, largoDelTrazado(autopista.g))
   // Lo que se recorre antes de la primera pregunta se dibuja con la respuesta anterior.
-  const previo = ventanas[0].desdeKm > 0 ? [trozoDelTrazado(autopista.g, 0, ventanas[0].desdeKm)] : []
+  const previo = ventanas[0].camaraKm > 0 ? [trozoDelTrazado(autopista.g, 0, ventanas[0].camaraKm)] : []
   const preguntas = ventanas.map((ventana, orden) => {
     const tomar = ({ salida, destino: adonde }) =>
       `Toma la salida ${salida.r}${adonde ? ` hacia ${adonde}` : ''}`
@@ -257,7 +258,7 @@ function decisionesDeSalidas(indice, pasos, contexto, { dibujaElDestino }) {
       hecha: esLaUltima ? correcta : `Sigues por ${autopista.n}, sin tomar las salidas ${lista}`,
       km: +(ventana.hastaKm - ventana.desdeKm).toFixed(1),
       alResponder: [
-        trozoDelTrazado(autopista.g, ventana.desdeKm, ventana.hastaKm),
+        trozoDelTrazado(autopista.g, ventana.camaraKm, kmHastaDondeSeDibuja(ventanas, orden)),
         ...(esLaUltima && dibujaElDestino
           ? [
               destino
@@ -266,7 +267,6 @@ function decisionesDeSalidas(indice, pasos, contexto, { dibujaElDestino }) {
             ]
           : []),
       ],
-      pines: ventana.salidas.map(({ salida }) => ({ p: salida.p, texto: `Salida ${salida.r}` })),
       ...(esLaUltima && {
         salidaElegida: {
           texto: `Salida ${ventana.salidas[ventana.indiceDeLaCorrecta].salida.r}`,

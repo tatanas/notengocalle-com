@@ -272,6 +272,11 @@ body.ruteo-sv.ver-mapa #panorama {
   visibility: hidden;
   pointer-events: none;
 }
+/* Ruta libre en una ronda: no hay mapa ni forma de volver al inicio; solo el panorama y las opciones. */
+body.ruta-libre-ronda #alternarVista,
+body.ruta-libre-ronda #volverAlInicio {
+  display: none;
+}
 .flecha-de-rumbo {
   background: none;
   border: 0;

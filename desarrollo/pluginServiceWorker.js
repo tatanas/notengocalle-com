@@ -7,6 +7,9 @@ const listarArchivos = carpeta =>
     elemento.isDirectory() ? listarArchivos(join(carpeta, elemento.name)) : [join(carpeta, elemento.name)],
   )
 
+// Los grafos de Ruta libre pesan megas cada uno: se bajan al jugar esa ruta (y el service worker los guarda entonces).
+const RUTA_DE_LOS_ARCHIVOS_BAJO_DEMANDA = '/data/ruta-libre/'
+
 // Plugin de Vite: publica sw.js con la lista de archivos a guardar y una versión que cambia sola
 // cuando cambia cualquiera de ellos (código, datos o librerías). Ya no hay que subir un número a mano.
 export function serviceWorker({ source: fuente, publicDir: carpetaPublica }) {
@@ -15,10 +18,10 @@ export function serviceWorker({ source: fuente, publicDir: carpetaPublica }) {
     apply: 'build',
     generateBundle(_, paquete) {
       const resumen = createHash('sha256')
-      const archivosPublicos = listarArchivos(carpetaPublica).map(archivo => {
-        resumen.update(readFileSync(archivo))
-        return '/' + relative(carpetaPublica, archivo).replaceAll('\\', '/')
-      })
+      const archivosPublicos = listarArchivos(carpetaPublica)
+        .map(archivo => '/' + relative(carpetaPublica, archivo).replaceAll('\\', '/'))
+        .filter(ruta => !ruta.startsWith(RUTA_DE_LOS_ARCHIVOS_BAJO_DEMANDA))
+      archivosPublicos.forEach(ruta => resumen.update(readFileSync(join(carpetaPublica, ruta))))
       const archivosConstruidos = Object.keys(paquete)
         .filter(archivo => archivo !== 'index.html')
         .map(archivo => '/' + archivo)

@@ -283,10 +283,12 @@ function veredicto(porcentaje, grupo) {
   return GRUPOS_SIN_CALLE.includes(grupo) ? 'no teni calle :(' : 'A seguir practicando 🗺️'
 }
 
+const largoEnPalabras = total => (total === 1 ? 'una pregunta' : `${total} preguntas`)
+
 function htmlDeMejorPersonal(total, maximo, anterior, esMejor) {
   if (!esMejor)
-    return `<p class="muted tight">Tu récord en rondas de ${total}: ${anterior.ok}/${maximo} en ${formatearTiempo(anterior.ms)}</p>`
-  if (!anterior) return `<p class="muted tight">Primera marca en rondas de ${total} preguntas.</p>`
+    return `<p class="muted tight">Tu récord en rondas de ${largoEnPalabras(total)}: ${anterior.ok}/${maximo} en ${formatearTiempo(anterior.ms)}</p>`
+  if (!anterior) return `<p class="muted tight">Primera marca en rondas de ${largoEnPalabras(total)}.</p>`
   return `<p class="tight">🏅 <b>¡Nuevo récord!</b> <span class="muted">Antes: ${anterior.ok}/${maximo} en ${formatearTiempo(anterior.ms)}</span></p>`
 }
 

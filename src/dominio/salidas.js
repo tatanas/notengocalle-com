@@ -226,6 +226,11 @@ export function ventanasDeSalidas(secuencia, largoDelPasoKm) {
   return ventanas.slice(-MAXIMO_DE_PREGUNTAS_POR_AUTOPISTA)
 }
 
+// Lo recorrido se dibuja de cámara en cámara, para que la línea llegue siempre hasta donde está el jugador: cada ventana dibuja
+// desde su cámara hasta la cámara de la siguiente (o, la última, hasta su salida).
+export const kmHastaDondeSeDibuja = (ventanas, orden) =>
+  ventanas[orden + 1] ? ventanas[orden + 1].camaraKm : ventanas[orden].hastaKm
+
 // El tramo de un trazado entre dos distancias medidas desde su comienzo.
 export function trozoDelTrazado(trazado, desdeKm, hastaKm) {
   const [dx, dy] = [KM_POR_GRADO_LONGITUD, KM_POR_GRADO_LATITUD]
