@@ -31,7 +31,8 @@ src/                    el juego (navegador)
   datos/                  datos.js lee window.DATA y arma los índices; lugaresStreetView.json, pistasCalles.json, recintos.json
   mapa/                   mapa.js (el mapa Leaflet y su estado), dibujo.js (cómo se dibuja cada cosa), ayudas.js, streetView.js (visor)
   dominio/                lógica por tema: calles, comunas, lugares, metro, cerros, zonas, chile, streetView (puntaje), ubicacion,
-                          compartir; ruteo en auto: decisionesEnAuto, decisionesConStreetView, cruceDeRuta, salidas, maniobras, rutaEnAuto
+                          compartir; ruteo en auto: decisionesEnAuto, decisionesConStreetView, cruceDeRuta, salidas, maniobras, rutaEnAuto;
+                          conducir libre: cruces, conduccion, camaraDeConduccion, instruccionesDeCruce, trazado
   juego/                  el motor de las rondas y los juegos
     engine.js               ciclo de una ronda: sortear, preguntar, corregir, cronometrar, resultado (arriba, el contrato de un modo)
     options.js              botones de alternativas      pasos.js   juegos "paso a paso" (ruteo)      registry.js   registrarModo
@@ -140,6 +141,7 @@ Las pruebas imprimen **solo lo que falla** más un resumen (unitarias con report
 | Reglas de "Encuentra la calle" / `st-punto` | `src/juego/modos/calles.js` (constantes arriba de `st-find`); el punto: `puntoParaPreguntar` en `src/dominio/calles.js` |
 | Niveles de Street View | listas de `tools/niveles_streetview.mjs`; selector en `src/interfaz/inicio.js`; `NIVEL_MAXIMO` en `src/juego/modos/streetView.js` |
 | Visor de Street View | `src/mapa/streetView.js` (un solo panorama reutilizado; ver [docs/streetview.md](docs/streetview.md)) |
+| Conducir libre (experimental, solo desarrollo) | [docs/conduccion-libre.md](docs/conduccion-libre.md): grafo `compartido/grafoVial.js`, cruces `src/dominio/cruces.js`, avance `src/dominio/conduccion.js`, cámara `src/dominio/camaraDeConduccion.js`, pantalla `src/interfaz/conducir.js` |
 | Rankings por ajuste (nivel de Street View, alcance de comunas) | `ajusteDeCategoria` y `COMUNAS_POR_ALCANCE` en `compartido/oficial.js`; el motor lo aplica en `iniciarPartida` |
 | Rondas oficiales / largos / categorías | `compartido/oficial.js` (lo comparten navegador y servidor) |
 | Puntajes y ranking del servidor | `servidor/puntajes.js`, `servidor/api.js` |
@@ -164,6 +166,7 @@ Las pruebas imprimen **solo lo que falla** más un resumen (unitarias con report
 | [docs/datos.md](docs/datos.md) | fuentes, qué trae `DATA`, pipeline de `tools/`, trampas de Overpass/Wikimedia |
 | [docs/ruteo.md](docs/ruteo.md) | rutas en auto y en micro: cómo se arman y las reglas del dueño |
 | [docs/streetview.md](docs/streetview.md) | Street View: niveles, puntos, llave de Google |
+| [docs/conduccion-libre.md](docs/conduccion-libre.md) | conducir libre por el grafo vial de OpenStreetMap, con Street View |
 | [docs/servidor.md](docs/servidor.md) | rutas del API, cuentas, ranking, base de datos, administración |
 | [docs/publicar.md](docs/publicar.md) | Netlify, GitHub y Neon |
 | [docs/publicidad.md](docs/publicidad.md) | AdSense |

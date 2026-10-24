@@ -36,6 +36,7 @@ Nombre de usuario y clave, sin correo, o "Continuar con Google". Decisiones:
 ## Ranking
 
 - Un ranking por juego **y por categoría**: el largo de la ronda (`10`, `20` o `todas`) y, en algunos juegos, el nivel o alcance (Street View por nivel, comunas por alcance). Las reglas de qué categorías existen para cada juego viven en `compartido/oficial.js` (`categoriasValidasDe`, `categoriaEnElResumen`, `ajusteDeCategoria`), que usan el navegador y el servidor. Ordena por aciertos y, a igual número, por menor tiempo. Las marcas antiguas de 15 y 30 no salen.
+- **Desafíos diarios** (`dd-…`): la categoría es la fecha de Chile (`AAAA-MM-DD`, la de hoy o la de ayer); cada cuenta puede enviar uno solo por modo y día (`enviarPuntaje` responde 409 `ya_jugado`, y un índice único parcial de `esquema.sql` lo asegura). Ver [modos.md](modos.md#desafíos-diarios-dd-ruta-dd-calles-dd-comunas-oct-2026).
 - De cada jugador cuenta su mejor ronda; todas las rondas quedan guardadas (permite el ranking "últimos 7 días" y, a futuro, historial).
 - **El puntaje lo calcula el navegador.** El servidor solo descarta lo imposible (`problemaDelPuntaje` en `compartido/oficial.js`: modo desconocido, largo distinto al oficial, tiempo inhumano). Alguien con ganas puede hacer trampa; es un riesgo aceptado para un juego entre amigos. Para borrar una marca tramposa, ver "Administrar".
 

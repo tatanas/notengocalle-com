@@ -30,6 +30,10 @@ export const MODOS_OFICIALES = [
   'rs-any-car',
   'rs-any-tp',
   'rs-sv-car',
+  'rs-sv-ruta',
+  'dd-ruta',
+  'dd-calles',
+  'dd-comunas',
   'ch-find',
   'ch-city',
   'ch-cityreg',
@@ -39,10 +43,58 @@ export const MODOS_OFICIALES = [
   'sv-ubicar',
 ]
 
-// Cuánto vale cada pregunta: casi todos los juegos suman 1 por acierto; Street View suma de 0 a 5 según la distancia.
+// Cuánto vale cada pregunta: casi todos los juegos suman 1 por acierto; Street View suma de 0 a 5 según la distancia y el
+// ruteo en auto, de 0 a 100 según cuánto más lenta que la óptima fue la ruta.
 // En esos juegos "aciertos" son los puntos de la ronda y "total" el máximo posible (preguntas × puntos).
-const PUNTOS_POR_PREGUNTA = { 'sv-ubicar': 5 }
+const PUNTOS_POR_PREGUNTA = { 'sv-ubicar': 5, 'rs-sv-ruta': 100, 'dd-ruta': 100 }
 export const puntosPorPregunta = modo => PUNTOS_POR_PREGUNTA[modo] ?? 1
+
+// ----- desafíos diarios: los mismos para todos, desde la medianoche de Chile continental. Su categoría de ranking es la fecha
+// (AAAA-MM-DD), y cada jugador los juega una sola vez.
+export const MODOS_DIARIOS = ['dd-ruta', 'dd-calles', 'dd-comunas']
+export const esModoDiario = modo => MODOS_DIARIOS.includes(modo)
+export const esCategoriaDiaria = categoria => /^\d{4}-\d{2}-\d{2}$/.test(categoria)
+
+const FORMATO_DE_FECHA = new Intl.DateTimeFormat('en-CA', {
+  timeZone: 'America/Santiago',
+  year: 'numeric',
+  month: '2-digit',
+  day: '2-digit',
+})
+const FORMATO_DE_HORA = new Intl.DateTimeFormat('en-GB', {
+  timeZone: 'America/Santiago',
+  hour: '2-digit',
+  minute: '2-digit',
+  second: '2-digit',
+  hourCycle: 'h23',
+})
+const MS_DE_UN_DIA = 24 * 60 * 60 * 1000
+
+// AAAA-MM-DD armado por partes: no depende de cómo cada navegador ordena y separa la fecha de un idioma.
+export function fechaDeHoyEnChile(ahora = new Date()) {
+  const partes = Object.fromEntries(
+    FORMATO_DE_FECHA.formatToParts(ahora).map(({ type, value }) => [type, value]),
+  )
+  return `${partes.year}-${partes.month}-${partes.day}`
+}
+// El día anterior a una fecha AAAA-MM-DD (sin depender de los cambios de hora).
+const diaAntesDe = fecha =>
+  new Date(Date.parse(`${fecha}T12:00:00Z`) - MS_DE_UN_DIA).toISOString().slice(0, 10)
+export const fechaDeAyerEnChile = (ahora = new Date()) => diaAntesDe(fechaDeHoyEnChile(ahora))
+
+// Cuánto falta para que cambie el día en Chile.
+export function segundosHastaLaMedianocheDeChile(ahora = new Date()) {
+  const [horas, minutos, segundos] = FORMATO_DE_HORA.format(ahora).split(':').map(Number)
+  return 24 * 3600 - (horas * 3600 + minutos * 60 + segundos)
+}
+
+// "24 oct" para una fecha AAAA-MM-DD.
+const etiquetaDeUnDia = fecha => {
+  if (fecha === fechaDeHoyEnChile()) return 'Hoy'
+  if (fecha === fechaDeAyerEnChile()) return 'Ayer'
+  const [, mes, dia] = fecha.split('-').map(Number)
+  return `${dia} ${['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'][mes - 1]}`
+}
 
 // Categorías de ranking según el largo de la ronda: 10 o 20 preguntas, o "todas" las del juego.
 export const TODAS_LAS_PREGUNTAS = 'todas'
@@ -52,7 +104,17 @@ export const CATEGORIAS_DE_RONDA = [...LARGOS_ELEGIBLES.map(String), TODAS_LAS_P
 
 // Las rondas son de 20 preguntas (o 10 si se prefiere), salvo en los juegos que se juegan más largo y por eso van de a menos y
 // siempre del mismo largo: Street View y las rutas (de más largas no vale la pena, y no tiene sentido un "todas").
-const LARGO_FIJO = { 'sv-ubicar': 10, 'rs-any-car': 10, 'rs-any-tp': 10, 'rs-sv-car': 10 }
+// El ruteo en auto es una sola ruta por ronda: es larga, y lo que se compara es qué tan bien se la recorre.
+const LARGO_FIJO = {
+  'sv-ubicar': 10,
+  'rs-any-car': 10,
+  'rs-any-tp': 10,
+  'rs-sv-car': 10,
+  'rs-sv-ruta': 1,
+  'dd-ruta': 1,
+  'dd-calles': 10,
+  'dd-comunas': 10,
+}
 export const largoNormalDe = modo => LARGO_FIJO[modo] ?? 20
 // Los juegos que recorren siempre todo su conjunto (las regiones de Chile: son 16) no tienen largos: solo "todas".
 const SIEMPRE_TODAS = new Set(['ch-find', 'ch-all'])
@@ -84,6 +146,7 @@ const AJUSTE_DE_CATEGORIA = {
 export const ajusteDeCategoria = modo => AJUSTE_DE_CATEGORIA[modo] ?? null
 
 const ETIQUETA_DE_CATEGORIA = {
+  1: 'Una ruta',
   [TODAS_LAS_PREGUNTAS]: 'Todas',
   facil: 'Fácil',
   medio: 'Medio',
@@ -93,9 +156,11 @@ const ETIQUETA_DE_CATEGORIA = {
   peri: 'Con periferia',
   all: 'Toda la RM',
 }
-export const etiquetaDeCategoria = categoria => ETIQUETA_DE_CATEGORIA[categoria] ?? categoria
+export const etiquetaDeCategoria = categoria =>
+  esCategoriaDiaria(categoria) ? etiquetaDeUnDia(categoria) : (ETIQUETA_DE_CATEGORIA[categoria] ?? categoria)
 
 export const categoriasValidasDe = modo => {
+  if (esModoDiario(modo)) return [fechaDeHoyEnChile(), fechaDeAyerEnChile()]
   const delAjuste = ajusteDeCategoria(modo)
   if (delAjuste) return delAjuste.valores
   if (SIEMPRE_TODAS.has(modo)) return [TODAS_LAS_PREGUNTAS]
@@ -129,6 +194,7 @@ export function categoriaEnElResumen(modo, pestana) {
 
 // Cuántas preguntas tiene una ronda de esta categoría (null = las que sean: "todas").
 export function preguntasDeCategoria(modo, categoria) {
+  if (esModoDiario(modo)) return largoNormalDe(modo)
   if (modo === 'sv-ubicar') return largoNormalDe(modo)
   if (ajusteDeCategoria(modo)) return COMUNAS_POR_ALCANCE[categoria]
   return categoria === TODAS_LAS_PREGUNTAS ? null : +categoria
@@ -136,7 +202,10 @@ export function preguntasDeCategoria(modo, categoria) {
 
 // Cómo se nombra la categoría al contar dónde quedó la ronda: "con 20 preguntas", "en el nivel Fácil"…
 export function textoDeCategoria(modo, categoria) {
+  if (esCategoriaDiaria(categoria))
+    return `el desafío ${categoria === fechaDeHoyEnChile() ? 'de hoy' : categoria === fechaDeAyerEnChile() ? 'de ayer' : `del ${etiquetaDeUnDia(categoria)}`}`
   if (categoria === TODAS_LAS_PREGUNTAS) return 'todas las preguntas'
+  if (categoria === '1') return 'una ruta'
   if (ajusteDeCategoria(modo))
     return modo === 'sv-ubicar'
       ? `el nivel ${etiquetaDeCategoria(categoria)}`

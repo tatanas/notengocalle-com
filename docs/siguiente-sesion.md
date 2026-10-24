@@ -3,13 +3,17 @@
 Estado, comandos y trucos para avanzar **sin gastar tokens en redescubrir el proyecto**. Lo que se carga siempre es `CLAUDE.md`; de lo demás, leer solo lo que la tarea toque (índice en `CLAUDE.md` y al final de `ARQUITECTURA.md`).
 
 ## Estado (octubre 2026)
+
 - 22 juegos con ronda oficial y ranking; cuentas y ranking con Neon (producción) o PGlite (local). `npm test` pasa.
 - Street View ("¿Dónde estás?") completo: 4 niveles, rondas de 10, puntos repartidos por calle, cerros con recinto, pistas. Ver [streetview.md](streetview.md).
 - Juegos de calles: `st-find` perdona los cruces; `st-punto` es la versión "difícil" de `st-name`; los tres permiten recorrer la calle en Street View al responder.
 - Ruteo en auto sobre la red real de Valhalla, con alternativas posibles y salidas de autopista: [ruteo.md](ruteo.md).
+- **Desafíos diarios** (primera tarjeta del menú): ruteo en auto, 10 calles y 10 comunas de la RM, iguales para todos, una vez al día, con ranking por fecha (reinicio a la medianoche de Chile): [modos.md](modos.md#desafíos-diarios-dd-ruta-dd-calles-dd-comunas-oct-2026).
+- **Ruteo en auto** (primer juego de la tarjeta Ruteo, `rs-sv-ruta`): una ruta A→B por ronda entre lugares emblemáticos, conduciendo por el grafo vial de OpenStreetMap con Street View; práctica con mapa, ronda real sin mapa, ranking "Una ruta". Probado con la llave real. Faltan los datos del Gran Santiago completo (hoy ~35 % del rectángulo), las huellas de ~90 lugares y el juego diario: [conduccion-libre.md](conduccion-libre.md). El modo libre es la pestaña 🚗 (solo con `npm run dev`).
 - **Sin probar a mano** (las pruebas no juegan Street View): ver [pendientes.md](pendientes.md). Es lo primero que conviene mirar jugando.
 
 ## Comandos útiles
+
 ```
 npm run dev                         juego + API local en http://localhost:5173
 npm test                            lint + unitarias + SOLO las suites de navegador que tocan lo modificado (rápido)
@@ -24,6 +28,7 @@ node servidor/admin.js reportes     túneles reportados por los jugadores
 ```
 
 ## Cómo ahorrar tokens
+
 - **Archivos bloqueados**: `.claude/settings.json` impide Read/Grep sobre lo pesado o generado (`public/data/`, `public/vendor/`, `tools/*.json`, `src/datos/lugaresStreetView.json` y `pistasCalles.json`, `dist/`, `node_modules/`, `package-lock.json`, fuentes). `data.js` son 2 MB en 2 líneas: un grep ahí devolvería todo. Para los datos del juego:
   ```
   npm run datos -- "Object.keys(D)"

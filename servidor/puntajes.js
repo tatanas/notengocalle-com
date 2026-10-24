@@ -3,11 +3,13 @@ import {
   MODOS_OFICIALES,
   CATEGORIAS_DE_CONSULTA,
   categoriasDelResumen,
+  esCategoriaDiaria,
+  esModoDiario,
   esMejorPuntaje,
   categoriaHeredada,
   problemaDelPuntaje,
 } from '../compartido/oficial.js'
-import { invalido, demasiados, noAutorizado } from './errores.js'
+import { conflicto, invalido, demasiados, noAutorizado } from './errores.js'
 
 const TAMANO_DE_TABLA = 50
 const RONDAS_MAXIMAS_POR_VENTANA = 40
@@ -23,7 +25,7 @@ function inicioDelPeriodo(url) {
 
 function categoriaDe(url) {
   const categoria = url.searchParams.get('categoria') || CATEGORIA_POR_DEFECTO
-  if (!CATEGORIAS_DE_CONSULTA.includes(categoria))
+  if (!CATEGORIAS_DE_CONSULTA.includes(categoria) && !esCategoriaDiaria(categoria))
     throw invalido('categoria_invalida', 'Categoría desconocida')
   return categoria
 }
@@ -111,6 +113,16 @@ export async function lideres({ db, url, usuario }) {
   return { datos: { modos, registrados: await usuariosRegistrados(db) } }
 }
 
+// Los desafíos diarios se juegan una sola vez por cuenta y día (además, un índice único de la base lo asegura).
+async function exigirQueNoLoHayaJugado(db, idDeUsuario, { modo, categoria }) {
+  const jugados = await db.query(
+    'select 1 from puntajes where usuario_id = $1 and modo = $2 and categoria = $3',
+    [idDeUsuario, modo, categoria],
+  )
+  if (jugados.length)
+    throw conflicto('ya_jugado', 'Ya jugaste este desafío con tu cuenta: solo cuenta la primera vez.')
+}
+
 async function exigirSinInundacion(db, idDeUsuario) {
   const [{ recientes }] = await db.query(
     `select count(*)::int as recientes from puntajes
@@ -134,6 +146,7 @@ export async function enviarPuntaje({ db, cuerpo, usuario }) {
   const problema = problemaDelPuntaje(ronda)
   if (problema) throw invalido('puntaje_invalido', `Puntaje no válido: ${problema}`)
   await exigirSinInundacion(db, usuario.id)
+  if (esModoDiario(ronda.modo)) await exigirQueNoLoHayaJugado(db, usuario.id, ronda)
 
   const todo = new Date(0).toISOString()
   const anterior = (await tabla(db, ronda.modo, ronda.categoria, todo, usuario.id)).yo

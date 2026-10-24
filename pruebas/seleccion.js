@@ -2,6 +2,7 @@
 // El conjunto completo tarda más de 10 minutos: se reserva para cambios que tocan todo el juego.
 
 const CONJUNTOS_DE_RONDAS = [
+  'desafios-diarios',
   'cronometro',
   'calles-propias',
   'rondas-oficiales',
@@ -15,6 +16,7 @@ const CONJUNTOS_DE_RONDAS = [
   'punto-en-calle',
 ]
 const CONJUNTOS_DEL_MOTOR = [
+  'desafios-diarios',
   'cronometro',
   'cuenta-regresiva',
   'reiniciar-ronda',
@@ -55,6 +57,7 @@ const REGLAS = [
   [/^src\/mapa\//, ['ajuste-celular', 'facil-dificil'], true],
   [/^src\/interfaz\/(inicio|navegacion)\.js$/, ['diseno-menu'], false],
   [/^src\/interfaz\/misCalles\.js$/, ['calles-propias'], false],
+  [/^src\/juego\/diarios\.js$/, ['desafios-diarios'], false],
   [/^src\/(dominio\/calles|interfaz\/recorrerCalle)\.js$/, ['punto-en-calle'], true],
   [/^src\/interfaz\/(ranking|resultadoOficial|cuenta)\.js$/, CONJUNTOS_DEL_RANKING, false],
   [/^src\/cuenta\//, CONJUNTOS_DEL_RANKING, false],

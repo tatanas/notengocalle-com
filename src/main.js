@@ -12,6 +12,17 @@ $('#btnHome').onclick = () => navegar('home')
 $('#btnRanking').onclick = () => navegar('ranking')
 $('#btnExplorar').onclick = () => navegar('explore')
 $('#btnProgreso').onclick = () => navegar('progress')
+// Conducir libre (experimental): una pestaña más, solo al trabajar en local.
+if (import.meta.env.DEV) {
+  await import('./interfaz/conducir.js')
+  const pestana = document.createElement('button')
+  pestana.className = 'pestana'
+  pestana.dataset.pantalla = 'drive'
+  pestana.title = 'Conducir libre (solo en desarrollo)'
+  pestana.innerHTML = '<span class="icono">🚗</span><span class="texto">Conducir</span>'
+  pestana.onclick = () => navegar('drive')
+  $('#pestanas').appendChild(pestana)
+}
 navegar('home')
 restaurarSesion()
 

@@ -28,9 +28,12 @@ import { mostrarResultadoOficial } from '../interfaz/resultadoOficial.js'
 import { ocultarPantalla, indicador, panel, mostrarPanel, aviso } from '../interfaz/panel.js'
 import { htmlDeAnuncio } from '../interfaz/anuncios.js'
 import { htmlDelBotonCompartir, conectarBotonCompartir } from '../interfaz/compartir.js'
+import { anotarResultado, yaSeEmpezo } from './diarios.js'
 
 /* Un modo define: id, group, name, desc (opcional: se muestra bajo el nombre en el menú), pool(), key(item) y ask(item, quiz).
    Opcionales: label(item), balance(item), setup(quiz), limpiar() (al salir), disponible() (si no, no aparece en el menú), all, keepLayer, noHint, aids, relief, chile, roomy, tall, study.
+   Los desafíos diarios (diario: true) son solo oficiales y se juegan una vez al día: ordenFijo (las preguntas salen en el orden de pool(), que
+   ya es el mismo para todos), categoriaDeRonda() (la fecha) y reglas (ajustes que se imponen a la ronda, como el alcance de las comunas).
    noHint: sin el botón "Ver nombres". aids: en la práctica dibuja bordes de comunas y metro de ayuda (la ronda oficial, no). */
 
 export let partida = null
@@ -113,13 +116,14 @@ export function iniciarPartida(
   modo,
   { ranked: oficial = false, category: categoria = null, reglas: reglasDePractica = null } = {},
 ) {
+  if (modo.diario && yaSeEmpezo(modo.id)) return aviso('Ya jugaste este desafío hoy. Vuelve mañana.')
   detenerPartida()
   // En Street View y en los juegos de comunas la categoría de ranking es un ajuste (nivel, alcance): el de la pestaña
   // del ranking o, si no, el elegido en el menú.
   const delAjuste = ajusteDeCategoria(modo.id)
   const variante = delAjuste ? (categoria ?? ajustes[delAjuste.ajuste]) : null
   const reglas = oficial
-    ? { ...REGLAS_OFICIALES, ...(delAjuste && { [delAjuste.ajuste]: variante }) }
+    ? { ...REGLAS_OFICIALES, ...modo.reglas, ...(delAjuste && { [delAjuste.ajuste]: variante }) }
     : reglasDePractica
   aplicarReglasDeRonda(reglas)
   const conjunto = modo.pool()
@@ -138,13 +142,17 @@ export function iniciarPartida(
   partida = {
     mode: modo,
     ranked: oficial,
-    category: oficial ? (variante ?? categoriaDe(tamano, conjunto.length)) : null,
+    category: oficial
+      ? (modo.categoriaDeRonda?.() ?? variante ?? categoriaDe(tamano, conjunto.length))
+      : null,
     variante,
     reglas: reglasDePractica,
-    items: muestraPonderada(conjunto, tamano, {
-      weightOf: oficial ? undefined : elemento => pesoAdaptativo(llaveDeEstadistica(modo, elemento)),
-      groupOf: modo.balance,
-    }),
+    items: modo.ordenFijo
+      ? conjunto.slice(0, tamano)
+      : muestraPonderada(conjunto, tamano, {
+          weightOf: oficial ? undefined : elemento => pesoAdaptativo(llaveDeEstadistica(modo, elemento)),
+          groupOf: modo.balance,
+        }),
     i: 0,
     ok: 0,
     pts: 0,
@@ -186,7 +194,7 @@ function prepararRonda() {
 
 function comenzarRonda() {
   temporizadorDelIndicador = setInterval(actualizarIndicador, 500)
-  botonReiniciar.hidden = !partida.ranked
+  botonReiniciar.hidden = !partida.ranked || !!partida.mode.diario
   if (partida.mode.study) {
     limpiarCapa()
     fijarModoDeEtiquetas('streets')
@@ -316,9 +324,11 @@ function terminarPartida() {
 
   const porcentaje = Math.round((ok / maximo) * 100)
   const segundosPorPregunta = (ms / total / 1000).toFixed(1).replace('.', ',')
-  const notaFinal = oficial
-    ? 'Estas rondas usan las mismas reglas para todos: Gran Santiago, todas las categorías, sin tus calles propias y sin ayudas.'
-    : 'Las preguntas que fallas aparecen más seguido en las próximas rondas.'
+  const notaFinal = modo.diario
+    ? 'Los desafíos diarios son iguales para todos y se juegan una sola vez al día. Se reinician a la medianoche de Chile.'
+    : oficial
+      ? 'Estas rondas usan las mismas reglas para todos: Gran Santiago, todas las categorías, sin tus calles propias y sin ayudas.'
+      : 'Las preguntas que fallas aparecen más seguido en las próximas rondas.'
   mostrarPanel(`<h3 class="tight">${veredicto(porcentaje, modo.group)}</h3>
     <p class="result-score">${ok} / ${maximo} <span class="muted">(${porcentaje}%)</span></p>
     <p class="tight">⏱ <b>${formatearTiempo(ms)}</b> <span class="muted">· ${segundosPorPregunta} s por pregunta</span></p>
@@ -327,7 +337,7 @@ function terminarPartida() {
     ${oficial ? '<div id="officialOutcome" class="outcome"></div>' : ''}
     ${fallos.length ? `<p class="muted" style="margin-bottom:4px">Para repasar:</p><p style="margin-top:0">${fallos.map(escaparHtml).join(' · ')}</p>` : ''}
     <div class="row" style="margin-top:12px">
-      <button class="btn" id="again">Otra ronda</button>
+      ${modo.diario ? '' : '<button class="btn" id="again">Otra ronda</button>'}
       ${oficial ? htmlDelBotonCompartir() : ''}
       ${!oficial && tieneRondaOficial(modo) ? '<button class="btn sec" id="goOfficial">🏆 Jugar con ranking</button>' : ''}
       <button class="btn sec" id="menu">Menú</button>
@@ -335,7 +345,9 @@ function terminarPartida() {
     <p class="muted" style="font-size:12px;margin-top:10px">${notaFinal}</p>
     ${htmlDeAnuncio('resultado')}`)
 
-  $('#again').onclick = () => iniciarPartida(modo, { ranked: oficial, category: categoria, reglas })
+  if ($('#again'))
+    $('#again').onclick = () => iniciarPartida(modo, { ranked: oficial, category: categoria, reglas })
+  if (modo.diario) anotarResultado(modo.id, { aciertos: ok, total: maximo, ms }, categoria)
   $('#menu').onclick = () => navegar('home')
   if ($('#goOfficial')) $('#goOfficial').onclick = () => iniciarPartida(modo, { ranked: true })
   if (!oficial) return

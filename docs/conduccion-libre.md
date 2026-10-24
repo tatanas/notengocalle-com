@@ -1,0 +1,74 @@
+# Ruteo en auto: conducir por el grafo vial (oct. 2026)
+
+Leer solo si la tarea toca este juego o el modo libre. Dos usos del mismo manejo (`src/interfaz/conductor.js`): en cada cruce se elige qué hacer, viendo la calle en Street View y el auto en el mapa.
+
+- **Juego "Ruteo en auto"** (`rs-sv-ruta`, `src/juego/modos/ruteoEnAuto.js`; primer juego de la tarjeta "Ruteo"): como los otros de ruteo, **el juego entrega una ruta de un lugar emblemático a otro y hay que hacerla**: no se elige nada (ni origen, ni destino, ni se toca el mapa para moverse). **Una ronda es una sola ruta**; puntaje de 0 a 100 contra la ruta óptima (ranking, categoría "Una ruta"). **Práctica** (🏋️): con el mapa a mano (nombres de calles, el auto, las opciones numeradas, el desvío) y, si el jugador fijó su punto propio, las rutas parten de él o llegan a él (como en los otros juegos de ruteo). **Ronda real** (🏆): el mapa se ve solo al principio (A, B y las huellas); al apretar "Estoy listo" desaparece y solo quedan Street View y las opciones, sin desvío en vivo. Sin Street View (sin llave) el juego no aparece (`disponible`). Se sortea entre los lugares con calles (`src/datos/lugaresConCalles.json`) a 3–14 km uno del otro.
+- **Conducir libre** (`src/interfaz/conducir.js`, pestaña 🚗 de la barra superior, **solo en desarrollo** como antes): sin misión ni puntaje; se parte buscando una dirección, tocando el mapa o con el punto fijo (o `?inicio=lat,lon`). Es donde se prueba el motor.
+
+Los juegos antiguos `rs-any-car` (en el mapa) y `rs-sv-car` (con Street View) quedaron guardados: siguen registrados con `disponible: () => false` (no salen en el menú) y en `MODOS_OFICIALES`. Una versión anterior, con otro motor de opciones, está en la rama `ruteo-libre-experimental`.
+
+El grafo (`public/data/grafo/santiago.json`, ~11 MB, **va en el repo** y se publica; el service worker no lo precarga) se baja al empezar. Para probar una ruta concreta en desarrollo: `?ruta=l49:l36` (ids de `DATA.landmarks`) fuerza esa ruta en el juego. **No guardar en el repo direcciones que ubiquen al dueño.**
+
+## Rutas entre lugares (`src/dominio/mision.js`, `lugaresDeRuteo.js`)
+
+Sirven los lugares emblemáticos (`l…`) que tienen calles en el grafo (`esLugarDeRuteo`; la lista sale de `node tools/grafo/lugaresConCalles.mjs`), salvo los barrios que no son un lugar concreto (solo plazas, persas, mercados, ferias y pueblos; nunca los "Barrio …"). **Un recinto tiene varias entradas y salidas**: con su **huella** (el polígono de OSM, `src/datos/huellasDeLugares.json`, que genera `node tools/huellas_lugares.mjs`) **se llega por cualquiera de las calles que la tocan** (dentro o a menos de 25 m del borde; no cuentan autopistas ni rampas) y **al partir se elige por cuál calle y sentido salir** (las 6 calles más cercanas al centro del lugar, cada una en sus dos sentidos). Si ninguna calle toca la huella (la de OSM a veces es solo el edificio, como el estadio dentro de su parque) valen las más cercanas a ella. Sin huella (un punto: una estatua, un bar) valen las calles más cercanas (la más cercana y las que están a menos de 40 m más allá). Una calle toca el lugar aunque ahí no haya portón (es una aproximación de "entrada"). Los barrios con perímetro no se usan; si se quisieran, llegar sería pasar por cualquier calle dentro del polígono.
+
+`prepararRuta` (`lugaresDeRuteo.js`) arma una ruta entre dos lugares; `MISIONES_DE_CONDUCCION` (`misionesDeConduccion.js`) es solo la lista de rutas de verificación de `tools/grafo/misiones.mjs`.
+
+- **Óptimo**: Dijkstra inverso desde el destino sobre los mismos costos con que se maneja (`segundosQueFaltan`) y `buscarCamino` desde la partida. Cada decisión sabe cuánto cuesta cada opción (`costosDeLasOpciones`), sin consultar nada.
+- **Puntaje** = tiempo normal del jugador / óptimo: 100 hasta un 3 % más, 0 al pasar un 50 % más, lineal entre medio (`TOLERANCIA_DEL_OPTIMO`, `LIMITE_PARA_PERDER`). Si el recorrido proyectado (lo andado más lo mejor que falta) pasa del 50 %, la ruta termina con 0 ("te alejaste demasiado"). También se puede rendir (0, y se muestra el óptimo).
+- Mientras se juega se ve cuánto desvío llevas ("+1 min 20 s sobre lo mejor"), sin decir cuál opción es la mejor.
+- Al terminar: puntaje, distancia, tiempo normal y en hora punta del jugador y del óptimo, km por **autopistas con TAG** (nombre "Autopista …"; el precio no está incluido) y **las 3 decisiones donde más se perdió** (`registrarDecision`), con la opción elegida y la mejor. El mapa muestra el recorrido en azul y el óptimo en verde.
+- `node tools/grafo/misiones.mjs` revisa esas rutas (llegada, óptimo, decisiones; seguir el óptimo debe dar 100).
+
+**Tiempos** (`src/dominio/tiempos.js`): un modelo propio, **no es tráfico real**. *Normal*: velocidad por tipo de calle (o 0,8 × la máxima indicada), semáforos, pares y giros. *Hora punta*: las mismas calles con velocidades máximas bajas (autopista 40, troncal 30, primaria 22, secundaria 20… km/h) y giros ×1,3, calibradas con mediciones públicas (UOCT/Waze: ~14 km/h en el centro y nororiente; TomTom 2025: bajo 20 km/h en los peaks); sale ~12–14 km/h en trayectos urbanos. El puntaje usa solo el tiempo normal.
+- **Google no entrega tiempos con tráfico con la llave actual**: la Directions API no está habilitada en el proyecto (`REQUEST_DENIED`, probado 24-oct-2026 con `DirectionsService` y `departureTime`). Habilitarla (o la Routes API) daría `duration_in_traffic` por hora de salida; tendría costo por consulta.
+- **TAG**: no hay API. Cada concesionaria publica tablas por pórtico y sentido (tarifa base fuera de punta, base punta y saturación; punta ~7:00–9:30 y 17:30–20:30; reajuste anual por IPC cada 1 de enero), que reúne la Dirección General de Concesiones. Costear una ruta requiere ubicar cada pórtico en el grafo. Hoy solo se informan los km por autopista concesionada.
+
+## Datos
+
+```
+node tools/grafo/bajarOsm.mjs                                       # Overpass por teselas de 0,05° (reanudable) → .local/grafo/osm-tesela-*.json
+node --max-old-space-size=8192 tools/grafo/construirSantiago.mjs    # junta .local/grafo/osm-*.json → public/data/grafo/santiago.json
+```
+
+`construirSantiago.mjs` junta todo `.local/grafo/osm-*.json` (también los de la rama experimental); una calle repetida cuenta una vez. Con solo esos corredores el grafo es de 76 mil cruces y 10,7 MB; donde los datos se cortan una calle parece sin salida, por eso hay que bajar el Gran Santiago completo.
+
+**Correcciones de OSM** (`tools/grafo/correccionesOsm.json`, las aplica `construirSantiago.mjs`): etiquetas que se pisan en una calle cuyo dato está mal, con el motivo. Hoy: el enlace entre Camino Santa Teresa de Los Andes y Gran Vía (way 24353249) no tiene `oneway` y solo se usa de Gran Vía hacia Santa Teresa; sin la corrección el juego ofrecía un ramal y una vuelta en U que no existen. Conviene corregirlo también en OpenStreetMap.
+
+**El grafo** (`compartido/grafoVial.js`, lo arma `tools/grafo/construirGrafo.mjs`): aristas dirigidas = un tramo de calle, en un sentido, entre dos cruces. Trae sentidos únicos, restricciones de giro de OSM, semáforos, pares, rotondas y enlaces (rampas, retornos). Se queda con la componente fuertemente conexa. Calles de servicio y privadas quedan fuera. La vuelta en U solo es legal donde la calle termina; los retornos son enlaces del grafo. El estado al conducir es la arista por la que se llegó a un cruce, porque lo que se puede hacer depende de por dónde se entra.
+
+## Qué se ofrece en cada cruce (`src/dominio/cruces.js`)
+
+Reglas del dueño: **todo lo que se puede hacer de verdad, y nada más**.
+
+- Solo giros permitidos (restricciones, sentidos únicos). Si hay una sola opción el auto sigue solo (`conduccion.js`), **salvo que cambie la calle**: se muestra como decisión de una sola opción ("No hay otra salida:") doblar de una calle con nombre a otra (Cerro La Campana → José Alcalde Délano), seguir de frente cuando la calle pasa a ser una autopista (Kennedy → Costanera Norte) y dar la vuelta donde la calle termina. Una rampa que da vueltas, las curvas y los cambios de nombre de una misma calle no se avisan.
+- **Salidas de autopista**: se dice lo que muestra el cartel y a qué calle llega ("Tomar la salida 4 «Manquehue-Calle Local» (llega a Avenida Presidente Kennedy Lateral)"). El cartel sale de OSM: `destination*` de la rampa o, si no, `destination` / `name` del nodo `motorway_junction`; si OSM no lo trae (la 8, la 11…) solo se dice a qué calle llega.
+- **Nada que no lleve a ninguna parte** (`esCallejon`): se explora lo que hay detrás de la salida sin volver al cruce; si se agota antes de sumar 400 m de tramos (ida y vuelta, `METROS_MAXIMOS_DE_CALLEJON`), es un acceso, un pasaje o una calle sin salida y no se ofrece (se cuenta en `sinSalida`). Un lazo que vuelve al mismo cruce por otro lado sí se ofrece. Si el destino de una ruta está en una calle sin salida, esa sí se ofrece (`fijarDestinosEnCallesSinSalida`; la llama `prepararMision`).
+- **Decisiones casi simultáneas son una sola** (`METROS_PARA_AGRUPAR_CRUCES`, 30 m): doblar a la izquierda cruzando el bandejón, o una vuelta en U por el retorno, son opciones del primer cruce y no un segundo cruce 10 m más allá.
+- Tipos (`TIPO`): seguir, doblar levemente, doblar, mantenerse a un lado (bifurcación), vuelta en U (siempre "por el retorno" si es por un enlace), N-ésima salida de una rotonda, entrada / salida / ramal. Una curva de la misma calle es "seguir derecho". Una vuelta se reconoce por terminar en sentido contrario (≥100° si vuelve por la misma calle, ≥135° si no) mirando hasta 250 m de continuación obligada; entrar a una autopista no cuenta como vuelta.
+- Orden: seguir de frente, de izquierda a derecha, rotonda por número de salida, vuelta al final. Las rampas sin nombre se nombran por la calle a la que llegan. Dos textos iguales se distinguen con "(hacia el norte)".
+- Texto de cada opción: `src/dominio/instruccionesDeCruce.js`.
+
+## Street View y el mapa (`src/dominio/camaraDeConduccion.js`, `src/mapa/streetView.js`)
+
+- La cámara va **45 m antes del cruce** (respaldos a 80, 120 y 180 m) sobre el trazado recorrido desde la última decisión, nunca sobre la calle anterior. Un panorama **sirve** solo si queda a ≤18 m del trazado y a ≥6 m de sus extremos (si no, es la calle de al lado o el cruce ya pasado). El rumbo es el del trazado **en el punto donde quedó el panorama**.
+- `mostrarPanoramaDeConduccion` **espera a que el visor esté de verdad en ese panorama** (`esperarQueCargue`) antes de devolverlo; sin eso la interfaz movía el auto del mapa mientras Street View seguía en el panorama anterior o en negro (hasta 900 m de diferencia). Apunta de nuevo el rumbo durante ~1,2 s por si Google lo devuelve al del auto que tomó la foto, salvo que el jugador ya haya movido la vista. No se puede caminar por Street View: el jugador se mueve decidiendo.
+- El auto del mapa se pone en la posición **real** del panorama y sigue a `position_changed` / `pov_changed` (`escucharPanorama`). Si no hay panorama, solo mapa y un aviso.
+- Medido con la llave real (24-oct-2026, 29 decisiones de un recorrido de 7,4 km, `tools/grafo/recorrerEnNavegador.mjs`): panorama a ≤4,3 m del eje de la calle, 22 a 50 m antes del cruce, rumbo exacto, carga de 0,1 a 1,2 s, auto del mapa en el mismo punto.
+
+## Limitaciones conocidas
+
+- **Pista contraria**: Google pasó una sola vez por la mayoría de las calles. En calles de doble sentido cerca de la mitad de los panoramas (6 de 12 medidos) están en la pista por la que manejó su auto, que puede ser la contraria al avance: se ve bien hacia adelante, pero el tránsito parece venir de frente. Buscar 3 m a la derecha del eje no cambió ninguno (no hay otro panorama).
+- El panorama **salta** de decisión en decisión; no hay trayecto intermedio (cargaría muchos panoramas: cuota).
+- Cada decisión carga un panorama de Google (cuota). El renderizado de un panorama sigue unos segundos después de cargar (en pruebas con navegador sin pantalla, esperar antes de capturar).
+- OSM: retornos, restricciones y pistas incompletos o mal dibujados; una calle que el grafo no ofrece (o una que ofrece) puede ser un error de OSM. Sin tráfico ni semáforos reales.
+- Los accesos de condominios se descartan por "no llevan a ninguna parte"; una calle sin salida real, larga (más de ~200 m), sí se ofrece.
+
+## Pruebas y herramientas
+
+- `pruebas/conduccion.test.js` (en `npm run test:unit`), sobre una ciudad chica sintética (`pruebas/ciudadDeConduccion.js`): calles sin salida, giros prohibidos, sentidos únicos, bandejón, bifurcación, rotonda, cámara, maniobras obligadas, entradas y salidas de un recinto, misión y puntaje.
+- `node tools/grafo/recorrer.mjs <lat,lon> <lat,lon> [calles|permitidas]` imprime las decisiones de un recorrido para revisar que sean las de la vida real.
+- `node tools/grafo/recorrerEnNavegador.mjs …` lo repite en el navegador con Street View real y mide cada decisión (manual: gasta cuota).
+- `node tools/grafo/jugarRutaEnNavegador.mjs l49:l36 [decisiones con error] [--oficial]` (ids de `DATA.landmarks`; `azar` sortea; por omisión la práctica) juega una ronda completa con Street View real (siempre la mejor opción, salvo los errores indicados) e imprime el puntaje. `window.__conducir` expone el estado, el auto, el panorama, la ruta y los costos a estas herramientas.
+- `node tools/huellas_lugares.mjs` baja las huellas de los lugares (Nominatim; ~3 min) a `src/datos/huellasDeLugares.json`. Hoy 146 de 234 lugares tienen (los barrios y varios lugares puntuales no); sin huella se usan las calles más cercanas.

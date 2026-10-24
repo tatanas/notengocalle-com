@@ -1,5 +1,7 @@
 import { estadisticas } from '../nucleo/progreso.js'
 import {
+  MODOS_DIARIOS,
+  fechaDeHoyEnChile,
   LARGOS_ELEGIBLES,
   LARGO_DE_TODAS,
   NIVELES_DE_STREET_VIEW,
@@ -25,7 +27,8 @@ import { limpiarCapa, fijarChile, fijarRelieve } from '../mapa/mapa.js'
 import { tieneRondaOficial, iniciarPartida, detenerPartida } from '../juego/engine.js'
 import { MODOS, modoPorId } from '../juego/registry.js'
 import { mostrarMisCalles } from './misCalles.js'
-import { definirPantalla } from './navegacion.js'
+import { resultadoDelDia, yaSeEmpezo } from '../juego/diarios.js'
+import { definirPantalla, navegar } from './navegacion.js'
 import { ocultarPanel, vistaDePantalla, mostrarPantalla } from './panel.js'
 import { htmlDelPie } from './pie.js'
 import { htmlDeAnuncio } from './anuncios.js'
@@ -34,15 +37,21 @@ import { alTraerProgreso } from '../cuenta/progresoCompartido.js'
 
 const GRUPOS = [
   {
-    name: 'Calles',
-    emoji: '🛣️',
-    blurb: `${callesDelJuego().length} avenidas, autopistas y carreteras.`,
+    name: 'Desafíos diarios',
+    emoji: '📅',
+    blurb: 'Compite con tus amigos para ver quién tiene calle.',
+    diario: true,
   },
   {
     name: 'Ruteo',
     emoji: '🧭',
     blurb:
-      'Arma rutas paso a paso: en auto entre dos puntos cualquiera y en micro y metro. En Explorar puedes ver los recorridos de micro más importantes.',
+      'Llega de un lugar a otro por la ruta más rápida: en auto, decidiendo en cada cruce viendo la calle, y en micro y metro. En Explorar puedes ver los recorridos de micro más importantes.',
+  },
+  {
+    name: 'Calles',
+    emoji: '🛣️',
+    blurb: `${callesDelJuego().length} avenidas, autopistas y carreteras.`,
   },
   {
     name: 'Comunas',
@@ -246,7 +255,29 @@ const htmlDeMisCalles = () => `<hr class="separador"><div class="ajustes-de-tarj
       <p class="muted">Agrega calles que te importan a ti (la de tu casa, la de un amigo). Aparecen en los juegos de calles y se guardan solo en este navegador.</p>
       <div id="myst"></div></div>`
 
+// Los desafíos diarios: un botón por desafío (sin práctica: esa está más abajo, en cada juego). Si ya se jugó, muestra cómo salió y
+// lleva al ranking del día.
+function filaDeDesafio(modo) {
+  const resultado = resultadoDelDia(modo.id)
+  const estado = resultado?.total
+    ? `✓ ${resultado.aciertos}/${resultado.total}`
+    : yaSeEmpezo(modo.id)
+      ? 'Ya empezado'
+      : 'Jugar'
+  return `<div class="mode-row"><button class="mode diario" data-diario="${modo.id}">
+    <span><b>${escaparHtml(modo.name)}</b></span><span class="estado-diario">${estado}</span></button></div>`
+}
+
+function tarjetaDeDesafiosDiarios(grupo) {
+  const modos = MODOS_DIARIOS.map(modoPorId).filter(modo => modo && (modo.disponible?.() ?? true))
+  return `<div class="card card-diaria" data-fecha="${fechaDeHoyEnChile()}">
+    <h3><span class="em">${grupo.emoji}</span>${grupo.name}</h3><p>${grupo.blurb}</p>
+    <div class="modes">${modos.map(filaDeDesafio).join('')}</div>
+  </div>`
+}
+
 function tarjetaDeGrupo(grupo) {
+  if (grupo.diario) return tarjetaDeDesafiosDiarios(grupo)
   const modos = MODOS.filter(modo => modo.group === grupo.name && (modo.disponible?.() ?? true)).sort(
     pasosPrimero,
   )
@@ -324,7 +355,18 @@ function conectarAjustes() {
     }
 }
 
+// Un desafío se juega una sola vez: si ya se empezó, lleva al ranking del día.
+function jugarDesafio(idDeModo, fechaDeLaTarjeta) {
+  if (fechaDeLaTarjeta !== fechaDeHoyEnChile()) return redibujarInicioSinSaltar()
+  if (yaSeEmpezo(idDeModo)) return navegar('ranking', idDeModo, fechaDeLaTarjeta)
+  iniciarPartida(modoPorId(idDeModo), { ranked: true })
+}
+
+const MS_ENTRE_REVISIONES_DEL_DIA = 30000
+let revisorDelDia = null
+
 function abrirInicio() {
+  clearInterval(revisorDelDia)
   detenerPartida()
   limpiarCapa()
   ocultarPanel()
@@ -341,9 +383,18 @@ function abrirInicio() {
         ranked: true,
         category: boton.dataset.nivel ?? null,
       })
+  for (const boton of vistaDePantalla.querySelectorAll('[data-diario]'))
+    boton.onclick = () => jugarDesafio(boton.dataset.diario, boton.closest('.card-diaria').dataset.fecha)
+  // Si el menú queda abierto pasada la medianoche, los desafíos se renuevan solos.
+  revisorDelDia = setInterval(() => {
+    const tarjeta = vistaDePantalla.querySelector('.card-diaria')
+    if (!tarjeta) return
+    if (tarjeta.dataset.fecha !== fechaDeHoyEnChile()) redibujarInicioSinSaltar()
+  }, MS_ENTRE_REVISIONES_DEL_DIA)
   mostrarMisCalles($('#myst'))
   conectarAjustes()
   conectarPuntoDeRuteo(redibujarInicioSinSaltar)
+  return () => clearInterval(revisorDelDia)
 }
 
 definirPantalla('home', abrirInicio)

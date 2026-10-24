@@ -1,4 +1,4 @@
-import { textoDeCategoria } from '../../compartido/oficial.js'
+import { esModoDiario, textoDeCategoria } from '../../compartido/oficial.js'
 import { entregaDe, vaciarBandejaDeSalida, enviarRondaOficial } from '../cuenta/puntajes.js'
 import { $, formatearTiempo } from '../nucleo/utilidades.js'
 import { abrirDialogoDeCuenta } from './cuenta.js'
@@ -6,9 +6,11 @@ import { navegar } from './navegacion.js'
 
 function htmlDeGuardados(modo, { categoria, puesto, jugadores, mejoro, mejor }) {
   const lugarEnTabla = `🏆 <b>Puesto ${puesto}</b> de ${jugadores} en el ranking de este juego con ${textoDeCategoria(modo, categoria)}.`
-  const personales = mejoro
-    ? 'Es tu mejor ronda de este largo.'
-    : `Tu mejor ronda de este largo sigue siendo ${mejor.aciertos}/${mejor.total} en ${formatearTiempo(mejor.ms)}.`
+  const personales = esModoDiario(modo)
+    ? 'Los desafíos diarios cuentan una sola vez: vuelve mañana por el próximo.'
+    : mejoro
+      ? 'Es tu mejor ronda de este largo.'
+      : `Tu mejor ronda de este largo sigue siendo ${mejor.aciertos}/${mejor.total} en ${formatearTiempo(mejor.ms)}.`
   return `<p class="tight">${lugarEnTabla}</p><p class="muted tight">${personales}</p>
     <button class="btn sec small" id="outcomeRanking" style="margin-top:6px">Ver ranking</button>`
 }

@@ -1,5 +1,6 @@
 // Pruebas de la lógica pura que comparten navegador y servidor: node --test tests/unit.test.js
 import { esAciertoDeStreetView, puntajeDeStreetView } from '../src/dominio/streetView.js'
+import { elegirConSemilla } from '../src/nucleo/semilla.js'
 import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
 import { test } from 'node:test'
@@ -22,6 +23,10 @@ import {
   categoriasDelResumen,
   categoriasValidasDe,
   esMejorPuntaje,
+  esCategoriaDiaria,
+  fechaDeAyerEnChile,
+  fechaDeHoyEnChile,
+  segundosHastaLaMedianocheDeChile,
   categoriaHeredada,
   largoDeRondaDe,
   largoNormalDe,
@@ -1040,4 +1045,27 @@ test('si la calle a la que se entra sale del cruce en los dos sentidos sin lado 
   const enElMapa = decisionesEnAuto(pasos, contextoDeJuguete()).decisiones.find(d => d.tipo === 'calle')
   assert.equal(enElMapa.correcta, 'Av. Cruce hacia el norte')
   assert.ok(enElMapa.opciones.includes('Av. Cruce hacia el sur'))
+})
+
+// ----- desafíos diarios
+
+test('la selección del día es la misma para todos, cambia con la fecha y no depende de quién la pide', () => {
+  const lista = Array.from({ length: 164 }, (_, i) => `calle ${i}`)
+  const delLunes = elegirConSemilla(lista, 10, '2026-10-26:calles')
+  assert.deepEqual(delLunes, elegirConSemilla(lista, 10, '2026-10-26:calles'))
+  assert.equal(new Set(delLunes).size, 10)
+  assert.notDeepEqual(delLunes, elegirConSemilla(lista, 10, '2026-10-27:calles'))
+  assert.notDeepEqual(delLunes, elegirConSemilla(lista, 10, '2026-10-26:comunas'))
+  assert.equal(lista[0], 'calle 0', 'no desordena la lista que recibe')
+})
+
+test('el día de los desafíos cambia a la medianoche de Chile (con su cambio de hora)', () => {
+  // En octubre Chile está en horario de verano (UTC-3); en invierno, UTC-4.
+  assert.equal(fechaDeHoyEnChile(new Date('2026-10-25T02:59:00Z')), '2026-10-24')
+  assert.equal(fechaDeHoyEnChile(new Date('2026-10-25T03:00:00Z')), '2026-10-25')
+  assert.equal(fechaDeHoyEnChile(new Date('2026-07-01T03:59:00Z')), '2026-06-30')
+  assert.equal(fechaDeHoyEnChile(new Date('2026-07-01T04:00:00Z')), '2026-07-01')
+  assert.equal(fechaDeAyerEnChile(new Date('2026-03-01T12:00:00Z')), '2026-02-28')
+  assert.equal(segundosHastaLaMedianocheDeChile(new Date('2026-10-25T02:59:00Z')), 60)
+  assert.ok(esCategoriaDiaria('2026-10-24') && !esCategoriaDiaria('20') && !esCategoriaDiaria('todas'))
 })

@@ -19,6 +19,9 @@ const LOGRO_POR_JUEGO = {
   'ch-cityreg': (ok, max) => `Le achunté a la región de ${ok} de ${max} ciudades de Chile`,
   'pn-reg': (ok, max) => `Le achunté a la región de ${ok} de ${max} parques nacionales`,
   'pn-photo': (ok, max) => `Reconocí ${ok} de ${max} parques nacionales por su foto`,
+  'dd-ruta': (ok, max) => `Saqué ${ok} de ${max} puntos en la ruta en auto del desafío diario`,
+  'dd-calles': (ok, max) => `Reconocí ${ok} de ${max} calles de Santiago en el desafío diario`,
+  'dd-comunas': (ok, max) => `Reconocí ${ok} de ${max} comunas de la RM en el desafío diario`,
   'sv-ubicar': (ok, max, nivel) =>
     `Saqué ${ok} de ${max} puntos ubicándome en Santiago con Street View${nivel ? ` (nivel ${nivel})` : ''}`,
 }

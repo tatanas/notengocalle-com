@@ -7,6 +7,7 @@ import { crearApi } from '../servidor/api.js'
 import { restablecerClave } from '../servidor/autenticacion.js'
 import { aplicarEsquema } from '../servidor/esquema.js'
 import { COSTO, cifrarClave, claveFiltrada } from '../servidor/claves.js'
+import { fechaDeAyerEnChile, fechaDeHoyEnChile } from '../compartido/oficial.js'
 import { ID_DE_CLIENTE_DE_GOOGLE } from '../compartido/configuracion.js'
 
 // Un "Google" de mentira: firma tokens con su propia llave, que la API recibe como si fuera de Google.
@@ -590,4 +591,40 @@ test('una cuenta con clave se vincula con Google solo con la sesión iniciada', 
     credencial: await tokenDeGoogle({ sub: 'otro' }),
   })
   assert.equal(otroGoogle.datos.error, 'ya_vinculada')
+})
+
+test('los desafíos diarios cuentan una sola vez por día, solo de hoy o de ayer, y tienen su propio ranking por fecha', async () => {
+  const hoy = fechaDeHoyEnChile()
+  const { llamar } = await registrado('Seba')
+  const otro = await registrado('Otra')
+  const calles = (aciertos, ms, categoria = hoy) => ronda('dd-calles', aciertos, ms, 10, categoria)
+  assert.equal((await llamar('POST', '/puntajes', calles(7, 60000))).estado, 201)
+  const repetido = await llamar('POST', '/puntajes', calles(10, 50000))
+  assert.equal(repetido.estado, 409)
+  assert.equal(repetido.datos.error, 'ya_jugado')
+  assert.equal(
+    (await llamar('POST', '/puntajes', calles(7, 60000, '2020-01-01'))).datos.error,
+    'puntaje_invalido',
+  )
+  assert.equal((await llamar('POST', '/puntajes', calles(7, 60000, 'hoy'))).datos.error, 'puntaje_invalido')
+  assert.equal(
+    (await llamar('POST', '/puntajes', ronda('dd-calles', 7, 60000, 20, hoy))).datos.error,
+    'puntaje_invalido',
+  )
+  assert.equal((await llamar('POST', '/puntajes', calles(5, 60000, fechaDeAyerEnChile()))).estado, 201)
+  assert.equal((await otro.llamar('POST', '/puntajes', calles(9, 70000))).estado, 201)
+  assert.equal((await llamar('POST', '/puntajes', ronda('dd-ruta', 80, 300000, 100, hoy))).estado, 201)
+
+  const tabla = await llamar('GET', `/tabla?modo=dd-calles&categoria=${hoy}`)
+  assert.equal(tabla.estado, 200)
+  assert.deepEqual(
+    tabla.datos.filas.map(fila => [fila.nombre, fila.aciertos]),
+    [
+      ['Otra', 9],
+      ['Seba', 7],
+    ],
+  )
+  const deAyer = await llamar('GET', `/tabla?modo=dd-calles&categoria=${fechaDeAyerEnChile()}`)
+  assert.equal(deAyer.datos.filas.length, 1)
+  assert.equal((await llamar('GET', '/tabla?modo=dd-calles&categoria=hoy')).estado, 400)
 })

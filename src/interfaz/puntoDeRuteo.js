@@ -12,7 +12,7 @@ const nombreCorto = ({ name: nombre, address: direccion = {} }) => {
   return [nombre || calle, comuna].filter(Boolean).join(', ')
 }
 
-async function buscarDirecciones(texto) {
+export async function buscarDirecciones(texto) {
   const respuesta = await fetch(NOMINATIM + encodeURIComponent(texto))
   if (!respuesta.ok) throw new Error(`Nominatim respondió ${respuesta.status}`)
   return (await respuesta.json()).map(resultado => ({

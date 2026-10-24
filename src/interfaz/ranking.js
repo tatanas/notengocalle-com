@@ -1,5 +1,9 @@
 import {
   CATEGORIAS_DE_RONDA,
+  MODOS_DIARIOS,
+  esModoDiario,
+  fechaDeAyerEnChile,
+  fechaDeHoyEnChile,
   ajusteDeCategoria,
   categoriaEnElResumen,
   categoriasValidasDe,
@@ -37,7 +41,8 @@ let jugadoresPorCategoria = {}
 // Cada juego tiene solo los largos que existen para él (las comunas y las regiones recorren todo su conjunto: no tienen de 10 ni de 20).
 const categoriasDe = idDeModo => (idDeModo ? categoriasValidasDe(idDeModo) : CATEGORIAS_DE_RONDA)
 
-const modosOficiales = () => MODOS.filter(tieneRondaOficial)
+// Los desafíos diarios tienen su propia tarjeta arriba; el resto, la de siempre.
+const modosOficiales = () => MODOS.filter(modo => tieneRondaOficial(modo) && !modo.diario)
 const gruposDe = modos => [...new Set(modos.map(modo => modo.group))]
 const puntaje = entrada => `${entrada.aciertos}/${entrada.total}`
 const fechaYHora = iso =>
@@ -84,16 +89,16 @@ function htmlDePestanasDeCategoria() {
 const filaDeTabla = entrada =>
   `<tr class="${soyYo(entrada) ? 'me' : ''}"><td>${entrada.puesto}</td><td>${escaparHtml(entrada.nombre)}</td><td>${puntaje(entrada)}</td><td>${formatearTiempoExacto(entrada.ms)}</td><td class="muted">${fechaYHora(entrada.en)}</td></tr>`
 
-function htmlDeTabla({ filas, jugadores, yo }) {
+function htmlDeTabla({ filas, jugadores, yo }, modo = vista.modo, categoria = vista.categoria) {
   if (!filas.length)
-    return `<p class="muted">Nadie ha jugado esta ronda (${textoDeCategoria(vista.modo, vista.categoria)}) en este período. ¡Puedes ser el primero!</p>`
+    return `<p class="muted">Nadie ha jugado esta ronda (${textoDeCategoria(modo, categoria)}) en este período. ¡Puedes ser el primero!</p>`
   const sobreLaTabla =
     yo && !filas.some(soyYo)
       ? `<tr><td colspan="5" class="muted">…</td></tr>${filaDeTabla({ ...yo, nombre: usuario.nombre })}`
       : ''
   return `<table class="stats board"><tr><th>#</th><th>Jugador</th><th>Aciertos</th><th>Tiempo</th><th>Fecha</th></tr>
     ${filas.map(filaDeTabla).join('')}${sobreLaTabla}</table>
-    <p class="muted" style="font-size:12.5px">${jugadores} ${jugadores === 1 ? 'jugador' : 'jugadores'} en ${textoDeCategoria(vista.modo, vista.categoria)}. Cuenta la mejor ronda de cada uno.</p>`
+    <p class="muted" style="font-size:12.5px">${jugadores} ${jugadores === 1 ? 'jugador' : 'jugadores'} en ${textoDeCategoria(modo, categoria)}. Gana quien más acierta; si hay empate, quien tardó menos.</p>`
 }
 
 // Solo los juegos que tienen la pestaña elegida; los de comunas y Street View, con el alcance o el nivel que cuenta en ella.
@@ -120,9 +125,11 @@ const htmlDeRegistrados = registrados =>
     : ''
 
 function htmlDePie() {
-  const jugar = vista.modo
-    ? `<button class="btn" id="rankPlay">🏆 Jugar (${textoDeCategoria(vista.modo, vista.categoria)})</button>`
-    : ''
+  // Los desafíos diarios se juegan una sola vez desde el menú.
+  const jugar =
+    vista.modo && !modoPorId(vista.modo)?.diario
+      ? `<button class="btn" id="rankPlay">🏆 Jugar (${textoDeCategoria(vista.modo, vista.categoria)})</button>`
+      : ''
   const iniciarSesionEnRanking = usuario
     ? ''
     : '<button class="btn sec" id="rankSignIn">Entrar o crear cuenta</button>'
@@ -130,6 +137,66 @@ function htmlDePie() {
     ? ''
     : '<p class="muted" style="font-size:12.5px">Puedes jugar sin cuenta, pero solo los puntajes con cuenta aparecen aquí.</p>'
   return `<div class="row" style="margin-top:12px">${jugar}${iniciarSesionEnRanking}</div>${notaDeInvitado}`
+}
+
+// ----- los desafíos diarios: una tarjeta aparte, arriba de todo, con el del día elegido (hoy o ayer)
+
+const vistaDiaria = { modo: MODOS_DIARIOS[0], dia: 'hoy' }
+const modosDiarios = () => MODOS_DIARIOS.map(modoPorId).filter(modo => modo && (modo.disponible?.() ?? true))
+const categoriaDelDia = () => (vistaDiaria.dia === 'hoy' ? fechaDeHoyEnChile() : fechaDeAyerEnChile())
+
+function htmlDeLaTarjetaDiaria() {
+  const fichas = (lista, activo, atributo) =>
+    lista
+      .map(
+        ([valor, etiqueta]) =>
+          `<button class="chip ${valor === activo ? 'on' : ''}" ${atributo}="${valor}">${escaparHtml(etiqueta)}</button>`,
+      )
+      .join('')
+  return `<div class="card" id="rankDiario">
+    <h3 style="margin-top:0">📅 Desafíos diarios</h3>
+    <div class="chips">${fichas(
+      modosDiarios().map(modo => [modo.id, modo.name]),
+      vistaDiaria.modo,
+      'data-diario-modo',
+    )}</div>
+    <div class="chips" style="margin-top:8px">${fichas(
+      [
+        ['hoy', 'Hoy'],
+        ['ayer', 'Ayer'],
+      ],
+      vistaDiaria.dia,
+      'data-diario-dia',
+    )}</div>
+    <div id="rankDiarioCuerpo" style="margin-top:12px"></div>
+  </div>`
+}
+
+async function cargarTablaDiaria() {
+  const cuerpo = $('#rankDiarioCuerpo')
+  const solicitado = { ...vistaDiaria }
+  cuerpo.innerHTML = '<p class="muted">Cargando…</p>'
+  let html
+  try {
+    html = htmlDeTabla(
+      await pedirTabla(vistaDiaria.modo, categoriaDelDia(), 'todo'),
+      vistaDiaria.modo,
+      categoriaDelDia(),
+    )
+  } catch (error) {
+    html = `<p class="muted">No se pudo cargar el ranking: ${escaparHtml(error.message)}.</p>`
+  }
+  if (cuerpo.isConnected && solicitado.modo === vistaDiaria.modo && solicitado.dia === vistaDiaria.dia)
+    cuerpo.innerHTML = html
+}
+
+function conectarTarjetaDiaria() {
+  for (const ficha of document.querySelectorAll('[data-diario-modo], [data-diario-dia]'))
+    ficha.onclick = () => {
+      vistaDiaria.modo = ficha.dataset.diarioModo ?? vistaDiaria.modo
+      vistaDiaria.dia = ficha.dataset.diarioDia ?? vistaDiaria.dia
+      dibujar()
+    }
 }
 
 async function cargarTabla() {
@@ -197,6 +264,7 @@ function dibujar() {
   mostrarPantalla(`<div class="wrap narrow">
     <div class="hero"><h2>🏆 Ranking</h2>
       <p>Las rondas de práctica no cuentan. Gana quien acierta más; si hay empate, quien pensó menos tiempo. Cada largo de ronda tiene su propio ranking.</p></div>
+    ${htmlDeLaTarjetaDiaria()}
     <div class="card">
       <div class="row">${htmlDeSelectorDeJuego()}<div class="chips">${htmlDeFichasDePeriodo()}</div></div>
       <div id="rankTabs" style="margin-top:12px">${htmlDePestanasDeCategoria()}</div>
@@ -209,13 +277,27 @@ function dibujar() {
   for (const pastilla of document.querySelectorAll('[data-period]'))
     pastilla.onclick = () => elegirVista({ periodo: pastilla.dataset.period })
   conectarPestanas()
+  conectarTarjetaDiaria()
 
-  if (cuentasDisponibles) cargarTabla()
-  else $('#rankBody').innerHTML = '<p class="muted">El ranking no está disponible en este momento.</p>'
+  if (cuentasDisponibles) {
+    cargarTablaDiaria()
+    cargarTabla()
+  } else {
+    const noDisponible = '<p class="muted">El ranking no está disponible en este momento.</p>'
+    $('#rankDiarioCuerpo').innerHTML = noDisponible
+    $('#rankBody').innerHTML = noDisponible
+  }
 }
 
 // Se abre en "Líderes de cada juego", salvo que vengan de un resultado: ahí, en el juego y el largo de la ronda recién jugada.
 function abrirRanking(idDeModo, categoria) {
+  // Venir de un desafío diario abre su tarjeta, arriba; la de siempre queda como estaba.
+  if (esModoDiario(idDeModo)) {
+    vistaDiaria.modo = idDeModo
+    vistaDiaria.dia = categoria === fechaDeAyerEnChile() ? 'ayer' : 'hoy'
+    idDeModo = undefined
+    categoria = undefined
+  }
   detenerPartida()
   limpiarCapa()
   ocultarPanel()

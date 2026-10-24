@@ -1,0 +1,7 @@
+[
+  {
+    "calle": 24353249,
+    "etiquetas": { "oneway": "-1" },
+    "motivo": "Enlace entre Camino Santa Teresa de Los Andes y Gran Vía (G-19, Vitacura): en OSM no tiene oneway, pero solo se usa desde Gran Vía hacia Santa Teresa. Conviene corregirlo también en OpenStreetMap."
+  }
+]

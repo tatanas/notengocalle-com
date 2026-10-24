@@ -167,6 +167,19 @@ function seguirEnElMapa(posicion) {
   mapa.panInside(lugar, { paddingTopLeft: [panoramaTapa + 40, 70], paddingBottomRight: [270, 40] })
 }
 
+// Quien dibuja algo que debe seguir al panorama (un auto en el mapa) se entera de cada cambio de posición y de rumbo.
+const oyentes = new Set()
+export function escucharPanorama(oyente) {
+  oyentes.add(oyente)
+  return () => oyentes.delete(oyente)
+}
+
+export const rumboDeLaVista = () => panorama?.getPov().heading ?? 0
+export const posicionDelPanorama = () => {
+  const posicion = panorama?.getPosition()
+  return posicion ? [posicion.lat(), posicion.lng()] : null
+}
+
 function crearPanorama(StreetViewPanorama) {
   panorama = new StreetViewPanorama(contenedor, {
     clickToGo: true,
@@ -179,10 +192,14 @@ function crearPanorama(StreetViewPanorama) {
     motionTrackingControl: false,
     panControl: false,
   })
-  panorama.addListener('pov_changed', () => alGirarLaVista?.(panorama.getPov().heading))
+  panorama.addListener('pov_changed', () => {
+    alGirarLaVista?.(panorama.getPov().heading)
+    for (const { alGirar } of oyentes) alGirar?.(panorama.getPov().heading)
+  })
   panorama.addListener('position_changed', () => {
     const posicion = panorama.getPosition()
     if (!posicion) return
+    for (const { alMoverse } of oyentes) alMoverse?.([posicion.lat(), posicion.lng()])
     if (!inicioDeLaPregunta) {
       if (document.body.classList.contains('recorriendo')) seguirEnElMapa(posicion)
       return
@@ -278,7 +295,7 @@ export async function mostrarPanorama(
   contenedor.hidden = false
   botones.hidden = false
   if (!panorama) crearPanorama(StreetViewPanorama)
-  panorama.setOptions({ showRoadLabels: recorrerCalle })
+  panorama.setOptions({ showRoadLabels: recorrerCalle, clickToGo: true, linksControl: true })
   document.getElementById('reportarTunel').hidden = !alReportarTunel
   document.getElementById('volverAlInicio').hidden = recorrerCalle
   document.getElementById('cerrarRecorrido').hidden = !recorrerCalle
@@ -318,4 +335,131 @@ export function ocultarPanorama() {
   alReportar = () => {}
   alVerElMapa = null
   alGirarLaVista = null
+}
+
+// ----- conducir: el panorama sigue al auto
+
+const GRADOS_DE_TOLERANCIA_DEL_RUMBO = 2
+const MILISEGUNDOS_PARA_FIJAR_EL_RUMBO = 150
+const INTENTOS_PARA_FIJAR_EL_RUMBO = 8
+let vistaMovidaPorElJugador = false
+
+// Google puede devolver la vista al rumbo del auto que tomó el panorama cuando éste termina de cargar: se vuelve a apuntar
+// unos instantes, salvo que el jugador ya haya movido la vista.
+function apuntarHacia(rumbo) {
+  vistaMovidaPorElJugador = false
+  panorama.setPov({ heading: rumbo, pitch: 0 })
+  let intentos = 0
+  const vigilante = setInterval(() => {
+    const desviado = diferenciaDeRumbo(panorama.getPov().heading, rumbo) > GRADOS_DE_TOLERANCIA_DEL_RUMBO
+    if (vistaMovidaPorElJugador || ++intentos > INTENTOS_PARA_FIJAR_EL_RUMBO) clearInterval(vigilante)
+    else if (desviado) panorama.setPov({ heading: rumbo, pitch: 0 })
+  }, MILISEGUNDOS_PARA_FIJAR_EL_RUMBO)
+}
+
+async function buscarSobreElTrazado(servicio, camara, evaluar) {
+  let menosMalo = null
+  for (const candidata of camara.candidatas) {
+    try {
+      const resultado = await servicio.getPanorama({
+        location: {
+          lat: candidata.punto[0],
+          lng: candidata.punto[1],
+        },
+        radius: RADIO_ESTRECHO_M,
+        preference: 'nearest',
+        sources: ['google'],
+      })
+      const { latLng } = resultado.data.location
+      const evaluacion = evaluar([latLng.lat(), latLng.lng()])
+      if (evaluacion.sirve) return { resultado, evaluacion, aproximado: false }
+      if (!menosMalo || evaluacion.distanciaAlTrazado < menosMalo.evaluacion.distanciaAlTrazado)
+        menosMalo = { resultado, evaluacion, aproximado: true }
+    } catch {
+      // ahí no hay panorama: se prueba más atrás
+    }
+  }
+  return menosMalo && menosMalo.evaluacion.distanciaAlTrazado <= DISTANCIA_TOLERADA_SI_NO_HAY_OTRA_M
+    ? menosMalo
+    : null
+}
+
+const DISTANCIA_TOLERADA_SI_NO_HAY_OTRA_M = 35
+
+// Muestra el panorama que mejor calza con `camara` (src/dominio/camaraDeConduccion.js), mirando hacia donde se avanza, sin
+// caminar por Street View: el jugador se mueve decidiendo. `evaluar([lat, lon])` dice si un panorama sirve y con qué rumbo.
+// Devuelve { posicion, rumbo, aproximado } con la posición real del panorama, o null si ahí no hay cobertura.
+export async function mostrarPanoramaDeConduccion(
+  camara,
+  evaluar,
+  { alVerElMapa: encuadrarAlVerElMapa } = {},
+) {
+  const maps = await cargarGoogleMaps()
+  const { StreetViewPanorama, StreetViewService } = await maps.importLibrary('streetView')
+  const elegido = await buscarSobreElTrazado(new StreetViewService(), camara, evaluar)
+  if (!elegido) return null
+  if (!contenedor) crearElementos()
+  const { latLng, pano } = elegido.resultado.data.location
+  quitarMarcadorDePosicion()
+  inicioDeLaPregunta = null
+  mapaEncuadrado = true
+  alVerElMapa = encuadrarAlVerElMapa ?? null
+  document.body.classList.remove('ver-mapa', 'recorriendo')
+  document.body.classList.add('con-panorama')
+  botonAlternar().textContent = '🗺️ Abrir mapa'
+  contenedor.hidden = false
+  botones.hidden = false
+  for (const id of ['reportarTunel', 'volverAlInicio', 'cerrarRecorrido'])
+    document.getElementById(id).hidden = true
+  if (!panorama) {
+    crearPanorama(StreetViewPanorama)
+    contenedor.addEventListener('pointerdown', () => {
+      vistaMovidaPorElJugador = true
+    })
+  }
+  panorama.setOptions({ clickToGo: false, linksControl: false, showRoadLabels: true })
+  const posicion = [latLng.lat(), latLng.lng()]
+  const inicioDeLaCarga = performance.now()
+  panorama.setPano(pano)
+  apuntarHacia(elegido.evaluacion.rumbo)
+  panorama.setVisible(true)
+  if (!(await esperarQueCargue(pano, posicion))) return null
+  return {
+    posicion,
+    rumbo: elegido.evaluacion.rumbo,
+    aproximado: elegido.aproximado,
+    distanciaAlTrazado: elegido.evaluacion.distanciaAlTrazado,
+    metrosAntesDelCruce: elegido.evaluacion.metrosAntesDelCruce,
+    ladoDelTrazado: elegido.evaluacion.ladoDelTrazado,
+    milisegundosDeCarga: Math.round(performance.now() - inicioDeLaCarga),
+  }
+}
+
+const MILISEGUNDOS_MAXIMOS_DE_CARGA = 10000
+const MILISEGUNDOS_ENTRE_REVISIONES_DE_CARGA = 100
+const METROS_DE_TOLERANCIA_AL_CARGAR = 5
+
+// `setPano` no espera: hasta que Google carga el panorama la vista sigue mostrando el anterior (o negro). Solo se da por
+// mostrado cuando el visor ya está en ese panorama y en su posición.
+async function esperarQueCargue(pano, posicion) {
+  for (
+    let esperado = 0;
+    esperado < MILISEGUNDOS_MAXIMOS_DE_CARGA;
+    esperado += MILISEGUNDOS_ENTRE_REVISIONES_DE_CARGA
+  ) {
+    const actual = panorama.getPosition()
+    if (
+      panorama.getPano() === pano &&
+      actual &&
+      distanciaKm([actual.lat(), actual.lng()], posicion) * 1000 <= METROS_DE_TOLERANCIA_AL_CARGAR
+    )
+      return true
+    await new Promise(resolver => setTimeout(resolver, MILISEGUNDOS_ENTRE_REVISIONES_DE_CARGA))
+  }
+  return false
+}
+
+// Gira el panorama que ya se está viendo (al partir, cuando se elige el otro sentido de la calle).
+export function apuntarPanoramaHacia(rumbo) {
+  if (panorama) apuntarHacia(rumbo)
 }

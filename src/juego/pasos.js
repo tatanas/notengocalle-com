@@ -14,7 +14,7 @@ import { registrarModo } from './registry.js'
 
 // En la práctica en auto, el jugador puede fijar un punto propio (su casa, su trabajo) del que parten o al que llegan
 // todas las rutas: ajustes.puntoDeRuteo = { nombre, lat, lon, sentido: 'desde' | 'hacia' }. Se guarda solo en su navegador.
-const PUNTO_PROPIO = 'propio'
+export const PUNTO_PROPIO = 'propio'
 const puntoPropio = () => {
   const { nombre, lat, lon } = ajustes.puntoDeRuteo
   return { id: PUNTO_PROPIO, name: nombre, lat, lon }
@@ -25,12 +25,12 @@ export const lugarDeLaRuta = ruta => extremoDeRuta(ruta.from === PUNTO_PROPIO ? 
 // Los destinos del punto propio: lugares emblemáticos ni tan cerca (la ruta sería trivial) ni tan lejos.
 const KM_MINIMOS_DESDE_EL_PUNTO = 3
 const KM_MAXIMOS_DESDE_EL_PUNTO = 30
-const esLugarDeLandmarks = lugar => /^l\d+$/.test(lugar.id)
+export const esLugarDeLandmarks = lugar => /^l\d+$/.test(lugar.id)
 
 // Un barrio sin límites precisos (Lo Curro, Santa María de Manquehue) no tiene un punto al que llegar: solo sirven los barrios
 // que son un lugar concreto (una plaza, un persa, un mercado).
 const BARRIO_CON_PUNTO_CONCRETO = /^(Plaza|Persa|Mercado|Feria|Pueblo)/
-const sirveParaRuteo = lugar => lugar.cat !== 'Barrios' || BARRIO_CON_PUNTO_CONCRETO.test(lugar.name)
+export const sirveParaRuteo = lugar => lugar.cat !== 'Barrios' || BARRIO_CON_PUNTO_CONCRETO.test(lugar.name)
 
 function rutasDelPuntoPropio() {
   const punto = puntoPropio()
@@ -211,10 +211,13 @@ export function preguntarPasos(q, cfg) {
   else terminar()
 }
 
+// Guardado: el "Ruteo en auto" del menú es ahora el juego por el grafo vial (src/juego/modos/ruteoEnAuto.js). Para devolver este
+// juego, quitar `disponible`.
 export function registrarModoDePasosEnAuto(id, nombre) {
   registrarModo({
     id,
     group: 'Ruteo',
+    disponible: () => false,
     aids: true,
     name: nombre,
     balance: ruta => lugarDeLaRuta(ruta)?.comuna,

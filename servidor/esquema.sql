@@ -109,6 +109,9 @@ create index if not exists puntajes_por_categoria on puntajes (modo, categoria, 
 
 create index if not exists puntajes_por_usuario on puntajes (usuario_id, creado_en);
 
+-- Los desafíos diarios (modos dd-…, con la fecha como categoría) se juegan una sola vez por cuenta y día.
+create unique index if not exists puntajes_un_desafio_por_dia on puntajes (usuario_id, modo, categoria) where modo like 'dd-%';
+
 -- Puntos de Street View que los jugadores marcaron como malos (túneles).
 create table if not exists reportes_de_puntos (
   id        integer generated always as identity primary key,

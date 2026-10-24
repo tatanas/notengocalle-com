@@ -14,6 +14,7 @@ Este archivo se carga siempre; lo demás, **solo el documento que la tarea toque
 | agrega o quita calles, lugares o barrios | [docs/decisiones-contenido.md](docs/decisiones-contenido.md) (lo ya descartado) y [docs/datos.md](docs/datos.md) (pipeline) |
 | toca el ruteo (`rs-*`) | [docs/ruteo.md](docs/ruteo.md) |
 | toca Street View | [docs/streetview.md](docs/streetview.md) |
+| toca la conducción libre (pestaña Conducir, grafo vial, decisiones en cruces) | [docs/conduccion-libre.md](docs/conduccion-libre.md) |
 | toca cuentas, ranking o la base de datos | [docs/servidor.md](docs/servidor.md) |
 | publica o configura Netlify/Neon | [docs/publicar.md](docs/publicar.md) |
 | toca anuncios | [docs/publicidad.md](docs/publicidad.md) |

@@ -15,10 +15,14 @@ export function serviceWorker({ source: fuente, publicDir: carpetaPublica }) {
     apply: 'build',
     generateBundle(_, paquete) {
       const resumen = createHash('sha256')
-      const archivosPublicos = listarArchivos(carpetaPublica).map(archivo => {
-        resumen.update(readFileSync(archivo))
-        return '/' + relative(carpetaPublica, archivo).replaceAll('\\', '/')
-      })
+      // El grafo vial de "Conducir libre" (solo desarrollo, decenas de MB) no se guarda para abrir sin conexión.
+      const archivosPublicos = listarArchivos(carpetaPublica)
+        .map(archivo => ({ archivo, ruta: '/' + relative(carpetaPublica, archivo).replaceAll('\\', '/') }))
+        .filter(({ ruta }) => !ruta.startsWith('/data/grafo/'))
+        .map(({ archivo, ruta }) => {
+          resumen.update(readFileSync(archivo))
+          return ruta
+        })
       const archivosConstruidos = Object.keys(paquete)
         .filter(archivo => archivo !== 'index.html')
         .map(archivo => '/' + archivo)

@@ -1,4 +1,4 @@
-import { MODOS_OFICIALES } from '../../compartido/oficial.js'
+import { MODOS_OFICIALES, esModoDiario } from '../../compartido/oficial.js'
 import {
   clicEnSiguiente,
   existe,
@@ -106,6 +106,8 @@ export async function callesPropias(navegador, { verificar }) {
 
 // Los juegos con Street View (sv-ubicar, rs-sv-car) cargan el script de Google y gastan cuota: se prueban a mano.
 const esDeStreetView = id => /(^|-)sv(-|$)/.test(id)
+// Guardado fuera del menú (el ruteo en auto ahora es el juego por el grafo vial, que lleva Street View): sigue existiendo para el ranking y el servidor.
+const esDelMenu = id => !esDeStreetView(id) && id !== 'rs-any-car' && !esModoDiario(id)
 
 // Cada juego con ranking debe poder iniciar su ronda oficial con el largo que el servidor espera.
 export async function rondasOficiales(navegador, { verificar }) {
@@ -115,8 +117,8 @@ export async function rondasOficiales(navegador, { verificar }) {
   // Street View carga el script de Google y gasta cuota: se prueba a mano.
   const ofrecidos = (
     await pagina.$$eval('[data-official]', botones => botones.map(boton => boton.dataset.official))
-  ).filter(id => !esDeStreetView(id))
-  const oficialesSinStreetView = MODOS_OFICIALES.filter(id => !esDeStreetView(id))
+  ).filter(esDelMenu)
+  const oficialesSinStreetView = MODOS_OFICIALES.filter(esDelMenu)
   verificar(
     ofrecidos.length === oficialesSinStreetView.length && ofrecidos.every(id => MODOS_OFICIALES.includes(id)),
     `los ${ofrecidos.length} juegos del menú tienen ronda oficial definida`,
@@ -256,8 +258,9 @@ export async function disenoMenu(navegador, { verificar }) {
   )
   // Street View solo sale si hay llave de Google: el orden se comprueba sin él y, si está, debe ir donde corresponde.
   const orden = [
-    'Calles',
+    'Desafíos diarios',
     'Ruteo',
+    'Calles',
     'Comunas',
     'Street View',
     'Lugares emblemáticos',
@@ -270,10 +273,10 @@ export async function disenoMenu(navegador, { verificar }) {
   const esperados = orden.filter(nombre => nombre !== 'Street View' || nombres.includes(nombre))
   verificar(
     nombres.join('|') === esperados.join('|'),
-    `las tarjetas salen en el orden Calles, Ruteo, Comunas, Street View, Lugares emblemáticos, Metro, Chile, Comunas de Chile, Parques nacionales (${nombres.join(' · ')})`,
+    `las tarjetas salen en el orden Desafíos diarios, Ruteo, Calles, Comunas, Street View, Lugares emblemáticos, Metro, Chile, Comunas de Chile, Parques nacionales (${nombres.join(' · ')})`,
   )
   verificar(
-    (await pagina.$('.card:first-child #myst')) !== null,
+    (await pagina.$('.card:nth-child(3) #myst')) !== null,
     '"Mis calles" está dentro de la tarjeta de Calles',
   )
   verificar(
@@ -295,7 +298,7 @@ export async function disenoMenu(navegador, { verificar }) {
   const chicos = await pagina.$$eval('.mode-row .practice', botones =>
     botones.filter(boton => !/(^|-)sv(-|$)/.test(boton.dataset.mode)).map(boton => boton.innerText.trim()),
   )
-  const sinStreetView = MODOS_OFICIALES.filter(id => !esDeStreetView(id))
+  const sinStreetView = MODOS_OFICIALES.filter(esDelMenu)
   const cantidadEsperada = sinStreetView.length
   const chicosEsperados = sinStreetView.filter(
     id => !['mt-', 'lm-', 'com-', 'cc-', 'ch-', 'pn-'].some(prefijo => id.startsWith(prefijo)),
@@ -597,6 +600,77 @@ export async function puntoEnCalle(navegador, { verificar }) {
   await pagina.waitForSelector('.q-head')
   await dormir(300)
   verificar(!/punto marcado/.test(await prompt()), 'el otro juego marca la calle entera')
+  verificar(!errores.length, `sin errores en la consola${errores.length ? ': ' + errores.join(' | ') : ''}`)
+  await pagina.close()
+}
+
+// Los desafíos diarios: primera tarjeta, botones lilas sin práctica, y una sola vez al día (también si se abandona).
+export async function desafiosDiarios(navegador, { verificar }) {
+  const { page: pagina, errors: errores } = await abrirPagina(navegador)
+  const primera = await pagina.$eval('.grid .card:first-child h3', titulo => titulo.innerText.trim())
+  verificar(primera.endsWith('Desafíos diarios'), `la primera tarjeta es "Desafíos diarios" (${primera})`)
+  const botones = await pagina.$$eval('.card-diaria [data-diario]', lista =>
+    lista.map(boton => ({ id: boton.dataset.diario, color: getComputedStyle(boton).backgroundColor })),
+  )
+  verificar(
+    ['dd-calles', 'dd-comunas'].every(id => botones.some(boton => boton.id === id)),
+    `tiene el de calles y el de comunas (${botones.map(boton => boton.id).join(', ')})`,
+  )
+  verificar(
+    botones.every(boton => boton.color === 'rgb(124, 58, 237)'),
+    'los botones son morados',
+  )
+  verificar(!(await existe(pagina, '.card-diaria .practice')), 'sin botón de práctica')
+
+  // Se juega una vez: parte al tiro, son 10 preguntas y al terminar no ofrece otra ronda.
+  await pagina.click('[data-diario="dd-comunas"]')
+  await pagina.waitForSelector('.q-head', { timeout: 8000 })
+  verificar(
+    /de 10$/.test((await texto(pagina, '.q-head')).split(String.fromCharCode(10))[0].trim()),
+    'son 10 preguntas',
+  )
+  verificar(await pagina.$eval('#btnRestart', boton => boton.hidden), 'no se puede reiniciar la ronda')
+  for (;;) {
+    await pagina.waitForSelector('.opt:not([disabled]), #menu', { timeout: 15000 })
+    if (await existe(pagina, '#menu')) break
+    await dormir(320)
+    await pagina.click('.opt:not([disabled])')
+    await pagina.waitForSelector('#btnNext')
+    await clicEnSiguiente(pagina)
+  }
+  verificar(!(await existe(pagina, '#again')), 'al terminar no ofrece otra ronda')
+  verificar(/desafíos diarios/i.test(await texto(pagina, '#panel')), 'y explica que se juega una sola vez')
+  await pagina.click('#menu')
+  await pagina.waitForSelector('.card-diaria')
+  const estado = await texto(pagina, '[data-diario="dd-comunas"] .estado-diario')
+  verificar(/^✓ \d+\/10$/.test(estado), `el botón muestra cómo salió (${estado})`)
+
+  // Ya jugado: el botón lleva al ranking del día, no a otra ronda (ni después de recargar la página).
+  for (const recargar of [false, true]) {
+    if (recargar) await pagina.reload({ waitUntil: 'networkidle2' })
+    await pagina.waitForSelector('[data-diario="dd-comunas"]')
+    await pagina.click('[data-diario="dd-comunas"]')
+    await pagina.waitForSelector('#rankDiario')
+    verificar(
+      (await pagina.$eval('.wrap .card', tarjeta => tarjeta.id)) === 'rankDiario' &&
+        (await pagina.$eval('[data-diario-modo].on', ficha => ficha.dataset.diarioModo)) === 'dd-comunas' &&
+        !(await existe(pagina, '.q-head')),
+      `ya jugado, lleva al ranking del día, que es la primera tarjeta${recargar ? ' (también tras recargar)' : ''}`,
+    )
+    await irAlInicio(pagina)
+  }
+
+  // Abandonar también cuenta como jugado.
+  await pagina.click('[data-diario="dd-calles"]')
+  await pagina.waitForSelector('.q-head', { timeout: 8000 })
+  await pagina.click('#btnHome')
+  await pagina.waitForSelector('#confirmDialog[open]')
+  await pagina.click('#confirmOk')
+  await pagina.waitForSelector('#screen:not(.hidden) .card-diaria')
+  verificar(
+    (await texto(pagina, '[data-diario="dd-calles"] .estado-diario')) === 'Ya empezado',
+    'si se abandona a medias, ese desafío ya no se puede volver a jugar hoy',
+  )
   verificar(!errores.length, `sin errores en la consola${errores.length ? ': ' + errores.join(' | ') : ''}`)
   await pagina.close()
 }

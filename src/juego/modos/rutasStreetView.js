@@ -3,7 +3,7 @@ import { decisionesConStreetView } from '../../dominio/decisionesConStreetView.j
 import { contextoDeLasDecisiones } from '../../dominio/rutaEnAuto.js'
 import { COLORES, COLORES_DE_TRAMOS, iconoDiv } from '../../mapa/dibujo.js'
 import { capa, encuadrar } from '../../mapa/mapa.js'
-import { mostrarPanorama, ocultarPanorama, streetViewDisponible } from '../../mapa/streetView.js'
+import { mostrarPanorama, ocultarPanorama } from '../../mapa/streetView.js'
 import { mostrarPanel, panel } from '../../interfaz/panel.js'
 import { encabezadoDePregunta, partida, responder } from '../engine.js'
 import { extremoDeRuta, lugarDeLaRuta, rutaCalculada, rutasEnAuto, salidasConocidasDe } from '../pasos.js'
@@ -200,9 +200,10 @@ function recorrerConStreetView(q, { A, B, recorrido, ruta }) {
 registrarModo({
   id: 'rs-sv-car',
   group: 'Ruteo',
+  // Guardado: ya no es necesario (la conducción libre usa Street View de otra forma). Para devolverlo, `disponible: streetViewDisponible` (de ../../mapa/streetView.js).
   name: 'Rutas en auto · con Street View',
   noHint: true,
-  disponible: streetViewDisponible,
+  disponible: () => false,
   balance: ruta => lugarDeLaRuta(ruta)?.comuna,
   pool: rutasEnAuto,
   key: ruta => ruta.k,

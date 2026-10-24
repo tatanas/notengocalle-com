@@ -5,24 +5,28 @@
   font-weight: 300;
   font-display: swap;
 }
+
 @font-face {
   font-family: 'gobCL';
   src: url('/fuentes/gobcl/gobCL-Regular.otf') format('opentype');
   font-weight: 400;
   font-display: swap;
 }
+
 @font-face {
   font-family: 'gobCL';
   src: url('/fuentes/gobcl/gobCL-Bold.otf') format('opentype');
   font-weight: 700;
   font-display: swap;
 }
+
 @font-face {
   font-family: 'gobCL';
   src: url('/fuentes/gobcl/gobCL-Heavy.otf') format('opentype');
   font-weight: 900;
   font-display: swap;
 }
+
 :root {
   --bg: #f5f7f6;
   --card: #ffffff;
@@ -42,9 +46,11 @@
   --top-h: 52px;
   --pestana-activa: #2a8f86;
 }
+
 * {
   box-sizing: border-box;
 }
+
 html,
 body {
   margin: 0;
@@ -60,16 +66,19 @@ body {
     sans-serif;
   -webkit-tap-highlight-color: transparent;
 }
+
 button {
   font: inherit;
   color: inherit;
 }
+
 #app {
   position: fixed;
   inset: 0;
   display: flex;
   flex-direction: column;
 }
+
 #topbar {
   height: var(--top-h);
   flex: 0 0 auto;
@@ -83,6 +92,7 @@ button {
   z-index: 1200;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
+
 /* Las secciones son pestañas, como las de un navegador: la activa, un poco más clara, con las curvas de Chrome abajo. */
 #pestanas {
   align-self: stretch;
@@ -92,6 +102,7 @@ button {
   min-width: 0;
   padding-left: 2px;
 }
+
 .pestana {
   position: relative;
   display: flex;
@@ -110,12 +121,15 @@ button {
   white-space: nowrap;
   cursor: pointer;
 }
+
 .pestana:hover {
   background: rgba(255, 255, 255, 0.12);
 }
+
 .pestana.activa {
   background: var(--pestana-activa);
 }
+
 .pestana.activa::before,
 .pestana.activa::after {
   content: '';
@@ -125,37 +139,45 @@ button {
   height: 10px;
   pointer-events: none;
 }
+
 .pestana.activa::before {
   left: -10px;
   background: radial-gradient(circle at 0 0, transparent 10px, var(--pestana-activa) 10.5px);
 }
+
 .pestana.activa::after {
   right: -10px;
   background: radial-gradient(circle at 100% 0, transparent 10px, var(--pestana-activa) 10.5px);
 }
+
 .pestana .icono {
   font-size: 18px;
   line-height: 1;
 }
+
 .pestana-inicio {
   flex: 0 1 auto;
 }
+
 .pestana-inicio img {
   flex: 0 0 auto;
   border-radius: 5px;
 }
+
 .pestana .marca {
   font-size: 16px;
   font-weight: 650;
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
 #hud {
   margin-left: auto;
   font-size: 14px;
   font-weight: 600;
   white-space: nowrap;
 }
+
 .iconbtn {
   background: transparent;
   border: 0;
@@ -166,27 +188,34 @@ button {
   cursor: pointer;
   color: inherit;
 }
+
 /* En el celular, Ranking, Explorar y Mi progreso muestran solo el emoji. */
 @media (max-width: 760px) {
   #pestanas {
     padding-left: 0;
   }
+
   .pestana .texto {
     display: none;
   }
+
   .pestana {
     padding: 0 8px;
   }
+
   .pestana .marca {
     font-size: 15px;
   }
 }
+
 .pagina-angosta {
   max-width: 560px;
 }
+
 .iconbtn:hover {
   background: rgba(255, 255, 255, 0.15);
 }
+
 #map {
   flex: 1;
   min-height: 0;
@@ -207,6 +236,7 @@ button {
   border-radius: 14px;
   padding: 14px 16px;
 }
+
 #panel.hidden {
   display: none;
 }
@@ -223,17 +253,21 @@ button {
   overflow: hidden;
   background: #111;
 }
+
 #panorama[hidden] {
   display: none;
 }
+
 body.con-panorama #panel {
   right: auto;
   left: 12px;
   width: min(300px, 44vw);
 }
+
 body.con-panorama .leaflet-top.leaflet-left {
   left: 50vw;
 }
+
 #botonesDePanorama {
   position: absolute;
   z-index: 1060;
@@ -242,9 +276,11 @@ body.con-panorama .leaflet-top.leaflet-left {
   display: flex;
   gap: 8px;
 }
+
 #botonesDePanorama[hidden] {
   display: none;
 }
+
 #botonesDePanorama button {
   border: 0;
   border-radius: 10px;
@@ -256,34 +292,42 @@ body.con-panorama .leaflet-top.leaflet-left {
   cursor: pointer;
   box-shadow: var(--shadow);
 }
+
 #alternarVista {
   display: none;
 }
+
 /* Ruteo con Street View: el panorama ocupa todo (no hay mapa hasta llegar) y la pregunta va encima. */
 body.ruteo-sv #panorama {
   right: 0;
   width: auto;
 }
+
 /* Se puede abrir el mapa para ver dónde se está (también en el escritorio, donde el panorama ocupa todo). */
 body.ruteo-sv #alternarVista {
   display: inline-block;
 }
+
 body.ruteo-sv.ver-mapa #panorama {
   visibility: hidden;
   pointer-events: none;
 }
+
 .flecha-de-rumbo {
   background: none;
   border: 0;
 }
+
 /* (con :not(.ver-mapa) para ganarle a la regla del celular que esconde el panel sobre el panorama) */
 body.ruteo-sv.con-panorama:not(.ver-mapa) #panel {
   display: block;
 }
+
 /* Recorriendo una calle (escritorio): el panel se achica a la derecha, con solo el nombre de la calle y "Siguiente". */
 .recorrido-titulo {
   display: none;
 }
+
 @media (min-width: 761px) {
   body.recorriendo #panel {
     left: auto;
@@ -291,54 +335,67 @@ body.ruteo-sv.con-panorama:not(.ver-mapa) #panel {
     width: 250px;
     padding: 10px 12px;
   }
-  body.recorriendo #panel > :not(.fb) {
+
+  body.recorriendo #panel> :not(.fb) {
     display: none;
   }
-  body.recorriendo #panel .fb > :not(h4):not(.recorrido-titulo):not(.next) {
+
+  body.recorriendo #panel .fb> :not(h4):not(.recorrido-titulo):not(.next) {
     display: none;
   }
+
   body.recorriendo .recorrido-titulo {
     display: block;
     font-weight: 700;
     margin: 2px 0 8px;
   }
 }
+
 @media (max-width: 760px) {
   #panorama {
     right: 0;
     width: auto;
   }
+
   body.con-panorama.ver-mapa #panorama {
     visibility: hidden;
     pointer-events: none;
   }
+
   body.con-panorama:not(.ver-mapa) #panel {
     display: none;
   }
+
   body.con-panorama #panel {
     right: 0;
     left: 0;
     width: auto;
   }
+
   body.con-panorama .leaflet-top.leaflet-left {
     left: 0;
   }
+
   #botonesDePanorama {
     right: 12px;
   }
+
   #alternarVista {
     display: inline-block;
   }
+
   #botonesDePanorama {
     left: 12px;
     flex-wrap: wrap;
     justify-content: flex-end;
   }
+
   body.ver-mapa #reportarTunel,
   body.ver-mapa #volverAlInicio {
     display: none;
   }
 }
+
 @media (max-width: 760px) {
   #panel {
     top: auto;
@@ -350,13 +407,16 @@ body.ruteo-sv.con-panorama:not(.ver-mapa) #panel {
     border-radius: 16px 16px 0 0;
     padding: 12px 14px calc(12px + env(safe-area-inset-bottom));
   }
+
   #panel.compact {
     max-height: 40%;
   }
+
   #panel.tall {
     max-height: 80%;
   }
 }
+
 .q-head {
   display: flex;
   align-items: center;
@@ -366,26 +426,32 @@ body.ruteo-sv.con-panorama:not(.ver-mapa) #panel {
   font-size: 13px;
   margin-bottom: 6px;
 }
+
 .q-prompt {
   font-size: 17px;
   margin: 2px 0 10px;
 }
+
 .q-prompt b {
   color: var(--pri);
 }
+
 .q-sub {
   color: var(--muted);
   font-size: 13px;
   margin: -6px 0 10px;
 }
+
 .opts {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 8px;
 }
+
 .opts.one {
   grid-template-columns: 1fr;
 }
+
 .opt {
   background: var(--bg);
   border: 1.5px solid var(--line);
@@ -395,35 +461,43 @@ body.ruteo-sv.con-panorama:not(.ver-mapa) #panel {
   text-align: left;
   min-height: 44px;
 }
+
 .opt:hover:not(:disabled) {
   border-color: var(--pri);
 }
+
 .opt.sel {
   border-color: var(--pri);
   background: var(--pri-soft);
 }
+
 .opt.ok {
   background: var(--ok-soft);
   border-color: var(--ok);
 }
+
 .opt.bad {
   background: var(--bad-soft);
   border-color: var(--bad);
 }
+
 .opt:disabled {
   cursor: default;
 }
+
 .opt .k {
   display: inline-block;
   min-width: 18px;
   color: var(--muted);
   font-size: 12px;
 }
+
 .linebtns {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
 }
+
 .linebtn {
   border: 2px solid transparent;
   border-radius: 999px;
@@ -433,21 +507,25 @@ body.ruteo-sv.con-panorama:not(.ver-mapa) #panel {
   cursor: pointer;
   opacity: 0.55;
 }
+
 .linebtn.sel {
   opacity: 1;
   border-color: var(--ink);
   box-shadow: 0 0 0 2px #fff inset;
 }
+
 .linebtn.ok {
   opacity: 1;
   outline: 3px solid var(--ok);
   outline-offset: 2px;
 }
+
 .linebtn.bad {
   opacity: 1;
   outline: 3px dashed var(--bad);
   outline-offset: 2px;
 }
+
 .btn {
   background: var(--pri);
   color: var(--pri-ink);
@@ -458,58 +536,72 @@ body.ruteo-sv.con-panorama:not(.ver-mapa) #panel {
   cursor: pointer;
   min-height: 44px;
 }
+
 .btn.sec {
   background: var(--bg);
   color: var(--ink);
   border: 1.5px solid var(--line);
 }
+
 .btn.small {
   padding: 7px 12px;
   min-height: 36px;
   font-size: 14px;
 }
+
 .btn:disabled {
   opacity: 0.5;
   cursor: default;
 }
+
 .row {
   display: flex;
   gap: 8px;
   flex-wrap: wrap;
   align-items: center;
 }
+
 .row.end {
   justify-content: flex-end;
 }
+
 .fb {
   margin-top: 10px;
   padding: 10px 12px;
   border-radius: 10px;
   font-size: 14px;
 }
+
 .fb.ok {
   background: var(--ok-soft);
 }
+
 .fb.bad {
   background: var(--bad-soft);
 }
+
 .fb.info {
   background: var(--pri-soft);
 }
+
 .fb h4 {
   margin: 0 0 4px;
   font-size: 15px;
 }
+
 .fb p {
   margin: 4px 0;
 }
+
 .fb .next {
   margin-top: 8px;
   width: 100%;
 }
+
 .muted {
   color: var(--muted);
 }
+
 .chip {
   display: inline-flex;
   align-items: center;
@@ -522,18 +614,22 @@ body.ruteo-sv.con-panorama:not(.ver-mapa) #panel {
   font-size: 13px;
   user-select: none;
 }
+
 .chip input {
   display: none;
 }
+
 .chip.on {
   background: var(--pri-soft);
   border-color: var(--pri);
 }
+
 .chips {
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
 }
+
 .progress {
   height: 5px;
   background: var(--line);
@@ -541,12 +637,14 @@ body.ruteo-sv.con-panorama:not(.ver-mapa) #panel {
   overflow: hidden;
   margin-bottom: 10px;
 }
-.progress > i {
+
+.progress>i {
   display: block;
   height: 100%;
   background: var(--pri);
   transition: width 0.3s;
 }
+
 .dot {
   display: inline-block;
   width: 10px;
@@ -555,6 +653,7 @@ body.ruteo-sv.con-panorama:not(.ver-mapa) #panel {
   vertical-align: middle;
   margin-right: 4px;
 }
+
 .lpill {
   display: inline-block;
   color: #fff;
@@ -575,14 +674,17 @@ body.ruteo-sv.con-panorama:not(.ver-mapa) #panel {
   padding: 16px;
   padding-bottom: calc(24px + env(safe-area-inset-bottom));
 }
+
 .screen.hidden {
   display: none;
 }
+
 .wrap {
   position: relative;
   max-width: 980px;
   margin: 0 auto;
 }
+
 /* Foto de Santiago al fondo del menú: se desvanece hacia el gris de la página y se va con el desplazamiento. */
 .home-backdrop {
   position: absolute;
@@ -597,21 +699,26 @@ body.ruteo-sv.con-panorama:not(.ver-mapa) #panel {
   -webkit-mask-image: linear-gradient(to bottom, #000 70%, transparent 100%);
   mask-image: linear-gradient(to bottom, #000 70%, transparent 100%);
 }
+
 .hero {
   margin: 4px 0 14px;
 }
+
 .hero.inicio {
   max-width: 760px;
   margin-inline: auto;
 }
+
 .hero h2 {
   margin: 0 0 4px;
   font-size: 22px;
 }
+
 .hero p {
   margin: 0;
   color: var(--muted);
 }
+
 /* Las tarjetas van una sobre otra, cada una en su propia línea */
 .grid {
   display: grid;
@@ -620,6 +727,7 @@ body.ruteo-sv.con-panorama:not(.ver-mapa) #panel {
   max-width: 760px;
   margin-inline: auto;
 }
+
 .card {
   background: var(--card);
   border-radius: 14px;
@@ -627,6 +735,7 @@ body.ruteo-sv.con-panorama:not(.ver-mapa) #panel {
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
   border: 1px solid var(--line);
 }
+
 .card h3 {
   margin: 0 0 2px;
   font-size: 16px;
@@ -634,19 +743,23 @@ body.ruteo-sv.con-panorama:not(.ver-mapa) #panel {
   align-items: center;
   gap: 8px;
 }
+
 .card .em {
   font-size: 20px;
 }
+
 .card p {
   margin: 0 0 10px;
   color: var(--muted);
   font-size: 13.5px;
 }
+
 .modes {
   display: flex;
   flex-direction: column;
   gap: 6px;
 }
+
 .mode {
   display: flex;
   justify-content: space-between;
@@ -660,17 +773,21 @@ body.ruteo-sv.con-panorama:not(.ver-mapa) #panel {
   text-align: left;
   width: 100%;
 }
+
 .mode:hover {
   border-color: var(--pri);
 }
+
 .mode small {
   color: var(--muted);
 }
+
 .mastery {
   font-size: 12px;
   color: var(--muted);
   white-space: nowrap;
 }
+
 select,
 input[type='text'],
 input[type='search'] {
@@ -682,31 +799,37 @@ input[type='search'] {
   color: var(--ink);
   width: 100%;
 }
+
 table.stats {
   width: 100%;
   border-collapse: collapse;
   font-size: 14px;
 }
+
 table.stats td,
 table.stats th {
   padding: 6px 4px;
   border-bottom: 1px solid var(--line);
   text-align: left;
 }
+
 table.stats th {
   color: var(--muted);
   font-weight: 600;
   font-size: 12.5px;
 }
+
 .foot {
   margin-top: 18px;
   color: var(--muted);
   font-size: 12px;
 }
+
 .foot a {
   color: var(--muted);
 }
-.foot + .foot {
+
+.foot+.foot {
   margin-top: 6px;
 }
 
@@ -725,18 +848,23 @@ table.stats th {
   padding: 0;
   white-space: nowrap;
 }
+
 .lbl:before {
   display: none;
 }
+
 .lbl.big {
   font-size: 13px;
 }
+
 .lbl.ok {
   color: #14532d;
 }
+
 .lbl.bad {
   color: #7f1d1d;
 }
+
 .pin {
   width: 18px;
   height: 18px;
@@ -744,15 +872,19 @@ table.stats th {
   border: 3px solid #fff;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
 }
+
 .pin.you {
   background: #2563eb;
 }
+
 .pin.ans {
   background: var(--bad);
 }
+
 .pin.good {
   background: var(--ok);
 }
+
 .pin.a,
 .pin.b {
   width: 28px;
@@ -763,15 +895,19 @@ table.stats th {
   font-weight: 800;
   font-size: 14px;
 }
+
 .pin.a {
   background: #2563eb;
 }
+
 .pin.b {
   background: #db2777;
 }
+
 .pin.salida {
   background: #7c3aed;
 }
+
 .pulse {
   width: 22px;
   height: 22px;
@@ -781,31 +917,39 @@ table.stats th {
   box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.7);
   animation: pulse 1.4s infinite;
 }
+
 @keyframes pulse {
   0% {
     box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.7);
   }
+
   70% {
     box-shadow: 0 0 0 16px rgba(245, 158, 11, 0);
   }
+
   100% {
     box-shadow: 0 0 0 0 rgba(245, 158, 11, 0);
   }
 }
+
 .leaflet-popup-content {
   font-size: 14px;
   margin: 10px 12px;
 }
+
 .leaflet-popup-content h4 {
   margin: 0 0 4px;
   font-size: 15px;
 }
+
 .leaflet-popup-content p {
   margin: 3px 0;
 }
+
 .leaflet-container {
   font: inherit;
 }
+
 .maptoggle {
   background: #fff;
   border-radius: 8px;
@@ -815,6 +959,7 @@ table.stats th {
   cursor: pointer;
   border: 0;
 }
+
 .toast {
   position: absolute;
   left: 50%;
@@ -830,6 +975,7 @@ table.stats th {
   transition: opacity 0.2s;
   pointer-events: none;
 }
+
 .toast.show {
   opacity: 0.92;
 }
@@ -839,6 +985,7 @@ table.stats th {
   position: relative;
   margin: 8px 0 4px;
 }
+
 .ph img {
   display: block;
   width: 100%;
@@ -848,14 +995,17 @@ table.stats th {
   background: #dfe6e4;
   cursor: zoom-in;
 }
+
 .ph.big img {
   max-height: 34vh;
 }
+
 @media (max-width: 760px) {
   .ph.big img {
     max-height: 24vh;
   }
 }
+
 .phnav {
   position: absolute;
   top: calc(13vh - 16px);
@@ -869,15 +1019,19 @@ table.stats th {
   line-height: 1;
   cursor: pointer;
 }
+
 .ph.big .phnav {
   top: calc(17vh - 16px);
 }
+
 .phnav.prev {
   left: 6px;
 }
+
 .phnav.next {
   right: 6px;
 }
+
 .phcount {
   position: absolute;
   top: 6px;
@@ -888,21 +1042,26 @@ table.stats th {
   padding: 1px 7px;
   border-radius: 999px;
 }
+
 .cred {
   font-size: 11px;
   color: var(--muted);
   margin-top: 3px;
   line-height: 1.3;
 }
+
 .cred a {
   color: var(--muted);
 }
+
 .leaflet-popup-content .ph img {
   max-height: 150px;
 }
+
 .leaflet-popup-content .phnav {
   top: 59px;
 }
+
 .lightbox {
   position: fixed;
   inset: 0;
@@ -913,16 +1072,19 @@ table.stats th {
   cursor: zoom-out;
   padding: 12px;
 }
+
 .lightbox img {
   max-width: 100%;
   max-height: 100%;
   border-radius: 6px;
 }
+
 .opt.miss {
   border-style: dashed;
   border-color: var(--ok);
   background: #f0fdf4;
 }
+
 .tri {
   width: 0;
   height: 0;
@@ -931,13 +1093,16 @@ table.stats th {
   border-bottom: 15px solid #7c5c3b;
   filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.5));
 }
+
 .tri.hi {
   border-bottom-color: #f59e0b;
   transform: scale(1.5);
 }
+
 .tri.ok {
   border-bottom-color: var(--ok);
 }
+
 .tri.bad {
   border-bottom-color: var(--bad);
 }
@@ -947,6 +1112,7 @@ table.stats th {
   padding-left: 18px;
   font-size: 13.5px;
 }
+
 .blist li {
   margin: 2px 0;
 }
@@ -957,6 +1123,7 @@ table.stats th {
   gap: 4px;
   margin: 2px 0;
 }
+
 .tstep {
   font-size: 12px;
   border-radius: 999px;
@@ -964,10 +1131,12 @@ table.stats th {
   background: var(--ok-soft);
   border: 1px solid var(--ok);
 }
+
 .tstep.bad {
   background: #fef3c7;
   border-color: var(--warn);
 }
+
 .tstep .lpill {
   font-size: 11px;
   padding: 0 6px;
@@ -995,17 +1164,21 @@ table.stats th {
 .tight {
   margin: 2px 0;
 }
+
 h3.tight {
   margin: 0 0 4px;
 }
+
 .result-score {
   font-size: 28px;
   margin: 4px 0;
   font-weight: 700;
 }
+
 .result-score .muted {
   font-size: 16px;
 }
+
 .outcome {
   margin: 8px 0;
   padding: 10px 12px;
@@ -1013,6 +1186,7 @@ h3.tight {
   background: var(--pri-soft);
   font-size: 14px;
 }
+
 .btn.wide {
   width: 100%;
 }
@@ -1022,17 +1196,21 @@ h3.tight {
   display: flex;
   gap: 6px;
 }
+
 .mode-row .mode {
   flex: 1;
   min-width: 0;
 }
+
 .mode.ranked {
   border-color: #f2d58a;
   background: #fffbeb;
 }
+
 .mode.ranked:hover {
   border-color: var(--warn);
 }
+
 .practice {
   flex: 0 0 auto;
   width: 56px;
@@ -1043,6 +1221,7 @@ h3.tight {
   font-size: 22px;
   color: var(--muted);
 }
+
 .practice:hover {
   border-color: var(--pri);
   color: var(--ink);
@@ -1064,12 +1243,15 @@ h3.tight {
   cursor: pointer;
   color: inherit;
 }
+
 .accountbtn:hover {
   background: rgba(255, 255, 255, 0.28);
 }
+
 #app:has(#screen.hidden) .accountbtn {
   display: none;
 }
+
 dialog {
   border: 0;
   border-radius: 14px;
@@ -1079,23 +1261,28 @@ dialog {
   color: var(--ink);
   font: inherit;
 }
+
 dialog::backdrop {
   background: rgba(15, 23, 42, 0.45);
 }
+
 dialog h3 {
   margin: 0 0 8px;
   font-size: 18px;
   padding-right: 28px;
 }
+
 dialog p {
   margin: 6px 0;
 }
+
 dialog form {
   display: flex;
   flex-direction: column;
   gap: 10px;
   margin: 10px 0;
 }
+
 dialog label {
   display: flex;
   flex-direction: column;
@@ -1103,6 +1290,7 @@ dialog label {
   font-size: 13px;
   color: var(--muted);
 }
+
 dialog input {
   font: inherit;
   padding: 10px;
@@ -1110,20 +1298,24 @@ dialog input {
   border-radius: 10px;
   color: var(--ink);
 }
+
 dialog input:focus {
   outline: 2px solid var(--pri);
   outline-offset: 1px;
 }
+
 dialog .hint {
   font-size: 12.5px;
   margin: 0;
 }
+
 dialog .error {
   color: var(--bad);
   font-size: 13.5px;
   margin: 0;
   min-height: 1em;
 }
+
 .dialog-close {
   position: absolute;
   top: 10px;
@@ -1135,21 +1327,25 @@ dialog .error {
   color: var(--muted);
   padding: 6px;
 }
+
 .boton-de-google {
   display: flex;
   justify-content: center;
   min-height: 44px;
   margin-top: 4px;
 }
+
 #share {
   display: inline-flex;
   align-items: center;
   gap: 8px;
 }
+
 .o-bien {
   text-align: center;
   margin: 2px 0 6px;
 }
+
 .linklike {
   border: 0;
   background: none;
@@ -1164,40 +1360,49 @@ dialog .error {
 .wrap.narrow {
   max-width: 720px;
 }
+
 /* En escritorio el ranking usa más ancho: los nombres de usuario y los tiempos quedaban apretados. */
 @media (min-width: 761px) {
   .wrap.narrow {
     max-width: 1100px;
   }
+
   table.board td {
     padding-right: 18px;
   }
 }
+
 .wrap.narrow select {
   flex: 1;
   min-width: 200px;
   width: auto;
 }
+
 button.chip {
   font: inherit;
   font-size: 13px;
 }
+
 table.board td:first-child {
   width: 34px;
   color: var(--muted);
 }
+
 /* En el resumen de líderes la primera columna es el nombre del juego, no un puesto */
 table.board.clickable td:first-child {
   width: 24%;
   color: inherit;
 }
+
 table.board tr.me td {
   background: var(--pri-soft);
   font-weight: 650;
 }
+
 table.board.clickable tr[data-open] {
   cursor: pointer;
 }
+
 table.board.clickable tr[data-open]:hover td {
   background: var(--bg);
 }
@@ -1214,14 +1419,17 @@ table.board.clickable tr[data-open]:hover td {
   background: rgba(15, 23, 42, 0.28);
   pointer-events: none;
 }
+
 #countdown[hidden] {
   display: none;
 }
+
 .countdown-label {
   margin: 0;
   font-size: 16px;
   text-shadow: 0 1px 6px rgba(0, 0, 0, 0.75);
 }
+
 .countdown-number {
   margin: 6px 0;
   font-size: min(38vw, 180px);
@@ -1230,6 +1438,7 @@ table.board.clickable tr[data-open]:hover td {
   text-shadow: 0 2px 14px rgba(0, 0, 0, 0.7);
   animation: count-pop 1s ease-out;
 }
+
 .countdown-hint {
   margin: 0;
   padding: 0 16px;
@@ -1237,14 +1446,17 @@ table.board.clickable tr[data-open]:hover td {
   font-weight: 650;
   text-shadow: 0 1px 6px rgba(0, 0, 0, 0.8);
 }
+
 @keyframes count-pop {
   0% {
     transform: scale(1.6);
     opacity: 0;
   }
+
   30% {
     opacity: 1;
   }
+
   100% {
     transform: scale(0.9);
     opacity: 0.85;
@@ -1258,6 +1470,7 @@ table.board.clickable tr[data-open]:hover td {
   flex-wrap: wrap;
   border-bottom: 1.5px solid var(--line);
 }
+
 .tab {
   font: inherit;
   font-size: 14px;
@@ -1269,9 +1482,11 @@ table.board.clickable tr[data-open]:hover td {
   color: var(--muted);
   cursor: pointer;
 }
+
 .tab small {
   opacity: 0.7;
 }
+
 .tab.on {
   color: var(--pri);
   border-bottom-color: var(--pri);
@@ -1292,6 +1507,7 @@ table.board.clickable tr[data-open]:hover td {
   font-size: 13px;
   color: var(--muted);
 }
+
 .length-row select {
   width: auto;
   padding: 5px 8px;
@@ -1303,23 +1519,28 @@ table.board.clickable tr[data-open]:hover td {
   border-top: 1px solid var(--line);
   margin: 14px 0 10px;
 }
+
 .subseccion {
   margin: 0 0 8px;
   font-size: 15px;
 }
+
 /* Lo configurable de cada tarjeta va al final, bajo una raya */
 .ajustes-de-tarjeta {
   display: flex;
   flex-direction: column;
   gap: 10px;
 }
+
 .ajustes-de-tarjeta .length-row {
   margin: 0;
 }
+
 .ajustes-de-tarjeta .nota {
   font-size: 12px;
   margin: 0;
 }
+
 /* Ruteo: el punto fijo del jugador y la búsqueda para elegirlo */
 .punto-propio {
   display: flex;
@@ -1327,19 +1548,23 @@ table.board.clickable tr[data-open]:hover td {
   align-items: center;
   gap: 8px;
 }
+
 .punto-propio select {
   width: auto;
   padding: 5px 8px;
 }
+
 #buscarPunto input {
   flex: 1;
   min-width: 0;
 }
+
 #resultadosDelPunto {
   display: flex;
   flex-direction: column;
   gap: 6px;
 }
+
 #resultadosDelPunto:empty {
   display: none;
 }
@@ -1349,20 +1574,154 @@ table.board.clickable tr[data-open]:hover td {
   margin: 18px auto 10px;
   text-align: center;
 }
+
 .anuncio-etiqueta {
   display: block;
   margin-bottom: 2px;
   font-size: 11px;
   color: var(--muted);
 }
+
 .anuncio-horizontal {
   width: 320px;
   height: 50px;
 }
+
 @media (min-width: 761px) {
+
   .anuncio-menu .anuncio-horizontal,
   .anuncio-paginas .anuncio-horizontal {
     width: 728px;
     height: 90px;
   }
+}
+
+/* Conducir libre */
+.cd-donde {
+  margin: 4px 0 2px;
+}
+
+.cd-insignia {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 2px solid #fff;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 18px;
+  text-align: center;
+  box-shadow: var(--shadow);
+}
+
+/* En el celular las opciones van sobre el panorama y el botón alterna con el mapa. */
+body.conduciendo.con-panorama:not(.ver-mapa) #panel {
+  display: block;
+}
+
+body.conduciendo #alternarVista {
+  display: inline-block;
+}
+
+body.conduciendo .q-sub {
+  margin: 10px 0 8px;
+}
+
+.cd-puntaje {
+  font-size: 44px;
+  font-weight: 800;
+  line-height: 1.1;
+  margin: 6px 0;
+}
+
+.cd-puntaje small {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.cd-tabla {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 6px 0;
+  font-size: 14px;
+}
+
+.cd-tabla th,
+.cd-tabla td {
+  text-align: right;
+  padding: 3px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.cd-tabla th:first-child,
+.cd-tabla td:first-child {
+  text-align: left;
+}
+
+.cd-errores {
+  margin: 6px 0 0 18px;
+  padding: 0;
+  font-size: 13px;
+}
+
+.cd-errores li {
+  margin-bottom: 6px;
+}
+
+/* Ronda real del ruteo en auto: el mapa no se ve, solo Street View y las opciones (el panel flota sobre el panorama). */
+body.ruteo-ciego #map {
+  visibility: hidden;
+}
+
+body.ruteo-ciego #panorama {
+  right: 0;
+  width: auto;
+}
+
+body.ruteo-ciego #alternarVista {
+  display: none;
+}
+
+body.ruteo-ciego.con-panorama:not(.ver-mapa) #panel {
+  display: block;
+}
+
+.cd-detalle {
+  margin: 6px 0 8px;
+  font-size: 14px;
+}
+
+.cd-detalle summary {
+  cursor: pointer;
+  font-weight: 600;
+}
+
+/* Desafíos diarios: botones morados con borde y letra blanca (no tienen práctica). */
+.mode.diario {
+  background: #97ceff;
+  border: 1px solid #65b3f7;
+  color: #fff;
+}
+
+.mode.diario:hover {
+  background: #5d92cb;
+  border-color: #0f5d79;
+}
+
+.mode.diario .estado-diario {
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+/* Mientras se aprieta un botón se hunde un poco y se oscurece, para que se note el clic (no solo el hover). */
+:where(button:not(:disabled)) {
+  transition:
+    transform 0.06s ease,
+    filter 0.06s ease;
+}
+
+:where(button:not(:disabled):active) {
+  transform: scale(0.97);
+  filter: brightness(0.9);
 }
