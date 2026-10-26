@@ -1,6 +1,7 @@
 // Revisa las rutas de prueba de la conducción libre: dónde se parte y se llega, la ruta óptima (km y minutos) y cuántas decisiones
 // tiene, y comprueba que seguir el óptimo termina con 100 puntos.
-//   node tools/grafo/misiones.mjs
+//   node tools/grafo/misiones.mjs            (con las decisiones simplificadas, como en el juego)
+//   node tools/grafo/misiones.mjs --completo (con todas las opciones)
 import { existsSync, readFileSync } from 'node:fs'
 import vm from 'node:vm'
 import { cargarGrafo } from '../../compartido/grafoVial.js'
@@ -21,7 +22,9 @@ for (const { id, origen, destino } of MISIONES_DE_CONDUCCION) {
   const a = lugares.get(origen)
   const b = lugares.get(destino)
   console.log(`\n${id}: ${nombreCortoDelLugar(a.name)} → ${nombreCortoDelLugar(b.name)}`)
-  const { mision, estado, optima } = prepararRuta(grafo, a, b, huellas)
+  const { mision, estado, optima } = prepararRuta(grafo, a, b, huellas, {
+    simplificar: !process.argv.includes('--completo'),
+  })
   console.log(
     `  llegada por: ${[...new Set([...mision.destinos].map(arista => nombreDeCalle(grafo, arista)))].join(', ')} (${accesosDelLugar(grafo, b, huellas[b.id]).size} tramos, ${huellas[b.id] ? 'con huella' : 'sin huella'}); salidas: ${estado.opcionesDePartida.length}`,
   )

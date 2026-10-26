@@ -28,7 +28,9 @@ import { mostrarResultadoOficial } from '../interfaz/resultadoOficial.js'
 import { ocultarPantalla, indicador, panel, mostrarPanel, aviso } from '../interfaz/panel.js'
 import { htmlDeAnuncio } from '../interfaz/anuncios.js'
 import { htmlDelBotonCompartir, conectarBotonCompartir } from '../interfaz/compartir.js'
-import { anotarResultado, yaSeEmpezo } from './diarios.js'
+import { enviarRondaOficial } from '../cuenta/puntajes.js'
+import { modoPorId } from './registry.js'
+import { anotarAvance, anotarResultado, desafiosSinTerminar, yaSeEmpezo } from './diarios.js'
 
 /* Un modo define: id, group, name, desc (opcional: se muestra bajo el nombre en el menú), pool(), key(item) y ask(item, quiz).
    Opcionales: label(item), balance(item), setup(quiz), limpiar() (al salir), disponible() (si no, no aparece en el menú), all, keepLayer, noHint, aids, relief, chile, roomy, tall, study.
@@ -43,6 +45,29 @@ const llaveDeEstadistica = (modo, elemento) => modo.id + ':' + modo.key(elemento
 
 // Lo máximo que se puede sumar en una ronda de tantas preguntas.
 const maximoDe = (modo, preguntas) => preguntas * (modo.puntosPorPregunta ?? 1)
+
+const MS_MINIMOS_POR_PREGUNTA = 250
+
+// Un desafío diario que se dejó a medias se cierra con lo que se alcanzó a sumar (el resto cuenta 0) y también va al ranking.
+function cerrarDesafioAbandonado(modo, fecha, { aciertos, ms }) {
+  const preguntas = modo.pool().length
+  if (!preguntas) return
+  const resultado = {
+    aciertos,
+    total: maximoDe(modo, preguntas),
+    ms: Math.max(Math.round(ms), preguntas * MS_MINIMOS_POR_PREGUNTA),
+  }
+  anotarResultado(modo.id, { ...resultado, abandonado: true }, fecha)
+  enviarRondaOficial({ modo: modo.id, categoria: fecha, ...resultado })
+}
+
+// Lo que quedó a medias en visitas anteriores (se cerró la pestaña): se cierra al abrir el menú.
+export function cerrarDesafiosSinTerminar() {
+  for (const { fecha, idDeModo, avance } of desafiosSinTerminar()) {
+    const modo = modoPorId(idDeModo)
+    if (modo && partida?.mode !== modo) cerrarDesafioAbandonado(modo, fecha, avance)
+  }
+}
 
 export const tieneRondaOficial = modo => MODOS_OFICIALES.includes(modo.id)
 
@@ -271,6 +296,7 @@ export function responder(ok, htmlDelComentario, { points: puntos = null, partia
   if (!contadas) q.misses.push(q.mode.label ? q.mode.label(elemento) : q.mode.key(elemento))
   if (puntos != null && !sumaPuntos) q.pts += puntos
   actualizarIndicador()
+  if (q.mode.diario) anotarAvance(q.mode.id, { aciertos: q.ok, ms: q.ms })
 
   const esUltima = q.i + 1 >= q.items.length
   const comentario = document.createElement('div')
@@ -386,9 +412,29 @@ botonReiniciar.onclick = async () => {
     iniciarPartida(actual.mode, { ranked: true, category: actual.category })
 }
 
-// Salir a media ronda pierde el avance (y, en una oficial, el puntaje): se pide confirmación.
-resguardarSalida(() =>
-  partida && !partida.starting
+async function confirmarAbandonoDelDesafio() {
+  const actual = partida
+  const sumado = actual.ok
+  const confirmado = await confirmarAccion({
+    title: '¿Abandonar el desafío?',
+    message: `Si sales ahora, el desafío de hoy se cierra con lo que llevas (${sumado} de ${maximoDe(actual.mode, actual.items.length)}) y no podrás volver a jugarlo hasta mañana.`,
+    confirmLabel: 'Abandonar',
+    cancelLabel: 'Seguir jugando',
+  })
+  if (confirmado && partida === actual) {
+    const enCurso = actual.t0 && !actual.answered ? Date.now() - actual.t0 : 0
+    cerrarDesafioAbandonado(actual.mode, actual.category, {
+      aciertos: actual.ok,
+      ms: actual.ms + enCurso,
+    })
+  }
+  return confirmado
+}
+
+// Salir a media ronda pierde el avance (y, en una oficial, el puntaje): se pide confirmación. En un desafío diario, salir lo cierra.
+resguardarSalida(() => {
+  if (partida?.mode.diario) return confirmarAbandonoDelDesafio()
+  return partida && !partida.starting
     ? confirmarAccion({
         title: '¿Salir de la ronda?',
         message: partida.ranked
@@ -397,8 +443,8 @@ resguardarSalida(() =>
         confirmLabel: 'Salir',
         cancelLabel: 'Seguir jugando',
       })
-    : true,
-)
+    : true
+})
 
 window.addEventListener('beforeunload', evento => {
   if (partida && !partida.starting) evento.preventDefault()

@@ -336,11 +336,11 @@ body.ruteo-sv.con-panorama:not(.ver-mapa) #panel {
     padding: 10px 12px;
   }
 
-  body.recorriendo #panel> :not(.fb) {
+  body.recorriendo #panel > :not(.fb) {
     display: none;
   }
 
-  body.recorriendo #panel .fb> :not(h4):not(.recorrido-titulo):not(.next) {
+  body.recorriendo #panel .fb > :not(h4):not(.recorrido-titulo):not(.next) {
     display: none;
   }
 
@@ -638,7 +638,7 @@ body.ruteo-sv.con-panorama:not(.ver-mapa) #panel {
   margin-bottom: 10px;
 }
 
-.progress>i {
+.progress > i {
   display: block;
   height: 100%;
   background: var(--pri);
@@ -829,7 +829,7 @@ table.stats th {
   color: var(--muted);
 }
 
-.foot+.foot {
+.foot + .foot {
   margin-top: 6px;
 }
 
@@ -1588,7 +1588,6 @@ table.board.clickable tr[data-open]:hover td {
 }
 
 @media (min-width: 761px) {
-
   .anuncio-menu .anuncio-horizontal,
   .anuncio-paginas .anuncio-horizontal {
     width: 728px;
@@ -1669,18 +1668,135 @@ body.conduciendo .q-sub {
   margin-bottom: 6px;
 }
 
-/* Ronda real del ruteo en auto: el mapa no se ve, solo Street View y las opciones (el panel flota sobre el panorama). */
-body.ruteo-ciego #map {
+/* Escritorio: el botón alterna entre los dos a la vez (lo normal), solo el panorama y solo el mapa. */
+@media (min-width: 761px) {
+  body.conduciendo.solo-panorama #panorama {
+    right: 0;
+    width: auto;
+  }
+
+  body.conduciendo.solo-panorama #botonesDePanorama,
+  body.conduciendo.ver-mapa #botonesDePanorama {
+    right: 12px;
+  }
+
+  body.conduciendo.ver-mapa #panorama {
+    visibility: hidden;
+    pointer-events: none;
+  }
+
+  /* los controles del mapa quedan a la derecha del panel, que flota a la izquierda */
+  body.conduciendo.ver-mapa .leaflet-top.leaflet-left {
+    left: min(324px, 44vw);
+  }
+}
+
+/* Veredicto de cada decisión al practicar: un aviso que aparece sobre el panorama y se va solo. */
+.veredicto {
+  position: fixed;
+  z-index: 1200;
+  top: calc(var(--top-h) + 64px + env(safe-area-inset-top));
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 8px 22px;
+  border-radius: 999px;
+  color: #fff;
+  font-size: 26px;
+  font-weight: 800;
+  text-align: center;
+  box-shadow: var(--shadow);
+  pointer-events: none;
+  animation: veredicto-aparece 0.25s ease-out;
+}
+
+.veredicto small {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.veredicto.bien {
+  background: #16a34a;
+}
+
+.veredicto.regular {
+  background: #d97706;
+}
+
+.veredicto.mal {
+  background: #dc2626;
+}
+
+@keyframes veredicto-aparece {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) scale(0.7);
+  }
+}
+
+.cd-plegar {
+  display: none;
+}
+
+/* En el celular el panel tapaba media pantalla: más bajo, medio transparente y con una manilla para esconder las opciones. */
+@media (max-width: 760px) {
+  body.conduciendo #panel {
+    max-height: 42%;
+    padding: 4px 12px calc(8px + env(safe-area-inset-bottom));
+    background: rgba(255, 255, 255, 0.88);
+    backdrop-filter: blur(6px);
+  }
+
+  body.conduciendo .opt {
+    padding: 6px 10px;
+    font-size: 14px;
+    margin-bottom: 4px;
+  }
+
+  body.conduciendo .nota {
+    margin: 2px 0;
+  }
+
+  body.conduciendo .q-sub {
+    margin: 6px 0 4px;
+  }
+
+  .cd-plegar {
+    display: block;
+    width: 100%;
+    height: 22px;
+    border: 0;
+    background: none;
+    position: relative;
+    cursor: pointer;
+  }
+
+  .cd-plegar::before {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 8px;
+    width: 44px;
+    height: 5px;
+    margin-left: -22px;
+    border-radius: 3px;
+    background: #9ca3af;
+  }
+
+  body.cd-plegado #panel > :not(.cd-plegar):not(.cd-donde) {
+    display: none;
+  }
+}
+
+/* Ronda real del ruteo en auto: se ve Street View con las opciones encima (el panel flota sobre el panorama); el mapa se puede abrir
+   cuando se quiera, pero sin el auto ni lo recorrido: no dice dónde se está. */
+body.ruteo-ciego:not(.ver-mapa) #map {
   visibility: hidden;
 }
 
 body.ruteo-ciego #panorama {
   right: 0;
   width: auto;
-}
-
-body.ruteo-ciego #alternarVista {
-  display: none;
 }
 
 body.ruteo-ciego.con-panorama:not(.ver-mapa) #panel {

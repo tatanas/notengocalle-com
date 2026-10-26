@@ -219,8 +219,33 @@ function crearPanorama(StreetViewPanorama) {
 
 const botonAlternar = () => document.getElementById('alternarVista')
 
+const esEscritorio = () => window.matchMedia('(min-width: 761px)').matches
+
+// En escritorio el botón recorre tres vistas: los dos a la vez, solo el panorama y solo el mapa. Se recuerda entre decisiones.
+const VISTAS_DE_ESCRITORIO = [
+  { clase: null, etiquetaDelBoton: '⛶ Solo panorama' },
+  { clase: 'solo-panorama', etiquetaDelBoton: '🗺️ Solo mapa' },
+  { clase: 'ver-mapa', etiquetaDelBoton: '◫ Ver ambos' },
+]
+let vistaDeEscritorio = 0
+
+function aplicarVistaDeEscritorio() {
+  const { clase, etiquetaDelBoton } = VISTAS_DE_ESCRITORIO[vistaDeEscritorio]
+  document.body.classList.remove('solo-panorama', 'ver-mapa')
+  if (clase) document.body.classList.add(clase)
+  botonAlternar().textContent = etiquetaDelBoton
+  if (clase === 'solo-panorama') return
+  repararMapaBase()
+  mapa.invalidateSize()
+  if (alVerElMapa) alVerElMapa()
+}
+
 // En el celular se ve el panorama o el mapa, uno a la vez.
 function alternarEntrePanoramaYMapa() {
+  if (esEscritorio() && !document.body.classList.contains('ruteo-ciego')) {
+    vistaDeEscritorio = (vistaDeEscritorio + 1) % VISTAS_DE_ESCRITORIO.length
+    return aplicarVistaDeEscritorio()
+  }
   const verMapa = document.body.classList.toggle('ver-mapa')
   botonAlternar().textContent = verMapa ? '👁 Ver panorama' : '🗺️ Abrir mapa'
   if (!verMapa) return
@@ -331,7 +356,7 @@ export function ocultarPanorama() {
   if (contenedor) contenedor.hidden = true
   if (botones) botones.hidden = true
   inicioDeLaPregunta = null
-  document.body.classList.remove('con-panorama', 'ver-mapa', 'recorriendo')
+  document.body.classList.remove('con-panorama', 'ver-mapa', 'solo-panorama', 'recorriendo')
   alReportar = () => {}
   alVerElMapa = null
   alGirarLaVista = null
@@ -404,9 +429,10 @@ export async function mostrarPanoramaDeConduccion(
   inicioDeLaPregunta = null
   mapaEncuadrado = true
   alVerElMapa = encuadrarAlVerElMapa ?? null
-  document.body.classList.remove('ver-mapa', 'recorriendo')
+  document.body.classList.remove('ver-mapa', 'solo-panorama', 'recorriendo')
   document.body.classList.add('con-panorama')
-  botonAlternar().textContent = '🗺️ Abrir mapa'
+  if (esEscritorio() && !document.body.classList.contains('ruteo-ciego')) aplicarVistaDeEscritorio()
+  else botonAlternar().textContent = '🗺️ Abrir mapa'
   contenedor.hidden = false
   botones.hidden = false
   for (const id of ['reportarTunel', 'volverAlInicio', 'cerrarRecorrido'])

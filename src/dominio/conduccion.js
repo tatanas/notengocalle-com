@@ -10,6 +10,7 @@ import {
 import { aristasCercaDe } from './indiceDeAristas.js'
 import { cruceDespuesDe, nombreDeCalle, TIPO } from './cruces.js'
 import { registrarDecision } from './mision.js'
+import { filtroDeOpcionesClaramentePeores } from './simplificarDecision.js'
 import {
   largoDelTrazado,
   proyectarEnElTrazado,
@@ -77,7 +78,12 @@ function partidasEnUnaCalle(grafo, { arista, fraccion, punto }) {
 
 // `mision` (src/dominio/mision.js) es opcional: con ella el juego termina al llegar y se anota lo que se pierde en cada decisión.
 // Con `salidas` ([{ arista, fraccion, punto }], ver lugaresDeRuteo.js) se parte de un lugar con varias salidas y se elige por cuál.
-export function empezarEn(grafo, punto, { radioMaximoM, mision = null, salidas = null } = {}) {
+// Con `simplificar` (y misión) se omiten las opciones claramente peores y más locales (src/dominio/simplificarDecision.js).
+export function empezarEn(
+  grafo,
+  punto,
+  { radioMaximoM, mision = null, salidas = null, simplificar = false } = {},
+) {
   const cercana = salidas?.length ? null : aristaMasCercana(grafo, punto, radioMaximoM)
   if (!salidas?.length && !cercana) return null
   const partidas = salidas?.length ? salidas : partidasEnUnaCalle(grafo, cercana)
@@ -94,9 +100,12 @@ export function empezarEn(grafo, punto, { radioMaximoM, mision = null, salidas =
     entrada: null,
     avisos: [],
     mision,
+    simplificar: simplificar && !!mision,
     historial: [],
     llego: false,
     metrosDePartida: 0,
+    decisionesPorDeshacer: [],
+    deshechas: 0,
   }
   estado.opcionesDePartida = estado.decision.opciones
   if (estado.decision.opciones.length === 1) elegirOpcion(estado, 0)
@@ -144,10 +153,13 @@ function avanzarHastaLaProximaDecision(estado) {
   const { grafo } = estado
   for (let tramos = 0; tramos < MAXIMO_DE_TRAMOS_SIN_DECISION; tramos++) {
     if (estado.llego) break
-    const cruce = cruceDespuesDe(grafo, estado.entrada)
+    const filtrar = estado.simplificar
+      ? filtroDeOpcionesClaramentePeores(grafo, estado.mision, estado.entrada)
+      : null
+    const cruce = cruceDespuesDe(grafo, estado.entrada, { filtrar })
     const [unica] = cruce.opciones
     if (cruce.opciones.length >= 2 || (unica && esManiobraObligada(grafo, estado.entrada, unica))) {
-      estado.decision = { ...cruce, esObligada: cruce.opciones.length === 1 }
+      estado.decision = { ...cruce, esObligada: cruce.opciones.length === 1 && !cruce.omitidas }
       return
     }
     if (!unica) break
@@ -156,9 +168,51 @@ function avanzarHastaLaProximaDecision(estado) {
   estado.decision = null
 }
 
-export function elegirOpcion(estado, idDeLaOpcion) {
+function fotoParaDeshacer(estado) {
+  return {
+    decision: estado.decision,
+    entrada: estado.entrada,
+    avisos: estado.avisos,
+    recorrido: [...estado.recorrido],
+    historial: [...estado.historial],
+    puntosRecorridos: estado.puntosRecorridos,
+    trazadoActual: estado.trazadoActual,
+    metros: estado.metros,
+    metrosDePartida: estado.metrosDePartida,
+    segundos: estado.segundos,
+  }
+}
+
+// En una ruta del juego se puede deshacer unas pocas veces; al conducir libremente, las que se quiera.
+export const DESHACER_POR_RUTA = 3
+export const deshacerQueQuedan = estado => (estado.mision ? DESHACER_POR_RUTA - estado.deshechas : Infinity)
+export const sePuedeDeshacer = estado =>
+  estado.decisionesPorDeshacer.length > 0 && deshacerQueQuedan(estado) > 0
+
+// Vuelve a la decisión anterior, con lo recorrido y el reloj de entonces.
+export function deshacerUltimaDecision(estado) {
+  const anterior = estado.decisionesPorDeshacer.pop()
+  Object.assign(estado, anterior, { llego: false, deshechas: estado.deshechas + 1 })
+}
+
+// Cuánto se tarda yendo por `opcion` hasta la próxima decisión (o hasta llegar), sin mover el estado.
+export function segundosHastaLaProximaDecision(estado, opcion) {
+  const copia = {
+    ...estado,
+    recorrido: [...estado.recorrido],
+    decisionesPorDeshacer: [],
+    historial: [],
+    avisos: [],
+  }
+  elegirOpcion(copia, opcion.id, { registrar: false })
+  return copia.segundos - estado.segundos
+}
+
+export function elegirOpcion(estado, idDeLaOpcion, { registrar = true } = {}) {
   const opcion = estado.decision.opciones.find(candidata => candidata.id === idDeLaOpcion)
-  if (estado.mision) registrarDecision(estado, opcion)
+  estado.decisionesPorDeshacer.push(fotoParaDeshacer(estado))
+  if (estado.mision && registrar)
+    registrarDecision(estado, opcion, mejor => segundosHastaLaProximaDecision(estado, mejor))
   estado.avisos = []
   estado.decision = null
   const tramoParcial =

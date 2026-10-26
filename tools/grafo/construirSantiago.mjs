@@ -37,8 +37,23 @@ const ARCHIVO_DE_CORRECCIONES = join(RAIZ, 'tools', 'grafo', 'correccionesOsm.js
 const correcciones = existsSync(ARCHIVO_DE_CORRECCIONES)
   ? JSON.parse(readFileSync(ARCHIVO_DE_CORRECCIONES, 'utf8'))
   : []
-for (const { calle, etiquetas } of correcciones)
+for (const { calle, etiquetas } of correcciones.filter(correccion => correccion.etiquetas))
   if (calles.has(calle)) calles.get(calle).tags = { ...calles.get(calle).tags, ...etiquetas }
+// Giros que OSM no prohíbe pero no se pueden hacer: { restriccion, desde, desdeNodo?, via, hacia, motivo } se vuelve una relación.
+correcciones
+  .filter(correccion => correccion.restriccion)
+  .forEach(({ restriccion, desde, desdeNodo, via, hacia }, indice) =>
+    restricciones.set(`correccion-${indice}`, {
+      type: 'relation',
+      id: `correccion-${indice}`,
+      tags: { type: 'restriction', restriction: restriccion },
+      members: [
+        { type: 'way', ref: desde, role: 'from', desdeNodo },
+        { type: 'node', ref: via, role: 'via' },
+        { type: 'way', ref: hacia, role: 'to' },
+      ],
+    }),
+  )
 console.log(`${correcciones.length} correcciones de OSM`)
 
 const latitudes = [...nodos.values()].map(nodo => nodo.lat)

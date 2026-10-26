@@ -4,6 +4,7 @@ import { test } from 'node:test'
 import {
   BANDERA,
   cargarGrafo,
+  segundosDeArista,
   diferenciaDeRumbo,
   entrantesA,
   rumboDeLlegada,
@@ -11,7 +12,16 @@ import {
 } from '../compartido/grafoVial.js'
 import { construirGrafo } from '../tools/grafo/construirGrafo.mjs'
 import { camaraDeLaDecision, evaluarPanorama } from '../src/dominio/camaraDeConduccion.js'
-import { aristaMasCercana, elegirOpcion, empezarEn, opcionQueSigue } from '../src/dominio/conduccion.js'
+import {
+  DESHACER_POR_RUTA,
+  aristaMasCercana,
+  deshacerQueQuedan,
+  deshacerUltimaDecision,
+  elegirOpcion,
+  empezarEn,
+  opcionQueSigue,
+  sePuedeDeshacer,
+} from '../src/dominio/conduccion.js'
 import {
   LIMITE_PARA_PERDER,
   TOLERANCIA_DEL_OPTIMO,
@@ -20,8 +30,10 @@ import {
   prepararMision,
   puntajeDeLaRuta,
   rutaOptima,
+  veredictoDeLaDecision,
 } from '../src/dominio/mision.js'
 import { accesosDelLugar, salidasDelLugar } from '../src/dominio/lugaresDeRuteo.js'
+import { filtroDeOpcionesClaramentePeores } from '../src/dominio/simplificarDecision.js'
 import { costosDelRecorrido } from '../src/dominio/tiempos.js'
 import { cruceDespuesDe, nombreDeCalle } from '../src/dominio/cruces.js'
 import { textosDelCruce } from '../src/dominio/instruccionesDeCruce.js'
@@ -253,7 +265,160 @@ test('un desvío baja el puntaje y queda anotado dónde se perdió el tiempo', (
   assert.notEqual(analisis.errores[0].elegida, analisis.errores[0].mejor)
 })
 
-test('el puntaje es 100 hasta un 3 % sobre el óptimo y 0 al pasar un 50 %', () => {
+test('equivocarse al elegir por dónde salir también se analiza (sin calle de entrada)', () => {
+  const { estado, optima } = empezarLaMision()
+  assert.ok(estado.decision.esPartida && estado.decision.opciones.length > 1)
+  const costos = costosDeLasOpciones(estado)
+  const peor = estado.decision.opciones[costos.indexOf(Math.max(...costos))]
+  elegirOpcion(estado, peor.id)
+  jugarLaMision(estado, optima)
+  estado.historial = estado.historial.slice(0, 1)
+  const analisis = analizarRecorrido(estado, optima)
+  assert.ok(analisis.errores.some(error => error.calle === 'La partida'))
+})
+
+test('deshacer vuelve a la decisión anterior, con lo recorrido y el reloj de entonces', () => {
+  const { estado, optima } = empezarLaMision()
+  const antes = {
+    decision: estado.decision,
+    metros: estado.metros,
+    segundos: estado.segundos,
+    recorrido: [...estado.recorrido],
+  }
+  elegirOpcion(estado, estado.decision.opciones[0].id)
+  assert.ok(sePuedeDeshacer(estado))
+  deshacerUltimaDecision(estado)
+  assert.equal(estado.decision, antes.decision)
+  assert.equal(estado.metros, antes.metros)
+  assert.equal(estado.segundos, antes.segundos)
+  assert.deepEqual(estado.recorrido, antes.recorrido)
+  jugarLaMision(estado, optima)
+  assert.equal(analizarRecorrido(estado, optima).puntaje, 100)
+})
+
+test('en una ruta del juego se puede deshacer 3 veces; al conducir libremente, sin límite', () => {
+  const { estado } = empezarLaMision()
+  for (let veces = 0; veces < DESHACER_POR_RUTA; veces++) {
+    assert.equal(deshacerQueQuedan(estado), DESHACER_POR_RUTA - veces)
+    elegirOpcion(estado, estado.decision.opciones[0].id)
+    assert.ok(sePuedeDeshacer(estado))
+    deshacerUltimaDecision(estado)
+  }
+  elegirOpcion(estado, estado.decision.opciones[0].id)
+  assert.ok(!sePuedeDeshacer(estado))
+
+  const libre = empezarEn(grafo, enMetros(100, 0))
+  for (let veces = 0; veces < 2 * DESHACER_POR_RUTA; veces++) {
+    elegirOpcion(libre, libre.decision.opciones[0].id)
+    assert.ok(sePuedeDeshacer(libre))
+    deshacerUltimaDecision(libre)
+  }
+})
+
+function contarDecisionesSiguiendoElOptimo({ simplificar }) {
+  const mision = prepararMision(grafo, accesosDelLugar(grafo, lugarEn(1600, 40), null))
+  const estado = empezarEn(grafo, enMetros(100, 0), { mision, simplificar })
+  const optima = rutaOptima(grafo, mision, estado.opcionesDePartida)
+  let decisiones = 0
+  while (estado.decision && !estado.llego) {
+    if (estado.decision.opciones.length >= 2) decisiones++
+    const costos = costosDeLasOpciones(estado)
+    const mejor = estado.decision.opciones[costos.indexOf(Math.min(...costos))]
+    assert.ok(opcionQueSigue(estado, optima.aristas.slice(estado.recorrido.length)) ?? mejor)
+    elegirOpcion(estado, (opcionQueSigue(estado, optima.aristas.slice(estado.recorrido.length)) ?? mejor).id)
+  }
+  return { decisiones, puntaje: analizarRecorrido(estado, optima).puntaje }
+}
+
+test('simplificar las decisiones no quita la ruta óptima ni agrega decisiones', () => {
+  const completo = contarDecisionesSiguiendoElOptimo({ simplificar: false })
+  const simple = contarDecisionesSiguiendoElOptimo({ simplificar: true })
+  assert.equal(simple.puntaje, 100)
+  assert.ok(simple.decisiones <= completo.decisiones)
+})
+
+// Opciones de mentira sobre la ciudad de prueba, con el costo que se quiera: `faltan` vale lo que tarda la última calle de cada una.
+function filtrarOpcionesDeMentira(especificaciones) {
+  const entrada = 0
+  const rangoActual = grafo.rango[entrada]
+  const aristas = especificaciones.map((_, indice) => indice + 1)
+  const opciones = especificaciones.map(([tipo, local, segundos], indice) => ({
+    tipo,
+    camino: [aristas[indice]],
+    segundos,
+    mismaCalle: tipo === 'seguir',
+    rangoDeLaCalle: local ? rangoActual + 2 : rangoActual,
+  }))
+  const faltan = Object.fromEntries(aristas.map(arista => [arista, segundosDeArista(grafo, arista)]))
+  const filtrar = filtroDeOpcionesClaramentePeores(grafo, { faltan }, entrada)
+  return filtrar(opciones).map(opcion => opciones.indexOf(opcion))
+}
+
+test('simplificar omite lo claramente peor y más local, y deja la mejor y lo que compite', () => {
+  // seguir (mejor), pasaje 90 s peor, giro local a 10 s, vuelta en U 170 s peor
+  assert.deepEqual(
+    filtrarOpcionesDeMentira([
+      ['seguir', false, 30],
+      ['giro', true, 120],
+      ['giro', true, 40],
+      ['vuelta', false, 200],
+    ]),
+    [0, 2],
+  )
+})
+
+test('si lo mejor es seguir derecho y nada compite, queda una sola opción (el auto sigue solo)', () => {
+  assert.deepEqual(
+    filtrarOpcionesDeMentira([
+      ['seguir', false, 30],
+      ['giro', true, 120],
+      ['vuelta', false, 200],
+    ]),
+    [0],
+  )
+})
+
+test('si lo mejor es doblar a una calle local, se deja la alternativa más cercana para no delatarlo', () => {
+  assert.deepEqual(
+    filtrarOpcionesDeMentira([
+      ['giro', true, 30],
+      ['giro', true, 150],
+      ['vuelta', false, 160],
+    ]),
+    [0, 1],
+  )
+})
+
+test('lo claramente peor pero de la misma jerarquía (o una avenida) no se omite', () => {
+  assert.deepEqual(
+    filtrarOpcionesDeMentira([
+      ['seguir', false, 30],
+      ['giro', false, 300],
+    ]),
+    [0, 1],
+  )
+})
+
+test('el veredicto compara lo perdido con el tramo de la mejor opción', () => {
+  assert.equal(veredictoDeLaDecision(0, 120), 'bien')
+  assert.equal(veredictoDeLaDecision(12, 40), 'bien')
+  assert.equal(veredictoDeLaDecision(60, 120), 'regular')
+  assert.equal(veredictoDeLaDecision(120, 120), 'mal')
+  assert.equal(veredictoDeLaDecision(19, 10), 'regular')
+  assert.equal(veredictoDeLaDecision(20, 10), 'mal')
+  assert.equal(veredictoDeLaDecision(Infinity, 120), 'mal')
+})
+
+test('cada decisión anota cuánto tarda por la mejor opción hasta la siguiente', () => {
+  const { estado } = empezarLaMision()
+  const costos = costosDeLasOpciones(estado)
+  const mejor = estado.decision.opciones[costos.indexOf(Math.min(...costos))]
+  elegirOpcion(estado, mejor.id)
+  assert.equal(estado.historial[0].mejor, mejor)
+  assert.ok(estado.historial[0].segundosDelTramoOptimo > 0)
+})
+
+test('el puntaje es 100 hasta un 3 % sobre el óptimo y 0 al pasar del doble', () => {
   assert.equal(puntajeDeLaRuta(1), 100)
   assert.equal(puntajeDeLaRuta(TOLERANCIA_DEL_OPTIMO), 100)
   assert.equal(puntajeDeLaRuta(LIMITE_PARA_PERDER), 0)

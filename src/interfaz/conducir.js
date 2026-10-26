@@ -8,7 +8,7 @@ import { definirPantalla } from './navegacion.js'
 import { mostrarPanel, ocultarPanel, ocultarPantalla } from './panel.js'
 import { buscarDirecciones } from './puntoDeRuteo.js'
 
-// Conducir libre (experimental, solo en desarrollo; pestaña "Conducir"): se parte donde se quiera (una dirección, un toque en el mapa
+// Conducir libre (pestaña "Conducir" de la barra superior): se parte donde se quiera (una dirección, un toque en el mapa
 // o el punto fijo del ruteo) y en cada cruce se elige qué hacer, viendo la calle en Street View. Sin misión ni puntaje. El juego
 // de ruteo en auto, que sí tiene rutas, puntaje y ranking, es src/juego/modos/ruteoEnAuto.js.
 const ZOOM_AL_CONDUCIR = 17

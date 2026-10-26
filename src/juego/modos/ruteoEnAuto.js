@@ -27,6 +27,8 @@ const KM_MAXIMOS_DESDE_EL_PUNTO = 30
 const ZOOM_AL_PARTIR = 17
 const PUNTAJE_PARA_ACERTAR = 80
 const PUNTAJE_PARA_ESTAR_CERCA = 40
+// Omite las calles menores claramente peores (src/dominio/simplificarDecision.js): menos decisiones, la misma ruta óptima.
+const SIMPLIFICAR_DECISIONES = true
 
 const lugaresConCalles = () => LUGARES_CON_CALLES.map(id => lugarPorId[id])
 
@@ -172,7 +174,7 @@ registrarModo({
     }
     if (partida !== q || q.answered) return
     const [origen, destino] = [extremoDeRuta(ruta.from), extremoDeRuta(ruta.to)]
-    const preparada = prepararRuta(grafo, origen, destino, HUELLAS)
+    const preparada = prepararRuta(grafo, origen, destino, HUELLAS, { simplificar: SIMPLIFICAR_DECISIONES })
     if (!preparada)
       return mostrarPanel(
         `${encabezadoDePregunta(q)}<p>${

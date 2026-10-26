@@ -130,7 +130,7 @@ export function salidasDelLugar(grafo, accesos, centro) {
 
 // La ruta de un lugar a otro ({ id, lat, lon } cada uno; `huellas` = { id: polígono }): se llega por cualquier calle que toque el
 // destino y al partir se elige por cuál calle salir del origen. null si el grafo no cubre alguno de los dos o no hay camino.
-export function prepararRuta(grafo, origen, destino, huellas = {}) {
+export function prepararRuta(grafo, origen, destino, huellas = {}, { simplificar = false } = {}) {
   const llegada = accesosDelLugar(grafo, destino, huellas[destino.id])
   const salidas = salidasDelLugar(grafo, accesosDelLugar(grafo, origen, huellas[origen.id]), [
     origen.lat,
@@ -138,7 +138,7 @@ export function prepararRuta(grafo, origen, destino, huellas = {}) {
   ])
   if (!llegada.size || !salidas.length) return null
   const mision = prepararMision(grafo, llegada)
-  const estado = empezarEn(grafo, [origen.lat, origen.lon], { mision, salidas })
+  const estado = empezarEn(grafo, [origen.lat, origen.lon], { mision, salidas, simplificar })
   const optima = estado && rutaOptima(grafo, mision, estado.opcionesDePartida)
   return optima ? { mision, estado, optima } : null
 }

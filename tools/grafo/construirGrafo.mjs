@@ -324,11 +324,16 @@ export function construirGrafo(elementos, { area, extremos }) {
     const hacia = restriccion.members.find(miembro => miembro.role === 'to' && miembro.type === 'way')
     const via = restriccion.members.find(miembro => miembro.role === 'via' && miembro.type === 'node')
     if (!desde || !hacia || !via) continue
-    const entradas = queLleganACruce.get(`${desde.ref}:${via.ref}`) ?? []
+    const entradas = (queLleganACruce.get(`${desde.ref}:${via.ref}`) ?? []).filter(
+      entrada => !desde.desdeNodo || aristas[entrada].desde === desde.desdeNodo,
+    )
     const salidas = queSalenDelCruce.get(`${hacia.ref}:${via.ref}`) ?? []
     if (tipo === 'no_u_turn') {
-      for (const entrada of entradas)
+      for (const entrada of entradas) {
         if (aristas[entrada].inversa !== -1) prohibir(entrada, aristas[entrada].inversa)
+        // Entre dos calzadas de un solo sentido la vuelta es de una calle a la otra, no por la inversa.
+        if (desde.ref !== hacia.ref) for (const salida of salidas) prohibir(entrada, salida)
+      }
     } else if (tipo.startsWith('no_')) {
       for (const entrada of entradas) for (const salida of salidas) prohibir(entrada, salida)
     } else if (tipo.startsWith('only_')) {

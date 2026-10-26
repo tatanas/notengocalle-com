@@ -4,7 +4,7 @@ import { escaparHtml } from '../nucleo/utilidades.js'
 const TITULO_POR_MOTIVO = {
   llegada: '🎯 ¡Llegaste!',
   rendicion: '🏳️ Te rendiste',
-  lejos: '😵 Te alejaste demasiado',
+  lejos: '😵 Ya fregaste: vas a demorar más del doble que la ruta óptima',
 }
 
 const formatearKm = metros => `${(metros / 1000).toFixed(1).replace('.', ',')} km`

@@ -1,12 +1,18 @@
 import { cargarGrafo } from '../../compartido/grafoVial.js'
 import { camaraDeLaDecision, evaluarPanorama } from '../dominio/camaraDeConduccion.js'
-import { elegirOpcion } from '../dominio/conduccion.js'
+import {
+  deshacerQueQuedan,
+  deshacerUltimaDecision,
+  elegirOpcion,
+  sePuedeDeshacer,
+} from '../dominio/conduccion.js'
 import { nombreDeCalle } from '../dominio/cruces.js'
 import { textosDelCruce } from '../dominio/instruccionesDeCruce.js'
 import {
   analizarRecorrido,
   costosDeLasOpciones,
   segundosDeDesvio,
+  veredictoDeLaDecision,
   yaSeFueDemasiadoLejos,
 } from '../dominio/mision.js'
 import { puntoCardinal, recortarTrazado } from '../dominio/trazado.js'
@@ -22,6 +28,7 @@ import {
   streetViewDisponible,
 } from '../mapa/streetView.js'
 import { $, escaparHtml } from '../nucleo/utilidades.js'
+import { confirmarAccion } from './confirmar.js'
 import { mostrarPanel } from './panel.js'
 
 // El manejo: el auto avanza de decisión en decisión por el grafo vial, viendo la calle en Street View, y el auto del mapa siempre
@@ -31,6 +38,13 @@ import { mostrarPanel } from './panel.js'
 const URL_DEL_GRAFO = '/data/grafo/santiago.json'
 const ZOOM_AL_CONDUCIR = 17
 const METROS_DE_CADA_OPCION_EN_EL_MAPA = 70
+const MILISEGUNDOS_DEL_VEREDICTO = 2200
+const MILISEGUNDOS_MAXIMOS_PARA_EL_PANORAMA = 20000
+const VEREDICTOS = {
+  bien: { clase: 'bien', texto: '¡Bien! 👍' },
+  regular: { clase: 'regular', texto: 'Pasable 😐' },
+  mal: { clase: 'mal', texto: '¡Mal! 👎' },
+}
 
 let grafoPendiente = null
 let estado = null
@@ -43,9 +57,9 @@ let alSalir = null
 let capaDelCruce = null
 let autoEnElMapa = null
 let ultimaVista = null
-let confirmandoRendicion = false
 let resultado = null
 let desactivar = null
+let temporizadorDelVeredicto = null
 
 export function cargarElGrafo() {
   grafoPendiente ||= fetch(URL_DEL_GRAFO)
@@ -77,8 +91,11 @@ function rotarAuto(rumbo) {
 // En escritorio el panorama tapa la mitad izquierda del mapa: el auto va al centro de la mitad que se ve.
 function centrarEnLaMitadVisible(posicion) {
   const zoom = Math.max(mapa.getZoom(), ZOOM_AL_CONDUCIR)
+  const { classList } = document.body
   const tapado =
-    document.body.classList.contains('con-panorama') && window.matchMedia('(min-width: 761px)').matches
+    classList.contains('con-panorama') &&
+    !classList.contains('ver-mapa') &&
+    window.matchMedia('(min-width: 761px)').matches
   const centro = mapa.project(posicion, zoom).subtract([tapado ? window.innerWidth / 4 : 0, 0])
   mapa.setView(mapa.unproject(centro, zoom), zoom, { animate: true })
 }
@@ -139,6 +156,30 @@ function dibujarRecorrido() {
   })
 }
 
+// ----- el veredicto de cada decisión (solo al practicar: en la ronda real no se dice qué opción era la mejor)
+
+function ocultarElVeredicto() {
+  clearTimeout(temporizadorDelVeredicto)
+  $('#veredicto')?.remove()
+}
+
+function mostrarElVeredicto(veredicto, segundosPerdidos) {
+  ocultarElVeredicto()
+  const { clase, texto } = VEREDICTOS[veredicto]
+  const detalle =
+    veredicto !== 'bien' && Number.isFinite(segundosPerdidos)
+      ? `<small>perdiste ${segundosPerdidos >= 60 ? `${Math.floor(segundosPerdidos / 60)} min ${Math.round(segundosPerdidos % 60)} s` : `${Math.round(segundosPerdidos)} s`}</small>`
+      : veredicto === 'mal'
+        ? '<small>sin vuelta atrás</small>'
+        : ''
+  const aviso = document.createElement('div')
+  aviso.id = 'veredicto'
+  aviso.className = `veredicto ${clase}`
+  aviso.innerHTML = `${texto}${detalle}`
+  document.body.appendChild(aviso)
+  temporizadorDelVeredicto = setTimeout(ocultarElVeredicto, MILISEGUNDOS_DEL_VEREDICTO)
+}
+
 // ----- el panel
 
 const formatearKm = metros => (metros / 1000).toFixed(1).replace('.', ',')
@@ -168,23 +209,35 @@ function htmlDeLaDecision(textos, { cargando, vista }) {
   const avisos = [
     ...estado.avisos,
     decision.sinSalida ? `${decision.sinSalida} calle(s) sin salida no se muestran.` : '',
+    decision.omitidas ? 'Se omiten calles menores claramente peores.' : '',
     cargando ? 'Buscando el panorama…' : '',
     vista === null ? 'Aquí no hay Street View.' : '',
     vista?.aproximado ? 'Este panorama queda a un lado de la calle (es el más cercano que hay).' : '',
   ].filter(Boolean)
-  const botonesDeAbajo = [
-    ruta
-      ? `<button class="btn sec small" id="cdRendirse">${confirmandoRendicion ? '¿Seguro? Se muestra la óptima' : '🏳️ Rendirme'}</button>`
-      : '',
-    alSalir ? '<button class="btn sec small" id="cdOtraPartida">↩ Otra partida</button>' : '',
-  ].join('')
-  return `${encabezado()}
+  return `<button class="cd-plegar" id="cdPlegar" aria-label="Mostrar u ocultar las opciones"></button>${encabezado()}
     <div class="cd-donde" data-rumbo="${Math.round(rumbo)}">${donde}</div>
     <div class="muted nota">${formatearKm(estado.metros)} km · ${Math.round(estado.segundos / 60)} min${textoDelDesvio()}</div>
     <p class="q-sub">${decision.esPartida ? '¿Hacia dónde sales?' : decision.esObligada ? 'No hay otra salida:' : '¿Qué haces en el cruce?'}</p>
     <div class="opts one">${botones}</div>
     ${avisos.map(aviso => `<p class="muted nota">${escaparHtml(aviso)}</p>`).join('')}
-    <div class="row">${botonesDeAbajo}</div>`
+    <div class="row">${htmlDeLosBotonesDeAbajo()}</div>`
+}
+
+function htmlDeLosBotonesDeAbajo() {
+  return [
+    ruta ? '<button class="btn sec small" id="cdRendirse">🏳️ Rendirme</button>' : '',
+    alSalir ? '<button class="btn sec small" id="cdOtraPartida">↩ Otra partida</button>' : '',
+    sePuedeDeshacer(estado)
+      ? `<button class="btn sec small" id="cdDeshacer" title="Vuelve a la decisión anterior">↶ Deshacer${Number.isFinite(deshacerQueQuedan(estado)) ? ` (${deshacerQueQuedan(estado)})` : ''}</button>`
+      : '',
+  ].join('')
+}
+
+// El auto se quedó sin cruces donde decidir (un camino sin salida en los datos): se puede deshacer o rendirse.
+function mostrarSinDecision() {
+  mostrarPanel(`${encabezado()}<p>El camino sigue sin cruces donde decidir.</p>
+    <div class="row">${htmlDeLosBotonesDeAbajo()}</div>`)
+  conectarOpciones([])
 }
 
 function conectarOpciones(lineas) {
@@ -196,29 +249,36 @@ function conectarOpciones(lineas) {
     boton.onmouseleave = () => lineas[indice].setStyle({ weight: 5, dashArray: '2 8' })
   })
   if ($('#cdOtraPartida')) $('#cdOtraPartida').onclick = () => alSalir()
+  if ($('#cdDeshacer')) $('#cdDeshacer').onclick = deshacer
+  if ($('#cdPlegar')) $('#cdPlegar').onclick = () => document.body.classList.toggle('cd-plegado')
   const rendirse = $('#cdRendirse')
-  if (rendirse)
-    rendirse.onclick = () => {
-      if (confirmandoRendicion) return terminar('rendicion')
-      confirmandoRendicion = true
-      rendirse.textContent = '¿Seguro? Se muestra la óptima'
-    }
+  if (rendirse) rendirse.onclick = pedirConfirmacionParaRendirse
+}
+
+// Si Google no responde o falla, se sigue sin panorama en vez de dejar las opciones deshabilitadas.
+async function buscarElPanorama(camara) {
+  if (!streetViewDisponible()) return null
+  const sinRespuesta = new Promise(resolver =>
+    setTimeout(() => resolver(null), MILISEGUNDOS_MAXIMOS_PARA_EL_PANORAMA),
+  )
+  const panorama = mostrarPanoramaDeConduccion(camara, posicion => evaluarPanorama(camara, posicion), {
+    alVerElMapa: () => autoEnElMapa && centrarEnLaMitadVisible(autoEnElMapa.getLatLng()),
+  }).catch(() => null)
+  return Promise.race([panorama, sinRespuesta])
 }
 
 async function mostrarDecision() {
   if (ruta && yaSeFueDemasiadoLejos(estado, ruta.optima)) return terminar('lejos')
-  confirmandoRendicion = false
+  document.body.classList.remove('cd-plegado')
   const { decision } = estado
   const lineas = dibujarRecorrido()
   const textos = textosDelCruce(decision.opciones)
   const camara = camaraDeLaDecision(estado)
   mostrarPanel(htmlDeLaDecision(textos, { cargando: true, vista: undefined }))
+  conectarOpciones(lineas)
   const estadoAlPedir = estado
-  const vista = streetViewDisponible()
-    ? await mostrarPanoramaDeConduccion(camara, posicion => evaluarPanorama(camara, posicion), {
-        alVerElMapa: () => autoEnElMapa && centrarEnLaMitadVisible(autoEnElMapa.getLatLng()),
-      })
-    : null
+  const vista = await buscarElPanorama(camara)
+  if (resultado) return ocultarPanorama()
   if (estado !== estadoAlPedir || estado.decision !== decision) return
   ultimaVista = { ...vista, camara }
   if (vista) ponerAuto(vista.posicion, vista.rumbo)
@@ -231,12 +291,41 @@ async function mostrarDecision() {
 }
 
 function elegir(id) {
-  const opcion = estado.decision.opciones.find(candidata => candidata.id === id)
+  const opcion = estado.decision?.opciones.find(candidata => candidata.id === id)
+  if (!opcion) return
   if (estado.decision.esPartida) apuntarPanoramaHacia(opcion.rumboFinal)
-  elegirOpcion(estado, id)
+  const decisionesAnotadas = estado.historial.length
+  try {
+    elegirOpcion(estado, id)
+  } catch (error) {
+    console.error(error)
+    estado.decision = null
+  }
+  ocultarElVeredicto()
+  if (ruta && estado.historial.length > decisionesAnotadas) {
+    const { segundosPerdidos, segundosDelTramoOptimo } = estado.historial.at(-1)
+    mostrarElVeredicto(veredictoDeLaDecision(segundosPerdidos, segundosDelTramoOptimo), segundosPerdidos)
+  }
   if (estado.llego) terminar('llegada')
   else if (estado.decision) mostrarDecision()
-  else mostrarPanel(`${encabezado()}<p>El camino sigue sin cruces donde decidir.</p>`)
+  else mostrarSinDecision()
+}
+
+async function pedirConfirmacionParaRendirse() {
+  const confirmado = await confirmarAccion({
+    title: '¿Rendirte?',
+    message: 'La ruta termina con 0 puntos y se te muestra la ruta óptima.',
+    confirmLabel: 'Rendirme',
+    cancelLabel: 'Seguir jugando',
+  })
+  if (confirmado && !resultado) terminar('rendicion')
+}
+
+function deshacer() {
+  if (resultado || !sePuedeDeshacer(estado)) return
+  ocultarElVeredicto()
+  deshacerUltimaDecision(estado)
+  mostrarDecision()
 }
 
 // ----- el final de una ruta del juego: el recorrido y el óptimo en el mapa y el análisis para quien llama
@@ -259,6 +348,8 @@ function dibujarElResultado() {
 }
 
 function terminar(motivo) {
+  if (resultado) return
+  ocultarElVeredicto()
   const analisis = analizarRecorrido(estado, ruta.optima)
   ocultarPanorama()
   quitarElAuto()
@@ -293,7 +384,9 @@ export function conducir(parametros) {
     alGirar: rotarAuto,
   })
   const alApretarUnaTecla = evento => {
-    if (evento.target.matches('input, textarea') || !/^[1-9]$/.test(evento.key)) return
+    if (evento.target.matches('input, textarea') || document.querySelector('dialog[open]')) return
+    if (evento.key.toLowerCase() === 'u') return $('#cdDeshacer')?.click()
+    if (!/^[1-9]$/.test(evento.key)) return
     document.querySelectorAll('#panel .opt[data-id]:not([disabled])')[+evento.key - 1]?.click()
   }
   document.addEventListener('keydown', alApretarUnaTecla)
@@ -312,11 +405,12 @@ export function dejarDeConducir() {
   ciego = false
   alTerminar = null
   alSalir = null
+  ocultarElVeredicto()
   quitarElAuto()
   capaDelCruce?.remove()
   capaDelCruce = null
   ocultarPanorama()
-  document.body.classList.remove('conduciendo', 'ruteo-ciego')
+  document.body.classList.remove('conduciendo', 'ruteo-ciego', 'cd-plegado')
 }
 
 // Para las pruebas con navegador (tools/grafo/…): lo que se ve en el panorama y en el mapa, sin importar los módulos otra vez.

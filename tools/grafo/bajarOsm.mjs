@@ -14,7 +14,12 @@ const RAIZ = join(dirname(fileURLToPath(import.meta.url)), '..', '..')
 const CARPETA = join(RAIZ, '.local', 'grafo')
 const GRAN_SANTIAGO = [-33.65, -70.85, -33.28, -70.43]
 const GRADOS_POR_TESELA = 0.05
-const ESPEJOS = ['https://overpass-api.de/api/interpreter', 'https://overpass.private.coffee/api/interpreter']
+const ESPEJOS = [
+  'https://overpass.openstreetmap.fr/api/interpreter',
+  'https://overpass-api.de/api/interpreter',
+  'https://overpass.private.coffee/api/interpreter',
+  'https://maps.mail.ru/osm/tools/overpass/api/interpreter',
+]
 const CLASES = 'motorway|trunk|primary|secondary|tertiary|unclassified|residential|living_street'
 const MILISEGUNDOS_POR_PEDIDO = 360_000
 const MILISEGUNDOS_ENTRE_TESELAS = 5000

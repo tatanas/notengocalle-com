@@ -30,6 +30,9 @@ const GRADOS_DE_MANTENERSE = 55
 const GRADOS_DE_VUELTA = 135
 // Volviendo por la misma calle (el retorno de una avenida) la curva de la calle le quita grados al giro.
 const GRADOS_DE_VUELTA_POR_LA_MISMA_CALLE = 100
+// Doblar a una calle lateral que da la vuelta a la manzana (un pasaje que vuelve a salir) termina en sentido contrario, pero no es
+// una vuelta en U: salvo por un retorno o un enlace, una vuelta empieza con un giro casi de media vuelta.
+const GRADOS_DEL_GIRO_DE_UNA_VUELTA = 120
 
 export const TIPO = {
   SEGUIR: 'seguir',
@@ -287,7 +290,9 @@ function clasificar(grafo, entrada, opcion) {
   const giro = Math.abs(opcion.giroInicial)
   const gradosDeVuelta = opcion.mismaCalle ? GRADOS_DE_VUELTA_POR_LA_MISMA_CALLE : GRADOS_DE_VUELTA
   const terminaEnSentidoContrario =
-    giro >= GRADOS_DE_MANTENERSE && Math.abs(opcion.giroNeto) >= gradosDeVuelta
+    giro >= GRADOS_DE_MANTENERSE &&
+    Math.abs(opcion.giroNeto) >= gradosDeVuelta &&
+    (giro >= GRADOS_DEL_GIRO_DE_UNA_VUELTA || opcion.porRetorno)
   const entraAUnaAutopista = !opcion.mismaCalle && opcion.rangoDeLaCalle <= 1
   if (volverPorLaMismaCalle || (terminaEnSentidoContrario && !entraAUnaAutopista)) return TIPO.VUELTA
   if (esEnlace(grafo, primera) && !(giro < GRADOS_DE_MANTENERSE && opcion.mismaCalle)) {
@@ -334,9 +339,12 @@ function ordenar(opciones) {
 }
 
 // El cruce al que se llega por `entrada`: sus opciones, ordenadas, y cuántas calles sin salida se dejaron fuera.
-export function cruceDespuesDe(grafo, entrada) {
+// `filtrar(opciones)` (opcional) deja solo algunas de las opciones antes de nombrarlas (bifurcaciones, salidas de rotonda): ver
+// simplificarDecision.js. Las que quedan fuera se cuentan en `omitidas`.
+export function cruceDespuesDe(grafo, entrada, { filtrar = null } = {}) {
   const candidatos = sinRepetidos(grafo, entrada, caminosDelCruce(grafo, entrada))
-  const opciones = candidatos.map(candidato => describirCamino(grafo, entrada, candidato))
+  const todas = candidatos.map(candidato => describirCamino(grafo, entrada, candidato))
+  const opciones = filtrar ? filtrar(todas) : todas
   marcarBifurcaciones(opciones)
   numerarSalidasDeRotonda(opciones)
   ordenar(opciones)
@@ -344,6 +352,7 @@ export function cruceDespuesDe(grafo, entrada) {
     entrada,
     nodo: grafo.hasta[entrada],
     opciones,
+    omitidas: todas.length - opciones.length,
     sinSalida: salientesLegales(grafo, entrada).filter(salida => esCallejon(grafo, salida)).length,
     esFinDeCalle: esFinDeCalle(grafo, grafo.hasta[entrada]),
   }

@@ -32,6 +32,22 @@ export function anotarQueSeEmpezo(idDeModo, fecha = fechaDeHoyEnChile()) {
   guardar()
 }
 
+// Lo que lleva un desafío empezado: por si se cierra la pestaña a medias, se cuenta lo que se alcanzó.
+export function anotarAvance(idDeModo, avance, fecha = fechaDeHoyEnChile()) {
+  const anotado = jugados[fecha]?.[idDeModo]
+  if (!anotado || anotado.total) return
+  anotado.avance = avance
+  guardar()
+}
+
+// Los desafíos que se empezaron y no se terminaron (ni de hoy ni de los días que se guardan).
+export const desafiosSinTerminar = () =>
+  Object.entries(jugados).flatMap(([fecha, delDia]) =>
+    Object.entries(delDia)
+      .filter(([, anotado]) => !anotado.total)
+      .map(([idDeModo, anotado]) => ({ fecha, idDeModo, avance: anotado.avance ?? { aciertos: 0, ms: 0 } })),
+  )
+
 export function anotarResultado(idDeModo, resultado, fecha = fechaDeHoyEnChile()) {
   jugados[fecha] ||= {}
   jugados[fecha][idDeModo] = resultado

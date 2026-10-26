@@ -617,8 +617,8 @@ export async function desafiosDiarios(navegador, { verificar }) {
     `tiene el de calles y el de comunas (${botones.map(boton => boton.id).join(', ')})`,
   )
   verificar(
-    botones.every(boton => boton.color === 'rgb(124, 58, 237)'),
-    'los botones son morados',
+    botones.every(boton => boton.color === 'rgb(151, 206, 255)'),
+    'los botones son celestes',
   )
   verificar(!(await existe(pagina, '.card-diaria .practice')), 'sin botón de práctica')
 
@@ -660,17 +660,31 @@ export async function desafiosDiarios(navegador, { verificar }) {
     await irAlInicio(pagina)
   }
 
-  // Abandonar también cuenta como jugado.
+  // Abandonar a medias cierra el desafío con lo que se alcanzó, y ya no se puede volver a jugar hoy.
   await pagina.click('[data-diario="dd-calles"]')
   await pagina.waitForSelector('.q-head', { timeout: 8000 })
   await pagina.click('#btnHome')
   await pagina.waitForSelector('#confirmDialog[open]')
+  verificar(
+    /Abandonar el desafío/.test(await texto(pagina, '#confirmDialog')),
+    'al salir de un desafío avisa que se cierra',
+  )
   await pagina.click('#confirmOk')
   await pagina.waitForSelector('#screen:not(.hidden) .card-diaria')
-  verificar(
-    (await texto(pagina, '[data-diario="dd-calles"] .estado-diario')) === 'Ya empezado',
-    'si se abandona a medias, ese desafío ya no se puede volver a jugar hoy',
-  )
+  const abandonado = await texto(pagina, '[data-diario="dd-calles"] .estado-diario')
+  verificar(/^Abandonado \d+\/10$/.test(abandonado), `si se abandona a medias queda cerrado (${abandonado})`)
+
+  // Si se cierra la pestaña a medias, al volver al menú se cierra igual, con lo que llevaba.
+  await pagina.evaluate(() => {
+    const jugados = JSON.parse(localStorage.getItem('ntc:desafiosDiarios'))
+    const hoy = Object.keys(jugados).sort().at(-1)
+    jugados[hoy]['dd-comunas'] = { avance: { aciertos: 4, ms: 20000 } }
+    localStorage.setItem('ntc:desafiosDiarios', JSON.stringify(jugados))
+  })
+  await pagina.reload({ waitUntil: 'networkidle2' })
+  await pagina.waitForSelector('[data-diario="dd-comunas"]')
+  const cerrado = await texto(pagina, '[data-diario="dd-comunas"] .estado-diario')
+  verificar(cerrado === 'Abandonado 4/10', `un desafío que quedó a medias se cierra al volver (${cerrado})`)
   verificar(!errores.length, `sin errores en la consola${errores.length ? ': ' + errores.join(' | ') : ''}`)
   await pagina.close()
 }

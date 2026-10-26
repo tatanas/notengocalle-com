@@ -24,7 +24,12 @@ import {
 import { REGIONES_DE_COMUNAS, COMUNAS_DE_CHILE } from '../datos/comunasDeChile.js'
 import { lineasElegidas } from '../dominio/metro.js'
 import { limpiarCapa, fijarChile, fijarRelieve } from '../mapa/mapa.js'
-import { tieneRondaOficial, iniciarPartida, detenerPartida } from '../juego/engine.js'
+import {
+  tieneRondaOficial,
+  iniciarPartida,
+  detenerPartida,
+  cerrarDesafiosSinTerminar,
+} from '../juego/engine.js'
 import { MODOS, modoPorId } from '../juego/registry.js'
 import { mostrarMisCalles } from './misCalles.js'
 import { resultadoDelDia, yaSeEmpezo } from '../juego/diarios.js'
@@ -260,7 +265,7 @@ const htmlDeMisCalles = () => `<hr class="separador"><div class="ajustes-de-tarj
 function filaDeDesafio(modo) {
   const resultado = resultadoDelDia(modo.id)
   const estado = resultado?.total
-    ? `✓ ${resultado.aciertos}/${resultado.total}`
+    ? `${resultado.abandonado ? 'Abandonado' : '✓'} ${resultado.aciertos}/${resultado.total}`
     : yaSeEmpezo(modo.id)
       ? 'Ya empezado'
       : 'Jugar'
@@ -368,6 +373,7 @@ let revisorDelDia = null
 function abrirInicio() {
   clearInterval(revisorDelDia)
   detenerPartida()
+  cerrarDesafiosSinTerminar()
   limpiarCapa()
   ocultarPanel()
   fijarRelieve(false)

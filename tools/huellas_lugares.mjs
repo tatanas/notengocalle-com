@@ -11,6 +11,8 @@ const RAIZ_DE_BATCH = 40
 const MILISEGUNDOS_ENTRE_PEDIDOS = 1200
 const METROS_MAXIMOS_DE_LA_BUSQUEDA_AL_PUNTO = 600
 const METROS_MINIMOS_DE_UNA_HUELLA = 25
+// Nominatim a veces devuelve otro lugar con el mismo nombre (otro "Pueblo…", otra "Municipalidad…"): si la huella queda lejos, se descarta.
+const METROS_MAXIMOS_DEL_PUNTO_A_LA_HUELLA = 1000
 const TOLERANCIA_DE_SIMPLIFICACION_M = 4
 const CAJA_DE_SANTIAGO = '-70.95,-33.25,-70.40,-33.75'
 const ARCHIVO_CRUDO = '.local/huellas_raw.json'
@@ -139,6 +141,13 @@ for (const lugar of lugares) {
   const mayor = anillos.reduce((a, b) => (areaDelAnillo(b) > areaDelAnillo(a) ? b : a))
   if (Math.sqrt(areaDelAnillo(mayor)) < METROS_MINIMOS_DE_UNA_HUELLA) continue
   const simplificado = simplificar(mayor.slice(0, -1))
+  const distanciaAlPunto = Math.min(
+    ...simplificado.map(([lon, lat]) => metros([lugar.lat, lugar.lon], [lat, lon])),
+  )
+  if (distanciaAlPunto > METROS_MAXIMOS_DEL_PUNTO_A_LA_HUELLA) {
+    console.log(`huella descartada: ${lugar.name} (a ${Math.round(distanciaAlPunto)} m de su punto)`)
+    continue
+  }
   if (simplificado.length >= 3)
     huellas[lugar.id] = simplificado.map(([lon, lat]) => [+lat.toFixed(5), +lon.toFixed(5)])
 }

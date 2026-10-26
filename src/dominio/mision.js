@@ -12,9 +12,9 @@ import { fijarDestinosEnCallesSinSalida, nombreDeCalle } from './cruces.js'
 import { costosDelRecorrido } from './tiempos.js'
 import { largoDelTrazado, unirTrazados } from './trazado.js'
 
-// Hasta un 3 % sobre el óptimo es 100 (hay rutas casi empatadas); al pasar un 50 % más se pierde todo.
+// Hasta un 3 % sobre el óptimo es 100 (hay rutas casi empatadas); al pasar del doble se pierde todo.
 export const TOLERANCIA_DEL_OPTIMO = 1.03
-export const LIMITE_PARA_PERDER = 1.5
+export const LIMITE_PARA_PERDER = 2
 const SEGUNDOS_MINIMOS_PARA_CONTARLO_COMO_ERROR = 5
 const CUANTOS_ERRORES_SE_MUESTRAN = 3
 
@@ -31,7 +31,7 @@ export function prepararMision(grafo, destinos) {
 
 // Lo que cuesta una opción: sus segundos más lo que falta después de ella (sin contar la calle en que termina, que ya está
 // en lo que cuesta).
-function costoDeLaOpcion(grafo, mision, opcion) {
+export function costoDeLaOpcion(grafo, mision, opcion) {
   const ultima = opcion.camino.at(-1)
   return opcion.segundos + mision.faltan[ultima] - segundosDeArista(grafo, ultima)
 }
@@ -65,19 +65,22 @@ export const costosDeLasOpciones = ({ grafo, mision, decision }) =>
   decision.opciones.map(opcion => costoDeLaOpcion(grafo, mision, opcion))
 
 // Anota cuánto se pierde en una decisión: lo que cuesta la opción elegida menos lo que cuesta la mejor.
-export function registrarDecision(estado, opcionElegida) {
+// `medirTramo(opcion)` dice cuánto se tarda por esa opción hasta la próxima decisión: el "tramo" con que se compara lo perdido.
+export function registrarDecision(estado, opcionElegida, medirTramo) {
   const { decision } = estado
   if (decision.opciones.length < 2) return
   const costos = costosDeLasOpciones(estado)
   const mejor = Math.min(...costos)
   const elegido = costos[decision.opciones.indexOf(opcionElegida)]
+  const mejorOpcion = decision.opciones[costos.indexOf(mejor)]
   estado.historial.push({
     metros: estado.metros,
     entrada: estado.entrada,
     opciones: decision.opciones,
     elegida: opcionElegida,
-    mejor: decision.opciones[costos.indexOf(mejor)],
+    mejor: mejorOpcion,
     segundosPerdidos: Number.isFinite(elegido) ? elegido - mejor : Infinity,
+    segundosDelTramoOptimo: medirTramo(mejorOpcion),
   })
 }
 
@@ -89,6 +92,24 @@ export function segundosDeDesvio(estado, optima) {
 
 export const yaSeFueDemasiadoLejos = (estado, optima) =>
   optima.segundos + segundosDeDesvio(estado, optima) > optima.segundos * LIMITE_PARA_PERDER
+
+// Cómo fue una decisión: lo perdido frente a la mejor opción, medido contra el tramo que esa mejor opción tarda hasta la próxima
+// decisión. Hasta un cuarto del tramo (o menos de 15 s, que es lo mismo) es bien; si se pierde tanto como el tramo (el doble de lo
+// que debía tardar), mal; en el medio, pasable. Nada bajo 20 s es malo.
+const SEGUNDOS_QUE_NO_IMPORTAN = 15
+const FRACCION_DEL_TRAMO_QUE_ES_BIEN = 0.25
+const SEGUNDOS_MINIMOS_DE_UN_TRAMO_PARA_COMPARAR = 20
+export function veredictoDeLaDecision(segundosPerdidos, segundosDelTramoOptimo) {
+  if (!Number.isFinite(segundosPerdidos)) return 'mal'
+  const tramo = Math.max(segundosDelTramoOptimo, SEGUNDOS_MINIMOS_DE_UN_TRAMO_PARA_COMPARAR)
+  if (segundosPerdidos >= tramo) return 'mal'
+  if (
+    segundosPerdidos < SEGUNDOS_QUE_NO_IMPORTAN ||
+    segundosPerdidos <= tramo * FRACCION_DEL_TRAMO_QUE_ES_BIEN
+  )
+    return 'bien'
+  return 'regular'
+}
 
 export function puntajeDeLaRuta(razon) {
   if (razon <= TOLERANCIA_DEL_OPTIMO) return 100
@@ -120,6 +141,9 @@ export function analizarRecorrido(estado, optima) {
       .filter(registro => registro.segundosPerdidos >= SEGUNDOS_MINIMOS_PARA_CONTARLO_COMO_ERROR)
       .sort((a, b) => b.segundosPerdidos - a.segundosPerdidos)
       .slice(0, CUANTOS_ERRORES_SE_MUESTRAN)
-      .map(registro => ({ ...registro, calle: nombreDeCalle(grafo, registro.entrada) })),
+      .map(registro => ({
+        ...registro,
+        calle: registro.entrada === null ? 'La partida' : nombreDeCalle(grafo, registro.entrada),
+      })),
   }
 }
