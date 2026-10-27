@@ -139,6 +139,7 @@ function planificar(q, origen, destino, preparada) {
     } Si el lugar tiene varias salidas, eliges por cuál salir; para llegar vale cualquier entrada.</p>
     <button class="btn" id="rutaEmpezar">${q.ranked ? 'Estoy listo' : 'Empezar'}</button>`)
   $('#rutaEmpezar').onclick = () => {
+    preparada.estado.practica = !q.ranked
     if (!q.ranked) mapa.setView([origen.lat, origen.lon], ZOOM_AL_PARTIR)
     conducir({
       estado: preparada.estado,

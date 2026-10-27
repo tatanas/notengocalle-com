@@ -1611,6 +1611,7 @@ table.board.clickable tr[data-open]:hover td {
   line-height: 18px;
   text-align: center;
   box-shadow: var(--shadow);
+  cursor: pointer;
 }
 
 /* En el celular las opciones van sobre el panorama y el botón alterna con el mapa. */

@@ -19,11 +19,14 @@ import { puntoCardinal, recortarTrazado } from '../dominio/trazado.js'
 import { COLORES_DE_TRAMOS } from '../mapa/dibujo.js'
 import { capa, encuadrar, mapa } from '../mapa/mapa.js'
 import {
+  alVolverAlPanoramaHacer,
   apuntarPanoramaHacia,
   escucharPanorama,
   mostrarPanoramaDeConduccion,
+  mostrarSoloElMapaDeConduccion,
   ocultarPanorama,
   posicionDelPanorama,
+  quiereVerSoloElMapa,
   rumboDeLaVista,
   streetViewDisponible,
 } from '../mapa/streetView.js'
@@ -151,7 +154,9 @@ function dibujarRecorrido() {
         iconSize: [22, 22],
         iconAnchor: [11, 11],
       }),
-    }).addTo(capaDelCruce)
+    })
+      .on('click', () => elegirDesdeElMapa(opcion.id))
+      .addTo(capaDelCruce)
     return linea
   })
 }
@@ -255,6 +260,11 @@ function conectarOpciones(lineas) {
   if (rendirse) rendirse.onclick = pedirConfirmacionParaRendirse
 }
 
+// Los números del mapa valen lo mismo que los botones del panel (que están deshabilitados mientras se busca el panorama).
+function elegirDesdeElMapa(id) {
+  if (document.querySelector(`#panel .opt[data-id="${id}"]:not([disabled])`)) elegir(id)
+}
+
 // Si Google no responde o falla, se sigue sin panorama en vez de dejar las opciones deshabilitadas.
 async function buscarElPanorama(camara) {
   if (!streetViewDisponible()) return null
@@ -277,6 +287,8 @@ async function mostrarDecision() {
   mostrarPanel(htmlDeLaDecision(textos, { cargando: true, vista: undefined }))
   conectarOpciones(lineas)
   const estadoAlPedir = estado
+  const soloMapa = !ciego && quiereVerSoloElMapa()
+  if (soloMapa) return mostrarDecisionSoloEnElMapa(textos, lineas, camara)
   const vista = await buscarElPanorama(camara)
   if (resultado) return ocultarPanorama()
   if (estado !== estadoAlPedir || estado.decision !== decision) return
@@ -287,6 +299,18 @@ async function mostrarDecision() {
     ponerAuto(camara.candidatas[0].punto, camara.candidatas[0].rumbo)
   }
   mostrarPanel(htmlDeLaDecision(textos, { cargando: false, vista }))
+  conectarOpciones(lineas)
+}
+
+// Con la vista de solo mapa no se pide ningún panorama: el auto va a donde habría quedado la cámara.
+function mostrarDecisionSoloEnElMapa(textos, lineas, camara) {
+  mostrarSoloElMapaDeConduccion({
+    alVerElMapa: () => autoEnElMapa && centrarEnLaMitadVisible(autoEnElMapa.getLatLng()),
+  })
+  const { punto, rumbo } = camara.candidatas[0]
+  ultimaVista = null
+  ponerAuto(punto, rumbo)
+  mostrarPanel(htmlDeLaDecision(textos, { cargando: false, vista: { rumbo } }))
   conectarOpciones(lineas)
 }
 
@@ -390,7 +414,9 @@ export function conducir(parametros) {
     document.querySelectorAll('#panel .opt[data-id]:not([disabled])')[+evento.key - 1]?.click()
   }
   document.addEventListener('keydown', alApretarUnaTecla)
+  alVolverAlPanoramaHacer(() => estado?.decision && !resultado && mostrarDecision())
   desactivar = () => {
+    alVolverAlPanoramaHacer(null)
     dejarDeEscucharAlPanorama()
     document.removeEventListener('keydown', alApretarUnaTecla)
   }

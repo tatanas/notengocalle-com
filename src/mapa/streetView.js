@@ -228,9 +228,18 @@ const VISTAS_DE_ESCRITORIO = [
   { clase: 'ver-mapa', etiquetaDelBoton: '◫ Ver ambos' },
 ]
 let vistaDeEscritorio = 0
+// Si el jugador eligió mirar solo el mapa, se respeta entre decisiones y no se piden panoramas (cuesta cuota de Google).
+let verSoloElMapa = false
+let alVolverAlPanorama = null
+
+export const quiereVerSoloElMapa = () => verSoloElMapa
+export const alVolverAlPanoramaHacer = accion => {
+  alVolverAlPanorama = accion
+}
 
 function aplicarVistaDeEscritorio() {
   const { clase, etiquetaDelBoton } = VISTAS_DE_ESCRITORIO[vistaDeEscritorio]
+  verSoloElMapa = clase === 'ver-mapa'
   document.body.classList.remove('solo-panorama', 'ver-mapa')
   if (clase) document.body.classList.add(clase)
   botonAlternar().textContent = etiquetaDelBoton
@@ -242,13 +251,17 @@ function aplicarVistaDeEscritorio() {
 
 // En el celular se ve el panorama o el mapa, uno a la vez.
 function alternarEntrePanoramaYMapa() {
+  const veniaDelMapa = verSoloElMapa
   if (esEscritorio() && !document.body.classList.contains('ruteo-ciego')) {
     vistaDeEscritorio = (vistaDeEscritorio + 1) % VISTAS_DE_ESCRITORIO.length
-    return aplicarVistaDeEscritorio()
+    aplicarVistaDeEscritorio()
+    if (veniaDelMapa && !verSoloElMapa) alVolverAlPanorama?.()
+    return
   }
   const verMapa = document.body.classList.toggle('ver-mapa')
+  verSoloElMapa = verMapa
   botonAlternar().textContent = verMapa ? '👁 Ver panorama' : '🗺️ Abrir mapa'
-  if (!verMapa) return
+  if (!verMapa) return veniaDelMapa ? alVolverAlPanorama?.() : undefined
   repararMapaBase()
   mapa.invalidateSize()
   if (alVerElMapa) alVerElMapa()
@@ -316,6 +329,7 @@ export async function mostrarPanorama(
   alGirarLaVista = alGirar
   document.body.classList.remove('ver-mapa')
   document.body.classList.add('con-panorama')
+  verSoloElMapa = false
   botonAlternar().textContent = '🗺️ Abrir mapa'
   contenedor.hidden = false
   botones.hidden = false
@@ -363,6 +377,25 @@ export function ocultarPanorama() {
 }
 
 // ----- conducir: el panorama sigue al auto
+
+// Conduciendo con la vista de solo mapa: queda el botón para volver al panorama, pero no se pide ninguno.
+export function mostrarSoloElMapaDeConduccion({ alVerElMapa: encuadrarAlVerElMapa = null } = {}) {
+  if (!contenedor) crearElementos()
+  quitarMarcadorDePosicion()
+  mapaEncuadrado = true
+  alVerElMapa = encuadrarAlVerElMapa
+  document.body.classList.remove('ver-mapa', 'solo-panorama', 'recorriendo')
+  document.body.classList.add('con-panorama')
+  if (esEscritorio() && !document.body.classList.contains('ruteo-ciego')) aplicarVistaDeEscritorio()
+  else {
+    document.body.classList.add('ver-mapa')
+    botonAlternar().textContent = '👁 Ver panorama'
+  }
+  contenedor.hidden = false
+  botones.hidden = false
+  for (const id of ['reportarTunel', 'volverAlInicio', 'cerrarRecorrido'])
+    document.getElementById(id).hidden = true
+}
 
 const GRADOS_DE_TOLERANCIA_DEL_RUMBO = 2
 const MILISEGUNDOS_PARA_FIJAR_EL_RUMBO = 150
@@ -431,6 +464,7 @@ export async function mostrarPanoramaDeConduccion(
   alVerElMapa = encuadrarAlVerElMapa ?? null
   document.body.classList.remove('ver-mapa', 'solo-panorama', 'recorriendo')
   document.body.classList.add('con-panorama')
+  verSoloElMapa = false
   if (esEscritorio() && !document.body.classList.contains('ruteo-ciego')) aplicarVistaDeEscritorio()
   else botonAlternar().textContent = '🗺️ Abrir mapa'
   contenedor.hidden = false

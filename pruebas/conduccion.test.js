@@ -144,8 +144,8 @@ test('un giro a la izquierda que cruza el bandejón y la vuelta en U son una sol
 test('dos calles que se abren casi de frente son una bifurcación', () => {
   const cruce = cruceDespuesDe(grafo, llegandoA([1400, 0], 90))
   assert.deepEqual(textosDe(cruce), [
-    'Mantenerse a la izquierda por Rama Norte',
-    'Mantenerse a la derecha por Rama Sur',
+    'Mantenerse a la izquierda por Rama Norte (das la vuelta, hacia el poniente)',
+    'Mantenerse a la derecha por Rama Sur (das la vuelta, hacia el poniente)',
   ])
 })
 
@@ -296,7 +296,7 @@ test('deshacer vuelve a la decisión anterior, con lo recorrido y el reloj de en
   assert.equal(analizarRecorrido(estado, optima).puntaje, 100)
 })
 
-test('en una ruta del juego se puede deshacer 3 veces; al conducir libremente, sin límite', () => {
+test('en una ronda se puede deshacer 3 veces; en la práctica y al conducir libremente, sin límite', () => {
   const { estado } = empezarLaMision()
   for (let veces = 0; veces < DESHACER_POR_RUTA; veces++) {
     assert.equal(deshacerQueQuedan(estado), DESHACER_POR_RUTA - veces)
@@ -306,6 +306,10 @@ test('en una ruta del juego se puede deshacer 3 veces; al conducir libremente, s
   }
   elegirOpcion(estado, estado.decision.opciones[0].id)
   assert.ok(!sePuedeDeshacer(estado))
+
+  const enPractica = empezarLaMision().estado
+  enPractica.practica = true
+  assert.equal(deshacerQueQuedan(enPractica), Infinity)
 
   const libre = empezarEn(grafo, enMetros(100, 0))
   for (let veces = 0; veces < 2 * DESHACER_POR_RUTA; veces++) {
@@ -355,15 +359,69 @@ function filtrarOpcionesDeMentira(especificaciones) {
 }
 
 test('simplificar omite lo claramente peor y más local, y deja la mejor y lo que compite', () => {
-  // seguir (mejor), pasaje 90 s peor, giro local a 10 s, vuelta en U 170 s peor
+  // doblar (mejor), pasaje 170 s peor, otro a 30 s, vuelta en U 270 s peor
+  assert.deepEqual(
+    filtrarOpcionesDeMentira([
+      ['giro', false, 30],
+      ['giro', true, 200],
+      ['giro', true, 60],
+      ['vuelta', false, 300],
+    ]),
+    [0, 2],
+  )
+  // si lo mejor es seguir derecho, las calles más chicas de los lados no llevan a ninguna parte aunque cuesten casi lo mismo
   assert.deepEqual(
     filtrarOpcionesDeMentira([
       ['seguir', false, 30],
-      ['giro', true, 120],
       ['giro', true, 40],
-      ['vuelta', false, 200],
+      ['giro', false, 45],
     ]),
     [0, 2],
+  )
+})
+
+test('las bifurcaciones dicen qué pasa y los empalmes cortos, con qué calle se conectan', () => {
+  const bifurcacion = {
+    tipo: 'mantenerse',
+    posicion: 'derecha',
+    calle: 'Piedra Viva',
+    giroNeto: 40,
+    haciaTrasLaContinuacion: 'poniente',
+    conectaCon: 'Camino Los Trapenses',
+    luegoLlegaA: null,
+  }
+  assert.deepEqual(textosDelCruce([bifurcacion]), [
+    'Mantenerse a la derecha por Piedra Viva (tramo corto que se conecta con Camino Los Trapenses; doblas a la derecha, hacia el poniente)',
+  ])
+})
+
+test('desde lejos solo importan las calles colectoras o mayores, y la cota crece con lo que falta', () => {
+  // la mejor cuesta 20 min: la cota sube a 144 s y las calles locales y las vueltas dejan de ser decisión
+  assert.deepEqual(
+    filtrarOpcionesDeMentira([
+      ['seguir', false, 1200],
+      ['giro', true, 1210],
+      ['giro', false, 1290],
+      ['giro', false, 1500],
+      ['vuelta', false, 1250],
+    ]),
+    [0, 2, 3],
+  )
+  // y lo que cambia menos del 2,5 % de lo que falta da lo mismo
+  assert.deepEqual(
+    filtrarOpcionesDeMentira([
+      ['seguir', false, 1200],
+      ['seguir', false, 1210],
+    ]),
+    [0],
+  )
+  // pero escoger entre dos calles distintas que siguen de frente (Santa Teresa o Gran Vía) siempre es decisión
+  assert.deepEqual(
+    filtrarOpcionesDeMentira([
+      ['seguir', false, 1200],
+      ['leve', false, 1210],
+    ]),
+    [0, 1],
   )
 })
 

@@ -25,6 +25,10 @@ const MAXIMO_DE_OPCIONES_AGRUPADAS = 8
 const METROS_PARA_BUSCAR_EL_NOMBRE = 800
 const METROS_PARA_MEDIR_EL_GIRO = 30
 const METROS_PARA_RECONOCER_UNA_VUELTA = 250
+// Para decir a dónde lleva una opción se mira hasta aquí por delante; un tramo de menos de METROS_DE_UN_TRAMO_CHICO no es una calle
+// sino un empalme (se dice con qué calle se conecta).
+const METROS_PARA_NOMBRAR_A_DONDE_LLEGA = 800
+const METROS_DE_UN_TRAMO_CHICO = 150
 const GRADOS_DE_SEGUIR_DERECHO = 20
 const GRADOS_DE_MANTENERSE = 55
 const GRADOS_DE_VUELTA = 135
@@ -238,6 +242,45 @@ function nombreMasAdelante(grafo, desde) {
   return null
 }
 
+// Las calles con nombre que se van recorriendo, con cuántos metros se recorre por cada una.
+function tramosConNombre(grafo, aristas) {
+  const tramos = []
+  for (const arista of aristas) {
+    const nombre = nombreDeCalle(grafo, arista)
+    if (!nombre) continue
+    const ultimo = tramos.at(-1)
+    if (ultimo && mismaCalle(ultimo.nombre, nombre)) ultimo.metros += grafo.metros[arista]
+    else tramos.push({ nombre, metros: grafo.metros[arista] })
+  }
+  return tramos
+}
+
+// Como lo diría alguien dando direcciones: si la calle a la que se entra es un empalme corto, a qué calle más grande se conecta; si es
+// la misma calle que se lleva (dos ramas con el mismo nombre), a qué otra calle llega más adelante.
+function aDondeLleva(grafo, camino, calleActual, calleDeLaOpcion) {
+  const recorrido = [...camino, ...continuacionObligada(grafo, camino, METROS_PARA_NOMBRAR_A_DONDE_LLEGA)]
+  const [primero, ...siguientes] = tramosConNombre(grafo, recorrido)
+  const sinDatos = { conectaCon: null, luegoLlegaA: null }
+  if (!primero) return sinDatos
+  if (mismaCalle(primero.nombre, calleActual))
+    return {
+      conectaCon: null,
+      luegoLlegaA:
+        siguientes.find(
+          tramo => !mismaCalle(tramo.nombre, calleActual) && !mismaCalle(tramo.nombre, calleDeLaOpcion),
+        )?.nombre ?? null,
+    }
+  if (primero.metros >= METROS_DE_UN_TRAMO_CHICO) return sinDatos
+  const siguiente = siguientes.find(tramo => !mismaCalle(tramo.nombre, primero.nombre))
+  if (siguiente) return { conectaCon: siguiente.nombre, luegoLlegaA: null }
+  const salidas = salidasPosibles(grafo, recorrido.at(-1))
+  if (salidas.some(salida => mismaCalle(nombreDeCalle(grafo, salida), primero.nombre))) return sinDatos
+  const conNombre = salidas.filter(salida => nombreDeCalle(grafo, salida))
+  if (!conNombre.length) return sinDatos
+  const mayor = conNombre.reduce((a, b) => (grafo.rango[b] < grafo.rango[a] ? b : a))
+  return { conectaCon: nombreDeCalle(grafo, mayor), luegoLlegaA: null }
+}
+
 // La calle a la que entra la opción: la última con nombre del camino o, si no tiene (rampas), la primera a la que llega.
 function calleDelCamino(grafo, camino) {
   const nombrada = camino.findLast(arista => nombreDeCalle(grafo, arista))
@@ -271,6 +314,10 @@ function describirCamino(grafo, entrada, { camino, segundos }) {
     giroNeto: diferenciaDeRumbo(rumboDeEntrada, rumboDeLlegada(grafo, [...camino, ...continuacion].at(-1))),
     rumboFinal,
     hacia: puntoCardinal(rumboFinal),
+    ...(esRamal
+      ? { conectaCon: null, luegoLlegaA: null }
+      : aDondeLleva(grafo, camino, nombreDeCalle(grafo, entrada), calle)),
+    haciaTrasLaContinuacion: puntoCardinal(rumboDeLlegada(grafo, [...camino, ...continuacion].at(-1))),
     mismaCalle: mismaCalle(calle, nombreDeCalle(grafo, entrada)),
     porRetorno: camino.length > 1 || esEnlace(grafo, camino[0]),
     destino:

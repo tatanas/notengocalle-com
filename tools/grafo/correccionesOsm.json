@@ -13,5 +13,12 @@
     "via": 12507430302,
     "hacia": 24353249,
     "motivo": "Gran Vía (G-19, Vitacura): quien viene de José Alcalde Délano por la calzada de un sentido y sigue hacia el poniente no puede doblar hacia el enlace a Camino Santa Teresa de Los Andes: ese enlace es solo para quien viene desde Gran Vía por el poniente (Lo Curro). Además OSM ya prohíbe la vuelta en U entre las dos calzadas (relación 11746879)."
+  },
+  {
+    "calle": 713128939,
+    "etiquetas": {
+      "access": "private"
+    },
+    "motivo": "Piedra Viva (Lo Barnechea): es el acceso de un condominio, pero OSM no lo marca como privado y el juego lo ofrecía como bifurcación de Camino Los Trapenses. Conviene corregirlo también en OpenStreetMap."
   }
 ]

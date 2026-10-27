@@ -158,7 +158,10 @@ function avanzarHastaLaProximaDecision(estado) {
       : null
     const cruce = cruceDespuesDe(grafo, estado.entrada, { filtrar })
     const [unica] = cruce.opciones
-    if (cruce.opciones.length >= 2 || (unica && esManiobraObligada(grafo, estado.entrada, unica))) {
+    if (
+      cruce.opciones.length >= 2 ||
+      (unica && !cruce.omitidas && esManiobraObligada(grafo, estado.entrada, unica))
+    ) {
       estado.decision = { ...cruce, esObligada: cruce.opciones.length === 1 && !cruce.omitidas }
       return
     }
@@ -183,9 +186,10 @@ function fotoParaDeshacer(estado) {
   }
 }
 
-// En una ruta del juego se puede deshacer unas pocas veces; al conducir libremente, las que se quiera.
+// En una ronda se puede deshacer unas pocas veces; en la práctica y al conducir libremente, las que se quiera.
 export const DESHACER_POR_RUTA = 3
-export const deshacerQueQuedan = estado => (estado.mision ? DESHACER_POR_RUTA - estado.deshechas : Infinity)
+export const deshacerQueQuedan = estado =>
+  estado.mision && !estado.practica ? DESHACER_POR_RUTA - estado.deshechas : Infinity
 export const sePuedeDeshacer = estado =>
   estado.decisionesPorDeshacer.length > 0 && deshacerQueQuedan(estado) > 0
 
